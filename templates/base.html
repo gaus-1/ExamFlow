@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">ExamFlow</div>
+            <nav>
+                <a href="#">Главная</a>
+                <a href="#">О проекте</a>
+                <a href="#">Контакты</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 ExamFlow. Все права защищены.</p>
+            <p>Используем открытые данные с <a href="https://fipi.ru" target="_blank">официального сайта ФИПИ</a></p>
+        </div>
+    </footer>
+    
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>Подготовка к экзаменам с ExamFlow</h1>
+        <p>Используем открытые данные с официального сайта ФИПИ для эффективной подготовки</p>
+        <button class="btn-primary" onclick="openBot()">Перейти в бота</button>
+        <div id="qrcode">
+            <img src="{{ qr_code }}" alt="QR-код для Telegram-бота">
+        </div>
+    </div>
+</section>
+{% endblock %}
