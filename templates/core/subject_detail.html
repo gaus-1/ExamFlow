@@ -1,23 +1,208 @@
 {% extends 'base.html' %}
 {% block title %}{{ subject.name }} — ExamFlow{% endblock %}
+
 {% block content %}
-<section class="py-5">
-  <div class="container">
-    <h1 class="mb-4">{{ subject.name }}</h1>
-    <div class="mb-3 text-muted">Всего заданий: {{ total_tasks }}</div>
-    <div class="row">
-      {% for t in page_obj %}
-      <div class="col-md-6 mb-3">
-        <div class="p-3 border rounded-3 h-100">
-          <div class="fw-semibold">{{ t.title }}</div>
-          <div class="small text-muted">Сложность: {{ t.difficulty }}</div>
-          <a class="btn btn-sm btn-outline-primary mt-2" href="{% url 'task_detail' t.id %}">Открыть</a>
+<!-- Header -->
+<section class="hero-gradient py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'home' %}" class="text-decoration-none">
+                                <i class="fas fa-home me-1"></i>Главная
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'subjects' %}" class="text-decoration-none">Предметы</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ subject.name }}</li>
+                    </ol>
+                </nav>
+                
+                <div class="d-flex align-items-center mb-3">
+                    {% if subject.name == "Математика" %}
+                        <i class="fas fa-calculator fa-3x me-3" style="color: var(--primary-color);"></i>
+                    {% elif subject.name == "Русский язык" %}
+                        <i class="fas fa-language fa-3x me-3" style="color: var(--secondary-color);"></i>
+                    {% elif subject.name == "Физика" %}
+                        <i class="fas fa-atom fa-3x me-3" style="color: var(--success-color);"></i>
+                    {% elif subject.name == "Химия" %}
+                        <i class="fas fa-flask fa-3x me-3" style="color: var(--warning-color);"></i>
+                    {% elif subject.name == "Биология" %}
+                        <i class="fas fa-dna fa-3x me-3" style="color: var(--success-color);"></i>
+                    {% elif subject.name == "История" %}
+                        <i class="fas fa-landmark fa-3x me-3" style="color: var(--error-color);"></i>
+                    {% elif subject.name == "Обществознание" %}
+                        <i class="fas fa-users fa-3x me-3" style="color: var(--primary-color);"></i>
+                    {% elif subject.name == "Информатика" %}
+                        <i class="fas fa-code fa-3x me-3" style="color: var(--secondary-color);"></i>
+                    {% else %}
+                        <i class="fas fa-book fa-3x me-3" style="color: var(--primary-color);"></i>
+                    {% endif %}
+                    
+                    <div>
+                        <h1 class="display-5 fw-bold mb-2">{{ subject.name }}</h1>
+                        <div class="text-muted">{{ subject.exam_type }} • {{ total_tasks }} заданий</div>
+                    </div>
+                </div>
+                
+                <p class="lead text-muted">
+                    {% if subject.name == "Математика" %}
+                        Решайте задания по алгебре, геометрии, тригонометрии и другим разделам математики
+                    {% elif subject.name == "Русский язык" %}
+                        Изучайте орфографию, пунктуацию, синтаксис и готовьтесь к написанию сочинений
+                    {% elif subject.name == "Физика" %}
+                        Практикуйтесь в решении задач по механике, термодинамике, электричеству и оптике
+                    {% else %}
+                        Готовьтесь к экзамену по предмету {{ subject.name }} с официальными заданиями ФИПИ
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="card-custom p-4">
+                    <h4 class="fw-bold mb-3">Начать подготовку</h4>
+                    <div class="d-grid gap-2">
+                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom">
+                            <i class="fab fa-telegram me-2"></i>
+                            Открыть в боте
+                        </a>
+                        <div class="small text-muted mt-2">
+                            Интерактивное решение заданий с отслеживанием прогресса
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      {% empty %}
-      <div class="col-12">Задания не найдены.</div>
-      {% endfor %}
     </div>
-  </div>
-  </section>
+</section>
+
+<!-- Tasks Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">
+                <i class="fas fa-tasks me-2"></i>
+                Доступные задания ({{ total_tasks }})
+            </h2>
+            <div class="d-flex gap-2">
+                <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-outline-custom">
+                    <i class="fas fa-random me-1"></i>
+                    Случайное задание
+                </a>
+                <a href="{% url 'subjects' %}" class="btn-outline-custom">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    К предметам
+                </a>
+            </div>
+        </div>
+        
+        {% if page_obj %}
+            <div class="row g-4">
+                {% for task in page_obj %}
+                <div class="col-lg-6">
+                    <div class="card-custom h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h6 class="fw-bold mb-0 flex-grow-1">{{ task.title|truncatechars:60 }}</h6>
+                            <div class="ms-2">
+                                <span class="badge" style="background-color: 
+                                    {% if task.difficulty == 1 %}var(--success-color)
+                                    {% elif task.difficulty == 2 %}var(--warning-color)
+                                    {% elif task.difficulty == 3 %}var(--error-color)
+                                    {% else %}var(--gray-400){% endif %};">
+                                    {% for i in "x"|ljust:task.difficulty %}⭐{% endfor %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {% if task.description %}
+                            <p class="text-muted small mb-3">
+                                {{ task.description|truncatechars:120 }}
+                            </p>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="small text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                {% if task.difficulty == 1 %}~5 мин
+                                {% elif task.difficulty == 2 %}~10 мин
+                                {% else %}~15 мин{% endif %}
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'task_detail' task.id %}" class="btn-outline-custom btn-sm">
+                                    <i class="fas fa-eye me-1"></i>
+                                    Просмотр
+                                </a>
+                                <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom btn-sm">
+                                    <i class="fas fa-play me-1"></i>
+                                    Решать
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Pagination" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <div class="card-custom">
+                    <i class="fas fa-tasks fa-5x mb-4" style="color: var(--gray-300);"></i>
+                    <h3>Задания загружаются</h3>
+                    <p class="text-muted mb-4">Скоро здесь появятся задания по этому предмету</p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{% url 'subjects' %}" class="btn-outline-custom">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            К предметам
+                        </a>
+                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom">
+                            <i class="fab fa-telegram me-1"></i>
+                            Открыть бота
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

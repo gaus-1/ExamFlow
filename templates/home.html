@@ -1,34 +1,226 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}ExamFlow - Главная{% endblock %}
+
+{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}
+
 {% block content %}
-<section class="hero">
+<!-- Hero Section -->
+<section class="hero-gradient py-5">
     <div class="container">
-        <h1>Подготовка к экзаменам с ExamFlow</h1>
-        <p>Используем открытые данные с официального сайта ФИПИ для эффективной подготовки</p>
-        <a class="btn-primary" href="https://t.me/ExamFlowBot" target="_blank">Перейти в бота</a>
-        <div id="qrcode" class="qr-container mt-4">
-            <img src="{{ qr_code }}" alt="QR-код для Telegram-бота">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-8">
+                <div class="animate-fade-in-up">
+                    <h1 class="display-4 fw-bold mb-4" style="color: var(--gray-800);">
+                        Подготовка к экзаменам 
+                        <span style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                            нового уровня
+                        </span>
+                    </h1>
+                    <p class="lead mb-4" style="color: var(--gray-600);">
+                        Эффективная подготовка к ЕГЭ и ОГЭ с использованием официальных материалов ФИПИ. 
+                        Решайте задания, отслеживайте прогресс, находите слабые места.
+                    </p>
+                    
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom">
+                            <i class="fab fa-telegram me-2"></i>
+                            Начать в Telegram
+                        </a>
+                        <a href="{% url 'subjects' %}" class="btn-outline-custom">
+                            <i class="fas fa-book me-2"></i>
+                            Выбрать предмет
+                        </a>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-4 text-center">
+                        <div>
+                            <div class="stat-number">{{ total_subjects }}</div>
+                            <div class="small text-muted">предметов</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">{{ total_tasks }}</div>
+                            <div class="small text-muted">заданий</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">100%</div>
+                            <div class="small text-muted">бесплатно</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 text-center">
+                <div class="animate-fade-in-up">
+                    <div class="card-custom p-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-qrcode me-2" style="color: var(--primary-color);"></i>
+                            QR-код для быстрого доступа
+                        </h5>
+                        <img src="{{ qr_code }}" alt="QR-код для Telegram-бота" class="img-fluid mb-3" style="max-width: 200px;">
+                        <p class="small text-muted">Отсканируйте камерой телефона</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light">
+<!-- Features Section -->
+<section class="py-5">
     <div class="container">
-        <h2 class="mb-4">Популярные предметы</h2>
-        <div class="row">
-            {% for s in subjects %}
-            <div class="col-md-4 mb-3">
-                <div class="p-3 border rounded-3 h-100">
-                    <div class="fw-semibold">{{ s.name }}</div>
-                    <div class="text-muted small">{{ s.get_exam_type_display }}</div>
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Почему выбирают ExamFlow?</h2>
+            <p class="text-muted">Всё необходимое для эффективной подготовки в одном месте</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-certificate fa-3x" style="color: var(--primary-color);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Официальные материалы ФИПИ</h5>
+                    <p class="text-muted">Используем только проверенные задания с официального сайта Федерального института педагогических измерений</p>
                 </div>
             </div>
-            {% empty %}
-            <div class="col-12">Пока нет предметов — загрузка данных выполняется.</div>
-            {% endfor %}
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-robot fa-3x" style="color: var(--secondary-color);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Умный Telegram-бот</h5>
+                    <p class="text-muted">Решайте задания прямо в Telegram. Бот запоминает ваш прогресс и предлагает персональные рекомендации</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-chart-line fa-3x" style="color: var(--success-color);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Отслеживание прогресса</h5>
+                    <p class="text-muted">Детальная аналитика вашей подготовки: сильные стороны, слабые места, рекомендации по улучшению</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-clock fa-3x" style="color: var(--warning-color);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Экономия времени</h5>
+                    <p class="text-muted">Не тратьте время на поиск качественных материалов — мы уже собрали их для вас</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-mobile-alt fa-3x" style="color: var(--primary-color);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Доступно везде</h5>
+                    <p class="text-muted">Готовьтесь в любом месте: дома, в транспорте, в школе — нужен только телефон</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-custom text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-heart fa-3x" style="color: var(--error-color);"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Абсолютно бесплатно</h5>
+                    <p class="text-muted">Качественная подготовка к экзаменам не должна стоить денег — доступ ко всем материалам бесплатный</p>
+                </div>
+            </div>
         </div>
-        <div class="mt-3 text-muted">Всего предметов: {{ total_subjects }} • Всего заданий: {{ total_tasks }}</div>
+    </div>
+</section>
+
+<!-- Subjects Section -->
+<section class="py-5 hero-gradient">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3">Доступные предметы</h2>
+            <p class="text-muted">Выберите предмет для начала подготовки</p>
+        </div>
+        
+        {% if subjects %}
+            <div class="row g-4">
+                {% for subject in subjects %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card-custom">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                {% if subject.name == "Математика" %}
+                                    <i class="fas fa-calculator fa-2x" style="color: var(--primary-color);"></i>
+                                {% elif subject.name == "Русский язык" %}
+                                    <i class="fas fa-language fa-2x" style="color: var(--secondary-color);"></i>
+                                {% elif subject.name == "Физика" %}
+                                    <i class="fas fa-atom fa-2x" style="color: var(--success-color);"></i>
+                                {% elif subject.name == "Химия" %}
+                                    <i class="fas fa-flask fa-2x" style="color: var(--warning-color);"></i>
+                                {% elif subject.name == "Биология" %}
+                                    <i class="fas fa-dna fa-2x" style="color: var(--success-color);"></i>
+                                {% elif subject.name == "История" %}
+                                    <i class="fas fa-landmark fa-2x" style="color: var(--error-color);"></i>
+                                {% elif subject.name == "Обществознание" %}
+                                    <i class="fas fa-users fa-2x" style="color: var(--primary-color);"></i>
+                                {% elif subject.name == "Информатика" %}
+                                    <i class="fas fa-code fa-2x" style="color: var(--secondary-color);"></i>
+                                {% else %}
+                                    <i class="fas fa-book fa-2x" style="color: var(--primary-color);"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">{{ subject.name }}</h5>
+                                <div class="small text-muted">{{ subject.exam_type }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small text-muted">
+                                <i class="fas fa-tasks me-1"></i>
+                                Задания доступны
+                            </div>
+                            <a href="{% url 'subject_detail' subject.id %}" class="btn-outline-custom btn-sm">
+                                Изучать <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'subjects' %}" class="btn-primary-custom">
+                    <i class="fas fa-th-large me-2"></i>
+                    Посмотреть все предметы
+                </a>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="card-custom">
+                    <i class="fas fa-spinner fa-spin fa-3x mb-3" style="color: var(--primary-color);"></i>
+                    <h4>Загрузка данных...</h4>
+                    <p class="text-muted">Подготавливаем материалы для изучения</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="card-custom text-center" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+            <h2 class="fw-bold mb-3">Начните подготовку прямо сейчас!</h2>
+            <p class="mb-4 opacity-90">Присоединяйтесь к тысячам учеников, которые уже готовятся с ExamFlow</p>
+            <a href="https://t.me/ExamFlowBot" target="_blank" class="btn btn-light btn-lg">
+                <i class="fab fa-telegram me-2"></i>
+                Открыть Telegram-бота
+            </a>
+        </div>
     </div>
 </section>
 {% endblock %}

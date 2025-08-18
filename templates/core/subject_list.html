@@ -1,38 +1,16 @@
 {% extends 'base.html' %}
-{% block title %}Предметы — ExamFlow{% endblock %}
-{% block content %}
-<section class="py-5">
-  <div class="container">
-    <h1 class="mb-4">Предметы</h1>
-    <div class="row">
-      {% for s in subjects %}
-      <div class="col-md-4 mb-3">
-        <div class="p-3 border rounded-3 h-100">
-          <div class="fw-semibold">{{ s.name }}</div>
-          <div class="text-muted small">{{ s.get_exam_type_display }}</div>
-        </div>
-      </div>
-      {% empty %}
-      <div class="col-12">Список пуст. Загрузите данные.</div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endblock %}
-
-{% extends 'base.html' %}
-
-{% block title %}Предметы - ExamFlow{% endblock %}
+{% block title %}Все предметы — ExamFlow{% endblock %}
 
 {% block content %}
 <!-- Header -->
-<section class="py-5 bg-primary text-white">
+<section class="hero-gradient py-5">
     <div class="container">
         <div class="text-center">
-            <h1 class="display-4 fw-bold mb-3">
-                <i class="fas fa-book"></i> Предметы
+            <h1 class="display-5 fw-bold mb-3">
+                <i class="fas fa-book-open me-3" style="color: var(--primary-color);"></i>
+                Все предметы
             </h1>
-            <p class="lead">Выберите предмет для изучения и начните подготовку к экзаменам</p>
+            <p class="lead text-muted">Выберите предмет для подготовки к экзамену</p>
         </div>
     </div>
 </section>
@@ -41,38 +19,86 @@
 <section class="py-5">
     <div class="container">
         {% if subjects %}
-            <div class="row">
+            <div class="row g-4">
                 {% for subject in subjects %}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-book me-2"></i>
-                                {{ subject.name }}
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted">
-                                {{ subject.description|default:"Изучите этот предмет для успешной подготовки к экзаменам"|truncatewords:20 }}
-                            </p>
-                            
-                            <div class="row text-center mb-3">
-                                <div class="col-6">
-                                    <div class="border-end">
-                                        <h6 class="text-primary mb-0">{{ subject.task_count }}</h6>
-                                        <small class="text-muted">Заданий</small>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <h6 class="text-success mb-0">{{ subject.topic_count|default:0 }}</h6>
-                                    <small class="text-muted">Тем</small>
-                                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card-custom h-100">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                {% if subject.name == "Математика" %}
+                                    <i class="fas fa-calculator fa-2x" style="color: var(--primary-color);"></i>
+                                {% elif subject.name == "Русский язык" %}
+                                    <i class="fas fa-language fa-2x" style="color: var(--secondary-color);"></i>
+                                {% elif subject.name == "Физика" %}
+                                    <i class="fas fa-atom fa-2x" style="color: var(--success-color);"></i>
+                                {% elif subject.name == "Химия" %}
+                                    <i class="fas fa-flask fa-2x" style="color: var(--warning-color);"></i>
+                                {% elif subject.name == "Биология" %}
+                                    <i class="fas fa-dna fa-2x" style="color: var(--success-color);"></i>
+                                {% elif subject.name == "История" %}
+                                    <i class="fas fa-landmark fa-2x" style="color: var(--error-color);"></i>
+                                {% elif subject.name == "Обществознание" %}
+                                    <i class="fas fa-users fa-2x" style="color: var(--primary-color);"></i>
+                                {% elif subject.name == "Информатика" %}
+                                    <i class="fas fa-code fa-2x" style="color: var(--secondary-color);"></i>
+                                {% elif subject.name == "Литература" %}
+                                    <i class="fas fa-feather-alt fa-2x" style="color: var(--secondary-color);"></i>
+                                {% elif subject.name == "География" %}
+                                    <i class="fas fa-globe-americas fa-2x" style="color: var(--success-color);"></i>
+                                {% else %}
+                                    <i class="fas fa-book fa-2x" style="color: var(--primary-color);"></i>
+                                {% endif %}
                             </div>
-                            
-                            <div class="d-grid">
-                                <a href="{% url 'subject_detail' subject.id %}" class="btn btn-primary">
-                                    <i class="fas fa-play"></i> Начать изучение
-                                </a>
+                            <div class="flex-grow-1">
+                                <h5 class="fw-bold mb-1">{{ subject.name }}</h5>
+                                <div class="small text-muted">{{ subject.exam_type }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="small text-muted mb-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Описание предмета
+                            </div>
+                            <p class="text-muted small">
+                                {% if subject.name == "Математика" %}
+                                    Алгебра, геометрия, тригонометрия, производные, интегралы, теория вероятностей
+                                {% elif subject.name == "Русский язык" %}
+                                    Орфография, пунктуация, синтаксис, стилистика, анализ текста, сочинение
+                                {% elif subject.name == "Физика" %}
+                                    Механика, термодинамика, электричество, оптика, квантовая и ядерная физика
+                                {% elif subject.name == "Химия" %}
+                                    Неорганическая и органическая химия, химические реакции, расчётные задачи
+                                {% elif subject.name == "Биология" %}
+                                    Ботаника, зоология, анатомия человека, генетика, экология, эволюция
+                                {% elif subject.name == "История" %}
+                                    История России и всеобщая история с древности до современности
+                                {% elif subject.name == "Обществознание" %}
+                                    Человек и общество, экономика, политика, право, социальные отношения
+                                {% elif subject.name == "Информатика" %}
+                                    Программирование, алгоритмы, базы данных, компьютерные сети
+                                {% else %}
+                                    Подготовка к экзамену по предмету {{ subject.name }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="small text-muted">
+                                    <i class="fas fa-tasks me-1"></i>
+                                    Задания готовы
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'subject_detail' subject.id %}" class="btn-outline-custom btn-sm">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Просмотр
+                                    </a>
+                                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom btn-sm">
+                                        <i class="fab fa-telegram me-1"></i>
+                                        В боте
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -81,56 +107,27 @@
             </div>
         {% else %}
             <div class="text-center py-5">
-                <div class="card">
-                    <div class="card-body">
-                        <i class="fas fa-book-open fa-5x text-muted mb-4"></i>
-                        <h3>Предметы загружаются</h3>
-                        <p class="text-muted mb-4">Скоро здесь появятся все доступные предметы для изучения</p>
-                        <a href="{% url 'home' %}" class="btn btn-primary">
-                            <i class="fas fa-home"></i> На главную
-                        </a>
-                    </div>
+                <div class="card-custom">
+                    <i class="fas fa-spinner fa-spin fa-3x mb-3" style="color: var(--primary-color);"></i>
+                    <h4>Загрузка предметов...</h4>
+                    <p class="text-muted">Подготавливаем материалы для изучения</p>
                 </div>
             </div>
         {% endif %}
     </div>
 </section>
 
-<!-- Statistics -->
-<section class="py-5 bg-light">
+<!-- CTA Section -->
+<section class="py-5 hero-gradient">
     <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <h4>Тысячи заданий</h4>
-                    <p class="text-muted">Большая база заданий по всем предметам ЕГЭ и ОГЭ</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h4>Отслеживание прогресса</h4>
-                    <p class="text-muted">Следите за своими успехами и анализируйте ошибки</p>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="feature-item">
-                    <div class="feature-icon">
-                        <i class="fas fa-medal"></i>
-                    </div>
-                    <h4>Система достижений</h4>
-                    <p class="text-muted">Получайте награды за успехи в обучении</p>
-                </div>
-            </div>
+        <div class="text-center">
+            <h3 class="fw-bold mb-3">Готовы начать подготовку?</h3>
+            <p class="text-muted mb-4">Переходите в Telegram-бот для интерактивного решения заданий</p>
+            <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom btn-lg">
+                <i class="fab fa-telegram me-2"></i>
+                Открыть бота
+            </a>
         </div>
     </div>
 </section>
 {% endblock %}
-
