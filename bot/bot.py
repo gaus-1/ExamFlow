@@ -22,6 +22,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Глобальная переменная для хранения ID текущего задания
+current_task_id = None
+
 
 def get_or_create_user(telegram_user):
     """Получить или создать пользователя Django с профилем"""
@@ -60,77 +63,99 @@ def get_or_create_user(telegram_user):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик команды /start"""
-    user = get_or_create_user(update.effective_user)
-    
-    keyboard = [
-        [InlineKeyboardButton("📚 Выбрать предмет", callback_data="subjects")],
-        [InlineKeyboardButton("🎯 Случайное задание", callback_data="random_task")],
-        [InlineKeyboardButton("📊 Мой прогресс", callback_data="progress")],
-        [InlineKeyboardButton("🏆 Рейтинг", callback_data="rating")],
-        [InlineKeyboardButton("ℹ️ О боте", callback_data="about")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    welcome_text = (
-        f"🎓 Добро пожаловать в ExamFlow, {update.effective_user.first_name}!\n\n"
-        "Я помогу вам эффективно подготовиться к ЕГЭ и ОГЭ с использованием "
-        "официальных материалов ФИПИ.\n\n"
-        "🎯 Решайте задания\n"
-        "📊 Отслеживайте прогресс\n"
-        "🏆 Соревнуйтесь с друзьями\n"
-        "💡 Получайте рекомендации\n\n"
-        "Выберите действие:"
-    )
-    
-    if update.message:
-        await update.message.reply_text(welcome_text, reply_markup=reply_markup)
-    else:
-        await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup)
+    try:
+        user = get_or_create_user(update.effective_user)
+        logger.info(f"Пользователь {update.effective_user.username or update.effective_user.id} запустил бота")
+        
+        keyboard = [
+            [InlineKeyboardButton("📚 Выбрать предмет", callback_data="subjects")],
+            [InlineKeyboardButton("🎯 Случайное задание", callback_data="random_task")],
+            [InlineKeyboardButton("📊 Мой прогресс", callback_data="progress")],
+            [InlineKeyboardButton("🏆 Рейтинг", callback_data="rating")],
+            [InlineKeyboardButton("ℹ️ О боте", callback_data="about")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        welcome_text = (
+            f"🎓 Добро пожаловать в ExamFlow, {update.effective_user.first_name}!\n\n"
+            "Я помогу вам эффективно подготовиться к ЕГЭ и ОГЭ с использованием "
+            "официальных материалов ФИПИ.\n\n"
+            "🎯 Решайте задания\n"
+            "📊 Отслеживайте прогресс\n"
+            "🏆 Соревнуйтесь с друзьями\n"
+            "💡 Получайте рекомендации\n\n"
+            "Выберите действие:"
+        )
+        
+        if update.message:
+            await update.message.reply_text(welcome_text, reply_markup=reply_markup)
+        elif update.callback_query:
+            await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup)
+        
+    except Exception as e:
+        logger.error(f"Ошибка в start: {str(e)}")
+        error_text = "❌ Произошла ошибка. Попробуйте позже или обратитесь в поддержку."
+        try:
+            if update.message:
+                await update.message.reply_text(error_text)
+            elif update.callback_query:
+                await update.callback_query.edit_message_text(error_text)
+        except:
+            pass
 
 
 async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показать меню выбора предметов"""
-    query = update.callback_query
-    await query.answer()
+    try:
+        query = update.callback_query
+        await query.answer()
+        logger.info(f"Пользователь {update.effective_user.username or update.effective_user.id} открыл меню предметов")
+        
+        subjects = Subject.objects.all()[:10]
+        
+        keyboard = []
+        for i in range(0, len(subjects), 2):
+            row = []
+            for j in range(2):
+                if i + j < len(subjects):
+                    subject = subjects[i + j]
+                    tasks_count = Task.objects.filter(subject=subject).count()
+                    
+                    # Эмодзи для предметов
+                    subject_emoji = {
+                        'Математика': '🧮',
+                        'Русский язык': '📝',
+                        'Физика': '⚛️',
+                        'Химия': '🧪',
+                        'Биология': '🧬',
+                        'История': '🏛️',
+                        'Обществознание': '👥',
+                        'Информатика': '💻',
+                        'Литература': '📚',
+                        'География': '🌍'
+                    }.get(subject.name, '📖')
+                    
+                    row.append(InlineKeyboardButton(
+                        f"{subject_emoji} {subject.name} ({tasks_count})", 
+                        callback_data=f"subject_{subject.id}"
+                    ))
+            keyboard.append(row)
+        
+        keyboard.append([InlineKeyboardButton("🔙 Главное меню", callback_data="main_menu")])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            "📚 Выберите предмет для изучения:\n\n"
+            "В скобках указано количество доступных заданий.",
+            reply_markup=reply_markup
+        )
     
-    subjects = Subject.objects.all()[:10]
-    
-    keyboard = []
-    for i in range(0, len(subjects), 2):
-        row = []
-        for j in range(2):
-            if i + j < len(subjects):
-                subject = subjects[i + j]
-                tasks_count = Task.objects.filter(subject=subject).count()
-                
-                # Эмодзи для предметов
-                subject_emoji = {
-                    'Математика': '🧮',
-                    'Русский язык': '📝',
-                    'Физика': '⚛️',
-                    'Химия': '🧪',
-                    'Биология': '🧬',
-                    'История': '🏛️',
-                    'Обществознание': '👥',
-                    'Информатика': '💻',
-                    'Литература': '📚',
-                    'География': '🌍'
-                }.get(subject.name, '📖')
-                
-                row.append(InlineKeyboardButton(
-                    f"{subject_emoji} {subject.name} ({tasks_count})", 
-                    callback_data=f"subject_{subject.id}"
-                ))
-        keyboard.append(row)
-    
-    keyboard.append([InlineKeyboardButton("🔙 Главное меню", callback_data="main_menu")])
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        "📚 Выберите предмет для изучения:\n\n"
-        "В скобках указано количество доступных заданий.",
-        reply_markup=reply_markup
-    )
+    except Exception as e:
+        logger.error(f"Ошибка в subjects_menu: {str(e)}")
+        try:
+            await query.edit_message_text("❌ Ошибка загрузки предметов. Попробуйте позже.")
+        except:
+            pass
 
 
 async def subject_detail(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -270,8 +295,9 @@ async def show_task(query, task, user):
     profile = UserProfile.objects.get(user=user)
     
     # Сохраняем ID текущего задания для голосовых подсказок
-    context_data = getattr(query, '_context_data', {})
-    context_data['current_task_id'] = task.id
+    # Используем глобальную переменную для хранения текущего задания
+    global current_task_id
+    current_task_id = task.id
     
     keyboard = [
         [InlineKeyboardButton("✅ Показать ответ", callback_data=f"answer_{task.id}")],
@@ -670,9 +696,10 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Для Premium пользователей - отправляем голосовую подсказку
     try:
-        task_id = context.user_data.get('current_task_id')
+        global current_task_id
+        task_id = current_task_id
         if not task_id:
-            await query.edit_message_text("❌ Задание не найдено")
+            await query.edit_message_text("❌ Задание не найдено. Сначала выберите задание для решения.")
             return
         
         task = Task.objects.get(id=task_id)
