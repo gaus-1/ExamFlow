@@ -20,5 +20,8 @@ beautifulsoup4==4.12.2
 lxml==5.2.2
 # HTTP запросы
 requests==2.31.0
+# Планировщик задач для keep-alive
+schedule==1.2.0
+# Тестирование
 pytest==8.3.2
 pytest-django==4.9.0
