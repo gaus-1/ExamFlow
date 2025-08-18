@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Слабые места — ExamFlow{% endblock %}
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <h1 class="mb-4">Слабые места</h1>
+    <div class="row">
+      {% for s in subjects %}
+      <div class="col-md-3 mb-3">
+        <div class="p-3 border rounded-3 text-center">
+          <div class="fw-semibold">{{ s.name }}</div>
+          <div class="small text-muted">Заданий: {{ s.task_count }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">Данные недоступны.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+

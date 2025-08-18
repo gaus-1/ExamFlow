@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from .tasks import get_bot_status
 
 def bot_control_panel(request):
@@ -15,3 +16,11 @@ def bot_api_status(request):
     """API для получения статуса бота"""
     status = get_bot_status()
     return JsonResponse(status)
+
+
+@csrf_exempt
+def telegram_webhook(request):
+    """Временная заглушка вебхука Telegram. Возвращает 200 OK.
+    Полноценную обработку апдейтов подключим позже.
+    """
+    return HttpResponse("ok")
