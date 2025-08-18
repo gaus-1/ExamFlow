@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-b=8q90=se^7twm97htmj$v2n-(b@8!0(%h48n=tnb=t^%ja!ta
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1').split(',') if h.strip()]
+ALLOWED_HOSTS = ['examflow.ru', 'www.examflow.ru', 'examflow3.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -137,4 +137,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
 
