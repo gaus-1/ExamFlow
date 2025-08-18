@@ -7,8 +7,9 @@ from datetime import datetime
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
+from bot.bot_instance import get_bot
 from core.models import Subject, Task, UserProgress, UserRating, Achievement, Topic, UserProfile, Subscription
 from django.contrib.auth.models import User
 from django.conf import settings
