@@ -9,10 +9,11 @@ django.setup()
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
-from core.models import Subject, Task, UserProgress
+from core.models import Subject, Task, UserProgress, UserRating, Achievement, Topic, UserProfile, Subscription
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import Count, Q
+from django.utils import timezone
 
 # Логирование
 logging.basicConfig(
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_or_create_user(telegram_user):
-    """Получить или создать пользователя Django"""
+    """Получить или создать пользователя Django с профилем"""
     username = f"tg_{telegram_user.id}"
     user, created = User.objects.get_or_create(
         username=username,
@@ -32,6 +33,28 @@ def get_or_create_user(telegram_user):
             'last_name': telegram_user.last_name or '',
         }
     )
+    
+    # Создаем или получаем профиль
+    profile, profile_created = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={
+            'telegram_id': str(telegram_user.id)
+        }
+    )
+    
+    # Создаем рейтинг если нужно
+    rating, rating_created = UserRating.objects.get_or_create(user=user)
+    
+    # Добавляем достижение за первый запуск
+    if created:
+        Achievement.objects.create(
+            user=user,
+            name='Первые шаги',
+            description='Запуск Telegram бота ExamFlow',
+            icon='fas fa-rocket',
+            color='#00ff88'
+        )
+    
     return user
 
 
@@ -243,13 +266,29 @@ async def show_task(query, task, user):
     # Проверить, решал ли пользователь это задание
     progress = UserProgress.objects.filter(user=user, task=task).first()
     
+    # Проверяем подписку и лимиты
+    profile = UserProfile.objects.get(user=user)
+    
+    # Сохраняем ID текущего задания для голосовых подсказок
+    context_data = getattr(query, '_context_data', {})
+    context_data['current_task_id'] = task.id
+    
     keyboard = [
         [InlineKeyboardButton("✅ Показать ответ", callback_data=f"answer_{task.id}")],
         [InlineKeyboardButton("👍 Знаю", callback_data=f"correct_{task.id}")],
         [InlineKeyboardButton("👎 Не знаю", callback_data=f"incorrect_{task.id}")],
+    ]
+    
+    # Добавляем кнопку голосовой подсказки
+    if profile.is_premium:
+        keyboard.append([InlineKeyboardButton("🎤 Голосовая подсказка", callback_data="voice_hint")])
+    else:
+        keyboard.append([InlineKeyboardButton("🎤 Голос (Premium)", callback_data="voice_hint")])
+    
+    keyboard.extend([
         [InlineKeyboardButton("🎯 Другое задание", callback_data="random_task")],
         [InlineKeyboardButton("🔙 К предмету", callback_data=f"subject_{task.subject.id}")]
-    ]
+    ])
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     status_text = ""
@@ -518,6 +557,7 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [InlineKeyboardButton("🌐 Открыть сайт", url="https://examflow.ru")],
+        [InlineKeyboardButton("💳 Подписка", callback_data="subscription")],
         [InlineKeyboardButton("🔙 Главное меню", callback_data="main_menu")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -525,17 +565,153 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
         "ℹ️ О ExamFlow\n\n"
         "🎯 Официальные задания ФИПИ\n"
+        "🎤 Голосовые подсказки (Premium)\n"
+        "🤖 ИИ персонализация (Premium)\n"
         "📊 Персональный прогресс\n"
         "🏆 Система рейтингов\n"
-        "🎓 Подготовка к ЕГЭ и ОГЭ\n"
-        "💯 Абсолютно бесплатно\n\n"
+        "🎓 Подготовка к ЕГЭ и ОГЭ\n\n"
+        "🆓 Бесплатно: 5 заданий/день\n"
+        "👑 Premium: безлимитные задания\n\n"
         "🌐 Сайт: https://examflow.ru\n"
         "📧 Поддержка: @ExamFlowSupport\n\n"
-        "Версия: 2.0\n"
+        "Версия: 3.0\n"
         "Обновлено: январь 2025"
     )
     
     await query.edit_message_text(text, reply_markup=reply_markup)
+
+
+async def subscription_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Меню подписки"""
+    query = update.callback_query
+    await query.answer()
+    
+    user = get_or_create_user(update.effective_user)
+    profile = UserProfile.objects.get(user=user)
+    
+    keyboard = []
+    
+    if profile.is_premium:
+        # Пользователь уже имеет подписку
+        active_sub = Subscription.objects.filter(
+            user=user, 
+            status='active',
+            expires_at__gt=timezone.now()
+        ).first()
+        
+        text = (
+            "👑 У вас активная подписка!\n\n"
+            f"📋 План: {profile.get_subscription_type_display()}\n"
+            f"⏰ Действует до: {profile.subscription_expires.strftime('%d.%m.%Y') if profile.subscription_expires else 'Неизвестно'}\n\n"
+            "✅ Безлимитные задания\n"
+            "✅ Голосовые подсказки\n"
+            "✅ ИИ персонализация\n"
+            "✅ Приоритетная поддержка\n\n"
+            "🌐 Управление подпиской на сайте"
+        )
+        
+        keyboard = [
+            [InlineKeyboardButton("🌐 Управление на сайте", url="https://examflow.ru/dashboard/")],
+            [InlineKeyboardButton("🔙 Назад", callback_data="about")]
+        ]
+    else:
+        # Предлагаем подписку
+        text = (
+            "💳 Подписка ExamFlow\n\n"
+            "🆓 Бесплатный план:\n"
+            f"• {profile.daily_tasks_limit} заданий в день\n"
+            f"• Сегодня решено: {profile.tasks_solved_today}\n"
+            "• Базовая статистика\n\n"
+            "👑 Premium планы:\n"
+            "• Безлимитные задания\n"
+            "• Голосовые подсказки\n"
+            "• ИИ персонализация\n"
+            "• Детальная аналитика\n"
+            "• Приоритетная поддержка\n\n"
+            "💰 Месячный: 990₽/мес\n"
+            "💰 Годовой: 9900₽/год (скидка 17%)"
+        )
+        
+        keyboard = [
+            [InlineKeyboardButton("💳 Оформить подписку", url="https://examflow.ru/register/")],
+            [InlineKeyboardButton("🆓 Продолжить бесплатно", callback_data="main_menu")],
+            [InlineKeyboardButton("🔙 Назад", callback_data="about")]
+        ]
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await query.edit_message_text(text, reply_markup=reply_markup)
+
+
+async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Голосовая подсказка для задания"""
+    query = update.callback_query
+    await query.answer()
+    
+    user = get_or_create_user(update.effective_user)
+    profile = UserProfile.objects.get(user=user)
+    
+    if not profile.is_premium:
+        keyboard = [
+            [InlineKeyboardButton("👑 Оформить Premium", callback_data="subscription")],
+            [InlineKeyboardButton("🔙 К заданию", callback_data="main_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            "🎤 Голосовые подсказки доступны только в Premium подписке!\n\n"
+            "👑 Оформите Premium и получите:\n"
+            "• Голосовые подсказки для всех заданий\n"
+            "• Озвучивание условий и решений\n"
+            "• Безлимитные задания\n"
+            "• ИИ персонализация",
+            reply_markup=reply_markup
+        )
+        return
+    
+    # Для Premium пользователей - отправляем голосовую подсказку
+    try:
+        task_id = context.user_data.get('current_task_id')
+        if not task_id:
+            await query.edit_message_text("❌ Задание не найдено")
+            return
+        
+        task = Task.objects.get(id=task_id)
+        
+        # Импортируем сервис голосовых подсказок
+        from core.voice_service import voice_service
+        
+        if task.audio_file:
+            # Отправляем готовый аудиофайл
+            audio_url = voice_service.get_audio_url(task.audio_file)
+            if audio_url:
+                await context.bot.send_voice(
+                    chat_id=update.effective_chat.id,
+                    voice=audio_url,
+                    caption="🎤 Голосовая подсказка к заданию"
+                )
+            else:
+                await query.edit_message_text("❌ Аудиофайл недоступен")
+        else:
+            # Генерируем аудио на лету
+            await query.edit_message_text("🎤 Генерирую голосовую подсказку...")
+            
+            audio_result = voice_service.generate_task_audio(task)
+            if audio_result and audio_result['task_audio']:
+                audio_url = voice_service.get_audio_url(audio_result['task_audio'])
+                if audio_url:
+                    await context.bot.send_voice(
+                        chat_id=update.effective_chat.id,
+                        voice=audio_url,
+                        caption="🎤 Голосовая подсказка к заданию"
+                    )
+                else:
+                    await query.edit_message_text("❌ Ошибка генерации аудио")
+            else:
+                await query.edit_message_text("❌ Не удалось создать голосовую подсказку")
+    
+    except Exception as e:
+        logger.error(f"Ошибка голосовой подсказки: {str(e)}")
+        await query.edit_message_text("❌ Ошибка при создании голосовой подсказки")
 
 
 async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -576,6 +752,8 @@ def main():
     application.add_handler(CallbackQueryHandler(about, pattern="about"))
     application.add_handler(CallbackQueryHandler(progress, pattern="progress"))
     application.add_handler(CallbackQueryHandler(rating, pattern="rating"))
+    application.add_handler(CallbackQueryHandler(subscription_menu, pattern="subscription"))
+    application.add_handler(CallbackQueryHandler(voice_hint, pattern="voice_hint"))
     
     # Обработчик для всех остальных callback (отладка)
     application.add_handler(CallbackQueryHandler(handle_unknown_callback))

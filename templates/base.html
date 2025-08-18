@@ -3,8 +3,33 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ExamFlow — Подготовка к экзаменам{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <title>{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}</title>
+    
+    <!-- SEO мета-теги -->
+    <meta name="description" content="Эффективная подготовка к ЕГЭ и ОГЭ с официальными материалами ФИПИ. Голосовые подсказки, персонализация, Telegram бот.">
+    <meta name="keywords" content="ЕГЭ, ОГЭ, подготовка, ФИПИ, экзамены, задания, математика, русский язык, физика, химия">
+    <meta name="author" content="ExamFlow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="ExamFlow — Подготовка к ЕГЭ и ОГЭ">
+    <meta property="og:description" content="Эффективная подготовка с официальными материалами ФИПИ">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://examflow.ru">
+    <meta property="og:image" content="https://examflow.ru/static/images/og-image.png">
+    <meta property="og:site_name" content="ExamFlow">
+    <meta property="og:locale" content="ru_RU">
+    
+    <!-- PWA мета-теги -->
+    <meta name="theme-color" content="#00ff88">
+    <meta name="msapplication-TileColor" content="#0a0a0a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ExamFlow">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -516,15 +541,113 @@
             color: var(--secondary-color);
         }
 
-        /* Responsive */
+        /* Мобильная оптимизация */
         @media (max-width: 768px) {
-            .hero h1 {
+            .hero-title {
                 font-size: 2rem;
+                line-height: 1.2;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
             }
             
             .stat-number {
                 font-size: 1.8rem;
             }
+            
+            .card-tech {
+                padding: 1rem;
+            }
+            
+            .btn-neon,
+            .btn-gradient {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-tech {
+                padding: 0.5rem 0;
+            }
+            
+            .nav-link-tech {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .card-tech {
+                padding: 0.75rem;
+            }
+            
+            .btn-neon,
+            .btn-gradient {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.8rem;
+            }
+            
+            .logo-tech {
+                font-size: 1.3rem;
+            }
+            
+            .header-info {
+                display: none;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Touch-friendly элементы */
+        @media (pointer: coarse) {
+            .btn-neon,
+            .btn-gradient,
+            .btn-neon-blue {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .nav-link-tech {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .card-tech {
+                padding: 1.5rem 1rem;
+            }
+        }
+
+        /* PWA стили */
+        .pwa-install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-top: 2px solid var(--neon-green);
+            padding: 1rem;
+            z-index: 1001;
+            transform: translateY(100%);
+            transition: var(--transition-base);
+        }
+
+        .pwa-install-banner.show {
+            transform: translateY(0);
+        }
+
+        .pwa-install-banner .btn {
+            margin-top: 0.5rem;
         }
     </style>
     
@@ -651,6 +774,90 @@
         // Observe all cards
         document.querySelectorAll('.card-custom').forEach(card => {
             observer.observe(card);
+        });
+    </script>
+    
+    <!-- PWA и мобильная оптимизация -->
+    <script>
+        // Регистрация Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(registration => {
+                        console.log('ExamFlow SW: Registration successful', registration);
+                    })
+                    .catch(error => {
+                        console.log('ExamFlow SW: Registration failed', error);
+                    });
+            });
+        }
+
+        // PWA Install Banner
+        let deferredPrompt;
+        const pwaInstallBanner = document.createElement('div');
+        pwaInstallBanner.className = 'pwa-install-banner';
+        pwaInstallBanner.innerHTML = `
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <strong class="text-white">📱 Установить ExamFlow</strong>
+                        <div class="small text-secondary">Получите быстрый доступ с главного экрана</div>
+                    </div>
+                    <div class="col-4 text-end">
+                        <button class="btn btn-neon btn-sm" id="pwa-install-btn">Установить</button>
+                        <button class="btn btn-link text-muted btn-sm ms-2" id="pwa-dismiss-btn">✕</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Показываем баннер через 3 секунды
+            setTimeout(() => {
+                if (!localStorage.getItem('pwa-dismissed')) {
+                    document.body.appendChild(pwaInstallBanner);
+                    pwaInstallBanner.classList.add('show');
+                }
+            }, 3000);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'pwa-install-btn') {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('PWA: User accepted install');
+                        }
+                        deferredPrompt = null;
+                        pwaInstallBanner.remove();
+                    });
+                }
+            }
+            
+            if (e.target.id === 'pwa-dismiss-btn') {
+                localStorage.setItem('pwa-dismissed', 'true');
+                pwaInstallBanner.remove();
+            }
+        });
+
+        // Мобильная оптимизация
+        document.addEventListener('DOMContentLoaded', function() {
+            // Улучшенные touch события для кнопок
+            document.querySelectorAll('.btn-neon, .btn-gradient, .btn-neon-blue').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                btn.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 100);
+                });
+            });
         });
     </script>
     

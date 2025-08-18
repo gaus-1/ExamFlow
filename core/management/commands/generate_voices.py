@@ -1,0 +1,155 @@
+"""
+Команда Django для генерации голосовых файлов
+"""
+
+from django.core.management.base import BaseCommand, CommandError
+from core.voice_service import voice_service, generate_task_voices
+from core.models import Task
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class Command(BaseCommand):
+    help = 'Генерирует голосовые файлы для заданий'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--task-id',
+            type=int,
+            help='Сгенерировать аудио только для указанного задания',
+        )
+        parser.add_argument(
+            '--limit',
+            type=int,
+            default=50,
+            help='Максимальное количество заданий для обработки (по умолчанию: 50)',
+        )
+        parser.add_argument(
+            '--cleanup',
+            action='store_true',
+            help='Очистить старые аудиофайлы (старше 30 дней)',
+        )
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            help='Принудительно перегенерировать существующие аудиофайлы',
+        )
+
+    def handle(self, *args, **options):
+        if options['cleanup']:
+            self.cleanup_old_files()
+            return
+
+        if options['task_id']:
+            self.generate_single_task(options['task_id'])
+        else:
+            self.generate_multiple_tasks(options['limit'], options['force'])
+
+    def generate_single_task(self, task_id):
+        """Генерирует аудио для одного задания"""
+        try:
+            task = Task.objects.get(id=task_id)
+            self.stdout.write(f'🎤 Генерация аудио для задания: {task.title}')
+            
+            result = voice_service.generate_task_audio(task)
+            
+            if result and result['task_audio']:
+                self.stdout.write(
+                    self.style.SUCCESS(f'✅ Аудио создано: {result["task_audio"]}')
+                )
+                if result['solution_audio']:
+                    self.stdout.write(
+                        self.style.SUCCESS(f'✅ Аудио решения: {result["solution_audio"]}')
+                    )
+            else:
+                self.stdout.write(
+                    self.style.ERROR('❌ Ошибка создания аудио')
+                )
+                
+        except Task.DoesNotExist:
+            raise CommandError(f'❌ Задание с ID {task_id} не найдено')
+        except Exception as e:
+            raise CommandError(f'❌ Ошибка: {str(e)}')
+
+    def generate_multiple_tasks(self, limit, force):
+        """Генерирует аудио для множества заданий"""
+        self.stdout.write(
+            self.style.SUCCESS(f'🎤 Начинаем генерацию голосовых файлов...')
+        )
+        
+        # Выбираем задания
+        if force:
+            tasks = Task.objects.filter(is_active=True)[:limit]
+            self.stdout.write(f'📋 Принудительная генерация для {tasks.count()} заданий')
+        else:
+            tasks = Task.objects.filter(is_active=True, audio_file__isnull=True)[:limit]
+            self.stdout.write(f'📋 Генерация для {tasks.count()} заданий без аудио')
+        
+        if not tasks:
+            self.stdout.write(
+                self.style.WARNING('⚠️  Нет заданий для обработки')
+            )
+            return
+        
+        generated_count = 0
+        error_count = 0
+        
+        for i, task in enumerate(tasks, 1):
+            try:
+                self.stdout.write(f'[{i}/{len(tasks)}] Обработка: {task.title[:50]}...')
+                
+                result = voice_service.generate_task_audio(task)
+                
+                if result and result['task_audio']:
+                    generated_count += 1
+                    self.stdout.write(
+                        self.style.SUCCESS(f'  ✅ Создано: {result["task_audio"]}')
+                    )
+                else:
+                    error_count += 1
+                    self.stdout.write(
+                        self.style.ERROR('  ❌ Ошибка создания аудио')
+                    )
+                
+                # Показываем прогресс каждые 10 заданий
+                if i % 10 == 0:
+                    self.stdout.write(
+                        self.style.WARNING(f'📊 Прогресс: {i}/{len(tasks)} | Создано: {generated_count} | Ошибок: {error_count}')
+                    )
+                
+            except Exception as e:
+                error_count += 1
+                self.stdout.write(
+                    self.style.ERROR(f'  ❌ Ошибка: {str(e)}')
+                )
+                continue
+        
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'🎉 Генерация завершена!'
+            )
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'📊 Создано файлов: {generated_count}'
+            )
+        )
+        if error_count > 0:
+            self.stdout.write(
+                self.style.WARNING(
+                    f'⚠️  Ошибок: {error_count}'
+                )
+            )
+
+    def cleanup_old_files(self):
+        """Очищает старые аудиофайлы"""
+        self.stdout.write('🧹 Очистка старых аудиофайлов...')
+        
+        deleted_count = voice_service.cleanup_old_audio(days=30)
+        
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'✅ Удалено файлов: {deleted_count}'
+            )
+        )
