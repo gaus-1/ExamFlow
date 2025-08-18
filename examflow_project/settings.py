@@ -9,13 +9,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.append(str(BASE_DIR))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+# Настройки разработки - не подходят для продакшена
+# См. https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: держите секретный ключ в секрете!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b=8q90=se^7twm97htmj$v2n-(b@8!0(%h48n=tnb=t^%ja!ta')
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: не запускайте с debug=True в продакшене!
 # В продакшене принудительно выключаем DEBUG
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
@@ -25,7 +25,7 @@ RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_HOST)
 
-# Application definition
+# Определение приложений
 
 INSTALLED_APPS = [
     'django.contrib.admin',

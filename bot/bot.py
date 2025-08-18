@@ -79,8 +79,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         welcome_text = (
             f"🎓 Добро пожаловать в ExamFlow, {update.effective_user.first_name}!\n\n"
-            "Я помогу вам эффективно подготовиться к ЕГЭ и ОГЭ с использованием "
-            "официальных материалов ФИПИ.\n\n"
+            "Я помогу вам эффективно подготовиться к ЕГЭ и ОГЭ с заданиями "
+            "на основе открытых материалов ФИПИ.\n\n"
             "🎯 Решайте задания\n"
             "📊 Отслеживайте прогресс\n"
             "🏆 Соревнуйтесь с друзьями\n"
@@ -150,8 +150,8 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "В скобках указано количество доступных заданий.",
             reply_markup=reply_markup
         )
-    
-    except Exception as e:
+            
+        except Exception as e:
         logger.error(f"Ошибка в subjects_menu: {str(e)}")
         try:
             await query.edit_message_text("❌ Ошибка загрузки предметов. Попробуйте позже.")
@@ -388,7 +388,7 @@ async def mark_correct(update: Update, context: ContextTypes.DEFAULT_TYPE):
     next_task = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('?').first()
     if next_task:
         await show_task(query, next_task, user)
-    else:
+            else:
         keyboard = [[InlineKeyboardButton("🔙 К предмету", callback_data=f"subject_{task.subject.id}")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -591,7 +591,7 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     text = (
         "ℹ️ О ExamFlow\n\n"
-        "🎯 Официальные задания ФИПИ\n"
+        "🎯 Задания на основе материалов ФИПИ\n"
         "🎤 Голосовые подсказки (Premium)\n"
         "🤖 ИИ персонализация (Premium)\n"
         "📊 Персональный прогресс\n"
@@ -678,11 +678,11 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     profile = UserProfile.objects.get(user=user)
     
     if not profile.is_premium:
-        keyboard = [
+    keyboard = [
             [InlineKeyboardButton("👑 Оформить Premium", callback_data="subscription")],
             [InlineKeyboardButton("🔙 К заданию", callback_data="main_menu")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
         
         await query.edit_message_text(
             "🎤 Голосовые подсказки доступны только в Premium подписке!\n\n"

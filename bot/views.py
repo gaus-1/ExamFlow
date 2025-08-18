@@ -89,7 +89,7 @@ async def handle_telegram_update(update: Update):
         # Обрабатываем команды
         if update.message:
             if update.message.text == '/start':
-                await start(update, context)
+                start(update, context)
                 return
         
         # Обрабатываем callback queries
@@ -109,25 +109,25 @@ async def handle_telegram_update(update: Update):
             
             # Обработчики с параметрами
             if callback_data.startswith('subject_'):
-                await subject_detail(update, context)
+                subject_detail(update, context)
             elif callback_data.startswith('solve_'):
-                await solve_subject_tasks(update, context)
+                solve_subject_tasks(update, context)
             elif callback_data.startswith('random_subject_'):
-                await random_subject_task(update, context)
+                random_subject_task(update, context)
             elif callback_data.startswith('answer_'):
-                await show_answer(update, context)
+                show_answer(update, context)
             elif callback_data.startswith('correct_'):
-                await mark_correct(update, context)
+                mark_correct(update, context)
             elif callback_data.startswith('incorrect_'):
-                await mark_incorrect(update, context)
+                mark_incorrect(update, context)
             elif callback_data.startswith('understood_'):
-                await mark_understood(update, context)
+                mark_understood(update, context)
             elif callback_data.startswith('not_understood_'):
-                await mark_not_understood(update, context)
+                mark_not_understood(update, context)
             elif callback_data in handlers:
-                await handlers[callback_data](update, context)
+                handlers[callback_data](update, context)
             else:
-                await handle_unknown_callback(update, context)
+                handle_unknown_callback(update, context)
         
     except Exception as e:
         logger.error(f"Ошибка в handle_telegram_update: {str(e)}")
@@ -135,12 +135,12 @@ async def handle_telegram_update(update: Update):
         # Отправляем сообщение об ошибке пользователю
         try:
             if update.callback_query:
-                await update.callback_query.edit_message_text(
+                asyncio.run(update.callback_query.edit_message_text(
                     "❌ Произошла ошибка. Попробуйте позже или обратитесь в поддержку."
-                )
+                ))
             elif update.message:
-                await update.message.reply_text(
+                asyncio.run(update.message.reply_text(
                     "❌ Произошла ошибка. Попробуйте позже или обратитесь в поддержку."
-                )
+                ))
         except:
             pass
