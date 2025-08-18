@@ -1,0 +1,24 @@
+"""
+URL-маршруты для модуля Telegram бота
+
+Определяет пути для:
+- Webhook от Telegram (/bot/webhook/)
+- Панели управления (/bot/control/)
+- API статуса (/bot/api/status/)
+"""
+
+from django.urls import path
+from . import views
+
+app_name = 'telegram_bot'
+
+urlpatterns = [
+    # Webhook для Telegram
+    path('webhook/', views.telegram_webhook, name='webhook'),
+    
+    # Панель управления
+    path('control/', views.bot_control_panel, name='control_panel'),
+    
+    # API
+    path('api/status/', views.bot_api_status, name='api_status'),
+]

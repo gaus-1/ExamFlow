@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+
+# Импорты из legacy модулей (для обратной совместимости)
 from core.views import home, subject_list, subject_detail, task_detail
 from core.auth_views import (
     register_view, login_view, logout_view, dashboard_view,
@@ -24,15 +26,35 @@ urlpatterns = [
     # Админка
     path('admin/', admin.site.urls),
 
-    # Главная
+    # Главная страница (legacy)
     path('', home, name='home'),
 
-    # Основные страницы
+    # ==========================================
+    # НОВЫЕ МОДУЛЬНЫЕ ПРИЛОЖЕНИЯ
+    # ==========================================
+    
+    # Модуль аутентификации
+    path('auth/', include('authentication.urls')),
+    
+    # Модуль обучения
+    path('', include('learning.urls')),  # Основные маршруты для обучения
+    
+    # Модуль Telegram бота
+    path('bot/', include('telegram_bot.urls')),
+    
+    # Модуль аналитики
+    path('analytics/', include('analytics.urls')),
+    
+    # ==========================================
+    # LEGACY МАРШРУТЫ (для обратной совместимости)
+    # ==========================================
+
+    # Основные страницы (legacy)
     path('subjects/', subject_list, name='subjects'),
     path('subjects/<int:subject_id>/', subject_detail, name='subject_detail'),
     path('tasks/<int:task_id>/', task_detail, name='task_detail'),
 
-    # Аутентификация
+    # Аутентификация (legacy)
     path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
@@ -41,10 +63,10 @@ urlpatterns = [
     path('achievements/', achievements_view, name='achievements'),
     path('subscribe/', subscribe_view, name='subscribe'),
 
-    # Бот
-    path('bot/', bot_control_panel, name='bot_control'),
-    path('bot/api/status/', bot_api_status, name='bot_api_status'),
-    path('bot/webhook/', telegram_webhook, name='telegram_webhook'),
+    # Бот (legacy)
+    path('bot-legacy/', bot_control_panel, name='bot_control'),
+    path('bot-legacy/api/status/', bot_api_status, name='bot_api_status'),
+    path('bot-legacy/webhook/', telegram_webhook, name='telegram_webhook'),
 
     # API
     path('api/tasks/random/', get_random_task, name='api_random_task'),

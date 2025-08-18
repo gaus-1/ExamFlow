@@ -34,8 +34,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Основные модули (legacy)
     'core',
     'bot',
+    
+    # Новые модульные приложения
+    'authentication',      # Аутентификация и регистрация
+    'learning',           # Обучение и задания  
+    'telegram_bot',       # Telegram бот функционал
+    'analytics',          # Аналитика и статистика
+    
+    # Внешние библиотеки
     'corsheaders',
     'django_redis',
 ]
