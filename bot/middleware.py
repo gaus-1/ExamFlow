@@ -1,5 +1,5 @@
-from django.utils.deprecation import MiddlewareMixin
-from django.http import HttpResponse
+from django.utils.deprecation import MiddlewareMixin  # type: ignore
+from django.http import HttpResponse  # type: ignore
 from .tasks import start_bot
 
 class AutoStartBotMiddleware(MiddlewareMixin):

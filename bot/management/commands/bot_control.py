@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand  # type: ignore
 from bot.tasks import start_bot, stop_bot, restart_bot, get_bot_status
 
 class Command(BaseCommand):
