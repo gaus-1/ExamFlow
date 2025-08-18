@@ -19,39 +19,44 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            /* Цветовая схема в стиле государственных сайтов */
-            --primary-color: #0056b3;
-            --primary-dark: #004085;
-            --primary-light: #cce7ff;
-            --secondary-color: #28a745;
-            --accent-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --success-color: #28a745;
+            /* Темная технологичная цветовая схема в стиле Reputationsquad/Resn */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1e1e1e;
             
-            /* Нейтральные цвета */
-            --white: #ffffff;
-            --gray-50: #f8f9fa;
-            --gray-100: #f1f3f4;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-400: #ced4da;
-            --gray-500: #adb5bd;
-            --gray-600: #6c757d;
-            --gray-700: #495057;
-            --gray-800: #343a40;
-            --gray-900: #212529;
+            /* Неоновые акцентные цвета */
+            --neon-green: #00ff88;
+            --neon-blue: #00d4ff;
+            --neon-purple: #ff00ff;
+            --neon-yellow: #ffff00;
+            --neon-red: #ff0040;
             
-            /* Тени */
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15), 0 10px 10px rgba(0, 0, 0, 0.04);
+            /* Градиенты */
+            --gradient-primary: linear-gradient(135deg, #00ff88, #00d4ff);
+            --gradient-secondary: linear-gradient(135deg, #ff00ff, #00d4ff);
+            --gradient-accent: linear-gradient(135deg, #00ff88, #ffff00);
+            --gradient-danger: linear-gradient(135deg, #ff0040, #ff00ff);
+            
+            /* Текстовые цвета */
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            --text-accent: #00ff88;
+            
+            /* Тени с неоновым свечением */
+            --glow-green: 0 0 20px rgba(0, 255, 136, 0.3);
+            --glow-blue: 0 0 20px rgba(0, 212, 255, 0.3);
+            --glow-purple: 0 0 20px rgba(255, 0, 255, 0.3);
+            --glow-yellow: 0 0 20px rgba(255, 255, 0, 0.3);
+            
+            --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --shadow-neon: 0 0 30px rgba(0, 255, 136, 0.2);
             
             /* Переходы */
-            --transition-base: all 0.2s ease-in-out;
-            --transition-fast: all 0.1s ease-in-out;
-            --transition-slow: all 0.3s ease-in-out;
+            --transition-fast: all 0.15s ease-out;
+            --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -61,256 +66,415 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: var(--gray-800);
-            background: var(--gray-50);
+            color: var(--text-primary);
+            background: var(--bg-primary);
             font-size: 16px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        /* Официальный заголовок */
-        .header-official {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow-md);
+        /* Фоновые анимированные элементы */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite alternate;
         }
 
-        .header-official .container {
+        @keyframes backgroundShift {
+            0% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0.6; transform: scale(1.1) rotate(2deg); }
+        }
+
+        /* Технологичный header */
+        .header-tech {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-dark);
+        }
+
+        .logo-tech {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo-official {
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white;
-            text-decoration: none;
-        }
-
-        .logo-official:hover {
-            color: var(--primary-light);
-            text-decoration: none;
-        }
-
-        .logo-official i {
-            margin-right: 0.5rem;
+            font-weight: 800;
             font-size: 1.8rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            transition: var(--transition-base);
+        }
+
+        .logo-tech:hover {
+            filter: drop-shadow(var(--glow-green));
+            transform: scale(1.02);
+        }
+
+        .logo-tech i {
+            margin-right: 0.5rem;
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         /* Навигация */
-        .navbar-custom {
-            background: white;
-            border-bottom: 3px solid var(--primary-color);
-            box-shadow: var(--shadow-sm);
-            padding: 0.75rem 0;
+        .navbar-tech {
+            background: transparent;
+            padding: 1rem 0;
         }
 
-        .nav-link-custom {
-            color: var(--gray-700) !important;
+        .nav-link-tech {
+            color: var(--text-secondary) !important;
             font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 8px;
             transition: var(--transition-base);
             text-decoration: none !important;
             position: relative;
+            margin: 0 0.25rem;
+            border: 1px solid transparent;
         }
 
-        .nav-link-custom:hover {
-            color: var(--primary-color) !important;
-            background: var(--primary-light);
-            transform: translateY(-1px);
-        }
-
-        .nav-link-custom.active {
-            color: var(--primary-color) !important;
-            background: var(--primary-light);
-            font-weight: 600;
-        }
-
-        .nav-link-custom::after {
+        .nav-link-tech::before {
             content: '';
             position: absolute;
-            bottom: -3px;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: var(--primary-color);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            border-radius: 8px;
             transition: var(--transition-base);
-            transform: translateX(-50%);
+            z-index: -1;
         }
 
-        .nav-link-custom:hover::after,
-        .nav-link-custom.active::after {
-            width: 80%;
+        .nav-link-tech:hover {
+            color: var(--text-primary) !important;
+            border-color: var(--neon-green);
+            box-shadow: var(--glow-green);
+            transform: translateY(-2px);
         }
 
-        /* Кнопки в официальном стиле */
-        .btn-primary-custom {
-            background: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            color: white;
-            padding: 0.75rem 2rem;
-            border-radius: 6px;
+        .nav-link-tech:hover::before {
+            opacity: 0.1;
+        }
+
+        .nav-link-tech.active {
+            color: var(--text-primary) !important;
+            border-color: var(--neon-green);
+            box-shadow: var(--glow-green);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        /* Неоновые технологичные кнопки */
+        .btn-neon {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 1rem 2rem;
+            border-radius: 8px;
             font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition-base);
-            box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 136, 0.3),
+                inset 0 0 20px rgba(0, 255, 136, 0.1);
         }
 
-        .btn-primary-custom::before {
+        .btn-neon::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            opacity: 0.1;
             transition: var(--transition-slow);
         }
 
-        .btn-primary-custom:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
-            color: white;
+        .btn-neon:hover {
+            color: var(--bg-primary);
+            background: var(--neon-green);
+            box-shadow: 
+                0 0 40px rgba(0, 255, 136, 0.6),
+                inset 0 0 40px rgba(0, 255, 136, 0.2);
+            transform: translateY(-3px);
             text-decoration: none;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
         }
 
-        .btn-primary-custom:hover::before {
+        .btn-neon:hover::before {
             left: 100%;
         }
 
-        .btn-outline-custom {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            background: white;
-            padding: 0.5rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-base);
-            box-shadow: var(--shadow-sm);
+        .btn-neon-blue {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 
+                0 0 20px rgba(0, 212, 255, 0.3),
+                inset 0 0 20px rgba(0, 212, 255, 0.1);
         }
 
-        .btn-outline-custom:hover {
-            background: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+        .btn-neon-blue::before {
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
         }
 
-        .btn-secondary-custom {
-            background: var(--secondary-color);
-            border: 2px solid var(--secondary-color);
-            color: white;
-            padding: 0.75rem 2rem;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-base);
-            box-shadow: var(--shadow-sm);
+        .btn-neon-blue:hover {
+            background: var(--neon-blue);
+            box-shadow: 
+                0 0 40px rgba(0, 212, 255, 0.6),
+                inset 0 0 40px rgba(0, 212, 255, 0.2);
         }
 
-        .btn-secondary-custom:hover {
-            background: #218838;
-            border-color: #218838;
-            color: white;
-            text-decoration: none;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Карточки в официальном стиле */
-        .card-custom {
-            background: white;
-            border: 1px solid var(--gray-300);
+        .btn-gradient {
+            background: var(--gradient-primary);
+            border: none;
+            color: var(--bg-primary);
+            padding: 1rem 2rem;
             border-radius: 8px;
-            padding: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-base);
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: var(--glow-green);
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 136, 0.5),
+                0 10px 30px rgba(0, 0, 0, 0.3);
+            color: var(--bg-primary);
+            text-decoration: none;
+        }
+
+        /* Технологичные карточки */
+        .card-tech {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
             transition: var(--transition-base);
             height: 100%;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-dark);
             position: relative;
             overflow: hidden;
         }
 
-        .card-custom::before {
+        .card-tech::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 0;
-            background: var(--primary-color);
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: var(--transition-base);
+            transform-origin: left;
+        }
+
+        .card-tech::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: var(--transition-slow);
+        }
+
+        .card-tech:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-green);
+            box-shadow: 
+                var(--shadow-dark),
+                0 0 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .card-tech:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-tech:hover::after {
+            opacity: 1;
+        }
+
+        .card-neon {
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
             transition: var(--transition-base);
         }
 
-        .card-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--primary-color);
-        }
-
-        .card-custom:hover::before {
-            height: 100%;
-        }
-
-        .card-official {
-            background: white;
-            border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-        }
-
-        .card-official::before {
+        .card-neon::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 16px;
+            transition: var(--transition-base);
         }
 
-        /* Секция героя */
-        .hero-official {
-            background: linear-gradient(135deg, var(--primary-light) 0%, white 100%);
-            border-bottom: 3px solid var(--primary-color);
+        .card-neon:hover {
+            border-color: var(--neon-green);
+            box-shadow: var(--glow-green);
+            transform: translateY(-8px) scale(1.02);
         }
 
-        .hero-content {
-            padding: 4rem 0;
+        .card-neon:hover::before {
+            opacity: 0.2;
+        }
+
+        /* Технологичная hero секция */
+        .hero-tech {
+            background: var(--bg-secondary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-tech::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 30%, rgba(0, 255, 136, 0.1) 50%, transparent 70%),
+                linear-gradient(-45deg, transparent 30%, rgba(0, 212, 255, 0.1) 50%, transparent 70%);
+            animation: heroGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroGlow {
+            0% { opacity: 0.3; transform: rotate(0deg) scale(1); }
+            100% { opacity: 0.7; transform: rotate(2deg) scale(1.05); }
         }
 
         .hero-title {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            text-align: center;
         }
 
         .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--gray-700);
-            margin-bottom: 2rem;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
             line-height: 1.6;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Геометрические элементы */
+        .geometric-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .geometric-shape {
+            position: absolute;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .geometric-shape:nth-child(1) {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .geometric-shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+
+        .geometric-shape:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+            border-color: rgba(255, 0, 255, 0.2);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Градиентный текст */
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-secondary {
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         /* Animations */
@@ -367,50 +531,51 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Official Header -->
-    <div class="header-official">
+    <!-- Tech Navigation -->
+    <nav class="header-tech">
         <div class="container">
-            <a href="{% url 'home' %}" class="logo-official">
-                <i class="fas fa-graduation-cap"></i>
-                ExamFlow
-            </a>
-            <div class="header-info text-end">
-                <div class="small opacity-90">Федеральный институт педагогических измерений</div>
-                <div class="small opacity-75">Официальные материалы для подготовки</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link-custom" href="{% url 'home' %}">
-                            <i class="fas fa-home me-2"></i>Главная
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-custom" href="{% url 'subjects' %}">
-                            <i class="fas fa-book me-2"></i>Предметы
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-custom" href="https://t.me/ExamFlowBot" target="_blank">
-                            <i class="fab fa-telegram me-2"></i>Telegram Бот
-                        </a>
-                    </li>
-                </ul>
+            <div class="navbar-tech navbar navbar-expand-lg">
+                <a href="{% url 'home' %}" class="logo-tech">
+                    <i class="fas fa-atom"></i>
+                    ExamFlow
+                </a>
                 
-                <div class="d-flex align-items-center">
-                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom">
-                        <i class="fab fa-telegram me-2"></i>Начать подготовку
-                    </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTech" style="color: var(--neon-green);">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarTech">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link-tech" href="{% url 'home' %}">
+                                <i class="fas fa-home me-2"></i>Главная
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-tech" href="{% url 'subjects' %}">
+                                <i class="fas fa-book-open me-2"></i>Предметы
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-tech" href="#pricing">
+                                <i class="fas fa-crown me-2"></i>Подписка
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-tech" href="https://t.me/ExamFlowBot" target="_blank">
+                                <i class="fab fa-telegram me-2"></i>Telegram Бот
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="#login" class="btn-neon-blue">
+                            <i class="fas fa-sign-in-alt me-2"></i>Войти
+                        </a>
+                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-gradient">
+                            <i class="fab fa-telegram me-2"></i>Начать
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

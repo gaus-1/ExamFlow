@@ -5,69 +5,78 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-official">
-    <div class="container hero-content">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <div class="animate-fade-in-up">
-                    <h1 class="hero-title">
-                        Подготовка к ЕГЭ и ОГЭ
-                        <span class="text-primary">с официальными материалами ФИПИ</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Используйте проверенные задания Федерального института педагогических измерений 
-                        для эффективной подготовки к государственным экзаменам.
-                    </p>
-                    
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary-custom">
-                            <i class="fab fa-telegram me-2"></i>
-                            Начать подготовку в боте
-                        </a>
-                        <a href="{% url 'subjects' %}" class="btn-outline-custom">
-                            <i class="fas fa-book me-2"></i>
-                            Выбрать предмет
-                        </a>
+<section class="hero-tech">
+    <div class="geometric-bg">
+        <div class="geometric-shape"></div>
+        <div class="geometric-shape"></div>
+        <div class="geometric-shape"></div>
+    </div>
+    
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="hero-title animate-fade-in-up">
+                    Официальная платформа подготовки к <span class="gradient-text-secondary">ЕГЭ и ОГЭ</span>
+                </h1>
+                
+                <p class="hero-subtitle animate-fade-in-up" style="animation-delay: 0.2s;">
+                    Актуальные задания в соответствии с демоверсиями ФИПИ. 
+                    Голосовые подсказки, персонализация и геймификация для максимальной эффективности.
+                </p>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-4 mb-5 animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-gradient">
+                        <i class="fab fa-telegram me-2"></i>
+                        Начать подготовку
+                    </a>
+                    <a href="{% url 'subjects' %}" class="btn-neon">
+                        <i class="fas fa-book-open me-2"></i>
+                        Выбрать предмет
+                    </a>
+                </div>
+                
+                <!-- Статистика -->
+                <div class="row g-4 mt-5 animate-fade-in-up" style="animation-delay: 0.6s;">
+                    <div class="col-md-4">
+                        <div class="card-tech text-center">
+                            <div class="h1 gradient-text mb-2">{{ total_subjects }}+</div>
+                            <div class="text-muted">предметов ЕГЭ/ОГЭ</div>
+                        </div>
                     </div>
-                    
-                    <!-- Статистика -->
-                    <div class="row text-center mt-5">
-                        <div class="col-4">
-                            <div class="card-official p-3">
-                                <div class="h2 text-primary mb-1">{{ total_subjects }}</div>
-                                <div class="small text-muted">предметов</div>
-                            </div>
+                    <div class="col-md-4">
+                        <div class="card-tech text-center">
+                            <div class="h1 gradient-text mb-2">{{ total_tasks }}+</div>
+                            <div class="text-muted">актуальных заданий</div>
                         </div>
-                        <div class="col-4">
-                            <div class="card-official p-3">
-                                <div class="h2 text-success mb-1">{{ total_tasks }}</div>
-                                <div class="small text-muted">заданий</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="card-official p-3">
-                                <div class="h2 text-info mb-1">100%</div>
-                                <div class="small text-muted">бесплатно</div>
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-tech text-center">
+                            <div class="h1 gradient-text mb-2">24/7</div>
+                            <div class="text-muted">доступ в Telegram</div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="col-lg-4 text-center">
-                <div class="animate-fade-in-up">
-                    <div class="card-official p-4">
-                        <h5 class="mb-3 text-primary">
-                            <i class="fas fa-qrcode me-2"></i>
-                            Быстрый доступ
-                        </h5>
-                        <img src="{{ qr_code }}" alt="QR-код для Telegram-бота" class="img-fluid mb-3" style="max-width: 180px; border: 2px solid var(--gray-300); border-radius: 8px;">
-                        <p class="small text-muted">Отсканируйте QR-код для перехода в Telegram-бот</p>
-                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-secondary-custom btn-sm mt-2">
-                            <i class="fab fa-telegram me-1"></i>
-                            Открыть бота
-                        </a>
+            <div class="col-lg-4 text-center mt-5 mt-lg-0">
+                <div class="card-neon animate-fade-in-up" style="animation-delay: 0.8s;">
+                    <h5 class="gradient-text mb-4">
+                        <i class="fas fa-qrcode me-2"></i>
+                        Быстрый доступ к боту
+                    </h5>
+                    <div class="position-relative d-inline-block">
+                        <img src="{{ qr_code }}" alt="QR-код для Telegram-бота" 
+                             class="img-fluid mb-3" 
+                             style="max-width: 200px; border: 2px solid var(--neon-green); border-radius: 12px; box-shadow: var(--glow-green);">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.7); opacity: 0; transition: var(--transition-base); border-radius: 12px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+                            <i class="fas fa-expand text-white fa-2x"></i>
+                        </div>
                     </div>
+                    <p class="text-muted mb-3">Отсканируйте камерой телефона</p>
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-neon-blue btn-sm">
+                        <i class="fab fa-telegram me-2"></i>
+                        Открыть бота
+                    </a>
                 </div>
             </div>
         </div>
@@ -75,71 +84,147 @@
 </section>
 
 <!-- Features Section -->
-<section class="py-5">
+<section class="py-5" style="background: var(--bg-secondary);">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="fw-bold mb-3">Почему выбирают ExamFlow?</h2>
-            <p class="text-muted">Всё необходимое для эффективной подготовки в одном месте</p>
+            <h2 class="gradient-text fw-bold mb-3">Преимущества ExamFlow</h2>
+            <p class="text-secondary">Технологии будущего для подготовки к экзаменам</p>
         </div>
         
         <div class="row g-4">
             <div class="col-lg-4 col-md-6">
-                <div class="card-custom text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-certificate fa-3x" style="color: var(--primary-color);"></i>
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-certificate fa-3x gradient-text"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Официальные материалы ФИПИ</h5>
-                    <p class="text-muted">Используем только проверенные задания с официального сайта Федерального института педагогических измерений</p>
+                    <h5 class="fw-bold mb-3 text-white">Соответствие ФИПИ</h5>
+                    <p class="text-secondary">Официальные задания и демоверсии, актуализированные в соответствии с требованиями ФИПИ</p>
                 </div>
             </div>
             
             <div class="col-lg-4 col-md-6">
-                <div class="card-custom text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-robot fa-3x" style="color: var(--secondary-color);"></i>
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-volume-up fa-3x" style="color: var(--neon-blue);"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Умный Telegram-бот</h5>
-                    <p class="text-muted">Решайте задания прямо в Telegram. Бот запоминает ваш прогресс и предлагает персональные рекомендации</p>
+                    <h5 class="fw-bold mb-3 text-white">Голосовые подсказки</h5>
+                    <p class="text-secondary">Озвучивание заданий и объяснений для лучшего восприятия материала</p>
                 </div>
             </div>
             
             <div class="col-lg-4 col-md-6">
-                <div class="card-custom text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-chart-line fa-3x" style="color: var(--success-color);"></i>
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-user-cog fa-3x" style="color: var(--neon-purple);"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Отслеживание прогресса</h5>
-                    <p class="text-muted">Детальная аналитика вашей подготовки: сильные стороны, слабые места, рекомендации по улучшению</p>
+                    <h5 class="fw-bold mb-3 text-white">Персонализация</h5>
+                    <p class="text-secondary">ИИ анализирует ваши ответы и создает индивидуальный план подготовки</p>
                 </div>
             </div>
             
             <div class="col-lg-4 col-md-6">
-                <div class="card-custom text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-clock fa-3x" style="color: var(--warning-color);"></i>
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-gamepad fa-3x" style="color: var(--neon-yellow);"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Экономия времени</h5>
-                    <p class="text-muted">Не тратьте время на поиск качественных материалов — мы уже собрали их для вас</p>
+                    <h5 class="fw-bold mb-3 text-white">Геймификация</h5>
+                    <p class="text-secondary">Система уровней, достижений и рейтингов делает обучение увлекательным</p>
                 </div>
             </div>
             
             <div class="col-lg-4 col-md-6">
-                <div class="card-custom text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-mobile-alt fa-3x" style="color: var(--primary-color);"></i>
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fab fa-telegram fa-3x gradient-text"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Доступно везде</h5>
-                    <p class="text-muted">Готовьтесь в любом месте: дома, в транспорте, в школе — нужен только телефон</p>
+                    <h5 class="fw-bold mb-3 text-white">Telegram интеграция</h5>
+                    <p class="text-secondary">Полноценный бот с синхронизацией прогресса и push-уведомлениями</p>
                 </div>
             </div>
             
             <div class="col-lg-4 col-md-6">
-                <div class="card-custom text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-heart fa-3x" style="color: var(--error-color);"></i>
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-chart-line fa-3x" style="color: var(--neon-green);"></i>
                     </div>
-                    <h5 class="fw-bold mb-3">Абсолютно бесплатно</h5>
-                    <p class="text-muted">Качественная подготовка к экзаменам не должна стоить денег — доступ ко всем материалам бесплатный</p>
+                    <h5 class="fw-bold mb-3 text-white">Аналитика прогресса</h5>
+                    <p class="text-secondary">Детальная статистика с выявлением слабых мест и рекомендациями</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="py-5" id="pricing">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="gradient-text fw-bold mb-3">Тарифные планы</h2>
+            <p class="text-secondary">Выберите подходящий план для эффективной подготовки</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-gift fa-3x text-secondary"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3 text-white">Бесплатный</h3>
+                    <div class="h2 gradient-text mb-4">0 ₽</div>
+                    <ul class="list-unstyled text-start text-secondary mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>5 заданий в день</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Базовая статистика</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Доступ к боту</li>
+                        <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>Голосовые подсказки</li>
+                        <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>Персонализация</li>
+                    </ul>
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-neon w-100">
+                        <i class="fab fa-telegram me-2"></i>Начать бесплатно
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-neon text-center position-relative">
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <span class="badge" style="background: var(--gradient-primary); padding: 0.5rem 1rem; border-radius: 20px;">ПОПУЛЯРНЫЙ</span>
+                    </div>
+                    <div class="mb-4 mt-3">
+                        <i class="fas fa-crown fa-3x" style="color: var(--neon-yellow);"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3 text-white">Месячный</h3>
+                    <div class="h2 gradient-text mb-4">990 ₽<small class="text-muted">/мес</small></div>
+                    <ul class="list-unstyled text-start text-secondary mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Неограниченные задания</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Полная статистика</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Голосовые подсказки</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>ИИ персонализация</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Приоритетная поддержка</li>
+                    </ul>
+                    <a href="#subscribe-monthly" class="btn-gradient w-100">
+                        <i class="fas fa-credit-card me-2"></i>Оформить подписку
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card-tech text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-star fa-3x" style="color: var(--neon-purple);"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3 text-white">Годовой</h3>
+                    <div class="h2 gradient-text mb-1">9900 ₽<small class="text-muted">/год</small></div>
+                    <div class="small text-success mb-4">Экономия 17%</div>
+                    <ul class="list-unstyled text-start text-secondary mb-4">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Все возможности месячного</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Скидка 17%</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Эксклюзивный контент</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Персональный куратор</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Сертификат о прохождении</li>
+                    </ul>
+                    <a href="#subscribe-yearly" class="btn-neon-blue w-100">
+                        <i class="fas fa-gem me-2"></i>Купить со скидкой
+                    </a>
                 </div>
             </div>
         </div>
