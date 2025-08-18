@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Регистрация в ExamFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: var(--bg-primary);
+        position: relative;
+        overflow: hidden;
+        padding: 2rem 0;
+    }
+
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+        z-index: -1;
+    }
+
+    .auth-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 16px;
+        padding: 3rem;
+        box-shadow: var(--shadow-dark);
+        max-width: 600px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+    }
+
+    .form-control-tech {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: var(--transition-base);
+    }
+
+    .form-control-tech:focus {
+        background: var(--bg-tertiary);
+        border-color: var(--neon-green);
+        box-shadow: var(--glow-green);
+        color: var(--text-primary);
+        outline: none;
+    }
+
+    .form-control-tech::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-label-tech {
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .auth-title {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .auth-subtitle {
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .strength-bar {
+        height: 4px;
+        background: var(--bg-secondary);
+        border-radius: 2px;
+        margin-top: 0.25rem;
+        overflow: hidden;
+    }
+
+    .strength-fill {
+        height: 100%;
+        background: var(--gradient-primary);
+        width: 0%;
+        transition: var(--transition-base);
+    }
+
+    .terms-check {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 4px;
+        width: 20px;
+        height: 20px;
+    }
+
+    .terms-check:checked {
+        background: var(--neon-green);
+        border-color: var(--neon-green);
+    }
+
+    .form-errors {
+        background: rgba(255, 0, 64, 0.1);
+        border: 1px solid rgba(255, 0, 64, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .form-errors ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .benefits-list {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .benefits-list h6 {
+        color: var(--neon-green);
+        margin-bottom: 1rem;
+    }
+
+    .benefits-list li {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .benefits-list i {
+        color: var(--neon-green);
+        width: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="auth-card">
+                    <h1 class="auth-title">Регистрация</h1>
+                    <p class="auth-subtitle">Создайте аккаунт для доступа ко всем возможностям ExamFlow</p>
+                    
+                    {% if form.errors %}
+                        <div class="form-errors">
+                            <strong>Исправьте следующие ошибки:</strong>
+                            {% for field, errors in form.errors.items %}
+                                <ul>
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" id="registerForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label-tech">
+                                        <i class="fas fa-user me-2"></i>Имя пользователя *
+                                    </label>
+                                    {{ form.username }}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label-tech">
+                                        <i class="fas fa-envelope me-2"></i>Email *
+                                    </label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label-tech">
+                                        <i class="fas fa-id-card me-2"></i>Имя
+                                    </label>
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label-tech">
+                                        <i class="fas fa-id-card me-2"></i>Фамилия
+                                    </label>
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label-tech">
+                                <i class="fas fa-lock me-2"></i>Пароль *
+                            </label>
+                            {{ form.password1 }}
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-fill" id="strengthFill"></div>
+                                </div>
+                                <span id="strengthText">Введите пароль</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label-tech">
+                                <i class="fas fa-lock me-2"></i>Подтверждение пароля *
+                            </label>
+                            {{ form.password2 }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check d-flex align-items-center">
+                                <input type="checkbox" class="terms-check me-3" id="termsCheck" required>
+                                <label for="termsCheck" class="text-secondary">
+                                    Я согласен с <a href="#" class="auth-link">условиями использования</a> 
+                                    и <a href="#" class="auth-link">политикой конфиденциальности</a>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-gradient w-100 mb-3" id="submitBtn" disabled>
+                            <i class="fas fa-user-plus me-2"></i>
+                            Создать аккаунт
+                        </button>
+                        
+                        <div class="text-center">
+                            <span class="text-muted">Уже есть аккаунт? </span>
+                            <a href="{% url 'login' %}" class="auth-link">Войти</a>
+                        </div>
+                    </form>
+                    
+                    <div class="benefits-list">
+                        <h6><i class="fas fa-star me-2"></i>Что вы получите:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check me-2"></i>5 заданий в день бесплатно</li>
+                            <li><i class="fas fa-check me-2"></i>Отслеживание прогресса</li>
+                            <li><i class="fas fa-check me-2"></i>Система достижений</li>
+                            <li><i class="fas fa-check me-2"></i>Доступ к Telegram боту</li>
+                            <li><i class="fas fa-check me-2"></i>Синхронизация между устройствами</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const termsCheck = document.getElementById('termsCheck');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Проверка силы пароля
+    password1.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        let text = 'Слабый пароль';
+        
+        if (password.length >= 8) strength += 25;
+        if (/[a-z]/.test(password)) strength += 25;
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[0-9]/.test(password)) strength += 25;
+        
+        if (strength >= 75) text = 'Сильный пароль';
+        else if (strength >= 50) text = 'Средний пароль';
+        else if (strength >= 25) text = 'Слабый пароль';
+        else text = 'Очень слабый пароль';
+        
+        strengthFill.style.width = strength + '%';
+        strengthText.textContent = text;
+    });
+    
+    // Проверка согласия с условиями
+    termsCheck.addEventListener('change', function() {
+        submitBtn.disabled = !this.checked;
+    });
+});
+</script>
+{% endblock %}

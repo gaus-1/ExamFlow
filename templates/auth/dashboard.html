@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Личный кабинет — ExamFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        background: var(--bg-primary);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .dashboard-header {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+    }
+
+    .level-badge {
+        background: var(--gradient-primary);
+        color: var(--bg-primary);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .subscription-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .subscription-free {
+        background: rgba(108, 117, 125, 0.2);
+        color: var(--text-secondary);
+        border: 1px solid var(--text-muted);
+    }
+
+    .subscription-premium {
+        background: var(--gradient-accent);
+        color: var(--bg-primary);
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: var(--transition-base);
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--neon-green);
+        box-shadow: var(--glow-green);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .progress-bar-tech {
+        background: var(--bg-secondary);
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .progress-fill-tech {
+        background: var(--gradient-primary);
+        height: 100%;
+        border-radius: 10px;
+        transition: var(--transition-slow);
+    }
+
+    .achievement-item {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 212, 255, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        transition: var(--transition-base);
+    }
+
+    .achievement-item:hover {
+        border-color: var(--neon-blue);
+        transform: translateX(5px);
+    }
+
+    .achievement-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .quick-action-btn {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        color: var(--text-primary);
+        padding: 1rem;
+        border-radius: 12px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition-base);
+        margin-bottom: 1rem;
+    }
+
+    .quick-action-btn:hover {
+        border-color: var(--neon-green);
+        box-shadow: var(--glow-green);
+        color: var(--text-primary);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    .section-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .section-title i {
+        color: var(--neon-green);
+        margin-right: 0.5rem;
+    }
+
+    .subscription-card {
+        background: var(--bg-card);
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .subscription-expired {
+        border-color: rgba(255, 0, 64, 0.3);
+    }
+
+    .tasks-limit-warning {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="gradient-text mb-2">
+                        Добро пожаловать, {{ user.first_name|default:user.username }}!
+                    </h1>
+                    <p class="text-secondary mb-3">
+                        Последняя активность: {{ profile.last_activity|date:"d.m.Y H:i" }}
+                    </p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <span class="level-badge">
+                            <i class="fas fa-star me-1"></i>
+                            Уровень {{ profile.level }}
+                        </span>
+                        <span class="subscription-badge {% if profile.is_premium %}subscription-premium{% else %}subscription-free{% endif %}">
+                            <i class="fas fa-{% if profile.is_premium %}crown{% else %}gift{% endif %} me-1"></i>
+                            {{ profile.get_subscription_type_display }}
+                        </span>
+                        {% if profile.streak_days > 0 %}
+                        <span class="level-badge">
+                            <i class="fas fa-fire me-1"></i>
+                            {{ profile.streak_days }} дней подряд
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ profile.experience }}</div>
+                        <div class="stat-label">Опыт</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Статистика -->
+            <div class="col-lg-8">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Ваша статистика
+                </h3>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ total_tasks_solved }}</div>
+                            <div class="stat-label">Решено заданий</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ user_subjects }}</div>
+                            <div class="stat-label">Изучено предметов</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ rating.accuracy }}%</div>
+                            <div class="stat-label">Точность</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-number">{{ rating.rank|default:"-" }}</div>
+                            <div class="stat-label">Место в рейтинге</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Лимиты заданий -->
+                {% if not profile.is_premium %}
+                <div class="tasks-limit-warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Лимит заданий сегодня:</strong>
+                            {{ profile.tasks_solved_today }}/{{ profile.daily_tasks_limit }}
+                        </div>
+                        <div class="progress-bar-tech" style="width: 150px;">
+                            <div class="progress-fill-tech" 
+                                 style="width: {{ profile.tasks_solved_today|floatformat:0|mul:100|div:profile.daily_tasks_limit }}%"></div>
+                        </div>
+                    </div>
+                    {% if not can_solve_tasks %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            Лимит исчерпан. <a href="#pricing" class="auth-link">Оформите подписку</a> для безлимитного доступа.
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Достижения -->
+                <h4 class="section-title">
+                    <i class="fas fa-trophy"></i>
+                    Последние достижения
+                </h4>
+                
+                {% if achievements %}
+                    {% for achievement in achievements %}
+                    <div class="achievement-item">
+                        <div class="achievement-icon" style="background-color: {{ achievement.color }}20; color: {{ achievement.color }};">
+                            <i class="{{ achievement.icon }}"></i>
+                        </div>
+                        <div>
+                            <strong>{{ achievement.name }}</strong>
+                            <div class="small text-muted">{{ achievement.description }}</div>
+                            <div class="small text-muted">{{ achievement.created_at|date:"d.m.Y" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="text-center mt-3">
+                        <a href="{% url 'achievements' %}" class="btn-neon-blue">
+                            <i class="fas fa-trophy me-2"></i>
+                            Все достижения
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Пока нет достижений. Решайте задания, чтобы их получить!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Боковая панель -->
+            <div class="col-lg-4">
+                <h3 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Быстрые действия
+                </h3>
+                
+                <a href="{% url 'subjects' %}" class="quick-action-btn">
+                    <i class="fas fa-book-open me-2"></i>
+                    Выбрать предмет
+                </a>
+                
+                <a href="https://t.me/ExamFlowBot" target="_blank" class="quick-action-btn">
+                    <i class="fab fa-telegram me-2"></i>
+                    Открыть бота
+                </a>
+                
+                <a href="{% url 'profile' %}" class="quick-action-btn">
+                    <i class="fas fa-user-cog me-2"></i>
+                    Настройки профиля
+                </a>
+
+                <!-- Подписка -->
+                <h4 class="section-title mt-4">
+                    <i class="fas fa-crown"></i>
+                    Подписка
+                </h4>
+                
+                {% if profile.is_premium and active_subscription %}
+                <div class="subscription-card">
+                    <i class="fas fa-crown fa-2x text-warning mb-2"></i>
+                    <h5 class="text-white">{{ active_subscription.get_subscription_type_display }}</h5>
+                    <p class="text-muted small mb-2">
+                        Действует до: {{ active_subscription.expires_at|date:"d.m.Y" }}
+                    </p>
+                    <div class="small text-success">
+                        <i class="fas fa-check me-1"></i>
+                        Безлимитные задания
+                    </div>
+                    <div class="small text-success">
+                        <i class="fas fa-check me-1"></i>
+                        Голосовые подсказки
+                    </div>
+                    <div class="small text-success">
+                        <i class="fas fa-check me-1"></i>
+                        ИИ персонализация
+                    </div>
+                </div>
+                {% else %}
+                <div class="subscription-card subscription-expired">
+                    <i class="fas fa-gift fa-2x text-muted mb-2"></i>
+                    <h5 class="text-white">Бесплатный план</h5>
+                    <p class="text-muted small mb-3">
+                        {{ profile.daily_tasks_limit }} заданий в день
+                    </p>
+                    <a href="#pricing" class="btn-gradient btn-sm">
+                        <i class="fas fa-arrow-up me-1"></i>
+                        Улучшить план
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Telegram интеграция -->
+                {% if not profile.telegram_id %}
+                <div class="card-tech mt-4 p-3 text-center">
+                    <i class="fab fa-telegram fa-2x text-info mb-2"></i>
+                    <h6 class="text-white">Подключите Telegram</h6>
+                    <p class="text-muted small mb-3">
+                        Синхронизируйте прогресс с ботом
+                    </p>
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-neon-blue btn-sm">
+                        <i class="fab fa-telegram me-1"></i>
+                        Подключить
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

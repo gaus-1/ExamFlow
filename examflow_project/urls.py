@@ -3,6 +3,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from core.views import home, subject_list, subject_detail, task_detail
+from core.auth_views import (
+    register_view, login_view, logout_view, dashboard_view, 
+    profile_view, subscribe_view, achievements_view, telegram_auth
+)
 from core.api import (
     get_random_task,
     get_subjects,
@@ -27,8 +31,14 @@ urlpatterns = [
     path('subjects/<int:subject_id>/', subject_detail, name='subject_detail'),
     path('tasks/<int:task_id>/', task_detail, name='task_detail'),
 
-    # Пользователь
-    # (пользовательские страницы будут добавлены позже)
+    # Аутентификация
+    path('register/', register_view, name='register'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
+    path('dashboard/', dashboard_view, name='dashboard'),
+    path('profile/', profile_view, name='profile'),
+    path('achievements/', achievements_view, name='achievements'),
+    path('subscribe/', subscribe_view, name='subscribe'),
 
     # Бот
     path('bot/', bot_control_panel, name='bot_control'),
@@ -44,6 +54,7 @@ urlpatterns = [
     path('api/topics/', get_topics, name='api_topics'),
     path('api/statistics/', get_statistics, name='api_statistics'),
     path('api/billing/create-subscription/', create_subscription, name='api_create_subscription'),
+    path('api/auth/telegram/', telegram_auth, name='api_telegram_auth'),
 ]
 
 if settings.DEBUG:

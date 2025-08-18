@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход в ExamFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: var(--bg-primary);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+        z-index: -1;
+    }
+
+    .auth-card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 16px;
+        padding: 3rem;
+        box-shadow: var(--shadow-dark);
+        max-width: 500px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-primary);
+    }
+
+    .form-control-tech {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: var(--transition-base);
+    }
+
+    .form-control-tech:focus {
+        background: var(--bg-tertiary);
+        border-color: var(--neon-green);
+        box-shadow: var(--glow-green);
+        color: var(--text-primary);
+        outline: none;
+    }
+
+    .form-control-tech::placeholder {
+        color: var(--text-muted);
+    }
+
+    .form-label-tech {
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .auth-title {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2.5rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-subtitle {
+        color: var(--text-secondary);
+        text-align: center;
+        margin-bottom: 3rem;
+        font-size: 1.1rem;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+        color: var(--text-muted);
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+    }
+
+    .divider span {
+        margin: 0 1rem;
+        font-size: 0.9rem;
+    }
+
+    .social-btn {
+        background: var(--bg-secondary);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--text-primary);
+        padding: 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition-base);
+        width: 100%;
+    }
+
+    .social-btn:hover {
+        border-color: var(--neon-blue);
+        box-shadow: var(--glow-blue);
+        color: var(--text-primary);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    .auth-link {
+        color: var(--neon-green);
+        text-decoration: none;
+        transition: var(--transition-base);
+    }
+
+    .auth-link:hover {
+        color: var(--neon-blue);
+        text-decoration: underline;
+    }
+
+    .alert-tech {
+        background: rgba(255, 0, 64, 0.1);
+        border: 1px solid rgba(255, 0, 64, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .alert-success-tech {
+        background: rgba(0, 255, 136, 0.1);
+        border-color: rgba(0, 255, 136, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="auth-card">
+                    <h1 class="auth-title">Вход</h1>
+                    <p class="auth-subtitle">Войдите в свой аккаунт ExamFlow</p>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert-tech {% if message.tags == 'success' %}alert-success-tech{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label-tech">
+                                <i class="fas fa-user me-2"></i>Имя пользователя или Email
+                            </label>
+                            {{ form.username }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.password.id_for_label }}" class="form-label-tech">
+                                <i class="fas fa-lock me-2"></i>Пароль
+                            </label>
+                            {{ form.password }}
+                        </div>
+                        
+                        <button type="submit" class="btn-gradient w-100 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Войти
+                        </button>
+                        
+                        <div class="text-center">
+                            <a href="#" class="auth-link small">Забыли пароль?</a>
+                        </div>
+                    </form>
+                    
+                    <div class="divider">
+                        <span>или</span>
+                    </div>
+                    
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="social-btn mb-3">
+                        <i class="fab fa-telegram fa-lg me-2"></i>
+                        Войти через Telegram
+                    </a>
+                    
+                    <div class="text-center mt-4">
+                        <span class="text-muted">Нет аккаунта? </span>
+                        <a href="{% url 'register' %}" class="auth-link">Зарегистрироваться</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
