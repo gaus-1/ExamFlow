@@ -302,17 +302,20 @@
             text-decoration: none;
         }
 
-        /* Технологичные карточки */
+        /* Минималистичные карточки с пастельными тонами */
         .card-tech {
-            background: var(--bg-card);
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
             padding: 2rem;
             transition: var(--transition-base);
             height: 100%;
-            box-shadow: var(--shadow-dark);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .card-tech::before {
@@ -321,49 +324,58 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 2px;
-            background: var(--gradient-primary);
+            height: 3px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
             transform: scaleX(0);
             transition: var(--transition-base);
             transform-origin: left;
         }
 
-        .card-tech::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.05) 0%, transparent 70%);
-            opacity: 0;
-            transition: var(--transition-slow);
-        }
-
         .card-tech:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-green);
+            transform: translateY(-8px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 1) 100%);
+            border-color: rgba(99, 102, 241, 0.3);
             box-shadow: 
-                var(--shadow-dark),
-                0 0 30px rgba(0, 255, 136, 0.2);
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                0 0 0 1px rgba(99, 102, 241, 0.05);
         }
 
         .card-tech:hover::before {
             transform: scaleX(1);
         }
 
-        .card-tech:hover::after {
-            opacity: 1;
+        /* Текст в карточках */
+        .card-tech h5,
+        .card-tech h6 {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .card-tech p,
+        .card-tech .text-secondary {
+            color: #64748b !important;
+        }
+
+        .card-tech .gradient-text {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .card-neon {
-            background: var(--bg-secondary);
-            border: 2px solid transparent;
-            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
             padding: 2.5rem;
             position: relative;
             overflow: hidden;
             transition: var(--transition-base);
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         .card-neon::before {
@@ -373,20 +385,96 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--gradient-primary);
-            opacity: 0.1;
-            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border-radius: 20px;
             transition: var(--transition-base);
         }
 
         .card-neon:hover {
-            border-color: var(--neon-green);
-            box-shadow: var(--glow-green);
-            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(99, 102, 241, 0.1),
+                0 0 20px rgba(99, 102, 241, 0.2);
+            transform: translateY(-10px) scale(1.02);
         }
 
         .card-neon:hover::before {
-            opacity: 0.2;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        /* Текст в neon карточках */
+        .card-neon h5,
+        .card-neon h6 {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .card-neon p,
+        .card-neon .text-muted {
+            color: #64748b !important;
+        }
+
+        .card-neon .text-white {
+            color: #1e293b !important;
+        }
+
+        /* Стили для иконок предметов */
+        .card-tech i.fa-dna {
+            color: #10b981; /* Зеленый для биологии */
+        }
+
+        .card-tech i.fa-code {
+            color: #3b82f6; /* Синий для информатики */
+        }
+
+        .card-tech i.fa-landmark {
+            color: #f59e0b; /* Желтый для истории */
+        }
+
+        .card-tech i.fa-calculator {
+            color: #8b5cf6; /* Фиолетовый для математики */
+        }
+
+        .card-tech i.fa-users {
+            color: #06b6d4; /* Голубой для обществознания */
+        }
+
+        .card-tech i.fa-language {
+            color: #ef4444; /* Красный для языков */
+        }
+
+        .card-tech i.fa-atom {
+            color: #f97316; /* Оранжевый для физики */
+        }
+
+        .card-tech i.fa-flask {
+            color: #84cc16; /* Лайм для химии */
+        }
+
+        /* Улучшенные статистические карточки */
+        .card-tech .stat-number {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+
+        /* Кнопки в светлых карточках */
+        .card-tech .btn-neon,
+        .card-neon .btn-neon {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
+        }
+
+        .card-tech .btn-neon:hover,
+        .card-neon .btn-neon:hover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
         }
 
         /* Технологичная hero секция */
