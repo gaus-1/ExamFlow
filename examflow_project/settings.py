@@ -109,6 +109,12 @@ else:
                     import socket
                     host = DATABASES['default'].get('HOST') or ''
                     port = int(DATABASES['default'].get('PORT') or 5432)
+                    if not host:
+                        # Попробуем достать hostname из DATABASE_URL
+                        from urllib.parse import urlparse
+                        parsed = urlparse(DATABASE_URL)
+                        host = parsed.hostname or ''
+
                     if host:
                         infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                         if infos:
@@ -117,6 +123,8 @@ else:
                             opts['hostaddr'] = ipv4_addr
                             # Гарантируем TLS
                             opts.setdefault('sslmode', 'require')
+                            # Прямо подключимся по IPv4, чтобы libpq не выбирал AAAA
+                            DATABASES['default']['HOST'] = ipv4_addr
                 except Exception:
                     # Тихо продолжаем, если не удалось резолвить IPv4
                     pass
