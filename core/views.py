@@ -14,3 +14,8 @@ def home(request):
         'total_tasks': total_tasks,
     }
     return render(request, 'home.html', context)
+
+
+def subjects(request):
+    items = Subject.objects.all().order_by('name')
+    return render(request, 'subjects.html', {'subjects': items})
