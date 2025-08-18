@@ -44,45 +44,48 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            /* Светлая современная цветовая схема */
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --bg-card: #ffffff;
+            /* Улучшенная Duolingo-вдохновленная цветовая схема */
+            --bg-primary: #F8FAFC;          /* Основной фон - светло-серый */
+            --bg-secondary: #F1F5F9;        /* Вторичный фон */
+            --bg-card: #FFFFFF;             /* Карточки - чистый белый */
+            --bg-elevated: #FFFFFF;         /* Поднятые элементы */
             
-            /* Современные акцентные цвета */
-            --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --accent-green: #10b981;
-            --accent-orange: #f59e0b;
-            --accent-red: #ef4444;
+            /* Duolingo-стиль акценты (темнее и стильнее) */
+            --accent-primary: #22C55E;      /* Основной зеленый - благородный */
+            --accent-secondary: #3B82F6;    /* Синий для важных действий */
+            --accent-success: #16A34A;      /* Успех - темно-зеленый */
+            --accent-warning: #F59E0B;      /* Предупреждение - янтарный */
+            --accent-danger: #EF4444;       /* Ошибка - красный */
             
-            /* Градиенты */
-            --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            --gradient-secondary: linear-gradient(135deg, #10b981, #06b6d4);
-            --gradient-accent: linear-gradient(135deg, #f59e0b, #f97316);
-            --gradient-danger: linear-gradient(135deg, #ef4444, #f97316);
+            /* Современные градиенты */
+            --gradient-primary: linear-gradient(135deg, #22C55E, #16A34A);
+            --gradient-secondary: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            --gradient-success: linear-gradient(135deg, #16A34A, #15803D);
+            --gradient-warm: linear-gradient(135deg, #F59E0B, #D97706);
             
-            /* Текстовые цвета */
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --text-accent: #3b82f6;
+            /* Duolingo-стиль текстовые цвета */
+            --text-primary: #1E293B;        /* Основной текст - темно-серый */
+            --text-secondary: #64748B;      /* Вторичный текст */
+            --text-muted: #94A3B8;          /* Приглушенный текст */
+            --text-accent: #22C55E;         /* Акцентный текст - зеленый */
+            --text-on-primary: #FFFFFF;     /* Текст на цветном фоне */
             
-            /* Современные тени */
-            --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            /* Duolingo-стиль тени (мягкие и стильные) */
+            --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.08);
+            --shadow-button: 0 2px 4px rgba(34, 197, 94, 0.2);
+            --shadow-button-hover: 0 4px 12px rgba(34, 197, 94, 0.25);
             
-            /* Цветные свечения для акцентов */
-            --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
-            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.3);
-            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+            /* Цветные акценты для интерактивности */
+            --glow-primary: 0 0 0 3px rgba(34, 197, 94, 0.1);
+            --glow-secondary: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            --glow-danger: 0 0 0 3px rgba(239, 68, 68, 0.1);
             
-            /* Границы */
-            --border-light: #e2e8f0;
-            --border-medium: #cbd5e1;
+            /* Границы в стиле Duolingo */
+            --border-light: #E2E8F0;
+            --border-medium: #CBD5E1;
+            --border-accent: #22C55E;
             
             /* Переходы */
             --transition-fast: all 0.15s ease-out;
@@ -106,6 +109,7 @@
         }
 
         /* Фоновые анимированные элементы */
+        /* Duolingo-стиль фоновые элементы */
         body::before {
             content: '';
             position: fixed;
@@ -114,46 +118,59 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
+                radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.01) 0%, transparent 50%);
             z-index: -1;
-            animation: backgroundShift 20s ease-in-out infinite alternate;
+            animation: gentleFloat 30s ease-in-out infinite alternate;
         }
 
-        @keyframes backgroundShift {
-            0% { opacity: 0.3; transform: scale(1) rotate(0deg); }
-            100% { opacity: 0.6; transform: scale(1.1) rotate(2deg); }
+        /* Duolingo-стиль анимации */
+        @keyframes gentleFloat {
+            0% { opacity: 0.5; transform: scale(1) translateY(0px); }
+            100% { opacity: 0.8; transform: scale(1.05) translateY(-10px); }
         }
 
-        /* Современный header */
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Duolingo-стиль header */
         .header-tech {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-elevated);
             border-bottom: 1px solid var(--border-light);
             position: sticky;
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-small);
+            box-shadow: var(--shadow-soft);
+            padding: 1rem 0;
         }
 
+        /* Duolingo-стиль логотип */
         .logo-tech {
             display: flex;
             align-items: center;
             font-weight: 800;
             font-size: 1.8rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--accent-primary);
             text-decoration: none;
             transition: var(--transition-base);
         }
 
         .logo-tech:hover {
-            filter: drop-shadow(var(--glow-green));
-            transform: scale(1.02);
+            color: var(--accent-success);
+            transform: scale(1.05);
         }
+
+        .logo-tech i {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+            color: var(--accent-primary);
+        }
+
+
 
         .logo-tech i {
             margin-right: 0.5rem;
@@ -197,10 +214,10 @@
         }
 
         .nav-link-tech:hover {
-            color: var(--accent-blue) !important;
-            border-color: var(--accent-blue);
-            box-shadow: var(--glow-blue);
+            color: var(--accent-primary) !important;
+            background: rgba(34, 197, 94, 0.08);
             transform: translateY(-2px);
+            border-radius: 12px;
         }
 
         .nav-link-tech:hover::before {
@@ -208,20 +225,21 @@
         }
 
         .nav-link-tech.active {
-            color: var(--accent-blue) !important;
-            border-color: var(--accent-blue);
-            box-shadow: var(--glow-blue);
-            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-primary) !important;
+            background: rgba(34, 197, 94, 0.12);
+            font-weight: 600;
+            border-radius: 12px;
         }
 
-        /* Неоновые технологичные кнопки */
+        /* Duolingo-стиль кнопки (яркие и дружелюбные) */
         .btn-neon {
-            background: var(--gradient-primary);
+            background: var(--accent-primary);
             border: none;
-            color: white;
+            color: var(--text-on-primary);
             padding: 1rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -229,11 +247,10 @@
             transition: var(--transition-base);
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow-medium);
-            letter-spacing: 1px;
-            box-shadow: 
-                0 0 20px rgba(0, 255, 136, 0.3),
-                inset 0 0 20px rgba(0, 255, 136, 0.1);
+            box-shadow: var(--shadow-button);
+            text-transform: none;
+            letter-spacing: 0;
+
         }
 
         .btn-neon::before {
@@ -249,15 +266,50 @@
         }
 
         .btn-neon:hover {
-            color: white;
-            background: var(--gradient-secondary);
-            box-shadow: var(--shadow-large);
-            transform: translateY(-3px);
+            background: var(--accent-success);
+            box-shadow: var(--shadow-button-hover);
+            transform: translateY(-2px) scale(1.02);
             text-decoration: none;
         }
 
         .btn-neon:hover::before {
             left: 100%;
+        }
+
+        /* Дополнительные Duolingo-стиль кнопки */
+        .btn-secondary-duolingo {
+            background: var(--accent-secondary);
+            border: none;
+            color: var(--text-on-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-base);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .btn-secondary-duolingo:hover {
+            background: #1D4ED8;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .btn-outline-duolingo {
+            background: transparent;
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition-base);
+        }
+
+        .btn-outline-duolingo:hover {
+            background: var(--accent-primary);
+            color: var(--text-on-primary);
+            transform: translateY(-2px);
         }
 
         .btn-neon-blue {
@@ -306,20 +358,18 @@
             text-decoration: none;
         }
 
-        /* Минималистичные карточки с пастельными тонами */
+        /* Duolingo-стиль карточки (дружелюбные и яркие) */
         .card-tech {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
             padding: 2rem;
             transition: var(--transition-base);
             height: 100%;
-            box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.1),
-                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: var(--shadow-card);
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(10px);
+            animation: bounceIn 0.6s ease-out;
         }
 
         .card-tech::before {
@@ -336,36 +386,40 @@
         }
 
         .card-tech:hover {
-            transform: translateY(-8px);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 1) 100%);
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 
-                0 20px 25px -5px rgba(0, 0, 0, 0.1),
-                0 10px 10px -5px rgba(0, 0, 0, 0.04),
-                0 0 0 1px rgba(99, 102, 241, 0.05);
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-elevated);
+            background: var(--bg-elevated);
         }
 
         .card-tech:hover::before {
             transform: scaleX(1);
         }
 
-        /* Текст в карточках */
+        /* Duolingo-стиль текст в карточках */
         .card-tech h5,
         .card-tech h6 {
-            color: #1e293b;
-            font-weight: 600;
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
 
         .card-tech p,
         .card-tech .text-secondary {
-            color: #64748b !important;
+            color: var(--text-secondary) !important;
+            line-height: 1.6;
         }
 
         .card-tech .gradient-text {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--accent-primary);
+            font-weight: 800;
+        }
+
+        /* Иконки в карточках */
+        .card-tech i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
         }
 
         .card-neon {
@@ -803,7 +857,7 @@
                 </div>
             </div>
         </div>
-    </nav>
+            </nav>
     
     <main>
         {% block content %}{% endblock %}
