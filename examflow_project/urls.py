@@ -4,9 +4,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from core.views import home, subject_list, subject_detail, task_detail
 from core.auth_views import (
-    register_view, login_view, logout_view, dashboard_view, 
+    register_view, login_view, logout_view, dashboard_view,
     profile_view, subscribe_view, achievements_view, telegram_auth
 )
+from core.admin_views import trigger_parsing, start_parsing, parsing_status
 from core.api import (
     get_random_task,
     get_subjects,
@@ -55,6 +56,11 @@ urlpatterns = [
     path('api/statistics/', get_statistics, name='api_statistics'),
     path('api/billing/create-subscription/', create_subscription, name='api_create_subscription'),
     path('api/auth/telegram/', telegram_auth, name='api_telegram_auth'),
+    
+    # Административные функции (БЕСПЛАТНЫЙ способ запуска парсинга)
+    path('admin/parsing/', trigger_parsing, name='admin_trigger_parsing'),
+    path('admin/start-parsing/', start_parsing, name='admin_start_parsing'),
+    path('admin/parsing-status/', parsing_status, name='admin_parsing_status'),
 ]
 
 if settings.DEBUG:

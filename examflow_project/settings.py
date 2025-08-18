@@ -45,6 +45,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.gzip.GZipMiddleware',
+    'core.auto_startup.trigger_startup_on_first_request',  # Автозапуск парсинга
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -239,6 +240,9 @@ if not DEBUG:
 # Keep-alive настройки
 SITE_URL = os.getenv('SITE_URL', 'https://examflow.ru')
 ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID', None)  # Telegram chat ID админа для уведомлений
+
+# Автозапуск парсинга при первом запросе (по умолчанию включен)
+AUTO_STARTUP_ENABLED = os.getenv('AUTO_STARTUP_ENABLED', 'true').lower() in ['true', '1', 'yes']
 
 # Логирование
 LOGGING = {
