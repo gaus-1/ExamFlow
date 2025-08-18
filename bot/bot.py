@@ -377,6 +377,43 @@ async def mark_understood(update: Update, context: ContextTypes.DEFAULT_TYPE):
     next_task = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('?').first()
     if next_task:
         await show_task(query, next_task, user)
+    else:
+        keyboard = [[InlineKeyboardButton("🔙 К предмету", callback_data=f"subject_{task.subject.id}")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(
+            "✅ Отлично! Вы изучили это задание.",
+            reply_markup=reply_markup
+        )
+
+
+async def mark_not_understood(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Отметить как непонятое"""
+    query = update.callback_query
+    await query.answer("📚 Рекомендуем повторить материал!")
+    
+    task_id = int(query.data.split('_')[2])  # not_understood_X
+    user = get_or_create_user(update.effective_user)
+    task = Task.objects.get(id=task_id)
+    
+    progress, created = UserProgress.objects.get_or_create(
+        user=user, 
+        task=task,
+        defaults={'is_correct': False, 'attempts': 1}
+    )
+    if not created:
+        progress.attempts += 1
+        progress.save()
+    
+    keyboard = [
+        [InlineKeyboardButton("🎯 Другое задание", callback_data="random_task")],
+        [InlineKeyboardButton("🔙 К предмету", callback_data=f"subject_{task.subject.id}")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await query.edit_message_text(
+        f"📚 Не расстраивайтесь! Изучите материал по теме '{task.title}' и возвращайтесь к заданиям.",
+        reply_markup=reply_markup
+    )
 
 
 async def progress(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -501,6 +538,17 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(text, reply_markup=reply_markup)
 
 
+async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик неизвестных callback'ов для отладки"""
+    query = update.callback_query
+    await query.answer("🤔 Неизвестная команда, возвращаюсь в главное меню...")
+    
+    logger.warning(f"Unknown callback data: {query.data}")
+    
+    # Перенаправляем в главное меню
+    await start(update, context)
+
+
 def main():
     """Запуск бота"""
     token = settings.TELEGRAM_BOT_TOKEN
@@ -523,10 +571,14 @@ def main():
     application.add_handler(CallbackQueryHandler(mark_correct, pattern="correct_\d+"))
     application.add_handler(CallbackQueryHandler(mark_incorrect, pattern="incorrect_\d+"))
     application.add_handler(CallbackQueryHandler(mark_understood, pattern="understood_\d+"))
+    application.add_handler(CallbackQueryHandler(mark_not_understood, pattern="not_understood_\d+"))
     application.add_handler(CallbackQueryHandler(start, pattern="main_menu"))
     application.add_handler(CallbackQueryHandler(about, pattern="about"))
     application.add_handler(CallbackQueryHandler(progress, pattern="progress"))
     application.add_handler(CallbackQueryHandler(rating, pattern="rating"))
+    
+    # Обработчик для всех остальных callback (отладка)
+    application.add_handler(CallbackQueryHandler(handle_unknown_callback))
     
     # Запуск бота
     logger.info("🤖 ExamFlow Bot запущен...")
