@@ -4,12 +4,12 @@
 {% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-tech">
-    <div class="geometric-bg">
-        <div class="geometric-shape"></div>
-        <div class="geometric-shape"></div>
-        <div class="geometric-shape"></div>
+<!-- Hero Section с фоновым изображением -->
+<section class="hero-tech hero-with-image">
+    <!-- Фоновое изображение: Вечернее рабочее место у окна с видом на город -->
+    <div class="hero-background">
+        <img src="{% static 'images/hero/evening-workspace.jpg' %}" alt="Вечернее рабочее место" class="hero-bg-image">
+        <div class="hero-overlay"></div>
     </div>
     
     <div class="container">
@@ -77,6 +77,90 @@
                         <i class="fab fa-telegram me-2"></i>
                         Открыть бота
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5" style="background: var(--bg-primary);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="gradient-text fw-bold mb-3">Как это работает</h2>
+            <p class="text-secondary">Простой и эффективный процесс обучения</p>
+        </div>
+        
+        <div class="row g-5 align-items-center">
+            <!-- Шаг 1: Регистрация -->
+            <div class="col-lg-6">
+                <div class="feature-content">
+                    <div class="feature-number">01</div>
+                    <h3 class="fw-bold mb-3">Быстрая регистрация</h3>
+                    <p class="text-secondary mb-4">
+                        Всего 3 поля: имя, email и пароль. Никаких лишних вопросов - 
+                        начинайте учиться через минуту после регистрации.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check text-success me-2"></i>Простая форма регистрации</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Мгновенный доступ к заданиям</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Синхронизация с Telegram ботом</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-image">
+                    <img src="{% static 'images/features/registration-interface.jpg' %}" 
+                         alt="Интерфейс ExamFlow" 
+                         class="img-fluid rounded-4 shadow-lg">
+                </div>
+            </div>
+            
+            <!-- Шаг 2: Групповое обучение -->
+            <div class="col-lg-6 order-lg-2">
+                <div class="feature-content">
+                    <div class="feature-number">02</div>
+                    <h3 class="fw-bold mb-3">Обучение в группе</h3>
+                    <p class="text-secondary mb-4">
+                        Присоединяйтесь к сообществу учеников. Решайте задания вместе, 
+                        обменивайтесь опытом и мотивируйте друг друга.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-users text-primary me-2"></i>Сообщество учеников</li>
+                        <li><i class="fas fa-comments text-primary me-2"></i>Обмен опытом</li>
+                        <li><i class="fas fa-trophy text-primary me-2"></i>Соревновательный элемент</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+                <div class="feature-image">
+                    <img src="{% static 'images/features/group-study.jpg' %}" 
+                         alt="Групповое обучение" 
+                         class="img-fluid rounded-4 shadow-lg">
+                </div>
+            </div>
+            
+            <!-- Шаг 3: Индивидуальная работа -->
+            <div class="col-lg-6">
+                <div class="feature-content">
+                    <div class="feature-number">03</div>
+                    <h3 class="fw-bold mb-3">Персональный прогресс</h3>
+                    <p class="text-secondary mb-4">
+                        Отслеживайте свои успехи, анализируйте слабые места и 
+                        получайте персональные рекомендации для улучшения результатов.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-chart-line text-warning me-2"></i>Детальная аналитика</li>
+                        <li><i class="fas fa-target text-warning me-2"></i>Персональные рекомендации</li>
+                        <li><i class="fas fa-brain text-warning me-2"></i>Адаптивное обучение</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="feature-image">
+                    <img src="{% static 'images/features/individual-study.jpg' %}" 
+                         alt="Индивидуальное обучение" 
+                         class="img-fluid rounded-4 shadow-lg">
                 </div>
             </div>
         </div>
@@ -301,6 +385,98 @@
                 </div>
             </div>
         {% endif %}
+    </div>
+</section>
+
+<!-- About Section с атмосферными изображениями -->
+<section class="py-5" style="background: var(--bg-primary);">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <h2 class="gradient-text fw-bold mb-4">Создано для успеха</h2>
+                    <p class="text-secondary mb-4 lead">
+                        ExamFlow — это результат глубокого анализа потребностей современных учеников. 
+                        Мы создали платформу, которая объединяет лучшие практики образования 
+                        с современными технологиями.
+                    </p>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-6">
+                            <div class="stat-item text-center">
+                                <div class="h3 gradient-text mb-1">12+</div>
+                                <div class="small text-muted">предметов ЕГЭ/ОГЭ</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item text-center">
+                                <div class="h3 gradient-text mb-1">1000+</div>
+                                <div class="small text-muted">активных учеников</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item text-center">
+                                <div class="h3 gradient-text mb-1">95%</div>
+                                <div class="small text-muted">довольных пользователей</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item text-center">
+                                <div class="h3 gradient-text mb-1">24/7</div>
+                                <div class="small text-muted">поддержка</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-highlights">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-brain text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Научный подход</h6>
+                                <p class="text-secondary mb-0 small">Основано на исследованиях в области педагогики</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-chart-line text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Измеримые результаты</h6>
+                                <p class="text-secondary mb-0 small">Отслеживайте прогресс в реальном времени</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="feature-icon me-3">
+                                <i class="fas fa-users text-warning"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Сообщество</h6>
+                                <p class="text-secondary mb-0 small">Учитесь вместе с единомышленниками</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-images">
+                    <!-- Основное изображение: Книги на подоконнике -->
+                    <div class="main-about-image mb-4">
+                        <img src="{% static 'images/about/books-windowsill.jpg' %}" 
+                             alt="Книги на подоконнике с растениями" 
+                             class="img-fluid rounded-4 shadow-lg">
+                    </div>
+                    
+                    <!-- Дополнительное изображение: Школьная доска -->
+                    <div class="secondary-about-image">
+                        <img src="{% static 'images/about/classroom-blackboard.jpg' %}" 
+                             alt="Школьная доска с формулами" 
+                             class="img-fluid rounded-4 shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
