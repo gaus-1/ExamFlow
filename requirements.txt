@@ -2,10 +2,9 @@ Django==4.2.7
 psycopg[binary]==3.2.3
 python-telegram-bot==22.3
 python-dotenv==1.0.0
-Pillow==11.0.0
+Pillow==10.4.0
 qrcode==7.4.2
 gTTS==2.5.1
-pyttsx3==2.90
 redis==5.0.1
 celery==5.3.4
 django-cors-headers==4.3.1
@@ -22,8 +21,3 @@ lxml==5.2.2
 requests==2.31.0
 # Планировщик задач для keep-alive
 schedule==1.2.0
-# Тестирование
-pytest==8.3.2
-pytest-django==4.9.0
-pytest-cov==4.1.0
-pytest-mock==3.12.0
