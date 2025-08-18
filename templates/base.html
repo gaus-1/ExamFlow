@@ -44,39 +44,45 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            /* Темная технологичная цветовая схема в стиле Reputationsquad/Resn */
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #121212;
-            --bg-tertiary: #1a1a1a;
-            --bg-card: #1e1e1e;
+            /* Светлая современная цветовая схема */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-card: #ffffff;
             
-            /* Неоновые акцентные цвета */
-            --neon-green: #00ff88;
-            --neon-blue: #00d4ff;
-            --neon-purple: #ff00ff;
-            --neon-yellow: #ffff00;
-            --neon-red: #ff0040;
+            /* Современные акцентные цвета */
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
             
             /* Градиенты */
-            --gradient-primary: linear-gradient(135deg, #00ff88, #00d4ff);
-            --gradient-secondary: linear-gradient(135deg, #ff00ff, #00d4ff);
-            --gradient-accent: linear-gradient(135deg, #00ff88, #ffff00);
-            --gradient-danger: linear-gradient(135deg, #ff0040, #ff00ff);
+            --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --gradient-secondary: linear-gradient(135deg, #10b981, #06b6d4);
+            --gradient-accent: linear-gradient(135deg, #f59e0b, #f97316);
+            --gradient-danger: linear-gradient(135deg, #ef4444, #f97316);
             
             /* Текстовые цвета */
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --text-muted: #666666;
-            --text-accent: #00ff88;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --text-accent: #3b82f6;
             
-            /* Тени с неоновым свечением */
-            --glow-green: 0 0 20px rgba(0, 255, 136, 0.3);
-            --glow-blue: 0 0 20px rgba(0, 212, 255, 0.3);
-            --glow-purple: 0 0 20px rgba(255, 0, 255, 0.3);
-            --glow-yellow: 0 0 20px rgba(255, 255, 0, 0.3);
+            /* Современные тени */
+            --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             
-            --shadow-dark: 0 4px 20px rgba(0, 0, 0, 0.5);
-            --shadow-neon: 0 0 30px rgba(0, 255, 136, 0.2);
+            /* Цветные свечения для акцентов */
+            --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+            --glow-purple: 0 0 20px rgba(139, 92, 246, 0.3);
+            --glow-green: 0 0 20px rgba(16, 185, 129, 0.3);
+            
+            /* Границы */
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
             
             /* Переходы */
             --transition-fast: all 0.15s ease-out;
@@ -108,9 +114,9 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
             z-index: -1;
             animation: backgroundShift 20s ease-in-out infinite alternate;
         }
@@ -120,15 +126,15 @@
             100% { opacity: 0.6; transform: scale(1.1) rotate(2deg); }
         }
 
-        /* Технологичный header */
+        /* Современный header */
         .header-tech {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid var(--border-light);
             position: sticky;
             top: 0;
             z-index: 1000;
             backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-dark);
+            box-shadow: var(--shadow-small);
         }
 
         .logo-tech {
@@ -191,9 +197,9 @@
         }
 
         .nav-link-tech:hover {
-            color: var(--text-primary) !important;
-            border-color: var(--neon-green);
-            box-shadow: var(--glow-green);
+            color: var(--accent-blue) !important;
+            border-color: var(--accent-blue);
+            box-shadow: var(--glow-blue);
             transform: translateY(-2px);
         }
 
@@ -202,17 +208,17 @@
         }
 
         .nav-link-tech.active {
-            color: var(--text-primary) !important;
-            border-color: var(--neon-green);
-            box-shadow: var(--glow-green);
-            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-blue) !important;
+            border-color: var(--accent-blue);
+            box-shadow: var(--glow-blue);
+            background: rgba(59, 130, 246, 0.1);
         }
 
         /* Неоновые технологичные кнопки */
         .btn-neon {
-            background: transparent;
-            border: 2px solid var(--neon-green);
-            color: var(--neon-green);
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
             padding: 1rem 2rem;
             border-radius: 8px;
             font-weight: 600;
@@ -223,7 +229,7 @@
             transition: var(--transition-base);
             position: relative;
             overflow: hidden;
-            text-transform: uppercase;
+            box-shadow: var(--shadow-medium);
             letter-spacing: 1px;
             box-shadow: 
                 0 0 20px rgba(0, 255, 136, 0.3),
@@ -243,11 +249,9 @@
         }
 
         .btn-neon:hover {
-            color: var(--bg-primary);
-            background: var(--neon-green);
-            box-shadow: 
-                0 0 40px rgba(0, 255, 136, 0.6),
-                inset 0 0 40px rgba(0, 255, 136, 0.2);
+            color: white;
+            background: var(--gradient-secondary);
+            box-shadow: var(--shadow-large);
             transform: translateY(-3px);
             text-decoration: none;
         }

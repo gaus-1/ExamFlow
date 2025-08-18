@@ -36,8 +36,15 @@ def telegram_webhook(request):
         data = json.loads(request.body.decode('utf-8'))
         logger.info(f"Получено обновление от Telegram: {data}")
         
+        # Получаем экземпляр бота
+        from bot.bot_instance import get_bot
+        bot = get_bot()
+        if not bot:
+            logger.error("Не удалось получить экземпляр бота")
+            return HttpResponse("bot error", status=500)
+        
         # Создаем объект Update
-        update = Update.de_json(data, None)
+        update = Update.de_json(data, bot)
         
         if update:
             # Запускаем обработку в асинхронном режиме
@@ -65,14 +72,19 @@ async def handle_telegram_update(update: Update):
             progress, rating, subscription_menu, voice_hint, handle_unknown_callback
         )
         
+        # Получаем экземпляр бота для контекста
+        from bot.bot_instance import get_bot
+        bot = get_bot()
+        
         # Создаем контекст (заглушка для совместимости)
         class MockContext:
-            def __init__(self):
+            def __init__(self, bot):
+                self.bot = bot
                 self.user_data = {}
                 self.bot_data = {}
                 self.chat_data = {}
         
-        context = MockContext()
+        context = MockContext(bot)
         
         # Обрабатываем команды
         if update.message:
