@@ -151,7 +151,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=reply_markup
         )
             
-        except Exception as e:
+    except Exception as e:
         logger.error(f"Ошибка в subjects_menu: {str(e)}")
         try:
             await query.edit_message_text("❌ Ошибка загрузки предметов. Попробуйте позже.")
@@ -388,7 +388,7 @@ async def mark_correct(update: Update, context: ContextTypes.DEFAULT_TYPE):
     next_task = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('?').first()
     if next_task:
         await show_task(query, next_task, user)
-            else:
+    else:
         keyboard = [[InlineKeyboardButton("🔙 К предмету", callback_data=f"subject_{task.subject.id}")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -678,11 +678,11 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     profile = UserProfile.objects.get(user=user)
     
     if not profile.is_premium:
-    keyboard = [
+        keyboard = [
             [InlineKeyboardButton("👑 Оформить Premium", callback_data="subscription")],
             [InlineKeyboardButton("🔙 К заданию", callback_data="main_menu")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
         
         await query.edit_message_text(
             "🎤 Голосовые подсказки доступны только в Premium подписке!\n\n"

@@ -47,8 +47,10 @@ def telegram_webhook(request):
         update = Update.de_json(data, bot)
         
         if update:
-            # Запускаем обработку в асинхронном режиме
-            asyncio.run(handle_telegram_update(update))
+            # Запускаем обработку синхронно (функции в bot.py не асинхронные)
+            import threading
+            thread = threading.Thread(target=handle_telegram_update_sync, args=(update,))
+            thread.start()
         
         return HttpResponse("ok")
         
@@ -61,10 +63,10 @@ def telegram_webhook(request):
         return HttpResponse("error", status=500)
 
 
-async def handle_telegram_update(update: Update):
-    """Асинхронная обработка обновления от Telegram"""
+def handle_telegram_update_sync(update: Update):
+    """Синхронная обработка обновления от Telegram"""
     try:
-        # Импортируем обработчики из bot.py
+        # Импортируем обработчики из bot.py (они синхронные, не асинхронные)
         from bot.bot import (
             start, subjects_menu, subject_detail, solve_subject_tasks,
             random_task, random_subject_task, show_answer, mark_correct,
@@ -89,7 +91,8 @@ async def handle_telegram_update(update: Update):
         # Обрабатываем команды
         if update.message:
             if update.message.text == '/start':
-                start(update, context)
+                # Запускаем асинхронную функцию в новом event loop
+                asyncio.run(start(update, context))
                 return
         
         # Обрабатываем callback queries
@@ -109,38 +112,28 @@ async def handle_telegram_update(update: Update):
             
             # Обработчики с параметрами
             if callback_data.startswith('subject_'):
-                subject_detail(update, context)
+                asyncio.run(subject_detail(update, context))
             elif callback_data.startswith('solve_'):
-                solve_subject_tasks(update, context)
+                asyncio.run(solve_subject_tasks(update, context))
             elif callback_data.startswith('random_subject_'):
-                random_subject_task(update, context)
+                asyncio.run(random_subject_task(update, context))
             elif callback_data.startswith('answer_'):
-                show_answer(update, context)
+                asyncio.run(show_answer(update, context))
             elif callback_data.startswith('correct_'):
-                mark_correct(update, context)
+                asyncio.run(mark_correct(update, context))
             elif callback_data.startswith('incorrect_'):
-                mark_incorrect(update, context)
+                asyncio.run(mark_incorrect(update, context))
             elif callback_data.startswith('understood_'):
-                mark_understood(update, context)
+                asyncio.run(mark_understood(update, context))
             elif callback_data.startswith('not_understood_'):
-                mark_not_understood(update, context)
+                asyncio.run(mark_not_understood(update, context))
             elif callback_data in handlers:
-                handlers[callback_data](update, context)
+                asyncio.run(handlers[callback_data](update, context))
             else:
-                handle_unknown_callback(update, context)
+                asyncio.run(handle_unknown_callback(update, context))
         
     except Exception as e:
-        logger.error(f"Ошибка в handle_telegram_update: {str(e)}")
-        
-        # Отправляем сообщение об ошибке пользователю
-        try:
-            if update.callback_query:
-                asyncio.run(update.callback_query.edit_message_text(
-                    "❌ Произошла ошибка. Попробуйте позже или обратитесь в поддержку."
-                ))
-            elif update.message:
-                asyncio.run(update.message.reply_text(
-                    "❌ Произошла ошибка. Попробуйте позже или обратитесь в поддержку."
-                ))
-        except:
-            pass
+        logger.error(f"Ошибка в handle_telegram_update_sync: {str(e)}")
+
+
+
