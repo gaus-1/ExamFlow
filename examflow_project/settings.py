@@ -99,6 +99,27 @@ else:
             }
             # Явно указываем backend для совместимости
             DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
+
+            # Форсируем IPv4 при необходимости: некоторые окружения не имеют IPv6-маршрутизации,
+            # а Supabase/PG-хост может сначала резолвиться в AAAA.
+            # Если DB_FORCE_IPV4=1 (по умолчанию в продакшене), подставим hostaddr IPv4.
+            force_ipv4 = os.getenv('DB_FORCE_IPV4', '1' if not DEBUG else '0') == '1'
+            if force_ipv4:
+                try:
+                    import socket
+                    host = DATABASES['default'].get('HOST') or ''
+                    port = int(DATABASES['default'].get('PORT') or 5432)
+                    if host:
+                        infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+                        if infos:
+                            ipv4_addr = infos[0][4][0]
+                            opts = DATABASES['default'].setdefault('OPTIONS', {})
+                            opts['hostaddr'] = ipv4_addr
+                            # Гарантируем TLS
+                            opts.setdefault('sslmode', 'require')
+                except Exception:
+                    # Тихо продолжаем, если не удалось резолвить IPv4
+                    pass
         except Exception:
             DATABASES = _sqlite_db()
     else:
