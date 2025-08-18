@@ -9,68 +9,87 @@ from .models import UserProfile
 
 
 class TechRegisterForm(UserCreationForm):
-    """Форма регистрации с технологичным дизайном"""
-    email = forms.EmailField(required=True)
-    first_name = forms.CharField(max_length=30, required=False)
-    last_name = forms.CharField(max_length=30, required=False)
-    phone = forms.CharField(max_length=20, required=False)
+    """Упрощенная форма регистрации в Duolingo-стиле - только необходимые поля"""
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'Ваш email адрес',
+            'class': 'form-control-duolingo'
+        })
+    )
+    first_name = forms.CharField(
+        max_length=30, 
+        required=True,  # Теперь обязательное поле
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Ваше имя',
+            'class': 'form-control-duolingo'
+        })
+    )
     
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+        fields = ('first_name', 'email', 'password1', 'password2')  # Убрали username, last_name, phone
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Добавляем технологичные CSS классы
-        for field_name, field in self.fields.items():
-            field.widget.attrs.update({
-                'class': 'form-control-tech',
-                'placeholder': self._get_placeholder(field_name)
-            })
-    
-    def _get_placeholder(self, field_name):
-        """Возвращает placeholder для поля"""
-        placeholders = {
-            'username': 'Имя пользователя',
-            'email': 'Email адрес',
-            'first_name': 'Имя',
-            'last_name': 'Фамилия',
-            'password1': 'Пароль',
-            'password2': 'Подтверждение пароля',
-            'phone': 'Телефон (необязательно)'
-        }
-        return placeholders.get(field_name, '')
+        # Duolingo-стиль оформление полей
+        self.fields['password1'].widget.attrs.update({
+            'placeholder': 'Придумайте пароль',
+            'class': 'form-control-duolingo'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'placeholder': 'Повторите пароль',
+            'class': 'form-control-duolingo'
+        })
+        
+        # Русские подписи полей
+        self.fields['first_name'].label = 'Ваше имя'
+        self.fields['email'].label = 'Email адрес'
+        self.fields['password1'].label = 'Пароль'
+        self.fields['password2'].label = 'Подтвердите пароль'
     
     def save(self, commit=True):
-        """Сохраняет пользователя и создает профиль"""
+        """Сохраняет пользователя с автогенерацией username из email"""
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
+        
+        # Автоматически генерируем username из email (до @ символа)
+        base_username = self.cleaned_data['email'].split('@')[0]
+        username = base_username
+        
+        # Если username уже существует, добавляем цифру
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+        
+        user.username = username
         
         if commit:
             user.save()
-            # Создаем профиль пользователя
-            UserProfile.objects.create(
-                user=user,
-                phone=self.cleaned_data.get('phone', '')
-            )
+            # Создаем упрощенный профиль пользователя
+            UserProfile.objects.create(user=user)
         return user
 
 
 class TechLoginForm(AuthenticationForm):
-    """Форма входа с технологичным дизайном"""
+    """Упрощенная форма входа в Duolingo-стиле - вход по email"""
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
-            'class': 'form-control-tech',
-            'placeholder': 'Имя пользователя или Email'
+            'class': 'form-control-duolingo',
+            'placeholder': 'Ваш email адрес'
         })
         self.fields['password'].widget.attrs.update({
-            'class': 'form-control-tech',
-            'placeholder': 'Пароль'
+            'class': 'form-control-duolingo',
+            'placeholder': 'Ваш пароль'
         })
+        
+        # Русские подписи
+        self.fields['username'].label = 'Email'
+        self.fields['password'].label = 'Пароль'
 
 
 class ProfileUpdateForm(forms.ModelForm):
