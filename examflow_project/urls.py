@@ -36,16 +36,14 @@ urlpatterns = [
     path('bot/webhook/', telegram_webhook, name='telegram_webhook'),
 
     # API
-    path('api/', include([
-        path('tasks/random/', get_random_task, name='api_random_task'),
-        path('tasks/<int:task_id>/', get_task_by_id, name='api_task_by_id'),
-        path('tasks/search/', api_search_tasks, name='api_search_tasks'),
-        path('subjects/', get_subjects, name='api_subjects'),
-        path('subjects/<int:subject_id>/tasks/', get_tasks_by_subject, name='api_tasks_by_subject'),
-        path('topics/', get_topics, name='api_topics'),
-        path('statistics/', get_statistics, name='api_statistics'),
-        path('billing/create-subscription/', create_subscription, name='api_create_subscription'),
-    ])),
+    path('api/tasks/random/', get_random_task, name='api_random_task'),
+    path('api/tasks/<int:task_id>/', get_task_by_id, name='api_task_by_id'),
+    path('api/tasks/search/', api_search_tasks, name='api_search_tasks'),
+    path('api/subjects/', get_subjects, name='api_subjects'),
+    path('api/subjects/<int:subject_id>/tasks/', get_tasks_by_subject, name='api_tasks_by_subject'),
+    path('api/topics/', get_topics, name='api_topics'),
+    path('api/statistics/', get_statistics, name='api_statistics'),
+    path('api/billing/create-subscription/', create_subscription, name='api_create_subscription'),
 ]
 
 if settings.DEBUG:

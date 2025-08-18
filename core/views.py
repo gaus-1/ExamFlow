@@ -8,12 +8,12 @@ from .utils import generate_qr_code
 
 @cache_page(30)
 def home(request):
-    # Лёгкий автосид: если база пуста, попробуем загрузить демо-данные
-    if Subject.objects.count() == 0 and Task.objects.count() == 0:
+    # Принудительная загрузка демо-данных при пустой базе
+    if Subject.objects.count() == 0:
         try:
             management.call_command('load_sample_data')
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error loading sample data: {e}")
 
     total_tasks = Task.objects.count()
     total_subjects = Subject.objects.count()
