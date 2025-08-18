@@ -1,6 +1,6 @@
 import os
-import dj_database_url
-from dotenv import load_dotenv
+import dj_database_url  # type: ignore
+from dotenv import load_dotenv  # type: ignore
 
 load_dotenv()
 

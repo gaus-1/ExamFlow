@@ -1,17 +1,18 @@
 import os
-import django
+import django  # type: ignore
 import logging
 
 # Настройка Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from core.models import Subject, Task, UserProgress, UserRating, Achievement, UserProfile, Subscription
-from django.contrib.auth.models import User
-from django.conf import settings
-from django.utils import timezone
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup  # type: ignore
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes  # type: ignore
+from core.models import Subject, Task, UserProgress, UserRating, Achievement, UserProfile, Subscription  # type: ignore
+from django.contrib.auth.models import User  # type: ignore
+from django.conf import settings  # type: ignore
+from django.utils import timezone  # type: ignore
+from django.db.models import Count, Q  # type: ignore
 
 # Логирование
 logging.basicConfig(
@@ -763,15 +764,15 @@ def main():
     
     # Обработчики callback-кнопок
     application.add_handler(CallbackQueryHandler(subjects_menu, pattern="subjects"))
-    application.add_handler(CallbackQueryHandler(subject_detail, pattern="subject_\d+"))
-    application.add_handler(CallbackQueryHandler(solve_subject_tasks, pattern="solve_\d+"))
+    application.add_handler(CallbackQueryHandler(subject_detail, pattern=r"subject_\d+"))
+    application.add_handler(CallbackQueryHandler(solve_subject_tasks, pattern=r"solve_\d+"))
     application.add_handler(CallbackQueryHandler(random_task, pattern="random_task"))
-    application.add_handler(CallbackQueryHandler(random_subject_task, pattern="random_subject_\d+"))
-    application.add_handler(CallbackQueryHandler(show_answer, pattern="answer_\d+"))
-    application.add_handler(CallbackQueryHandler(mark_correct, pattern="correct_\d+"))
-    application.add_handler(CallbackQueryHandler(mark_incorrect, pattern="incorrect_\d+"))
-    application.add_handler(CallbackQueryHandler(mark_understood, pattern="understood_\d+"))
-    application.add_handler(CallbackQueryHandler(mark_not_understood, pattern="not_understood_\d+"))
+    application.add_handler(CallbackQueryHandler(random_subject_task, pattern=r"random_subject_\d+"))
+    application.add_handler(CallbackQueryHandler(show_answer, pattern=r"answer_\d+"))
+    application.add_handler(CallbackQueryHandler(mark_correct, pattern=r"correct_\d+"))
+    application.add_handler(CallbackQueryHandler(mark_incorrect, pattern=r"incorrect_\d+"))
+    application.add_handler(CallbackQueryHandler(mark_understood, pattern=r"understood_\d+"))
+    application.add_handler(CallbackQueryHandler(mark_not_understood, pattern=r"not_understood_\d+"))
     application.add_handler(CallbackQueryHandler(start, pattern="main_menu"))
     application.add_handler(CallbackQueryHandler(about, pattern="about"))
     application.add_handler(CallbackQueryHandler(progress, pattern="progress"))

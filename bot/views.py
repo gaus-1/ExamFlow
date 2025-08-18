@@ -1,12 +1,12 @@
 import json
 import asyncio
 import logging
-from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.conf import settings
-from telegram import Update
+from django.shortcuts import render  # type: ignore
+from django.http import JsonResponse, HttpResponse  # type: ignore
+from django.views.decorators.csrf import csrf_exempt  # type: ignore
+from django.views.decorators.http import require_POST  # type: ignore
+from django.conf import settings  # type: ignore
+from telegram import Update  # type: ignore
 
 logger = logging.getLogger(__name__)
 

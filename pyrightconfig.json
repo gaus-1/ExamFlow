@@ -1,0 +1,39 @@
+{
+    "include": [
+        "."
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        ".git",
+        ".pytest_cache",
+        "static/images"
+    ],
+    "ignore": [],
+    "defineConstant": {},
+    "stubPath": "",
+    "reportMissingImports": "none",
+    "reportMissingTypeStubs": "none",
+    "pythonVersion": "3.11",
+    "pythonPlatform": "All",
+    "executionEnvironments": [
+        {
+            "root": ".",
+            "pythonVersion": "3.11",
+            "pythonPlatform": "All",
+            "extraPaths": []
+        }
+    ],
+    "typeCheckingMode": "basic",
+    "useLibraryCodeForTypes": true,
+    "autoImportCompletions": true,
+    "autoSearchPaths": true,
+    "reportGeneralTypeIssues": "none",
+    "reportOptionalSubscript": "none",
+    "reportOptionalMemberAccess": "none",
+    "reportOptionalCall": "none",
+    "reportOptionalIterable": "none",
+    "reportOptionalContextManager": "none",
+    "reportOptionalOperand": "none",
+    "reportTypedDictNotRequiredAccess": "none"
+}
