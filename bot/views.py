@@ -1,5 +1,4 @@
 import json
-import asyncio
 import logging
 from django.shortcuts import render  # type: ignore
 from django.http import JsonResponse, HttpResponse  # type: ignore
@@ -46,10 +45,8 @@ def telegram_webhook(request):
         update = Update.de_json(data, bot)
         
         if update:
-            # Запускаем обработку синхронно (функции в bot.py не асинхронные)
-            import threading
-            thread = threading.Thread(target=handle_telegram_update_sync, args=(update,))
-            thread.start()
+            # Обрабатываем обновление синхронно
+            handle_telegram_update_sync(update, bot)
         
         return HttpResponse("ok")
         
@@ -62,77 +59,67 @@ def telegram_webhook(request):
         return HttpResponse("error", status=500)
 
 
-def handle_telegram_update_sync(update: Update):
+def handle_telegram_update_sync(update: Update, bot):
     """Синхронная обработка обновления от Telegram"""
     try:
-        # Импортируем обработчики из bot.py (они синхронные, не асинхронные)
-        from bot.bot import (
-            start, subjects_menu, subject_detail, solve_subject_tasks,
-            random_task, random_subject_task, show_answer, mark_correct,
-            mark_incorrect, mark_understood, mark_not_understood, about,
-            progress, rating, subscription_menu, voice_hint, handle_unknown_callback
+        # Импортируем синхронные обработчики
+        from bot.sync_handlers import (
+            start_sync, subjects_menu_sync, about_sync, progress_sync,
+            rating_sync, random_task_sync, handle_unknown_callback_sync
         )
-        
-        # Получаем экземпляр бота для контекста
-        from bot.bot_instance import get_bot
-        bot = get_bot()
-        
-        # Создаем контекст (заглушка для совместимости)
-        class MockContext:
-            def __init__(self, bot):
-                self.bot = bot
-                self.user_data = {}
-                self.bot_data = {}
-                self.chat_data = {}
-        
-        context = MockContext(bot)
         
         # Обрабатываем команды
         if update.message:
             if update.message.text == '/start':
-                # Запускаем асинхронную функцию в новом event loop
-                asyncio.run(start(update, context))
+                start_sync(update, bot)
                 return
         
         # Обрабатываем callback queries
         if update.callback_query:
             callback_data = update.callback_query.data
+            logger.info(f"Обрабатываю callback: {callback_data}")
+            logger.info(f"Тип обновления: callback_query")
+            logger.info(f"Пользователь: {update.effective_user.username or update.effective_user.id}")
             
-            handlers = {
-                'subjects': subjects_menu,
-                'main_menu': start,
-                'about': about,
-                'progress': progress,
-                'rating': rating,
-                'subscription': subscription_menu,
-                'voice_hint': voice_hint,
-                'random_task': random_task,
-            }
-            
-            # Обработчики с параметрами
-            if callback_data.startswith('subject_'):
-                asyncio.run(subject_detail(update, context))
-            elif callback_data.startswith('solve_'):
-                asyncio.run(solve_subject_tasks(update, context))
-            elif callback_data.startswith('random_subject_'):
-                asyncio.run(random_subject_task(update, context))
-            elif callback_data.startswith('answer_'):
-                asyncio.run(show_answer(update, context))
-            elif callback_data.startswith('correct_'):
-                asyncio.run(mark_correct(update, context))
-            elif callback_data.startswith('incorrect_'):
-                asyncio.run(mark_incorrect(update, context))
-            elif callback_data.startswith('understood_'):
-                asyncio.run(mark_understood(update, context))
-            elif callback_data.startswith('not_understood_'):
-                asyncio.run(mark_not_understood(update, context))
-            elif callback_data in handlers:
-                asyncio.run(handlers[callback_data](update, context))
+            # Простые обработчики
+            if callback_data == 'subjects':
+                subjects_menu_sync(update, bot)
+            elif callback_data == 'main_menu':
+                start_sync(update, bot)
+            elif callback_data == 'about':
+                about_sync(update, bot)
+            elif callback_data == 'progress':
+                progress_sync(update, bot)
+            elif callback_data == 'rating':
+                rating_sync(update, bot)
+            elif callback_data == 'random_task':
+                random_task_sync(update, bot)
+            elif callback_data.startswith('subject_'):
+                # Пока что просто возвращаем в главное меню
+                # TODO: Добавить обработку предметов
+                logger.info(f"Callback для предмета: {callback_data}")
+                start_sync(update, bot)
             else:
-                asyncio.run(handle_unknown_callback(update, context))
+                # Неизвестный callback - логируем и возвращаем в главное меню
+                logger.warning(f"Неизвестный callback: {callback_data}")
+                handle_unknown_callback_sync(update, bot)
         
     except Exception as e:
         logger.error(f"Ошибка в handle_telegram_update_sync: {str(e)}")
+        # В случае ошибки пытаемся отправить сообщение об ошибке
+        try:
+            if update.message:
+                bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text="❌ Произошла ошибка. Попробуйте команду /start"
+                )
+            elif update.callback_query:
+                bot.send_message(
+                    chat_id=update.callback_query.message.chat_id,
+                    text="❌ Произошла ошибка. Попробуйте команду /start"
+                )
+        except:
+            pass
 
 
 
