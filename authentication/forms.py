@@ -105,15 +105,16 @@ class ProfileUpdateForm(forms.ModelForm):
     
     class Meta:
         model = UserProfile
-        fields = ['phone', 'birth_date', 'school', 'grade']
+        # Используем только реально существующие поля модели UserProfile
+        fields = ['phone']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Добавляем русские подписи
+        # Добавляем русские подписи для полей формы
         self.fields['phone'].label = 'Телефон'
-        self.fields['birth_date'].label = 'Дата рождения'
-        self.fields['school'].label = 'Школа'
-        self.fields['grade'].label = 'Класс'
+        self.fields['first_name'].label = 'Имя'
+        self.fields['last_name'].label = 'Фамилия'
+        self.fields['email'].label = 'Email'
         
         # Применяем стили Duolingo
         for field in self.fields.values():
