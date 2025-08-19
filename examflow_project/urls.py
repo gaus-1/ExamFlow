@@ -45,6 +45,9 @@ urlpatterns = [
     # Модуль аналитики
     path('analytics/', include('analytics.urls')),
     
+    # Модуль управления дизайнами
+    path('themes/', include('themes.urls')),
+    
     # ==========================================
     # LEGACY МАРШРУТЫ (для обратной совместимости)
     # ==========================================
@@ -53,6 +56,7 @@ urlpatterns = [
     path('subjects/', subject_list, name='subjects'),
     path('subjects/<int:subject_id>/', subject_detail, name='subject_detail'),
     path('tasks/<int:task_id>/', task_detail, name='task_detail'),
+    path('theme-demo/', include('core.urls')),
 
     # Аутентификация (legacy)
     path('register/', register_view, name='register'),

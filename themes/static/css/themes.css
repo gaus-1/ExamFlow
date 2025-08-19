@@ -1,0 +1,288 @@
+/* ========================================
+   МОДУЛЬ УПРАВЛЕНИЯ ДИЗАЙНАМИ EXAMFLOW
+   ======================================== */
+
+/* ========================================
+   ДИЗАЙН "ШКОЛЬНИК" (ТЕКУЩИЙ DUOLINGO-СТИЛЬ)
+   ======================================== */
+[data-theme="school"] {
+    /* Основные цвета фона */
+    --bg-primary: #F8FAFC;          /* Светло-серый фон */
+    --bg-secondary: #F1F5F9;        /* Вторичный фон */
+    --bg-card: #FFFFFF;             /* Карточки - чистый белый */
+    --bg-elevated: #FFFFFF;         /* Поднятые элементы */
+    
+    /* Яркие акценты для школьников */
+    --accent-primary: #22C55E;      /* Основной зеленый */
+    --accent-secondary: #3B82F6;    /* Синий для важных действий */
+    --accent-success: #16A34A;      /* Успех - темно-зеленый */
+    --accent-warning: #F59E0B;      /* Предупреждение - янтарный */
+    --accent-danger: #EF4444;       /* Ошибка - красный */
+    --accent-purple: #8B5CF6;       /* Фиолетовый для креатива */
+    --accent-orange: #F97316;       /* Оранжевый для энергии */
+    --accent-pink: #EC4899;         /* Розовый для мотивации */
+    
+    /* Градиенты для школьников */
+    --gradient-primary: linear-gradient(135deg, #22C55E, #16A34A);
+    --gradient-secondary: linear-gradient(135deg, #3B82F6, #1D4ED8);
+    --gradient-success: linear-gradient(135deg, #16A34A, #15803D);
+    --gradient-warm: linear-gradient(135deg, #F59E0B, #D97706);
+    --gradient-creative: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    --gradient-energetic: linear-gradient(135deg, #F97316, #EA580C);
+    
+    /* Текстовые цвета */
+    --text-primary: #1E293B;        /* Основной текст */
+    --text-secondary: #64748B;      /* Вторичный текст */
+    --text-muted: #94A3B8;          /* Приглушенный текст */
+    --text-accent: #22C55E;         /* Акцентный текст */
+    --text-on-primary: #FFFFFF;     /* Текст на цветном фоне */
+    
+    /* Тени и эффекты */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-button: 0 2px 4px rgba(34, 197, 94, 0.2);
+    --shadow-button-hover: 0 4px 12px rgba(34, 197, 94, 0.25);
+    
+    /* Цветные акценты */
+    --glow-primary: 0 0 0 3px rgba(34, 197, 94, 0.1);
+    --glow-secondary: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    --glow-danger: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    
+    /* Границы */
+    --border-light: #E2E8F0;
+    --border-medium: #CBD5E1;
+    --border-accent: #22C55E;
+    
+    /* Переходы */
+    --transition-fast: all 0.15s ease-out;
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Анимации для школьников */
+    --animation-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-spring: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ========================================
+   ДИЗАЙН "ВЗРОСЛЫЙ" (ПРОФЕССИОНАЛЬНЫЙ)
+   ======================================== */
+[data-theme="adult"] {
+    /* Сдержанные цвета фона */
+    --bg-primary: #F8FAFC;          /* Светлый фон */
+    --bg-secondary: #F1F5F9;        /* Вторичный фон */
+    --bg-card: #FFFFFF;             /* Карточки */
+    --bg-elevated: #FFFFFF;         /* Поднятые элементы */
+    
+    /* Профессиональные акценты */
+    --accent-primary: #1E40AF;      /* Темно-синий */
+    --accent-secondary: #475569;    /* Серый */
+    --accent-success: #059669;      /* Темно-зеленый */
+    --accent-warning: #D97706;      /* Темно-янтарный */
+    --accent-danger: #DC2626;       /* Темно-красный */
+    --accent-info: #0891B2;         /* Информационный синий */
+    --accent-neutral: #6B7280;      /* Нейтральный серый */
+    
+    /* Сдержанные градиенты */
+    --gradient-primary: linear-gradient(135deg, #1E40AF, #1E3A8A);
+    --gradient-secondary: linear-gradient(135deg, #475569, #374151);
+    --gradient-success: linear-gradient(135deg, #059669, #047857);
+    --gradient-warm: linear-gradient(135deg, #D97706, #B45309);
+    --gradient-info: linear-gradient(135deg, #0891B2, #0E7490);
+    --gradient-neutral: linear-gradient(135deg, #6B7280, #4B5563);
+    
+    /* Профессиональные текстовые цвета */
+    --text-primary: #111827;        /* Очень темный текст */
+    --text-secondary: #374151;      /* Вторичный текст */
+    --text-muted: #6B7280;          /* Приглушенный текст */
+    --text-accent: #1E40AF;         /* Акцентный текст */
+    --text-on-primary: #FFFFFF;     /* Текст на цветном фоне */
+    
+    /* Тени и эффекты */
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-elevated: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-button: 0 1px 3px rgba(30, 64, 175, 0.2);
+    --shadow-button-hover: 0 4px 6px rgba(30, 64, 175, 0.25);
+    
+    /* Цветные акценты */
+    --glow-primary: 0 0 0 2px rgba(30, 64, 175, 0.1);
+    --glow-secondary: 0 0 0 2px rgba(71, 85, 105, 0.1);
+    --glow-danger: 0 0 0 2px rgba(220, 38, 38, 0.1);
+    
+    /* Границы */
+    --border-light: #E5E7EB;
+    --border-medium: #D1D5DB;
+    --border-accent: #1E40AF;
+    
+    /* Переходы */
+    --transition-fast: all 0.15s ease-out;
+    --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Сдержанные анимации */
+    --animation-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --animation-spring: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ========================================
+   ПЕРЕКЛЮЧАТЕЛЬ ДИЗАЙНОВ
+   ======================================== */
+.theme-switcher-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 1rem;
+}
+
+.theme-switcher-btn {
+    background: var(--bg-card);
+    border: 2px solid var(--border-light);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition-base);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+}
+
+.theme-switcher-btn:hover {
+    background: var(--accent-primary);
+    color: var(--text-on-primary);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-button);
+}
+
+.theme-switcher-btn.active {
+    background: var(--accent-primary);
+    color: var(--text-on-primary);
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-button);
+}
+
+.theme-switcher-btn.school-btn {
+    border-color: var(--accent-purple);
+}
+
+.theme-switcher-btn.school-btn:hover,
+.theme-switcher-btn.school-btn.active {
+    background: var(--accent-purple);
+    border-color: var(--accent-purple);
+}
+
+.theme-switcher-btn.adult-btn {
+    border-color: var(--accent-secondary);
+}
+
+.theme-switcher-btn.adult-btn:hover,
+.theme-switcher-btn.adult-btn.active {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+}
+
+/* Анимация переключения */
+.theme-switching * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ========================================
+   АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
+   ======================================== */
+@media (max-width: 768px) {
+    .theme-switcher-container {
+        flex-direction: column;
+        gap: 0.25rem;
+        margin: 0.5rem;
+    }
+    
+    .theme-switcher-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .theme-switcher-container {
+        margin: 0.25rem;
+    }
+    
+    .theme-switcher-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* ========================================
+   ПЕРЕХОДЫ МЕЖДУ ДИЗАЙНАМИ
+   ======================================== */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Плавное изменение цветов при переключении */
+body,
+.navbar-tech,
+.footer-custom,
+.btn-neon,
+.btn-secondary-duolingo,
+.btn-outline-duolingo,
+.nav-link-tech {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   УВЕДОМЛЕНИЯ ОБ ИЗМЕНЕНИИ ТЕМЫ
+   ======================================== */
+.theme-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--bg-card);
+    border: 2px solid var(--accent-primary);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: var(--shadow-elevated);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.theme-notification.show {
+    transform: translateX(0);
+}
+
+.theme-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.theme-notification-icon {
+    font-size: 1.5rem;
+}
+
+.theme-notification-text {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Адаптивность уведомлений для мобильных устройств */
+@media (max-width: 768px) {
+    .theme-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        transform: translateY(-100%);
+    }
+    
+    .theme-notification.show {
+        transform: translateY(0);
+    }
+}

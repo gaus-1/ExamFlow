@@ -41,6 +41,9 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <!-- Модуль управления дизайнами -->
+    <link rel="stylesheet" href="{% static 'css/themes.css' %}">
+    
     <!-- Custom CSS -->
     <style>
         :root {
@@ -56,6 +59,11 @@
             --accent-success: #16A34A;      /* Успех - темно-зеленый */
             --accent-warning: #F59E0B;      /* Предупреждение - янтарный */
             --accent-danger: #EF4444;       /* Ошибка - красный */
+            
+            /* Дополнительные акценты для школьной темы */
+            --accent-purple: #8B5CF6;       /* Фиолетовый для школьников */
+            --accent-orange: #F97316;       /* Оранжевый для школьников */
+            --accent-neon: #10B981;         /* Неоновый зеленый */
             
             /* Современные градиенты */
             --gradient-primary: linear-gradient(135deg, #22C55E, #16A34A);
@@ -91,6 +99,29 @@
             --transition-fast: all 0.15s ease-out;
             --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ========================================
+           ДИЗАЙН "ШКОЛЬНИК" (ТЕКУЩИЙ DUOLINGO-СТИЛЬ)
+           ======================================== */
+        [data-theme="school"] {
+            --accent-primary: #22C55E;      /* Яркий зеленый */
+            --accent-secondary: #3B82F6;    /* Синий */
+            --accent-purple: #8B5CF6;       /* Фиолетовый */
+            --accent-orange: #F97316;       /* Оранжевый */
+            --accent-neon: #10B981;         /* Неоновый зеленый */
+            --animation-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* ========================================
+           ДИЗАЙН "ВЗРОСЛЫЙ" (ПРОФЕССИОНАЛЬНЫЙ)
+           ======================================== */
+        [data-theme="adult"] {
+            --accent-primary: #1E40AF;      /* Темно-синий */
+            --accent-secondary: #475569;    /* Серый */
+            --accent-info: #0891B2;         /* Информационный синий */
+            --accent-success: #059669;      /* Темно-зеленый */
+            --animation-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         * {
@@ -998,11 +1029,142 @@
         .pwa-install-banner .btn {
             margin-top: 0.5rem;
         }
+
+        /* ========================================
+           СТИЛИ ПЕРЕКЛЮЧАТЕЛЯ ДИЗАЙНОВ
+           ======================================== */
+        
+        .theme-switcher-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-switcher-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition-base);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .theme-switcher-btn:hover {
+            background: var(--accent-primary);
+            color: var(--text-on-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-button);
+        }
+
+        .theme-switcher-btn.active {
+            background: var(--accent-primary);
+            color: var(--text-on-primary);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-button);
+        }
+
+        .theme-switcher-btn.school-btn {
+            border-color: var(--accent-purple);
+        }
+
+        .theme-switcher-btn.school-btn:hover,
+        .theme-switcher-btn.school-btn.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .theme-switcher-btn.adult-btn {
+            border-color: var(--accent-secondary);
+        }
+
+        .theme-switcher-btn.adult-btn:hover,
+        .theme-switcher-btn.adult-btn.active {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+        }
+
+        /* Анимация переключения тем */
+        .theme-switching * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Уведомления об изменении темы */
+        .theme-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-elevated);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .theme-notification.show {
+            transform: translateX(0);
+        }
+
+        .theme-notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .theme-notification-text {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .theme-switcher-container {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .theme-switcher-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .theme-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100%);
+            }
+
+            .theme-notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .theme-switcher-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body data-theme="school">
     <!-- Tech Navigation -->
     <nav class="header-tech">
         <div class="container">
@@ -1038,7 +1200,22 @@
                                 <i class="fab fa-telegram me-2"></i>Telegram Бот
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link-tech" href="{% url 'theme_demo' %}">
+                                <i class="fas fa-palette me-2"></i>Демо дизайнов
+                            </a>
+                        </li>
                     </ul>
+                    
+                    <!-- Переключатель дизайнов -->
+                    <div class="theme-switcher-container d-flex align-items-center me-3">
+                        <button class="theme-switcher-btn school-btn" data-theme="school" title="Дизайн для школьников">
+                            🎓 Школьник
+                        </button>
+                        <button class="theme-switcher-btn adult-btn" data-theme="adult" title="Дизайн для взрослых">
+                            👔 Взрослый
+                        </button>
+                    </div>
                     
                     <div class="d-flex align-items-center gap-3">
                         {% if user.is_authenticated %}
@@ -1211,6 +1388,9 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+    
+    <!-- Модуль управления дизайнами -->
+    <script src="{% static 'js/theme-switcher.js' %}"></script>
     
     <!-- Скрытая административная ссылка -->
     {% if user.is_superuser %}

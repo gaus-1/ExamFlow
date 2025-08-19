@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'learning',           # Обучение и задания  
     'telegram_bot',       # Telegram бот функционал
     'analytics',          # Аналитика и статистика
+    'themes',             # Управление дизайнами и темами
     
     # Внешние библиотеки
     'corsheaders',

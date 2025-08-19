@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест переключателя дизайнов - ExamFlow</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Улучшенная Duolingo-вдохновленная цветовая схема */
+            --bg-primary: #F8FAFC;          /* Основной фон - светло-серый */
+            --bg-secondary: #F1F5F9;        /* Вторичный фон */
+            --bg-card: #FFFFFF;             /* Карточки - чистый белый */
+            --bg-elevated: #FFFFFF;         /* Поднятые элементы */
+            
+            /* Duolingo-стиль акценты (темнее и стильнее) */
+            --accent-primary: #22C55E;      /* Основной зеленый - благородный */
+            --accent-secondary: #3B82F6;    /* Синий для важных действий */
+            --accent-success: #16A34A;      /* Успех - темно-зеленый */
+            --accent-warning: #F59E0B;      /* Предупреждение - янтарный */
+            --accent-danger: #EF4444;       /* Ошибка - красный */
+            
+            /* Дополнительные акценты для школьной темы */
+            --accent-purple: #8B5CF6;       /* Фиолетовый для школьников */
+            --accent-orange: #F97316;       /* Оранжевый для школьников */
+            --accent-neon: #10B981;         /* Неоновый зеленый */
+            
+            /* Современные градиенты */
+            --gradient-primary: linear-gradient(135deg, #22C55E, #16A34A);
+            --gradient-secondary: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            --gradient-success: linear-gradient(135deg, #16A34A, #15803D);
+            --gradient-warm: linear-gradient(135deg, #F59E0B, #D97706);
+            
+            /* Duolingo-стиль текстовые цвета */
+            --text-primary: #1E293B;        /* Основной текст - темно-серый */
+            --text-secondary: #64748B;      /* Вторичный текст */
+            --text-muted: #94A3B8;          /* Приглушенный текст */
+            --text-accent: #22C55E;         /* Акцентный текст - зеленый */
+            --text-on-primary: #FFFFFF;     /* Текст на цветном фоне */
+            
+            /* Duolingo-стиль тени (мягкие и стильные) */
+            --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.08);
+            --shadow-button: 0 2px 4px rgba(34, 197, 94, 0.2);
+            --shadow-button-hover: 0 4px 12px rgba(34, 197, 94, 0.25);
+            
+            /* Цветные акценты для интерактивности */
+            --glow-primary: 0 0 0 3px rgba(34, 197, 94, 0.1);
+            --glow-secondary: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            --glow-danger: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            
+            /* Границы в стиле Duolingo */
+            --border-light: #E2E8F0;
+            --border-medium: #CBD5E1;
+            --border-accent: #22C55E;
+            
+            /* Переходы */
+            --transition-fast: all 0.15s ease-out;
+            --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ========================================
+           ДИЗАЙН "ШКОЛЬНИК" (ТЕКУЩИЙ DUOLINGO-СТИЛЬ)
+           ======================================== */
+        [data-theme="school"] {
+            --accent-primary: #22C55E;      /* Яркий зеленый */
+            --accent-secondary: #3B82F6;    /* Синий */
+            --accent-purple: #8B5CF6;       /* Фиолетовый */
+            --accent-orange: #F97316;       /* Оранжевый */
+            --accent-neon: #10B981;         /* Неоновый зеленый */
+            --animation-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* ========================================
+           ДИЗАЙН "ВЗРОСЛЫЙ" (ПРОФЕССИОНАЛЬНЫЙ)
+           ======================================== */
+        [data-theme="adult"] {
+            --accent-primary: #1E40AF;      /* Темно-синий */
+            --accent-secondary: #475569;    /* Серый */
+            --accent-info: #0891B2;         /* Информационный синий */
+            --accent-success: #059669;      /* Темно-зеленый */
+            --animation-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            transition: var(--transition-base);
+        }
+
+        /* ========================================
+           СТИЛИ ПЕРЕКЛЮЧАТЕЛЯ ДИЗАЙНОВ
+           ======================================== */
+        
+        .theme-switcher-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .theme-switcher-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition-base);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .theme-switcher-btn:hover {
+            background: var(--accent-primary);
+            color: var(--text-on-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-button);
+        }
+
+        .theme-switcher-btn.active {
+            background: var(--accent-primary);
+            color: var(--text-on-primary);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-button);
+        }
+
+        .theme-switcher-btn.school-btn {
+            border-color: var(--accent-purple);
+        }
+
+        .theme-switcher-btn.school-btn:hover,
+        .theme-switcher-btn.school-btn.active {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .theme-switcher-btn.adult-btn {
+            border-color: var(--accent-secondary);
+        }
+
+        .theme-switcher-btn.adult-btn:hover,
+        .theme-switcher-btn.adult-btn.active {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+        }
+
+        /* Анимация переключения тем */
+        .theme-switching * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Уведомления об изменении темы */
+        .theme-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-elevated);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .theme-notification.show {
+            transform: translateX(0);
+        }
+
+        .theme-notification-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .theme-notification-text {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Стили для демонстрации */
+        .demo-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-base);
+        }
+
+        .demo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .demo-button {
+            background: var(--accent-primary);
+            color: var(--text-on-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .demo-button:hover {
+            background: var(--accent-success);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-button);
+        }
+
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .color-swatch {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 8px;
+            border: 2px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .primary-color { background-color: var(--accent-primary); }
+        .secondary-color { background-color: var(--accent-secondary); }
+        .accent-color { background-color: var(--accent-purple); }
+        .success-color { background-color: var(--accent-success); }
+        .warning-color { background-color: var(--accent-warning); }
+        .danger-color { background-color: var(--accent-danger); }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .theme-switcher-container {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .theme-switcher-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .theme-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100%);
+            }
+
+            .theme-notification.show {
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .theme-switcher-btn {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body data-theme="school">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-5">
+                    <i class="fas fa-palette me-3"></i>
+                    Тестирование переключателя дизайнов
+                </h1>
+                
+                <!-- Переключатель дизайнов -->
+                <div class="demo-card text-center">
+                    <h3>Переключатель дизайнов</h3>
+                    <p class="text-muted mb-3">Используйте кнопки ниже для переключения между дизайнами</p>
+                    
+                    <div class="theme-switcher-container justify-content-center">
+                        <button class="theme-switcher-btn school-btn" data-theme="school">
+                            🎓 Школьник
+                        </button>
+                        <button class="theme-switcher-btn adult-btn" data-theme="adult">
+                            👔 Взрослый
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Информация о текущей теме -->
+                <div class="demo-card">
+                    <h4>Текущая тема</h4>
+                    <div id="current-theme-info">
+                        <p><strong>Название:</strong> <span id="theme-name">Школьник</span></p>
+                        <p><strong>Описание:</strong> <span id="theme-description">Яркий и игровой дизайн для учащихся 9-11 классов</span></p>
+                        <p><strong>Атрибут data-theme:</strong> <code id="theme-attribute">school</code></p>
+                    </div>
+                </div>
+
+                <!-- Демонстрация цветовой палитры -->
+                <div class="demo-card">
+                    <h4>Цветовая палитра</h4>
+                    <div class="color-palette">
+                        <div class="color-swatch primary-color" title="Основной цвет">P</div>
+                        <div class="color-swatch secondary-color" title="Вторичный цвет">S</div>
+                        <div class="color-swatch accent-color" title="Акцентный цвет">A</div>
+                        <div class="color-swatch success-color" title="Цвет успеха">✓</div>
+                        <div class="color-swatch warning-color" title="Цвет предупреждения">⚠</div>
+                        <div class="color-swatch danger-color" title="Цвет ошибки">✗</div>
+                    </div>
+                </div>
+
+                <!-- Демонстрация кнопок -->
+                <div class="demo-card">
+                    <h4>Стили кнопок</h4>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="demo-button">Основная кнопка</button>
+                        <button class="demo-button" style="background: var(--accent-secondary);">Вторичная кнопка</button>
+                        <button class="demo-button" style="background: var(--accent-success);">Кнопка успеха</button>
+                    </div>
+                </div>
+
+                <!-- Демонстрация карточек -->
+                <div class="demo-card">
+                    <h4>Стили карточек</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="demo-card">
+                                <h5>Карточка 1</h5>
+                                <p>Пример карточки с текстом для демонстрации стилей.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="demo-card">
+                                <h5>Карточка 2</h5>
+                                <p>Еще одна карточка для показа различных вариантов.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="demo-card">
+                                <h5>Карточка 3</h5>
+                                <p>Третья карточка для полной демонстрации.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Инструкции -->
+                <div class="demo-card">
+                    <h4>Инструкции по использованию</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Как переключать дизайны:</h6>
+                            <ol>
+                                <li>Используйте кнопки "🎓 Школьник" и "👔 Взрослый" выше</li>
+                                <li>Ваш выбор автоматически сохраняется в браузере</li>
+                                <li>Тема применяется ко всем элементам на странице</li>
+                                <li>Переключение происходит без перезагрузки</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Особенности дизайнов:</h6>
+                            <ul>
+                                <li><strong>Школьник:</strong> Яркие цвета, анимации, игровой стиль</li>
+                                <li><strong>Взрослый:</strong> Сдержанные цвета, профессиональный вид</li>
+                                <li>Оба дизайна полностью адаптивны</li>
+                                <li>Плавные переходы между темами</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Скрипт переключателя дизайнов -->
+    <script>
+        /**
+         * Простой переключатель дизайнов для тестирования
+         */
+        class SimpleThemeSwitcher {
+            constructor() {
+                this.currentTheme = 'school';
+                this.themes = {
+                    school: {
+                        name: 'Школьник',
+                        icon: '🎓',
+                        description: 'Яркий и игровой дизайн для учащихся 9-11 классов'
+                    },
+                    adult: {
+                        name: 'Взрослый', 
+                        icon: '👔',
+                        description: 'Профессиональный дизайн для родителей и учителей'
+                    }
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.restoreTheme();
+                this.addEventListeners();
+                this.updateUI();
+                console.log('🎨 Простой переключатель дизайнов инициализирован');
+            }
+
+            restoreTheme() {
+                const savedTheme = localStorage.getItem('examflow_theme');
+                if (savedTheme && this.themes[savedTheme]) {
+                    this.currentTheme = savedTheme;
+                }
+                this.applyTheme(this.currentTheme);
+            }
+
+            addEventListeners() {
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('theme-switcher-btn')) {
+                        const theme = e.target.getAttribute('data-theme');
+                        if (theme && this.themes[theme]) {
+                            this.switchTheme(theme);
+                        }
+                    }
+                });
+            }
+
+            switchTheme(theme) {
+                if (!this.themes[theme] || theme === this.currentTheme) return;
+                
+                this.currentTheme = theme;
+                this.applyTheme(theme);
+                this.saveTheme(theme);
+                this.updateUI();
+                this.showNotification(theme);
+                
+                console.log(`🎨 Применена тема: ${this.themes[theme].name}`);
+            }
+
+            applyTheme(theme) {
+                document.body.setAttribute('data-theme', theme);
+            }
+
+            saveTheme(theme) {
+                localStorage.setItem('examflow_theme', theme);
+            }
+
+            updateUI() {
+                // Обновляем активные состояния кнопок
+                document.querySelectorAll('.theme-switcher-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-theme') === this.currentTheme) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // Обновляем информацию о теме
+                const theme = this.themes[this.currentTheme];
+                document.getElementById('theme-name').textContent = theme.name;
+                document.getElementById('theme-description').textContent = theme.description;
+                document.getElementById('theme-attribute').textContent = this.currentTheme;
+            }
+
+            showNotification(theme) {
+                const notification = document.createElement('div');
+                notification.className = 'theme-notification';
+                notification.innerHTML = `
+                    <div class="theme-notification-content">
+                        <span class="theme-notification-icon">${this.themes[theme].icon}</span>
+                        <span class="theme-notification-text">Дизайн изменен на "${this.themes[theme].name}"</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Анимация появления
+                setTimeout(() => notification.classList.add('show'), 100);
+                
+                // Автоматическое скрытие
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            window.themeSwitcher = new SimpleThemeSwitcher();
+        });
+    </script>
+</body>
+</html>

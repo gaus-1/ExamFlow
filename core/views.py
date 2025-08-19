@@ -51,3 +51,8 @@ def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     similar_tasks = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('-created_at')[:3]
     return render(request, 'core/task_detail.html', {'task': task, 'similar_tasks': similar_tasks})
+
+
+def theme_demo(request):
+    """Демонстрационная страница для тестирования переключателя дизайнов"""
+    return render(request, 'core/theme_demo.html')

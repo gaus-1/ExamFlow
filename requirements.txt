@@ -16,7 +16,7 @@ whitenoise==6.6.0
 PyPDF2==3.0.1
 pdfminer.six==20231228
 beautifulsoup4==4.12.2
-lxml==5.2.2
+lxml>=6.0.0
 # HTTP запросы
 requests==2.31.0
 # Планировщик задач для keep-alive
