@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     
     # Основные модули (legacy)
     'core',
-    'bot',
+    # 'bot',  # УБРАНО - конфликт с telegram_bot
     
     # Новые модульные приложения
     'authentication',      # Аутентификация и регистрация

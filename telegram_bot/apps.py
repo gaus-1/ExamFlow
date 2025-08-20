@@ -11,6 +11,6 @@ class TelegramBotConfig(AppConfig):
     - Отправку уведомлений пользователям
     - Синхронизацию данных между сайтом и ботом
     """
-    default_auto_field = 'django.db.models.BigAutoField'
+    default_auto_field = 'django.db.models.BigAutoField'  # type: ignore
     name = 'telegram_bot'
     verbose_name = 'Telegram Бот'
