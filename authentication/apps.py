@@ -11,6 +11,6 @@ class AuthenticationConfig(AppConfig):
     - Управление профилями пользователей
     - Восстановление паролей
     """
-    default_auto_field = 'django.db.models.BigAutoField'
+    default_auto_field = 'django.db.models.BigAutoField'  # type: ignore
     name = 'authentication'
     verbose_name = 'Аутентификация'

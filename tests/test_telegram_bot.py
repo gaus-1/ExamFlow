@@ -16,22 +16,22 @@ class TestTelegramBot(TestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         # Создаем тестовые данные для бота
-        self.exam_type = ExamType.objects.create(
+        self.exam_type = ExamType.objects.create( # type: ignore
             name='ЕГЭ',
             description='Единый государственный экзамен'
         )
         
-        self.subject = Subject.objects.create(
+        self.subject = Subject.objects.create( # type: ignore
             name='Математика',
             exam_type=self.exam_type
         )
         
-        self.topic = Topic.objects.create(
+        self.topic = Topic.objects.create( # type: ignore
             name='Алгебра',
             subject=self.subject
         )
         
-        self.task = Task.objects.create(
+        self.task = Task.objects.create( # type: ignore 
             title='Тестовое задание',
             content='Решите: 2 + 2 = ?',
             answer='4',
@@ -54,11 +54,11 @@ class TestTelegramBot(TestCase):
         self.assertEqual(user.last_name, 'Пользователь')
         
         # Проверяем создание профиля
-        profile = UserProfile.objects.get(user=user)
+        profile = UserProfile.objects.get(user=user) # type: ignore
         self.assertEqual(profile.telegram_id, '123456789')
         
         # Проверяем создание рейтинга
-        self.assertTrue(UserRating.objects.filter(user=user).exists())
+        self.assertTrue(UserRating.objects.filter(user=user).exists()) # type: ignore
 
     def test_get_or_create_user_existing(self):
         """Тест получения существующего пользователя"""
@@ -67,7 +67,7 @@ class TestTelegramBot(TestCase):
             username='tg_123456789',
             first_name='Тест'
         )
-        UserProfile.objects.create(
+        UserProfile.objects.create( # type: ignore
             user=existing_user,
             telegram_id='123456789'
         )
@@ -145,8 +145,8 @@ class TestTelegramBot(TestCase):
                 content_type='application/json'
             )
             
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.content.decode(), 'OK')
+            self.assertEqual(response.status_code, 200) # type: ignore
+            self.assertEqual(response.content.decode(), 'OK') # type: ignore
 
     def test_webhook_view_invalid_json(self):
         """Тест webhook с невалидным JSON"""
@@ -160,7 +160,7 @@ class TestTelegramBot(TestCase):
             content_type='application/json'
         )
         
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 500) # type: ignore
 
     def test_bot_api_status(self):
         """Тест API статуса бота"""
@@ -169,12 +169,12 @@ class TestTelegramBot(TestCase):
         client = Client()
         response = client.get('/bot/api/status/')
         
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200) # type: ignore
         
         import json
-        data = json.loads(response.content)
-        self.assertEqual(data['status'], 'active')
-        self.assertEqual(data['mode'], 'webhook')
+        data = json.loads(response.content) # type: ignore
+        self.assertEqual(data['status'], 'active') # type: ignore
+        self.assertEqual(data['mode'], 'webhook') # type: ignore
 
     def test_bot_control_panel_unauthorized(self):
         """Тест панели управления ботом без авторизации"""
@@ -184,7 +184,7 @@ class TestTelegramBot(TestCase):
         response = client.get('/bot/control/')
         
         # Должен быть редирект на страницу входа
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302) # type: ignore
 
     def test_bot_control_panel_authorized_superuser(self):
         """Тест панели управления ботом для суперпользователя"""
@@ -201,5 +201,5 @@ class TestTelegramBot(TestCase):
         client.login(username='admin', password='adminpass123')
         
         response = client.get('/bot/control/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200) # type: ignore
         self.assertContains(response, 'Webhook режим')

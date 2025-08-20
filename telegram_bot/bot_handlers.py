@@ -44,7 +44,7 @@ def get_or_create_user(telegram_user):
     )
     
     # Создаем или получаем профиль
-    profile, profile_created = UserProfile.objects.get_or_create(
+    profile, profile_created = UserProfile.objects.get_or_create( # type: ignore
         user=user,
         defaults={
             'telegram_id': str(telegram_user.id)
@@ -52,7 +52,7 @@ def get_or_create_user(telegram_user):
     )
     
     # Создаем рейтинг если нужно
-    rating, rating_created = UserRating.objects.get_or_create(user=user)
+    rating, rating_created = UserRating.objects.get_or_create(user=user) # type: ignore
     
     return user, created
 
@@ -113,7 +113,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         await query.answer()
         
-        subjects = Subject.objects.annotate(
+        subjects = Subject.objects.annotate( # type: ignore
             tasks_count=Count('topics__tasks')
         ).filter(tasks_count__gt=0)
         
@@ -152,9 +152,9 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.answer()
     
     subject_id = int(query.data.split('_')[1])
-    subject = Subject.objects.get(id=subject_id)
+    subject = Subject.objects.get(id=subject_id) # type: ignore 
     
-    topics = Topic.objects.filter(subject=subject).annotate(
+    topics = Topic.objects.filter(subject=subject).annotate( # type: ignore
         tasks_count=Count('tasks')
     ).filter(tasks_count__gt=0)
     
@@ -204,8 +204,8 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем ID задания из callback_data
     if query.data.startswith('topic_'):
         topic_id = int(query.data.split('_')[1])
-        topic = Topic.objects.get(id=topic_id)
-        tasks = Task.objects.filter(topic=topic)
+        topic = Topic.objects.get(id=topic_id) # type: ignore
+        tasks = Task.objects.filter(topic=topic) # type: ignore
         
         if not tasks:
             await query.edit_message_text("❌ В этой теме пока нет заданий")
@@ -214,7 +214,7 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         task = tasks.first()  # Берем первое задание
     else:
         # Случайное задание
-        tasks = Task.objects.all()
+        tasks = Task.objects.all() # type: ignore
         if not tasks:
             await query.edit_message_text("❌ Задания пока не загружены")
             return
@@ -264,14 +264,14 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     user, _ = get_or_create_user(update.effective_user)
-    task = Task.objects.get(id=current_task_id)
+    task = Task.objects.get(id=current_task_id) # type: ignore
     user_answer = update.message.text.strip()
     
     # Проверяем ответ
     is_correct = task.check_answer(user_answer)
     
     # Сохраняем прогресс
-    progress, created = UserProgress.objects.get_or_create(
+    progress, created = UserProgress.objects.get_or_create( # type: ignore
         user=user,
         task=task,
         defaults={
@@ -289,7 +289,7 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if is_correct:
         response = f"✅ **Правильно!** 🎉\n\n"
         # Обновляем рейтинг
-        rating, _ = UserRating.objects.get_or_create(user=user)
+        rating, _ = UserRating.objects.get_or_create(user=user) # type: ignore
         rating.total_points += 10
         rating.correct_answers += 1
         rating.save()
@@ -329,11 +329,11 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user, _ = get_or_create_user(update.effective_user)
     
     # Получаем статистику
-    total_attempts = UserProgress.objects.filter(user=user).count()
-    correct_answers = UserProgress.objects.filter(user=user, is_correct=True).count()
+    total_attempts = UserProgress.objects.filter(user=user).count() # type: ignore
+    correct_answers = UserProgress.objects.filter(user=user, is_correct=True).count() # type: ignore
     accuracy = round((correct_answers / total_attempts * 100) if total_attempts > 0 else 0, 1)
     
-    rating, _ = UserRating.objects.get_or_create(user=user)
+    rating, _ = UserRating.objects.get_or_create(user=user) # type: ignore
     
     stats_text = f"""
 📊 **Ваша статистика**
@@ -344,7 +344,7 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🎯 **Точность:** {accuracy}%
 ⭐ **Рейтинг:** {rating.total_points} очков
 
-🏆 **Достижения:** {Achievement.objects.filter(user=user).count()}
+🏆 **Достижения:** {user.achievements.count()}
 
 Продолжайте решать задания для улучшения результатов!
 """
@@ -382,7 +382,7 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user, _ = get_or_create_user(update.effective_user)
     
     # Проверяем подписку
-    subscription = Subscription.objects.filter(user=user, is_active=True).first()
+    subscription = Subscription.objects.filter(user=user, is_active=True).first() # type: ignore
     if not subscription:
         await query.edit_message_text(
             "🔊 **Голосовые подсказки доступны только в Premium**\n\n"
@@ -393,7 +393,7 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     
-    task = Task.objects.get(id=current_task_id)
+    task = Task.objects.get(id=current_task_id) # type: ignore
     
     # Здесь должна быть логика отправки голосового файла
     # Пока отправляем текстовую подсказку

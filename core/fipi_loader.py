@@ -167,11 +167,11 @@ class FipiLoader:
         
         with transaction.atomic():
             # Создаем типы экзаменов
-            ege, _ = ExamType.objects.get_or_create(
+            ege, _ = ExamType.objects.get_or_create(  # type: ignore
                 code='EGE',
                 defaults={'name': 'Единый государственный экзамен'}
             )
-            oge, _ = ExamType.objects.get_or_create(
+            oge, _ = ExamType.objects.get_or_create(  # type: ignore
                 code='OGE', 
                 defaults={'name': 'Основной государственный экзамен'}
             )
@@ -187,7 +187,7 @@ class FipiLoader:
                 for subject_key, subject_data in subjects.items():
                     try:
                         # Создаем предмет
-                        subject, created = Subject.objects.get_or_create(
+                        subject, created = Subject.objects.get_or_create(  # type: ignore
                             name=subject_data['name'],
                             exam_type=exam_type_name,
                             defaults={
@@ -231,7 +231,7 @@ class FipiLoader:
             for link_data in demo_links:
                 try:
                     # Создаем тему если её нет
-                    topic, _ = Topic.objects.get_or_create(
+                    topic, _ = Topic.objects.get_or_create(  # type: ignore
                         subject=subject,
                         name=link_data.get('topic', 'Демоверсия'),
                         defaults={
@@ -242,7 +242,7 @@ class FipiLoader:
                     )
                     
                     # Создаем задание
-                    task, created = Task.objects.get_or_create(
+                    task, created = Task.objects.get_or_create(  # type: ignore
                         subject=subject,
                         title=link_data['title'],
                         defaults={
@@ -427,11 +427,11 @@ class FipiLoader:
         
         for subject_name, tasks in sample_tasks.items():
             try:
-                subjects = Subject.objects.filter(name=subject_name)
+                subjects = Subject.objects.filter(name=subject_name)  # type: ignore  # type: ignore
                 
                 for subject in subjects:
                     # Создаем общую тему
-                    topic, _ = Topic.objects.get_or_create(
+                    topic, _ = Topic.objects.get_or_create(  # type: ignore
                         subject=subject,
                         name='Примеры заданий',
                         defaults={
@@ -442,7 +442,7 @@ class FipiLoader:
                     )
                     
                     for task_data in tasks:
-                        task, created = Task.objects.get_or_create(
+                        task, created = Task.objects.get_or_create(  # type: ignore
                             subject=subject,
                             title=task_data['title'],
                             defaults={

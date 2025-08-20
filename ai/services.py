@@ -155,15 +155,15 @@ class AiService:
 
 	def _get_cache(self, prompt: str) -> Optional[AiResponse]:
 		ph = self._hash_prompt(prompt)
-		return AiResponse.objects.filter(prompt_hash=ph).first()
+		return AiResponse.objects.filter(prompt_hash=ph).first()  # type: ignore
 
 	def _set_cache(self, prompt: str, result: AiResult, provider: Optional[AiProvider] = None) -> AiResponse:
 		ph = self._hash_prompt(prompt)
-		ai_provider = provider if provider else AiProvider.objects.filter(is_active=True).order_by("priority").first()
+		ai_provider = provider if provider else AiProvider.objects.filter(is_active=True).order_by("priority").first()  # type: ignore
 		if not ai_provider:
 			# создаём запись провайдера локально, если нет ни одного
-			ai_provider = AiProvider.objects.create(name="Local", provider_type="fallback", is_active=True, priority=100)
-		return AiResponse.objects.create(
+			ai_provider = AiProvider.objects.create(name="Local", provider_type="fallback", is_active=True, priority=100)  # type: ignore
+		return AiResponse.objects.create(  # type: ignore
 			prompt_hash=ph,
 			prompt=prompt,
 			response=result.text,
@@ -175,7 +175,7 @@ class AiService:
 		# Без регистрации: 10/день; с регистрацией: 30/день
 		is_auth = bool(user and getattr(user, "is_authenticated", False))
 		max_daily = 30 if is_auth else 10
-		limit, _ = AiLimit.objects.get_or_create(
+		limit, _ = AiLimit.objects.get_or_create(  # type: ignore
 			user=user if is_auth else None,
 			session_id=None if is_auth else (session_id or "guest"),
 			limit_type="daily",
@@ -190,7 +190,7 @@ class AiService:
 			limit.current_usage = 0
 			limit.reset_date = timezone.now() + timezone.timedelta(days=1)
 			limit.max_limit = max_daily
-			limit.save()
+			limit.save()  # type: ignore
 		return limit
 
 	def ask(self, prompt: str, user=None, session_id: Optional[str] = None, use_cache: bool = True) -> Dict[str, Any]:
@@ -209,16 +209,16 @@ class AiService:
 			cached = self._get_cache(prompt)
 			if cached:
 				cached.increment_usage()
-				AiRequest.objects.create(
+				AiRequest.objects.create(  # type: ignore
 					user=user, session_id=session_id, request_type="question", prompt=prompt,
 					response=cached.response, tokens_used=cached.tokens_used, cost=0, ip_address=None
 				)
-				limit.current_usage += 1
-				limit.save()
+				limit.current_usage += 1  # type: ignore
+				limit.save()  # type: ignore
 				return {"response": cached.response, "provider": cached.provider.name, "cached": True, "tokens_used": cached.tokens_used}
 
 		# Выбор провайдера: сначала БД активных, затем локально определённые
-		provider_obj = AiProvider.objects.filter(is_active=True).order_by("priority").first()
+		provider_obj = AiProvider.objects.filter(is_active=True).order_by("priority").first()  # type: ignore
 		provider_client: BaseProvider
 		if provider_obj:
 			# Мэпим тип на клиента
@@ -242,7 +242,7 @@ class AiService:
 		result = provider_client.generate(prompt)
 
 		# Логирование и сохранение
-		AiRequest.objects.create(
+		AiRequest.objects.create(  # type: ignore
 			user=user,
 			session_id=session_id,
 			request_type="question",
@@ -254,8 +254,8 @@ class AiService:
 		)
 
 		# Обновляем лимит
-		limit.current_usage += 1
-		limit.save()
+		limit.current_usage += 1  # type: ignore
+		limit.save()  # type: ignore
 
 		# Сохраняем кэш
 		self._set_cache(prompt, result, provider_obj)

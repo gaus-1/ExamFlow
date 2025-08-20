@@ -53,7 +53,7 @@ def send_weekly_inactive_reminders(limit: int = 200) -> int:
 	sent = 0
 
 	# Ищем профили с telegram_id и last_activity < 7 дней назад
-	qs = UserProfile.objects.filter(telegram_id__isnull=False).select_related('user')
+	qs = UserProfile.objects.filter(telegram_id__isnull=False).select_related('user')  # type: ignore
 	for profile in qs.iterator():
 		if profile.last_activity and profile.last_activity > threshold:
 			continue
@@ -62,13 +62,13 @@ def send_weekly_inactive_reminders(limit: int = 200) -> int:
 		user = profile.user
 
 		# Проверим лог: не слали ли уже за последние 7 дней
-		log = ReminderLog.objects.filter(user=user, reminder_type='weekly_inactive').first()
+		log = ReminderLog.objects.filter(user=user, reminder_type='weekly_inactive').first()  # type: ignore
 		if log and log.last_sent_at and log.last_sent_at > threshold:
 			continue
 
 		ok = _send_tg_message(bot_token, chat_id, REMINDER_TEXT)
 		if ok:
-			ReminderLog.objects.update_or_create(
+			ReminderLog.objects.update_or_create(  # type: ignore
 				user=user,
 				reminder_type='weekly_inactive',
 				defaults={'last_sent_at': now},

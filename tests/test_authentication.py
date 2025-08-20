@@ -53,7 +53,8 @@ class TestAuthentication(TestCase):
         self.assertTrue(user.username.startswith('test'))
         
         # Проверяем создание профиля
-        self.assertTrue(UserProfile.objects.filter(user=user).exists())
+        from core.models import UserProfile
+        self.assertTrue(UserProfile.objects.filter(user=user).exists()) # type: ignore
 
     def test_username_generation_from_email(self):
         """Тест автогенерации username из email"""
@@ -94,13 +95,13 @@ class TestAuthentication(TestCase):
     def test_register_view_get(self):
         """Тест GET запроса к странице регистрации"""
         response = self.client.get('/auth/register/')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200) # type: ignore
 
     def test_register_view_post_valid(self):
         """Тест POST запроса с валидными данными"""
         response = self.client.post('/auth/register/', self.test_user_data)
         # Ожидаем редирект после успешной регистрации
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302) # type: ignore
         
         # Проверяем создание пользователя
         self.assertTrue(User.objects.filter(email='test@example.com').exists())
@@ -111,7 +112,7 @@ class TestAuthentication(TestCase):
         invalid_data['email'] = 'invalid-email'
         
         response = self.client.post('/auth/register/', invalid_data)
-        self.assertEqual(response.status_code, 200)  # Остаемся на той же странице
+        self.assertEqual(response.status_code, 200)  # Остаемся на той же странице # type: ignore
         
         # Пользователь не должен быть создан
         self.assertFalse(User.objects.filter(first_name='Тест').exists())

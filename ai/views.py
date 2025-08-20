@@ -233,14 +233,14 @@ def api_limits(request):
         session_id = None if is_auth else request.session.session_key
 
         max_daily = 30 if is_auth else 10
-        limit, _ = AiLimit.objects.get_or_create(
+        limit, _ = AiLimit.objects.get_or_create( # type: ignore
             user=request.user if is_auth else None,
             session_id=session_id,
             limit_type='daily',
             defaults={
                 'current_usage': 0,
                 'max_limit': max_daily,
-                'reset_date': timezone.now(),
+                'reset_date': timezone.now().date(), # type: ignore
             }
         )
         # Синхронизируем максимальный лимит на случай смены статуса

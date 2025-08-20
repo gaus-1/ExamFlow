@@ -43,13 +43,13 @@ class Command(BaseCommand):
     def start_bot(self, daemon=False):
         """Запускает Telegram бота"""
         self.stdout.write(
-            self.style.SUCCESS('🤖 Запуск Telegram бота ExamFlow...')
+            self.style.SUCCESS('🤖 Запуск Telegram бота ExamFlow...')  # type: ignore
         )
         
         # Проверяем, не запущен ли уже бот
         if self.is_bot_running():
             self.stdout.write(
-                self.style.WARNING('⚠️  Бот уже запущен!')
+                self.style.WARNING('⚠️  Бот уже запущен!')  # type: ignore
             )
             return
         
@@ -59,7 +59,7 @@ class Command(BaseCommand):
             
             if not os.path.exists(bot_path):
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Файл бота не найден: {bot_path}')
+                    self.style.ERROR(f'❌ Файл бота не найден: {bot_path}')  # type: ignore
                 )
                 return
             
@@ -83,35 +83,35 @@ class Command(BaseCommand):
                 time.sleep(2)
                 if process.poll() is None:
                     self.stdout.write(
-                        self.style.SUCCESS(f'✅ Бот запущен в фоне (PID: {process.pid})')
+                        self.style.SUCCESS(f'✅ Бот запущен в фоне (PID: {process.pid})')  # type: ignore
                     )
                 else:
                     # Читаем ошибки
                     stdout, stderr = process.communicate()
                     self.stdout.write(
-                        self.style.ERROR(f'❌ Ошибка запуска бота: {stderr.decode()}')
+                        self.style.ERROR(f'❌ Ошибка запуска бота: {stderr.decode()}')  # type: ignore
                     )
             else:
                 # Запуск в интерактивном режиме
                 self.stdout.write('🔄 Запуск в интерактивном режиме...')
                 self.stdout.write(
-                    self.style.WARNING('📝 Нажмите Ctrl+C для остановки')
+                    self.style.WARNING('📝 Нажмите Ctrl+C для остановки')  # type: ignore
                 )
                 
                 try:
                     subprocess.run([sys.executable, bot_path], check=True)
                 except KeyboardInterrupt:
                     self.stdout.write(
-                        self.style.WARNING('\n⚠️  Остановка по запросу пользователя...')
+                        self.style.WARNING('\n⚠️  Остановка по запросу пользователя...')  # type: ignore
                     )
                 except subprocess.CalledProcessError as e:
                     self.stdout.write(
-                        self.style.ERROR(f'❌ Ошибка запуска: {e}')
+                        self.style.ERROR(f'❌ Ошибка запуска: {e}')  # type: ignore
                     )
                     
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Неожиданная ошибка: {str(e)}')
+                self.style.ERROR(f'❌ Неожиданная ошибка: {str(e)}')  # type: ignore
             )
 
     def stop_bot(self):
@@ -122,7 +122,7 @@ class Command(BaseCommand):
         pid_file = 'bot.pid'
         if not os.path.exists(pid_file):
             self.stdout.write(
-                self.style.WARNING('⚠️  PID файл не найден. Бот может быть не запущен.')
+                self.style.WARNING('⚠️  PID файл не найден. Бот может быть не запущен.')  # type: ignore
             )
             return
         
@@ -137,12 +137,12 @@ class Command(BaseCommand):
             os.remove(pid_file)
             
             self.stdout.write(
-                self.style.SUCCESS(f'✅ Бот остановлен (PID: {pid})')
+                self.style.SUCCESS(f'✅ Бот остановлен (PID: {pid})')  # type: ignore
             )
             
         except (ValueError, ProcessLookupError) as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка остановки: {str(e)}')
+                self.style.ERROR(f'❌ Ошибка остановки: {str(e)}')  # type: ignore
             )
             # Удаляем некорректный PID файл
             if os.path.exists(pid_file):
@@ -160,7 +160,7 @@ class Command(BaseCommand):
         if self.is_bot_running():
             pid = self.get_bot_pid()
             self.stdout.write(
-                self.style.SUCCESS(f'🟢 Telegram бот запущен (PID: {pid})')
+                self.style.SUCCESS(f'🟢 Telegram бот запущен (PID: {pid})')  # type: ignore
             )
             
             # Проверяем, отвечает ли бот
@@ -181,28 +181,28 @@ class Command(BaseCommand):
                         if bot_info.get('ok'):
                             bot_name = bot_info['result']['username']
                             self.stdout.write(
-                                self.style.SUCCESS(f'✅ Бот отвечает: @{bot_name}')
+                                self.style.SUCCESS(f'✅ Бот отвечает: @{bot_name}')  # type: ignore
                             )
                         else:
                             self.stdout.write(
-                                self.style.ERROR('❌ Бот не отвечает на запросы')
+                                self.style.ERROR('❌ Бот не отвечает на запросы')  # type: ignore
                             )
                     else:
                         self.stdout.write(
-                            self.style.ERROR(f'❌ Ошибка API: {response.status_code}')
+                            self.style.ERROR(f'❌ Ошибка API: {response.status_code}')  # type: ignore
                         )
                 else:
                     self.stdout.write(
-                        self.style.WARNING('⚠️  TELEGRAM_BOT_TOKEN не настроен')
+                        self.style.WARNING('⚠️  TELEGRAM_BOT_TOKEN не настроен')  # type: ignore
                     )
                     
             except Exception as e:
                 self.stdout.write(
-                    self.style.WARNING(f'⚠️  Не удалось проверить API: {str(e)}')
+                    self.style.WARNING(f'⚠️  Не удалось проверить API: {str(e)}')  # type: ignore
                 )
         else:
             self.stdout.write(
-                self.style.ERROR('🔴 Telegram бот остановлен')
+                self.style.ERROR('🔴 Telegram бот остановлен')  # type: ignore
             )
 
     def is_bot_running(self):

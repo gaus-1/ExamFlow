@@ -30,7 +30,7 @@ class Command(BaseCommand):
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
         if not token:
             self.stdout.write(
-                self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен в переменных окружения')
+                self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен в переменных окружения')  # type: ignore
             )
             return
 
@@ -62,17 +62,17 @@ class Command(BaseCommand):
             
             if result.get('ok'):
                 self.stdout.write(
-                    self.style.SUCCESS('✅ Webhook успешно установлен!')
+                    self.style.SUCCESS('✅ Webhook успешно установлен!')  # type: ignore
                 )
                 self.stdout.write(f"📍 URL: {webhook_url}")
             else:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Ошибка установки webhook: {result.get("description", "Неизвестная ошибка")}')
+                    self.style.ERROR(f'❌ Ошибка установки webhook: {result.get("description", "Неизвестная ошибка")}')  # type: ignore
                 )
                 
         except requests.exceptions.RequestException as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка запроса: {str(e)}')
+                self.style.ERROR(f'❌ Ошибка запроса: {str(e)}')  # type: ignore
             )
 
     def _delete_webhook(self, token):
@@ -87,16 +87,16 @@ class Command(BaseCommand):
             
             if result.get('ok'):
                 self.stdout.write(
-                    self.style.SUCCESS('✅ Webhook успешно удален!')
+                    self.style.SUCCESS('✅ Webhook успешно удален!')  # type: ignore
                 )
             else:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Ошибка удаления webhook: {result.get("description", "Неизвестная ошибка")}')
+                    self.style.ERROR(f'❌ Ошибка удаления webhook: {result.get("description", "Неизвестная ошибка")}')  # type: ignore
                 )
                 
         except requests.exceptions.RequestException as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка запроса: {str(e)}')
+                self.style.ERROR(f'❌ Ошибка запроса: {str(e)}')  # type: ignore
             )
 
     def _get_webhook_info(self, token):
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                 info = result.get('result', {})
                 
                 self.stdout.write(
-                    self.style.SUCCESS('✅ Информация о webhook:')
+                    self.style.SUCCESS('✅ Информация о webhook:')  # type: ignore
                 )
                 self.stdout.write(f"📍 URL: {info.get('url', 'Не установлен')}")
                 self.stdout.write(f"🔄 Pending updates: {info.get('pending_update_count', 0)}")
@@ -126,10 +126,10 @@ class Command(BaseCommand):
                     self.stdout.write("⚠️  Webhook не настроен")
             else:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Ошибка получения информации: {result.get("description", "Неизвестная ошибка")}')
+                    self.style.ERROR(f'❌ Ошибка получения информации: {result.get("description", "Неизвестная ошибка")}')  # type: ignore
                 )
                 
         except requests.exceptions.RequestException as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка запроса: {str(e)}')
+                self.style.ERROR(f'❌ Ошибка запроса: {str(e)}')  # type: ignore
             )
