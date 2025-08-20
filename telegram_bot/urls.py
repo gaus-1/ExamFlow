@@ -19,6 +19,9 @@ urlpatterns = [
     # Тестовая функция для проверки webhook
     path('test/', views.test_webhook, name='test_webhook'),
     
+    # Тест API бота
+    path('test-api/', views.test_bot_api, name='test_bot_api'),
+    
     # Панель управления
     path('control/', views.bot_control_panel, name='control_panel'),
     

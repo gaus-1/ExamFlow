@@ -21,6 +21,8 @@ if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
     echo "   Переменная должна называться точно: TELEGRAM_BOT_TOKEN"
 else
     echo "✅ TELEGRAM_BOT_TOKEN настроен: ${TELEGRAM_BOT_TOKEN:0:10}..."
+    echo "🔄 Запускаем полную диагностику бота..."
+    python manage.py diagnose_bot
     echo "🔄 Перезагружаем данные бота..."
     python manage.py reload_bot_data --force
     echo "🔄 Настраиваем webhook для бота..."

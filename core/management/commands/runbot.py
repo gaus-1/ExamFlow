@@ -54,12 +54,28 @@ class Command(BaseCommand):
             return
         
         try:
-            # Путь к файлу бота
-            bot_path = os.path.join(os.getcwd(), 'bot', 'bot.py')
-            
-            if not os.path.exists(bot_path):
+            # Проверяем настройки бота
+            from django.conf import settings
+            token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+            if not token:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Файл бота не найден: {bot_path}')  # type: ignore
+                    self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен!')  # type: ignore
+                )
+                self.stdout.write('   Добавьте TELEGRAM_BOT_TOKEN в Environment Variables')
+                return
+            
+            # Проверяем доступность бота
+            try:
+                from telegram_bot.bot_main import get_bot
+                bot = get_bot()
+                if not bot:
+                    self.stdout.write(
+                        self.style.ERROR('❌ Не удалось создать экземпляр бота')  # type: ignore
+                    )
+                    return
+            except Exception as e:
+                self.stdout.write(
+                    self.style.ERROR(f'❌ Ошибка создания бота: {e}')  # type: ignore
                 )
                 return
             
@@ -67,29 +83,16 @@ class Command(BaseCommand):
                 # Запуск в фоновом режиме
                 self.stdout.write('🔄 Запуск в фоновом режиме...')
                 
-                # Создаем процесс в фоне
-                process = subprocess.Popen(
-                    [sys.executable, bot_path],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    start_new_session=True
-                )
-                
-                # Сохраняем PID
-                with open('bot.pid', 'w') as f:
-                    f.write(str(process.pid))
-                
-                # Ждем немного и проверяем, что процесс запустился
-                time.sleep(2)
-                if process.poll() is None:
+                # Запускаем бота через новую команду
+                try:
+                    from django.core.management import call_command
+                    call_command('run_bot_polling', '--daemon')
                     self.stdout.write(
-                        self.style.SUCCESS(f'✅ Бот запущен в фоне (PID: {process.pid})')  # type: ignore
+                        self.style.SUCCESS('✅ Бот запущен в фоне')  # type: ignore
                     )
-                else:
-                    # Читаем ошибки
-                    stdout, stderr = process.communicate()
+                except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f'❌ Ошибка запуска бота: {stderr.decode()}')  # type: ignore
+                        self.style.ERROR(f'❌ Ошибка запуска бота: {e}')  # type: ignore
                     )
             else:
                 # Запуск в интерактивном режиме
@@ -99,12 +102,13 @@ class Command(BaseCommand):
                 )
                 
                 try:
-                    subprocess.run([sys.executable, bot_path], check=True)
+                    from django.core.management import call_command
+                    call_command('run_bot_polling')
                 except KeyboardInterrupt:
                     self.stdout.write(
                         self.style.WARNING('\n⚠️  Остановка по запросу пользователя...')  # type: ignore
                     )
-                except subprocess.CalledProcessError as e:
+                except Exception as e:
                     self.stdout.write(
                         self.style.ERROR(f'❌ Ошибка запуска: {e}')  # type: ignore
                     )

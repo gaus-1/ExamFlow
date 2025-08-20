@@ -34,8 +34,43 @@ def test_webhook(request):
         'message': 'Webhook endpoint доступен',
         'timestamp': datetime.now().isoformat(),
         'token_exists': bool(settings.TELEGRAM_BOT_TOKEN),
-        'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None
+        'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None,
+        'bot_available': False  # Будем проверять доступность бота
     })
+
+
+def test_bot_api(request):
+    """
+    Тестирует API бота напрямую
+    """
+    try:
+        bot = get_bot()
+        if not bot:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Бот не может быть создан',
+                'token_exists': bool(settings.TELEGRAM_BOT_TOKEN)
+            }, status=500)
+        
+        # Тестируем API бота
+        import asyncio
+        bot_info = asyncio.run(bot.get_me())
+        
+        return JsonResponse({
+            'status': 'ok',
+            'message': 'Бот доступен',
+            'bot_username': bot_info.username,
+            'bot_id': bot_info.id,
+            'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None
+        })
+        
+    except Exception as e:
+        logger.error(f"Ошибка тестирования API бота: {e}")
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Ошибка API бота: {str(e)}',
+            'token_exists': bool(settings.TELEGRAM_BOT_TOKEN)
+        }, status=500)
 
 
 @csrf_exempt
@@ -114,8 +149,16 @@ def telegram_webhook(request):
                             [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
                             [InlineKeyboardButton("📊 Статистика", callback_data="stats")],
                         ])
-                        bot.send_message(chat_id=chat_id, text="Добро пожаловать в ExamFlow! Выберите действие:", reply_markup=kb)
-                        logger.info("Быстрый ответ на /start отправлен через PTB")
+                        # Убираем await, так как мы находимся в синхронном контексте
+                        # Используем синхронный метод отправки сообщения
+                        import asyncio
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        try:
+                            loop.run_until_complete(bot.send_message(chat_id=chat_id, text="Добро пожаловать в ExamFlow! Выберите действие:", reply_markup=kb))
+                            logger.info("Быстрый ответ на /start отправлен через PTB")
+                        finally:
+                            loop.close()
             except Exception as ex:
                 logger.warning(f"Не удалось отправить быстрый ответ на /start: {ex}")
 
