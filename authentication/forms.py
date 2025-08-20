@@ -74,7 +74,7 @@ class TechRegisterForm(UserCreationForm):
         if commit:
             user.save()
             # Создаем упрощенный профиль пользователя
-            UserProfile.objects.create(user=user)
+            UserProfile.objects.create(user=user)  # type: ignore
         return user
 
 

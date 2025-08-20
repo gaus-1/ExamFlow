@@ -28,7 +28,7 @@ def subjects_list(request):
     - Количество тем и заданий
     - Прогресс пользователя (если авторизован)
     """
-    subjects = Subject.objects.annotate(
+    subjects = Subject.objects.annotate(  # type: ignore
         topics_count=Count('topics'),
         tasks_count=Count('topics__tasks')
     ).filter(tasks_count__gt=0)
@@ -36,7 +36,7 @@ def subjects_list(request):
     # Добавляем прогресс для авторизованных пользователей
     if request.user.is_authenticated:
         for subject in subjects:
-            solved_tasks = UserProgress.objects.filter(
+            solved_tasks = UserProgress.objects.filter(  # type: ignore
                 user=request.user,
                 task__topic__subject=subject,
                 is_correct=True
@@ -58,15 +58,15 @@ def subject_detail(request, subject_id):
     - Статистику решенных заданий
     """
     subject = get_object_or_404(Subject, id=subject_id)
-    topics = Topic.objects.filter(subject=subject).annotate(
+    topics = Topic.objects.filter(subject=subject).annotate(  # type: ignore
         tasks_count=Count('tasks')
     ).filter(tasks_count__gt=0)
     
     # Статистика для авторизованных пользователей
     user_stats = {}
     if request.user.is_authenticated:
-        total_tasks = Task.objects.filter(topic__subject=subject).count()
-        solved_tasks = UserProgress.objects.filter(
+        total_tasks = Task.objects.filter(topic__subject=subject).count()  # type: ignore
+        solved_tasks = UserProgress.objects.filter(  # type: ignore
             user=request.user,
             task__topic__subject=subject,
             is_correct=True

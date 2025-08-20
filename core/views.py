@@ -9,15 +9,15 @@ from .utils import generate_qr_code
 @cache_page(30)
 def home(request):
     # Принудительная загрузка демо-данных при пустой базе
-    if Subject.objects.count() == 0:
+    if Subject.objects.count() == 0:  # type: ignore
         try:
             management.call_command('load_sample_data')
         except Exception as e:
             print(f"Error loading sample data: {e}")
 
-    total_tasks = Task.objects.count()
-    total_subjects = Subject.objects.count()
-    subjects = Subject.objects.all()[:6]
+    total_tasks = Task.objects.count()  # type: ignore
+    total_subjects = Subject.objects.count()  # type: ignore
+    subjects = Subject.objects.all()[:6]  # type: ignore
     qr_code = generate_qr_code("https://t.me/ExamFlowBot")
     return render(request, 'home.html', {
         'qr_code': qr_code,
@@ -29,14 +29,14 @@ def home(request):
 
 @cache_page(30)
 def subject_list(request):
-    items = Subject.objects.all().order_by('name')
+    items = Subject.objects.all().order_by('name')  # type: ignore
     return render(request, 'core/subject_list.html', {'subjects': items})
 
 
 @cache_page(30)
 def subject_detail(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
-    tasks = Task.objects.filter(subject=subject).order_by('-created_at', '-id')
+    tasks = Task.objects.filter(subject=subject).order_by('-created_at', '-id')  # type: ignore
     paginator = Paginator(tasks, 20)
     page_obj = paginator.get_page(request.GET.get('page'))
     context = {
@@ -49,7 +49,7 @@ def subject_detail(request, subject_id):
 
 def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    similar_tasks = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('-created_at')[:3]
+    similar_tasks = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('-created_at')[:3]  # type: ignore
     return render(request, 'core/task_detail.html', {'task': task, 'similar_tasks': similar_tasks})
 
 
