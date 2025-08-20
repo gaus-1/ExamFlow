@@ -16,6 +16,9 @@ urlpatterns = [
     # Webhook для Telegram
     path('webhook/', views.telegram_webhook, name='webhook'),
     
+    # Тестовая функция для проверки webhook
+    path('test/', views.test_webhook, name='test_webhook'),
+    
     # Панель управления
     path('control/', views.bot_control_panel, name='control_panel'),
     

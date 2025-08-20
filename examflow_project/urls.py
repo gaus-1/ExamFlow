@@ -21,7 +21,7 @@ from core.api import (
     get_statistics,
     create_subscription,
 )
-from bot.views import bot_control_panel, bot_api_status, telegram_webhook
+# Убираем legacy импорты бота - теперь используется модульный telegram_bot
 
 urlpatterns = [
     # Админка
@@ -71,10 +71,7 @@ urlpatterns = [
     path('achievements/', achievements_view, name='achievements'),
     path('subscribe/', subscribe_view, name='subscribe'),
 
-    # Бот (legacy)
-    path('bot-legacy/', bot_control_panel, name='bot_control'),
-    path('bot-legacy/api/status/', bot_api_status, name='bot_api_status'),
-    path('bot-legacy/webhook/', telegram_webhook, name='telegram_webhook'),
+    # Бот (legacy) - УБРАНО, теперь используется модульный telegram_bot
 
     # API
     path('api/tasks/random/', get_random_task, name='api_random_task'),

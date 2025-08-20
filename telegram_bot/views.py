@@ -12,6 +12,7 @@ import asyncio
 import logging
 import threading
 import requests  # type: ignore
+import datetime
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -25,6 +26,19 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+def test_webhook(request):
+    """
+    Тестовая функция для проверки доступности webhook
+    """
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'Webhook endpoint доступен',
+        'timestamp': datetime.datetime.now().isoformat(),
+        'token_exists': bool(settings.TELEGRAM_BOT_TOKEN),
+        'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None
+    })
+
+
 @csrf_exempt
 @require_POST
 def telegram_webhook(request):
@@ -34,21 +48,36 @@ def telegram_webhook(request):
     Принимает JSON с обновлениями от Telegram API
     и передает их в обработчики бота
     """
+    logger.info(f"=== НАЧАЛО ОБРАБОТКИ WEBHOOK ===")
+    logger.info(f"Время: {datetime.datetime.now()}")
+    logger.info(f"IP: {request.META.get('REMOTE_ADDR', 'unknown')}")
+    logger.info(f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
+    
     try:
+        # Детальное логирование входящего webhook
+        logger.info(f"Webhook получен: {request.method} {request.path}")
+        logger.info(f"Headers: {dict(request.headers)}")
+        logger.info(f"Body length: {len(request.body)} bytes")
+        
         # Парсим JSON данные
         data = json.loads(request.body.decode('utf-8'))
+        logger.info(f"Webhook data: {json.dumps(data, indent=2, ensure_ascii=False)}")
         
         # Получаем экземпляр бота
         bot = get_bot()
+        logger.info(f"Bot instance получен: {bot is not None}")
         
         # Создаем объект Update
         update = Update.de_json(data, bot)
+        logger.info(f"Update создан: {update is not None}")
         
         if update:
             # Быстрая реакция на /start в синхронном режиме (диагностика отклика)
             try:
                 if update.message and (update.message.text or '').strip().lower().startswith('/start'):
                     chat_id = update.message.chat_id
+                    logger.info(f"Обрабатываем /start для chat_id: {chat_id}")
+                    
                     # Пытаемся отправить через Bot API (http), чтобы исключить проблемы клиента
                     try:
                         reply_kb = {
@@ -56,7 +85,12 @@ def telegram_webhook(request):
                             'resize_keyboard': True
                         }
                         token = settings.TELEGRAM_BOT_TOKEN
-                        requests.post(
+                        if not token:
+                            logger.error("TELEGRAM_BOT_TOKEN не настроен в settings!")
+                            return HttpResponse(b"ERROR: No token", status=500)
+                        logger.info(f"Отправляем HTTP-ответ через Bot API для токена: {token[:10]}...")
+                        
+                        response = requests.post(
                             f"https://api.telegram.org/bot{token}/sendMessage",
                             json={
                                 'chat_id': chat_id,
@@ -65,10 +99,11 @@ def telegram_webhook(request):
                             },
                             timeout=8,
                         )
-                        logger.info("Быстрый ответ /start отправлен через HTTP")
+                        logger.info(f"HTTP-ответ отправлен, статус: {response.status_code}, ответ: {response.text}")
                     except Exception as http_ex:
                         logger.warning(f"HTTP-ответ на /start не удался: {http_ex}")
                         # Резерв: пробуем через python-telegram-bot
+                        logger.info("Пробуем резервный способ через python-telegram-bot")
                         from telegram import InlineKeyboardButton, InlineKeyboardMarkup  # type: ignore
                         kb = InlineKeyboardMarkup([
                             [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
@@ -89,11 +124,13 @@ def telegram_webhook(request):
             threading.Thread(target=_run_async, args=(update,), daemon=True).start()
 
         # Немедленно подтверждаем приём, чтобы избежать таймаута Telegram
-        return HttpResponse("OK")
+        logger.info("Webhook успешно обработан, возвращаем OK")
+        logger.info(f"=== КОНЕЦ ОБРАБОТКИ WEBHOOK ===")
+        return HttpResponse(b"OK")
         
     except Exception as e:
         logger.error(f"Ошибка обработки webhook: {e}")
-        return HttpResponse("ERROR", status=500)
+        return HttpResponse(b"ERROR", status=500)
 
 
 async def handle_telegram_update(update: Update):
