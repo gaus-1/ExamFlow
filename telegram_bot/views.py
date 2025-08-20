@@ -10,6 +10,8 @@
 import json
 import asyncio
 import logging
+import threading
+import requests  # type: ignore
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -43,9 +45,50 @@ def telegram_webhook(request):
         update = Update.de_json(data, bot)
         
         if update:
-            # Обрабатываем обновление асинхронно
-            asyncio.run(handle_telegram_update(update))
-            
+            # Быстрая реакция на /start в синхронном режиме (диагностика отклика)
+            try:
+                if update.message and (update.message.text or '').strip().lower().startswith('/start'):
+                    chat_id = update.message.chat_id
+                    # Пытаемся отправить через Bot API (http), чтобы исключить проблемы клиента
+                    try:
+                        reply_kb = {
+                            'keyboard': [["📚 Предметы", "🎯 Случайное"], ["📊 Статистика"]],
+                            'resize_keyboard': True
+                        }
+                        token = settings.TELEGRAM_BOT_TOKEN
+                        requests.post(
+                            f"https://api.telegram.org/bot{token}/sendMessage",
+                            json={
+                                'chat_id': chat_id,
+                                'text': 'Добро пожаловать в ExamFlow! Выберите действие:',
+                                'reply_markup': reply_kb
+                            },
+                            timeout=8,
+                        )
+                        logger.info("Быстрый ответ /start отправлен через HTTP")
+                    except Exception as http_ex:
+                        logger.warning(f"HTTP-ответ на /start не удался: {http_ex}")
+                        # Резерв: пробуем через python-telegram-bot
+                        from telegram import InlineKeyboardButton, InlineKeyboardMarkup  # type: ignore
+                        kb = InlineKeyboardMarkup([
+                            [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
+                            [InlineKeyboardButton("📊 Статистика", callback_data="stats")],
+                        ])
+                        bot.send_message(chat_id=chat_id, text="Добро пожаловать в ExamFlow! Выберите действие:", reply_markup=kb)
+                        logger.info("Быстрый ответ на /start отправлен через PTB")
+            except Exception as ex:
+                logger.warning(f"Не удалось отправить быстрый ответ на /start: {ex}")
+
+            # Обрабатываем обновление в отдельном потоке, чтобы мгновенно отвечать Telegram
+            def _run_async(u: Update):
+                try:
+                    asyncio.run(handle_telegram_update(u))
+                except Exception as ex:
+                    logger.error(f"Ошибка фоновой обработки обновления: {ex}")
+
+            threading.Thread(target=_run_async, args=(update,), daemon=True).start()
+
+        # Немедленно подтверждаем приём, чтобы избежать таймаута Telegram
         return HttpResponse("OK")
         
     except Exception as e:
@@ -60,6 +103,22 @@ async def handle_telegram_update(update: Update):
     Создает mock-контекст и вызывает соответствующие обработчики
     """
     try:
+        # Быстрый ответ на /start через прямой вызов API — минимизируем риски парсинга
+        if update.message and (update.message.text or '').strip().lower().startswith('/start'):
+            try:
+                await update.effective_chat.send_action('typing')  # type: ignore
+            except Exception:
+                pass
+            try:
+                await update.effective_chat.send_message(  # type: ignore
+                    text=(
+                        "Добро пожаловать в ExamFlow!\n\n"
+                        "Нажмите кнопки ниже: Предметы, Случайное, Статистика."
+                    )
+                )
+            except Exception as e:
+                logger.error(f"Ошибка быстрой отправки /start: {e}")
+
         # Импортируем обработчики
         from .bot_handlers import (
             start, subjects_menu, show_subject_topics, show_task,
@@ -73,9 +132,10 @@ async def handle_telegram_update(update: Update):
         # Обрабатываем команды
         if update.message:
             if update.message.text:
-                if update.message.text.startswith('/start'):
+                text = update.message.text.strip()
+                if text.startswith('/start') or text.lower() in ('меню','start'):
                     await start(update, context)
-                elif update.message.text.startswith('/help'):
+                elif text.startswith('/help'):
                     await start(update, context)
                 else:
                     # Обрабатываем как ответ на задание

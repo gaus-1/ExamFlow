@@ -83,10 +83,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
         
         keyboard = [
-            [InlineKeyboardButton("📚 Предметы", callback_data="subjects")],
-            [InlineKeyboardButton("📊 Моя статистика", callback_data="stats")],
-            [InlineKeyboardButton("🎯 Случайное задание", callback_data="random_task")],
-            [InlineKeyboardButton("🌐 Открыть сайт", url="https://examflow.ru")]
+            [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
+            [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
