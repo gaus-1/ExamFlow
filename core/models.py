@@ -100,6 +100,7 @@ class UserProfile(TimeStampedModel):
     subscription_expires = models.DateTimeField(null=True, blank=True)
     daily_tasks_limit = models.IntegerField(default=5)  # type: ignore  # Лимит заданий в день для бесплатных
     tasks_solved_today = models.IntegerField(default=0)  # type: ignore
+    current_task_id = models.IntegerField(blank=True, null=True)  # ID текущего задания для бота
     def __str__(self):
         return f"Профиль: {self.user.username}"  # type: ignore
     

@@ -23,8 +23,24 @@ from django.utils import timezone
 # Настройка логирования
 logger = logging.getLogger(__name__)
 
-# Глобальная переменная для хранения ID текущего задания
-current_task_id = None
+# Функция для получения текущего задания пользователя из профиля
+def get_current_task_id(user):
+    """Получает ID текущего задания из профиля пользователя"""
+    try:
+        profile = UserProfile.objects.get(user=user)  # type: ignore
+        return profile.current_task_id
+    except UserProfile.DoesNotExist:
+        return None
+
+def set_current_task_id(user, task_id):
+    """Устанавливает ID текущего задания в профиле пользователя"""
+    try:
+        profile = UserProfile.objects.get(user=user)  # type: ignore
+        profile.current_task_id = task_id
+        profile.save()
+        logger.info(f"Установлен current_task_id: {task_id} для пользователя {user.username}")
+    except UserProfile.DoesNotExist:
+        logger.error(f"Профиль не найден для пользователя {user.username}")
 
 
 def get_or_create_user(telegram_user):
@@ -164,9 +180,10 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     import random
     task = random.choice(list(tasks))
 
-    global current_task_id
-    current_task_id = task.id
-    logger.info(f"show_subject_topics: установлен current_task_id: {current_task_id}")
+    # Устанавливаем текущее задание в профиле пользователя
+    user, _ = get_or_create_user(update.effective_user)
+    set_current_task_id(user, task.id)
+    logger.info(f"show_subject_topics: установлен current_task_id: {task.id}")
 
     task_text = f"""
 📝 **Задание №{task.id}**
@@ -205,7 +222,15 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     # Определяем источник: случайное по предмету или полностью случайное
-    if query.data.startswith('random_subject_'):
+    if query.data.startswith('subject_'):
+        subject_id = int(query.data.split('_')[1])
+        tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
+        if not tasks:
+            await query.edit_message_text(f"❌ В предмете пока нет заданий")
+            return
+        import random
+        task = random.choice(list(tasks))
+    elif query.data.startswith('random_subject_'):
         subject_id = int(query.data.split('_')[2])
         tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
         if not tasks:
