@@ -1,3 +1,89 @@
+import logging
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup  # type: ignore
+
+logger = logging.getLogger(__name__)
+
+
+def _menu_keyboard():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("📚 Выбрать предмет", callback_data="subjects")],
+        [InlineKeyboardButton("🎯 Случайное задание", callback_data="random_task")],
+        [InlineKeyboardButton("📊 Мой прогресс", callback_data="progress")],
+        [InlineKeyboardButton("🏆 Рейтинг", callback_data="rating")],
+        [InlineKeyboardButton("ℹ️ О боте", callback_data="about")],
+    ])
+
+
+def start_sync(update, bot):
+    text = (
+        "🎓 Добро пожаловать в ExamFlow!\n\n"
+        "Решайте задания, следите за прогрессом и готовьтесь к ЕГЭ/ОГЭ."
+    )
+    chat_id = update.effective_chat.id
+    bot.send_message(chat_id=chat_id, text=text, reply_markup=_menu_keyboard())
+
+
+def subjects_menu_sync(update, bot):
+    chat_id = update.effective_chat.id
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=update.callback_query.message.message_id,
+        text="📚 Выберите предмет (в разработке)",
+        reply_markup=_menu_keyboard()
+    )
+
+
+def random_task_sync(update, bot):
+    chat_id = update.effective_chat.id
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=update.callback_query.message.message_id,
+        text="🎲 Случайное задание (в разработке)",
+        reply_markup=_menu_keyboard()
+    )
+
+
+def progress_sync(update, bot):
+    chat_id = update.effective_chat.id
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=update.callback_query.message.message_id,
+        text="📊 Ваш прогресс (в разработке)",
+        reply_markup=_menu_keyboard()
+    )
+
+
+def rating_sync(update, bot):
+    chat_id = update.effective_chat.id
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=update.callback_query.message.message_id,
+        text="🏆 Рейтинг (в разработке)",
+        reply_markup=_menu_keyboard()
+    )
+
+
+def about_sync(update, bot):
+    chat_id = update.effective_chat.id
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=update.callback_query.message.message_id,
+        text=(
+            "ℹ️ О ExamFlow\n\n"
+            "Материалы на основе ФИПИ. Мы не являемся официальным партнёром ФИПИ."
+        ),
+        reply_markup=_menu_keyboard()
+    )
+
+
+def handle_unknown_callback_sync(update, bot):
+    chat_id = update.effective_chat.id
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=update.callback_query.message.message_id,
+        text="🤔 Неизвестная команда. Возвращаюсь в главное меню.",
+        reply_markup=_menu_keyboard()
+    )
 """
 Синхронные обработчики для Telegram бота в webhook режиме
 

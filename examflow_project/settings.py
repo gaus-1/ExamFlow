@@ -86,6 +86,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'examflow_project.wsgi.application'
 
+# URL-ы аутентификации
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+
 # Database
 # В продакшене используем DATABASE_URL, локально по умолчанию SQLite
 DATABASE_URL = os.getenv('DATABASE_URL')

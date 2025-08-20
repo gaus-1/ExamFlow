@@ -33,6 +33,8 @@ class ThemeManager {
         
         // Применяем тему к странице
         this.applyTheme(this.currentTheme);
+        // Обновляем активное состояние кнопок при старте
+        this.updateActiveButton(this.currentTheme);
         
         // Добавляем класс для плавных переходов
         document.documentElement.classList.add('theme-transition');
@@ -79,21 +81,20 @@ class ThemeManager {
         
         // Обработчики для кнопок
         switcher.addEventListener('click', (e) => {
-            if (e.target.classList.contains('theme-switcher-btn')) {
-                const theme = e.target.dataset.theme;
-                this.switchTheme(theme);
-            }
+            const btn = e.target.closest('.theme-switcher-btn');
+            if (!btn) return;
+            const theme = btn.dataset.theme;
+            if (theme) this.switchTheme(theme);
         });
         
         // Обработчик для мобильных устройств
         if (window.innerWidth <= 768) {
             switcher.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const theme = e.target.dataset.theme;
-                if (theme) {
-                    this.switchTheme(theme);
-                }
-            });
+                const btn = e.target.closest('.theme-switcher-btn');
+                if (!btn) return;
+                const theme = btn.dataset.theme;
+                if (theme) this.switchTheme(theme);
+            }, { passive: true });
         }
         
         console.log('ThemeManager: Обработчики событий добавлены');

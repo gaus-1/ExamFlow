@@ -5,6 +5,7 @@ Singleton экземпляр Telegram бота для webhook режима
 import os
 import django
 from telegram import Bot
+from telegram.constants import BotCommandScopeDefault  # type: ignore
 from django.conf import settings
 import logging
 
@@ -35,6 +36,14 @@ class BotInstance:
             try:
                 self._bot = Bot(token=bot_token)
                 logger.info("Экземпляр бота создан успешно")
+                try:
+                    # Настроим команды бота (меню снизу)
+                    self._bot.set_my_commands([
+                        ("start", "Главное меню"),
+                        ("ai", "Открыть ИИ на сайте"),
+                    ])
+                except Exception as e:
+                    logger.warning(f"Не удалось установить команды бота: {e}")
             except Exception as e:
                 logger.error(f"Ошибка создания экземпляра бота: {str(e)}")
                 return None
