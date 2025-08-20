@@ -15,7 +15,12 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 
-from .forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
+# Импортируем формы из нового модуля authentication
+try:
+    from authentication.forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
+except ImportError:
+    # Если модуль недоступен, используем заглушки
+    from .forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
 from .models import UserProfile, UserRating, Achievement, Subscription
 
 
