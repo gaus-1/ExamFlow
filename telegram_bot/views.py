@@ -171,37 +171,37 @@ async def handle_telegram_update(update: Update):
             if update.message.text:
                 text = update.message.text.strip()
                 if text.startswith('/start') or text.lower() in ('меню','start'):
-                    await start(update, context)
+                    await start(update, context)  # type: ignore
                 elif text.startswith('/help'):
-                    await start(update, context)
+                    await start(update, context)  # type: ignore
                 else:
                     # Обрабатываем как ответ на задание
-                    await handle_answer(update, context)
+                    await handle_answer(update, context)  # type: ignore
         
         # Обрабатываем callback-запросы
         elif update.callback_query:
             callback_data = update.callback_query.data
             
             if callback_data == "subjects":
-                await subjects_menu(update, context)
+                await subjects_menu(update, context)  # type: ignore
             elif callback_data == "stats":
-                await show_stats(update, context)
+                await show_stats(update, context)  # type: ignore
             elif callback_data == "random_task":
-                await show_task(update, context)
+                await show_task(update, context)  # type: ignore
             elif callback_data == "main_menu":
-                await start(update, context)
+                await start(update, context)  # type: ignore
             elif callback_data.startswith("subject_"):
-                await show_subject_topics(update, context)
+                await show_subject_topics(update, context)  # type: ignore
             elif callback_data.startswith("topic_"):
-                await show_task(update, context)
+                await show_task(update, context)  # type: ignore
             elif callback_data.startswith("random_subject_"):
-                await show_task(update, context)
+                await show_task(update, context)  # type: ignore
             elif callback_data.startswith("voice_"):
-                await voice_hint(update, context)
+                await voice_hint(update, context)  # type: ignore
             elif callback_data.startswith("answer_"):
-                await show_task(update, context)
+                await show_task(update, context)  # type: ignore
             else:
-                await handle_unknown_callback(update, context)
+                await handle_unknown_callback(update, context)  # type: ignore
                 
     except Exception as e:
         logger.error(f"Ошибка обработки обновления: {e}")
