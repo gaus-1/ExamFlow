@@ -166,6 +166,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     global current_task_id
     current_task_id = task.id
+    logger.info(f"show_subject_topics: установлен current_task_id: {current_task_id}")
 
     task_text = f"""
 📝 **Задание №{task.id}**
@@ -207,6 +208,11 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data.startswith('random_subject_'):
         subject_id = int(query.data.split('_')[2])
         tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
+        if not tasks:
+            await query.edit_message_text(f"❌ В предмете пока нет заданий")
+            return
+        import random
+        task = random.choice(list(tasks))
     else:
         tasks = Task.objects.all()  # type: ignore
         if not tasks:
@@ -217,6 +223,7 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         task = random.choice(list(tasks))
     
     current_task_id = task.id
+    logger.info(f"Установлен current_task_id: {current_task_id} для задания: {task.title}")
     
     # Формируем текст задания
     task_text = f"""
@@ -253,6 +260,8 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Проверяет правильность ответа и сохраняет прогресс
     """
     global current_task_id
+    
+    logger.info(f"handle_answer вызван. current_task_id: {current_task_id}")
     
     if not current_task_id:
         await update.message.reply_text("❌ Сначала выберите задание!")
