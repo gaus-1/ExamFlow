@@ -37,7 +37,7 @@ class Topic(models.Model):
     code = models.CharField(max_length=20, verbose_name="Код темы")
     
     def __str__(self):
-        return f"{self.subject.name} - {self.name}"
+        return f"{self.subject.name} - {self.name}"  # type: ignore
     
     class Meta:
         verbose_name = "Тема"
@@ -88,9 +88,9 @@ class UserProfile(TimeStampedModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     telegram_id = models.CharField(max_length=50, blank=True, unique=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
-    level = models.IntegerField(default=1)
-    experience = models.IntegerField(default=0)
-    streak_days = models.IntegerField(default=0)  # Дни подряд
+    level = models.IntegerField(default=1)  # type: ignore
+    experience = models.IntegerField(default=0)  # type: ignore
+    streak_days = models.IntegerField(default=0)  # Дни подряд  # type: ignore
     last_activity = models.DateTimeField(auto_now=True)
     subscription_type = models.CharField(
         max_length=20, 
@@ -98,11 +98,10 @@ class UserProfile(TimeStampedModel):
         default='free'
     )
     subscription_expires = models.DateTimeField(null=True, blank=True)
-    daily_tasks_limit = models.IntegerField(default=5)  # Лимит заданий в день для бесплатных
-    tasks_solved_today = models.IntegerField(default=0)
-    
+    daily_tasks_limit = models.IntegerField(default=5)  # type: ignore  # Лимит заданий в день для бесплатных
+    tasks_solved_today = models.IntegerField(default=0)  # type: ignore
     def __str__(self):
-        return f"Профиль: {self.user.username}"
+        return f"Профиль: {self.user.username}"  # type: ignore
     
     @property
     def is_premium(self):
@@ -131,11 +130,11 @@ class UserProfile(TimeStampedModel):
 class UserRating(TimeStampedModel):
     """Рейтинг пользователя"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    correct_answers = models.IntegerField(default=0)
-    incorrect_answers = models.IntegerField(default=0)
-    total_attempts = models.IntegerField(default=0)
-    total_time_spent = models.IntegerField(default=0)  # Общее время в секундах
-    rank = models.IntegerField(default=0)
+    correct_answers = models.IntegerField(default=0)  # type: ignore
+    incorrect_answers = models.IntegerField(default=0)  # type: ignore
+    total_attempts = models.IntegerField(default=0)  # type: ignore
+    total_time_spent = models.IntegerField(default=0)  # type: ignore  # Общее время в секундах
+    rank = models.IntegerField(default=0)  # type: ignore
     
     class Meta:
         ordering = ['-correct_answers', 'total_time_spent']
@@ -147,10 +146,10 @@ class UserRating(TimeStampedModel):
         """Процент правильных ответов"""
         if self.total_attempts == 0:
             return 0
-        return round((self.correct_answers / self.total_attempts) * 100, 1)
+        return round((self.correct_answers / self.total_attempts) * 100, 1)  # type: ignore
     
     def __str__(self):
-        return f"{self.user.username}: {self.correct_answers}/{self.total_attempts} ({self.accuracy}%)"
+        return f"{self.user.username}: {self.correct_answers}/{self.total_attempts} ({self.accuracy}%)"  # type: ignore
 
 
 class Achievement(TimeStampedModel):
@@ -162,7 +161,7 @@ class Achievement(TimeStampedModel):
     color = models.CharField(max_length=7, default='#ffd700')
     
     def __str__(self):
-        return f"{self.user.username}: {self.name}"
+        return f"{self.user.username}: {self.name}"  # type: ignore
     
     class Meta:
         verbose_name = "Достижение"
@@ -191,7 +190,7 @@ class Subscription(TimeStampedModel):
     expires_at = models.DateTimeField()
     
     def __str__(self):
-        return f"{self.user.username}: {self.subscription_type} ({self.status})"
+        return f"{self.user.username}: {self.subscription_type} ({self.status})"  # type: ignore
     
     class Meta:
         verbose_name = "Подписка"
@@ -211,6 +210,5 @@ class ReminderLog(TimeStampedModel):
         verbose_name = "Лог напоминаний"
         verbose_name_plural = "Логи напоминаний"
         unique_together = ['user', 'reminder_type']
-
     def __str__(self):
-        return f"{self.user.username} - {self.reminder_type} @ {self.last_sent_at.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.user.username} - {self.reminder_type} @ {self.last_sent_at.strftime('%Y-%m-%d %H:%M')}"  # type: ignore

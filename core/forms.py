@@ -10,7 +10,7 @@ from .models import UserProfile
 
 # Импортируем формы из нового модуля для обратной совместимости
 try:
-    from authentication.forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
+    from authentication.forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm  # type: ignore
     __all__ = ['TechRegisterForm', 'TechLoginForm', 'ProfileUpdateForm']
 except ImportError:
     # Если модуль authentication недоступен, создаем заглушки

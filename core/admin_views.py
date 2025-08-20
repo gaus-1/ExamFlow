@@ -27,8 +27,16 @@ _parsing_status = {
 
 def admin_panel(request):
     """Административная панель управления"""
-    subjects_count = Subject.objects.count()
-    tasks_count = Task.objects.count()
+    try:
+        from core.models import Subject, Task
+        subjects_count = Subject.objects.count()  # type: ignore
+    except Exception:
+        subjects_count = 0
+    
+    try:
+        tasks_count = Task.objects.count()  # type: ignore
+    except Exception:
+        tasks_count = 0
     
     context = {
         'subjects_count': subjects_count,
@@ -117,8 +125,9 @@ def start_parsing(request):
                     logger.warning(f"Ошибка генерации голоса: {str(e)}")
             
             # Финиш
-            subjects_count = Subject.objects.count()
-            tasks_count = Task.objects.count()
+            from core.models import Subject, Task
+            subjects_count = Subject.objects.count()  # type: ignore
+            tasks_count = Task.objects.count()  # type: ignore
             
             _parsing_status.update({
                 'running': False,
@@ -156,7 +165,7 @@ def trigger_parsing(request):
     """Простой endpoint для запуска парсинга одним запросом"""
     if request.method == 'GET':
         # Показываем простую форму
-        return HttpResponse("""
+        html_content = """
         <!DOCTYPE html>
         <html>
         <head>
@@ -234,7 +243,8 @@ def trigger_parsing(request):
             </div>
         </body>
         </html>
-        """)
+        """
+        return HttpResponse(html_content.encode('utf-8'), content_type='text/html; charset=utf-8')
     
     elif request.method == 'POST':
         return start_parsing(request)
