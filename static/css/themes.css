@@ -7,46 +7,46 @@
    ======================================== */
 :root {
     /* Основные цвета фона */
-    --bg-primary: #F8FAFC;          /* Основной фон - светло-серый */
-    --bg-secondary: #F1F5F9;        /* Вторичный фон */
-    --bg-card: #FFFFFF;             /* Карточки - чистый белый */
-    --bg-elevated: #FFFFFF;         /* Поднятые элементы */
-    --bg-overlay: rgba(0, 0, 0, 0.1); /* Наложения */
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #FFFFFF;
+    --bg-overlay: rgba(0, 0, 0, 0.1);
     
-    /* Основные акценты */
-    --accent-primary: #1E40AF;      /* Основной синий - профессиональный */
-    --accent-secondary: #475569;    /* Вторичный серый */
-    --accent-success: #059669;      /* Успех - темно-зеленый */
-    --accent-warning: #D97706;      /* Предупреждение - оранжевый */
-    --accent-danger: #DC2626;       /* Ошибка - красный */
-    --accent-info: #0891B2;         /* Информационный синий */
+    /* Основные акценты - Bali Hai палитра */
+    --accent-primary: #7e90a6;
+    --accent-secondary: #274172;
+    --accent-success: #5ba66a;
+    --accent-warning: #d89632;
+    --accent-danger: #f44336;
+    --accent-info: #274172;
     
     /* Текстовые цвета */
-    --text-primary: #1E293B;        /* Основной текст - темно-серый */
-    --text-secondary: #475569;      /* Вторичный текст */
-    --text-muted: #64748B;          /* Приглушенный текст */
-    --text-accent: #1E40AF;         /* Акцентный текст - синий */
-    --text-on-primary: #FFFFFF;     /* Текст на цветном фоне */
-    --text-on-accent: #FFFFFF;      /* Текст на акцентном фоне */
+    --text-primary: #1E293B;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-accent: #274172;
+    --text-on-primary: #FFFFFF;
+    --text-on-accent: #FFFFFF;
     
     /* Градиенты */
-    --gradient-primary: linear-gradient(135deg, #1E40AF, #1E3A8A);
-    --gradient-secondary: linear-gradient(135deg, #475569, #374151);
-    --gradient-success: linear-gradient(135deg, #059669, #047857);
-    --gradient-warm: linear-gradient(135deg, #D97706, #B45309);
+    --gradient-primary: linear-gradient(135deg, #7e90a6, #274172);
+    --gradient-secondary: linear-gradient(135deg, #5ba66a, #274172);
+    --gradient-success: linear-gradient(135deg, #5ba66a, #4a8f5a);
+    --gradient-warm: linear-gradient(135deg, #d89632, #b87a28);
     
     /* Тени */
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-    --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-elevated: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-    --shadow-button: 0 2px 4px rgba(30, 64, 175, 0.2);
-    --shadow-button-hover: 0 4px 8px rgba(30, 64, 175, 0.3);
+    --shadow-soft: 0 1px 3px rgba(126, 144, 166, 0.15), 0 1px 2px rgba(126, 144, 166, 0.1);
+    --shadow-card: 0 4px 6px rgba(126, 144, 166, 0.1), 0 2px 4px rgba(126, 144, 166, 0.08);
+    --shadow-elevated: 0 10px 15px rgba(126, 144, 166, 0.15), 0 4px 6px rgba(126, 144, 166, 0.1);
+    --shadow-button: 0 2px 4px rgba(126, 144, 166, 0.2);
+    --shadow-button-hover: 0 4px 8px rgba(126, 144, 166, 0.3);
     
     /* Границы */
     --border-light: #E2E8F0;
     --border-medium: #CBD5E1;
-    --border-accent: #1E40AF;
-    --border-focus: #3B82F6;
+    --border-accent: #7e90a6;
+    --border-focus: #274172;
     
     /* Переходы */
     --transition-fast: all 0.15s ease-out;
@@ -88,37 +88,37 @@
    ======================================== */
 [data-theme="school"] {
     /* Основные цвета фона */
-    --bg-primary: #FEF7FF;          /* Светло-фиолетовый фон */
-    --bg-secondary: #F3E8FF;        /* Фиолетовый вторичный фон */
-    --bg-card: #FFFFFF;             /* Карточки остаются белыми */
-    --bg-elevated: #FAF5FF;         /* Поднятые элементы - очень светлый фиолетовый */
+    --bg-primary: #FEF7FF;
+    --bg-secondary: #F3E8FF;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #FAF5FF;
     
-    /* Яркие акценты для школьников */
-    --accent-primary: #8B5CF6;      /* Основной фиолетовый */
-    --accent-secondary: #F97316;    /* Вторичный оранжевый */
-    --accent-success: #10B981;      /* Неоновый зеленый */
-    --accent-warning: #F59E0B;      /* Яркий желтый */
-    --accent-danger: #EF4444;       /* Яркий красный */
-    --accent-info: #06B6D4;         /* Голубой */
+    /* Яркие акценты - Blue Bell палитра */
+    --accent-primary: #8f97c0;
+    --accent-secondary: #152be3;
+    --accent-success: #60a872;
+    --accent-warning: #dd983a;
+    --accent-danger: #f44336;
+    --accent-info: #152be3;
     
     /* Текстовые цвета */
-    --text-primary: #1E1B4B;        /* Темно-фиолетовый текст */
-    --text-secondary: #5B21B6;      /* Фиолетовый вторичный текст */
-    --text-accent: #8B5CF6;         /* Акцентный текст - фиолетовый */
+    --text-primary: #1E1B4B;
+    --text-secondary: #5B21B6;
+    --text-accent: #8f97c0;
     
     /* Градиенты */
-    --gradient-primary: linear-gradient(135deg, #8B5CF6, #7C3AED);
-    --gradient-secondary: linear-gradient(135deg, #F97316, #EA580C);
-    --gradient-success: linear-gradient(135deg, #10B981, #059669);
-    --gradient-warm: linear-gradient(135deg, #F59E0B, #D97706);
+    --gradient-primary: linear-gradient(135deg, #8f97c0, #152be3);
+    --gradient-secondary: linear-gradient(135deg, #60a872, #8f97c0);
+    --gradient-success: linear-gradient(135deg, #60a872, #4a8f5a);
+    --gradient-warm: linear-gradient(135deg, #dd983a, #b87a28);
     
     /* Тени */
-    --shadow-button: 0 2px 8px rgba(139, 92, 246, 0.3);
-    --shadow-button-hover: 0 4px 12px rgba(139, 92, 246, 0.4);
+    --shadow-button: 0 2px 8px rgba(143, 151, 192, 0.3);
+    --shadow-button-hover: 0 8px 20px rgba(143, 151, 192, 0.4);
     
     /* Границы */
-    --border-accent: #8B5CF6;
-    --border-focus: #A78BFA;
+    --border-accent: #8f97c0;
+    --border-focus: #152be3;
     
     /* Анимации */
     --animation-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -130,36 +130,36 @@
    ======================================== */
 [data-theme="adult"] {
     /* Основные цвета фона */
-    --bg-primary: #F8FAFC;          /* Светло-серый фон */
-    --bg-secondary: #F1F5F9;        /* Серый вторичный фон */
-    --bg-card: #FFFFFF;             /* Карточки - чистый белый */
-    --bg-elevated: #FFFFFF;         /* Поднятые элементы */
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #FFFFFF;
     
-    /* Профессиональные акценты */
-    --accent-primary: #1E40AF;      /* Темно-синий */
-    --accent-secondary: #475569;    /* Серый */
-    --accent-success: #059669;      /* Темно-зеленый */
-    --accent-warning: #D97706;      /* Оранжевый */
-    --accent-danger: #DC2626;       /* Красный */
-    --accent-info: #0891B2;         /* Синий */
+    /* Профессиональные акценты - Bali Hai палитра */
+    --accent-primary: #7e90a6;
+    --accent-secondary: #274172;
+    --accent-success: #5ba66a;
+    --accent-warning: #d89632;
+    --accent-danger: #f44336;
+    --accent-info: #274172;
     
     /* Текстовые цвета */
-    --text-primary: #1E293B;        /* Темно-серый */
-    --text-secondary: #475569;      /* Серый */
-    --text-accent: #1E40AF;         /* Синий */
+    --text-primary: #1E293B;
+    --text-secondary: #475569;
+    --text-accent: #274172;
     
     /* Градиенты */
-    --gradient-primary: linear-gradient(135deg, #1E40AF, #1E3A8A);
-    --gradient-secondary: linear-gradient(135deg, #475569, #374151);
-    --gradient-success: linear-gradient(135deg, #059669, #047857);
+    --gradient-primary: linear-gradient(135deg, #7e90a6, #274172);
+    --gradient-secondary: linear-gradient(135deg, #5ba66a, #274172);
+    --gradient-success: linear-gradient(135deg, #5ba66a, #4a8f5a);
     
     /* Тени */
-    --shadow-button: 0 2px 4px rgba(30, 64, 175, 0.2);
-    --shadow-button-hover: 0 4px 8px rgba(30, 64, 175, 0.3);
+    --shadow-button: 0 2px 4px rgba(126, 144, 166, 0.2);
+    --shadow-button-hover: 0 4px 8px rgba(126, 144, 166, 0.3);
     
     /* Границы */
-    --border-accent: #1E40AF;
-    --border-focus: #3B82F6;
+    --border-accent: #7e90a6;
+    --border-focus: #274172;
     
     /* Анимации */
     --animation-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -213,287 +213,319 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: var(--transition-slow);
+    transition: left 0.5s;
 }
 
 .theme-switcher-btn:hover::before {
     left: 100%;
 }
 
-/* Кнопка "Школьник" */
-.theme-switcher-btn[data-theme="school"] {
-    background: var(--gradient-primary);
-    color: var(--text-on-accent);
+.theme-switcher-btn.school {
+    background: var(--accent-primary);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
 }
 
-.theme-switcher-btn[data-theme="school"]:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+.theme-switcher-btn.school:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-button-hover);
 }
 
-/* Кнопка "Взрослый" */
-.theme-switcher-btn[data-theme="adult"] {
-    background: var(--gradient-secondary);
-    color: var(--text-on-accent);
+.theme-switcher-btn.adult {
+    background: var(--accent-primary);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
 }
 
-.theme-switcher-btn[data-theme="adult"]:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(71, 85, 105, 0.4);
+.theme-switcher-btn.adult:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
 }
 
-/* Активная кнопка */
 .theme-switcher-btn.active {
-    box-shadow: inset 0 0 0 2px var(--text-on-accent);
-    transform: scale(1.1);
+    background: var(--accent-secondary);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button-hover);
 }
 
 /* ========================================
-   АДАПТИВНОСТЬ ПЕРЕКЛЮЧАТЕЛЯ
+   СТИЛИ КНОПОК
+   ======================================== */
+
+/* Общие стили кнопок */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    min-height: 44px;
+}
+
+/* Эффект свечения для школьников */
+[data-theme="school"] .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+[data-theme="school"] .btn:hover::before {
+    left: 100%;
+}
+
+/* Основная кнопка */
+.btn-primary {
+    background: var(--gradient-primary);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
+}
+
+[data-theme="school"] .btn-primary {
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(143, 151, 192, 0.4);
+}
+
+[data-theme="school"] .btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(143, 151, 192, 0.5);
+}
+
+[data-theme="adult"] .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+/* Вторичная кнопка */
+.btn-secondary {
+    background: var(--gradient-secondary);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
+}
+
+[data-theme="school"] .btn-secondary {
+    border-radius: 20px;
+    box-shadow: 0 3px 12px rgba(21, 43, 227, 0.3);
+}
+
+[data-theme="school"] .btn-secondary:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(21, 43, 227, 0.4);
+}
+
+[data-theme="adult"] .btn-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+/* Кнопка успеха */
+.btn-success {
+    background: var(--gradient-success);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
+}
+
+[data-theme="school"] .btn-success {
+    border-radius: 22px;
+    box-shadow: 0 4px 15px rgba(96, 168, 114, 0.4);
+}
+
+[data-theme="school"] .btn-success:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 7px 22px rgba(96, 168, 114, 0.5);
+}
+
+[data-theme="adult"] .btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+/* Кнопка предупреждения */
+.btn-warning {
+    background: var(--gradient-warm);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
+}
+
+[data-theme="school"] .btn-warning {
+    border-radius: 24px;
+    box-shadow: 0 4px 15px rgba(221, 152, 58, 0.4);
+}
+
+[data-theme="school"] .btn-warning:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 7px 22px rgba(221, 152, 58, 0.5);
+}
+
+[data-theme="adult"] .btn-warning:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+/* Кнопка опасности */
+.btn-danger {
+    background: var(--accent-danger);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
+}
+
+[data-theme="school"] .btn-danger {
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+}
+
+[data-theme="school"] .btn-danger:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 7px 22px rgba(244, 67, 54, 0.5);
+}
+
+[data-theme="adult"] .btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+/* Кнопка информации */
+.btn-info {
+    background: var(--accent-info);
+    color: var(--text-on-primary);
+    box-shadow: var(--shadow-button);
+}
+
+[data-theme="school"] .btn-info {
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(21, 43, 227, 0.4);
+}
+
+[data-theme="school"] .btn-info:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 7px 22px rgba(21, 43, 227, 0.5);
+}
+
+[data-theme="adult"] .btn-info:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-hover);
+}
+
+/* Размеры кнопок */
+.btn-sm {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    min-height: 36px;
+}
+
+.btn-lg {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--font-size-lg);
+    min-height: 52px;
+}
+
+/* Кнопка с иконкой */
+.btn-icon {
+    padding: var(--spacing-md);
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* ========================================
+   АНИМАЦИИ И ЭФФЕКТЫ
+   ======================================== */
+
+/* Пульсация для школьников */
+[data-theme="school"] .btn-primary {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 4px 15px rgba(143, 151, 192, 0.4); }
+    50% { box-shadow: 0 4px 20px rgba(143, 151, 192, 0.6); }
+    100% { box-shadow: 0 4px 15px rgba(143, 151, 192, 0.4); }
+}
+
+/* Плавающий эффект для школьников */
+[data-theme="school"] .btn:hover {
+    animation: float 0.6s ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Эффект нажатия */
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* ========================================
+   АДАПТИВНОСТЬ
    ======================================== */
 @media (max-width: 768px) {
     .theme-switcher {
         top: 10px;
         right: 10px;
-        padding: var(--spacing-xs);
     }
     
-    .theme-switcher-container {
-        flex-direction: column;
-        gap: var(--spacing-xs);
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-sm);
+        min-height: 40px;
     }
     
-    .theme-switcher-btn {
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: var(--font-size-xs);
-    }
-}
-
-@media (max-width: 480px) {
-    .theme-switcher {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        top: auto;
+    .btn-lg {
+        padding: var(--spacing-md) var(--spacing-lg);
+        min-height: 48px;
     }
 }
 
 /* ========================================
-   АНИМАЦИИ ПЕРЕКЛЮЧЕНИЯ ТЕМ
+   ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ ДЛЯ ШКОЛЬНИКОВ
    ======================================== */
-.theme-transition {
-    transition: 
-        background-color var(--transition-base),
-        color var(--transition-base),
-        border-color var(--transition-base),
-        box-shadow var(--transition-base);
+[data-theme="school"] .btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
 }
 
-/* Плавное появление переключателя */
-.theme-switcher {
-    animation: slideInRight 0.5s ease-out;
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Эффект пульсации для активной темы */
-.theme-switcher-btn.active {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
-    }
-    50% {
-        box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
-    }
+[data-theme="school"] .btn:active::after {
+    width: 200px;
+    height: 200px;
 }
 
 /* ========================================
-   УВЕДОМЛЕНИЕ О СМЕНЕ ТЕМЫ
+   ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ ДЛЯ ВЗРОСЛЫХ
    ======================================== */
-.theme-notification {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: var(--bg-card);
-    border: 2px solid var(--border-accent);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    box-shadow: var(--shadow-elevated);
-    z-index: 999;
-    transform: translateX(100%);
-    transition: var(--transition-base);
-    max-width: 300px;
+[data-theme="adult"] .btn {
+    border: 1px solid transparent;
 }
 
-.theme-notification.show {
-    transform: translateX(0);
+[data-theme="adult"] .btn:hover {
+    border-color: var(--border-accent);
 }
 
-.theme-notification-title {
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--spacing-xs);
-    font-size: var(--font-size-sm);
+[data-theme="adult"] .btn:focus {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
 }
-
-.theme-notification-text {
-    color: var(--text-secondary);
-    font-size: var(--font-size-xs);
-    line-height: 1.4;
-}
-
-/* ========================================
-   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ТЕМ
-   ======================================== */
-
-/* Стили для школьной темы */
-[data-theme="school"] .card-tech {
-    border: 2px solid var(--border-light);
-    background: linear-gradient(135deg, #FAF5FF, #F3E8FF);
-}
-
-[data-theme="school"] .btn-neon {
-    background: var(--gradient-primary);
-    border-radius: var(--radius-2xl);
-    font-size: var(--font-size-lg);
-}
-
-[data-theme="school"] .hero-title {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Стили для взрослой темы */
-[data-theme="adult"] .card-tech {
-    border: 1px solid var(--border-light);
-    background: var(--bg-card);
-}
-
-[data-theme="adult"] .btn-neon {
-    background: var(--gradient-primary);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-base);
-}
-
-[data-theme="adult"] .hero-title {
-    color: var(--text-primary);
-    font-weight: 700;
-}
-
-/* ========================================
-   ГЛУБОКИЕ РАЗЛИЧИЯ ДИЗАЙНОВ
-   ======================================== */
-
-/* ШКОЛЬНИК: крупная типографика, большие отступы, округлые формы, весёлые элементы */
-[data-theme="school"] body {
-    font-size: 18px;
-    line-height: 1.7;
-}
-
-[data-theme="school"] .navbar-tech {
-    padding: 1.25rem 0;
-}
-
-[data-theme="school"] .logo-tech {
-    font-size: 2rem;
-}
-
-[data-theme="school"] .nav-link-tech {
-    padding: 0.85rem 1.25rem !important;
-    border-radius: 14px;
-    font-weight: 700;
-}
-
-[data-theme="school"] .btn-neon,
-[data-theme="school"] .btn-gradient,
-[data-theme="school"] .btn-secondary-duolingo,
-[data-theme="school"] .btn-outline-duolingo {
-    border-radius: 20px;
-    padding: 1rem 1.5rem;
-    font-size: 1.05rem;
-}
-
-[data-theme="school"] .form-control-duolingo {
-    border-radius: 16px;
-    padding: 1.1rem 1.25rem;
-    font-size: 1.05rem;
-}
-
-[data-theme="school"] .card-tech,
-[data-theme="school"] .card-neon {
-    border-radius: 22px;
-    padding: 2rem;
-}
-
-[data-theme="school"] .hero-tech {
-    min-height: 88vh;
-}
-
-/* ВЗРОСЛЫЙ: компактный интерфейс, строгие формы, меньшие отступы, акцент на данные */
-[data-theme="adult"] body {
-    font-size: 15px;
-    line-height: 1.55;
-}
-
-[data-theme="adult"] .navbar-tech {
-    padding: 0.5rem 0;
-}
-
-[data-theme="adult"] .nav-link-tech {
-    padding: 0.5rem 0.9rem !important;
-    border-radius: 8px;
-    font-weight: 600;
-}
-
-[data-theme="adult"] .btn-neon,
-[data-theme="adult"] .btn-gradient,
-[data-theme="adult"] .btn-secondary-duolingo,
-[data-theme="adult"] .btn-outline-duolingo {
-    border-radius: 10px;
-    padding: 0.65rem 1.1rem;
-    font-size: 0.95rem;
-}
-
-[data-theme="adult"] .form-control-duolingo {
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
-    font-size: 0.95rem;
-}
-
-[data-theme="adult"] .card-tech,
-[data-theme="adult"] .card-neon {
-    border-radius: 12px;
-    padding: 1.25rem;
-}
-
-[data-theme="adult"] .hero-tech {
-    min-height: 70vh;
-}
-
-/* Разное: плотность таблиц/статистики для взрослой темы */
-[data-theme="adult"] .stat-item { padding: 0.75rem; }
-[data-theme="adult"] .feature-list li { padding: 0.35rem 0; }
-
-/* ========================================
-   УТИЛИТЫ ДЛЯ ТЕМ
-   ======================================== */
-.theme-text-primary { color: var(--text-primary) !important; }
-.theme-text-secondary { color: var(--text-secondary) !important; }
-.theme-text-accent { color: var(--text-accent) !important; }
-.theme-bg-primary { background-color: var(--bg-primary) !important; }
-.theme-bg-card { background-color: var(--bg-card) !important; }
-.theme-border-accent { border-color: var(--border-accent) !important; }
