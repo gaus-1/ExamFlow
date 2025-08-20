@@ -13,89 +13,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # Пустая миграция - таблицы уже существуют
+        # Только обновляем поле difficulty в Task
         migrations.AlterField(
             model_name='task',
             name='difficulty',
             field=models.IntegerField(verbose_name='Сложность'),
-        ),
-        migrations.CreateModel(
-            name='UserRating',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('correct_answers', models.IntegerField(default=0)),
-                ('incorrect_answers', models.IntegerField(default=0)),
-                ('total_attempts', models.IntegerField(default=0)),
-                ('total_time_spent', models.IntegerField(default=0)),
-                ('rank', models.IntegerField(default=0)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'verbose_name': 'Рейтинг пользователя',
-                'verbose_name_plural': 'Рейтинги пользователей',
-                'ordering': ['-correct_answers', 'total_time_spent'],
-            },
-        ),
-        migrations.CreateModel(
-            name='UserProfile',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('telegram_id', models.CharField(blank=True, max_length=50, null=True, unique=True)),
-                ('phone', models.CharField(blank=True, max_length=20)),
-                ('level', models.IntegerField(default=1)),
-                ('experience', models.IntegerField(default=0)),
-                ('streak_days', models.IntegerField(default=0)),
-                ('last_activity', models.DateTimeField(auto_now=True)),
-                ('subscription_type', models.CharField(choices=[('free', 'Бесплатный'), ('monthly', 'Месячный'), ('yearly', 'Годовой')], default='free', max_length=20)),
-                ('subscription_expires', models.DateTimeField(blank=True, null=True)),
-                ('daily_tasks_limit', models.IntegerField(default=5)),
-                ('tasks_solved_today', models.IntegerField(default=0)),
-                ('current_task_id', models.IntegerField(blank=True, null=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'verbose_name': 'Профиль пользователя',
-                'verbose_name_plural': 'Профили пользователей',
-            },
-        ),
-        migrations.CreateModel(
-            name='Subscription',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('subscription_type', models.CharField(choices=[('monthly', 'Месячный'), ('yearly', 'Годовой')], max_length=20)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('payment_id', models.CharField(max_length=100, unique=True)),
-                ('payment_method', models.CharField(choices=[('card', 'Банковская карта'), ('btc', 'Bitcoin')], max_length=20)),
-                ('status', models.CharField(choices=[('pending', 'Ожидает'), ('active', 'Активна'), ('expired', 'Истекла'), ('cancelled', 'Отменена')], default='pending', max_length=20)),
-                ('starts_at', models.DateTimeField()),
-                ('expires_at', models.DateTimeField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'verbose_name': 'Подписка',
-                'verbose_name_plural': 'Подписки',
-            },
-        ),
-        migrations.CreateModel(
-            name='Achievement',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('description', models.TextField()),
-                ('icon', models.CharField(default='fas fa-trophy', max_length=50)),
-                ('color', models.CharField(default='#ffd700', max_length=7)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'verbose_name': 'Достижение',
-                'verbose_name_plural': 'Достижения',
-            },
         ),
     ]
