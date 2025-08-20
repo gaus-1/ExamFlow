@@ -14,8 +14,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from django.contrib.auth.models import User
 from core.models import (
-    Subject, Task, UserProgress, UserRating, 
-    Achievement, Topic, UserProfile, Subscription
+    Subject, Task, UserProgress, UserRating,
+    Achievement, UserProfile, Subscription
 )
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -113,8 +113,9 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         query = update.callback_query
         await query.answer()
         
-        subjects = Subject.objects.annotate( # type: ignore
-            tasks_count=Count('topics__tasks')
+        # Считаем задания через обратную связь Task.subject
+        subjects = Subject.objects.annotate(  # type: ignore
+            tasks_count=Count('task')
         ).filter(tasks_count__gt=0)
         
         if not subjects:
@@ -144,48 +145,49 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    Показывает темы выбранного предмета
-    
-    Отображает список тем с количеством заданий в каждой
+    Показывает случайное задание выбранного предмета (упрощенный режим без тем)
     """
     query = update.callback_query
     await query.answer()
-    
+
     subject_id = int(query.data.split('_')[1])
-    subject = Subject.objects.get(id=subject_id) # type: ignore 
-    
-    topics = Topic.objects.filter(subject=subject).annotate( # type: ignore
-        tasks_count=Count('tasks')
-    ).filter(tasks_count__gt=0)
-    
-    if not topics:
+    subject = Subject.objects.get(id=subject_id)  # type: ignore
+
+    tasks = Task.objects.filter(subject=subject)  # type: ignore
+    if not tasks:
         await query.edit_message_text(
-            f"📖 **{subject.name}**\n\nТемы пока загружаются...",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Назад", callback_data="subjects")
-            ]])
+            f"❌ В предметe {subject.name} пока нет заданий",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]])
         )
         return
-    
-    keyboard = []
-    for topic in topics:
-        button_text = f"{topic.name} ({topic.tasks_count})"
-        keyboard.append([InlineKeyboardButton(
-            button_text, 
-            callback_data=f"topic_{topic.id}"
-        )])
-    
-    keyboard.extend([
-        [InlineKeyboardButton("🎯 Случайное задание", callback_data=f"random_subject_{subject_id}")],
-        [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")],
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
-    ])
-    
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    
+
+    import random
+    task = random.choice(list(tasks))
+
+    global current_task_id
+    current_task_id = task.id
+
+    task_text = f"""
+📝 **Задание №{task.id}**
+**Предмет:** {task.subject.name}
+
+**Заголовок:** {task.title}
+
+**Условие:**
+{task.description or 'Описание задания отсутствует'}
+
+Введите ваш ответ:
+"""
+
+    keyboard = [
+        [InlineKeyboardButton("🔊 Голосовая подсказка", callback_data=f"voice_{task.id}")],
+        [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
+        [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+    ]
+
     await query.edit_message_text(
-        f"📖 **{subject.name}**\n\nВыберите тему для изучения:",
-        reply_markup=reply_markup,
+        task_text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode='Markdown'
     )
 
@@ -201,37 +203,30 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     
-    # Получаем ID задания из callback_data
-    if query.data.startswith('topic_'):
-        topic_id = int(query.data.split('_')[1])
-        topic = Topic.objects.get(id=topic_id) # type: ignore
-        tasks = Task.objects.filter(topic=topic) # type: ignore
-        
-        if not tasks:
-            await query.edit_message_text("❌ В этой теме пока нет заданий")
-            return
-            
-        task = tasks.first()  # Берем первое задание
+    # Определяем источник: случайное по предмету или полностью случайное
+    if query.data.startswith('random_subject_'):
+        subject_id = int(query.data.split('_')[2])
+        tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
     else:
-        # Случайное задание
-        tasks = Task.objects.all() # type: ignore
+        tasks = Task.objects.all()  # type: ignore
         if not tasks:
             await query.edit_message_text("❌ Задания пока не загружены")
             return
         
         import random
-        task = random.choice(tasks)
+        task = random.choice(list(tasks))
     
     current_task_id = task.id
     
     # Формируем текст задания
     task_text = f"""
 📝 **Задание №{task.id}**
-**Предмет:** {task.topic.subject.name}
-**Тема:** {task.topic.name}
+**Предмет:** {task.subject.name}
+
+**Заголовок:** {task.title}
 
 **Условие:**
-{task.content}
+{task.description or 'Описание задания отсутствует'}
 
 Введите ваш ответ:
 """
@@ -265,10 +260,11 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     user, _ = get_or_create_user(update.effective_user)
     task = Task.objects.get(id=current_task_id) # type: ignore
-    user_answer = update.message.text.strip()
+    user_answer = (update.message.text or '').strip()
     
-    # Проверяем ответ
-    is_correct = task.check_answer(user_answer)
+    # Проверяем ответ (простая текстовая проверка)
+    correct_value = (task.answer or '').strip()
+    is_correct = bool(correct_value) and (user_answer.lower() == correct_value.lower())
     
     # Сохраняем прогресс
     progress, created = UserProgress.objects.get_or_create( # type: ignore
@@ -297,8 +293,9 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response = f"❌ **Неправильно**\n\n"
         response += f"**Правильный ответ:** {task.answer}\n\n"
     
-    if task.explanation:
-        response += f"**Объяснение:**\n{task.explanation}"
+    # У нас нет поля explanation в модели Task — показываем источник/подсказку, если есть
+    if task.source:
+        response += f"**Источник:** {task.source}"
     
     keyboard = [
         [InlineKeyboardButton("🎯 Следующее задание", callback_data="random_task")],
@@ -327,13 +324,13 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     user, _ = get_or_create_user(update.effective_user)
-    
+
     # Получаем статистику
-    total_attempts = UserProgress.objects.filter(user=user).count() # type: ignore
-    correct_answers = UserProgress.objects.filter(user=user, is_correct=True).count() # type: ignore
+    total_attempts = UserProgress.objects.filter(user=user).count()  # type: ignore
+    correct_answers = UserProgress.objects.filter(user=user, is_correct=True).count()  # type: ignore
     accuracy = round((correct_answers / total_attempts * 100) if total_attempts > 0 else 0, 1)
     
-    rating, _ = UserRating.objects.get_or_create(user=user) # type: ignore
+    rating, _ = UserRating.objects.get_or_create(user=user)  # type: ignore
     
     stats_text = f"""
 📊 **Ваша статистика**
@@ -344,7 +341,7 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🎯 **Точность:** {accuracy}%
 ⭐ **Рейтинг:** {rating.total_points} очков
 
-🏆 **Достижения:** {user.achievements.count()}
+🏆 **Достижения:** {Achievement.objects.filter(user=user).count()}
 
 Продолжайте решать задания для улучшения результатов!
 """
