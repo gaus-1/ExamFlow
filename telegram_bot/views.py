@@ -12,15 +12,14 @@ import asyncio
 import logging
 import threading
 import requests  # type: ignore
-import datetime
+from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import user_passes_test
 from telegram import Update
-from .bot_main import setup_bot_application
-from bot.bot_instance import get_bot
+from .bot_main import setup_bot_application, get_bot
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ def test_webhook(request):
     return JsonResponse({
         'status': 'ok',
         'message': 'Webhook endpoint доступен',
-        'timestamp': datetime.datetime.now().isoformat(),
+        'timestamp': datetime.now().isoformat(),
         'token_exists': bool(settings.TELEGRAM_BOT_TOKEN),
         'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None
     })
@@ -49,7 +48,7 @@ def telegram_webhook(request):
     и передает их в обработчики бота
     """
     logger.info(f"=== НАЧАЛО ОБРАБОТКИ WEBHOOK ===")
-    logger.info(f"Время: {datetime.datetime.now()}")
+    logger.info(f"Время: {datetime.now()}")
     logger.info(f"IP: {request.META.get('REMOTE_ADDR', 'unknown')}")
     logger.info(f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
     

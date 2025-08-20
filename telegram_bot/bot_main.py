@@ -27,6 +27,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def get_bot():
+    """
+    Возвращает экземпляр бота для использования в views
+    """
+    from telegram import Bot
+    return Bot(settings.TELEGRAM_BOT_TOKEN)
+
+
 def setup_bot_application():
     """
     Настраивает и возвращает приложение бота
