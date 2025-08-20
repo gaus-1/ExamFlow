@@ -34,6 +34,12 @@ class BotInstance:
             
             try:
                 self._bot = Bot(token=bot_token)
+                # Быстрая проверка токена
+                try:
+                    me = self._bot.get_me()
+                    logger.info(f"Бот авторизован как @{getattr(me, 'username', 'unknown')}")
+                except Exception as e:
+                    logger.error(f"Ошибка авторизации бота (проверьте TELEGRAM_BOT_TOKEN): {e}")
                 logger.info("Экземпляр бота создан успешно")
                 try:
                     # Настроим команды бота (меню снизу)

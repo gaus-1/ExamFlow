@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import user_passes_test
 from telegram import Update
 from .bot_main import setup_bot_application
 from bot.bot_instance import get_bot
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -145,8 +146,15 @@ def bot_api_status(request):
     
     Возвращает JSON с информацией о состоянии бота
     """
+    token_set = bool(getattr(settings, 'TELEGRAM_BOT_TOKEN', ''))
+    try:
+        bot = get_bot()
+        ok = bot is not None
+    except Exception:
+        ok = False
     return JsonResponse({
-        'status': 'active',
+        'status': 'active' if ok else 'error',
         'mode': 'webhook',
-        'message': 'Бот работает в режиме webhook'
+        'token_configured': token_set,
+        'message': 'Бот работает в режиме webhook' if ok else 'Бот недоступен, проверьте токен и webhook'
     })

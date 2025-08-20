@@ -395,6 +395,100 @@
 }
 
 /* ========================================
+   ГЛУБОКИЕ РАЗЛИЧИЯ ДИЗАЙНОВ
+   ======================================== */
+
+/* ШКОЛЬНИК: крупная типографика, большие отступы, округлые формы, весёлые элементы */
+[data-theme="school"] body {
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+[data-theme="school"] .navbar-tech {
+    padding: 1.25rem 0;
+}
+
+[data-theme="school"] .logo-tech {
+    font-size: 2rem;
+}
+
+[data-theme="school"] .nav-link-tech {
+    padding: 0.85rem 1.25rem !important;
+    border-radius: 14px;
+    font-weight: 700;
+}
+
+[data-theme="school"] .btn-neon,
+[data-theme="school"] .btn-gradient,
+[data-theme="school"] .btn-secondary-duolingo,
+[data-theme="school"] .btn-outline-duolingo {
+    border-radius: 20px;
+    padding: 1rem 1.5rem;
+    font-size: 1.05rem;
+}
+
+[data-theme="school"] .form-control-duolingo {
+    border-radius: 16px;
+    padding: 1.1rem 1.25rem;
+    font-size: 1.05rem;
+}
+
+[data-theme="school"] .card-tech,
+[data-theme="school"] .card-neon {
+    border-radius: 22px;
+    padding: 2rem;
+}
+
+[data-theme="school"] .hero-tech {
+    min-height: 88vh;
+}
+
+/* ВЗРОСЛЫЙ: компактный интерфейс, строгие формы, меньшие отступы, акцент на данные */
+[data-theme="adult"] body {
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+[data-theme="adult"] .navbar-tech {
+    padding: 0.5rem 0;
+}
+
+[data-theme="adult"] .nav-link-tech {
+    padding: 0.5rem 0.9rem !important;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+[data-theme="adult"] .btn-neon,
+[data-theme="adult"] .btn-gradient,
+[data-theme="adult"] .btn-secondary-duolingo,
+[data-theme="adult"] .btn-outline-duolingo {
+    border-radius: 10px;
+    padding: 0.65rem 1.1rem;
+    font-size: 0.95rem;
+}
+
+[data-theme="adult"] .form-control-duolingo {
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+}
+
+[data-theme="adult"] .card-tech,
+[data-theme="adult"] .card-neon {
+    border-radius: 12px;
+    padding: 1.25rem;
+}
+
+[data-theme="adult"] .hero-tech {
+    min-height: 70vh;
+}
+
+/* Разное: плотность таблиц/статистики для взрослой темы */
+[data-theme="adult"] .stat-item { padding: 0.75rem; }
+[data-theme="adult"] .feature-list li { padding: 0.35rem 0; }
+
+/* ========================================
    УТИЛИТЫ ДЛЯ ТЕМ
    ======================================== */
 .theme-text-primary { color: var(--text-primary) !important; }
