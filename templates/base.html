@@ -1030,103 +1030,7 @@
             margin-top: 0.5rem;
         }
 
-        /* ========================================
-           СТИЛИ ПЕРЕКЛЮЧАТЕЛЯ ДИЗАЙНОВ
-           ======================================== */
-        
-        .theme-switcher-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
 
-        .theme-switcher-btn {
-            background: var(--bg-card);
-            border: 2px solid var(--border-light);
-            color: var(--text-primary);
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: var(--transition-base);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-
-        .theme-switcher-btn:hover {
-            background: var(--accent-primary);
-            color: var(--text-on-primary);
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-button);
-        }
-
-        .theme-switcher-btn.active {
-            background: var(--accent-primary);
-            color: var(--text-on-primary);
-            border-color: var(--accent-primary);
-            box-shadow: var(--shadow-button);
-        }
-
-        .theme-switcher-btn.school-btn {
-            border-color: var(--accent-purple);
-        }
-
-        .theme-switcher-btn.school-btn:hover,
-        .theme-switcher-btn.school-btn.active {
-            background: var(--accent-purple);
-            border-color: var(--accent-purple);
-        }
-
-        .theme-switcher-btn.adult-btn {
-            border-color: var(--accent-secondary);
-        }
-
-        .theme-switcher-btn.adult-btn:hover,
-        .theme-switcher-btn.adult-btn.active {
-            background: var(--accent-secondary);
-            border-color: var(--accent-secondary);
-        }
-
-        /* Анимация переключения тем */
-        .theme-switching * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        /* Уведомления об изменении темы */
-        .theme-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--bg-card);
-            border: 2px solid var(--accent-primary);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            box-shadow: var(--shadow-elevated);
-            z-index: 1000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .theme-notification.show {
-            transform: translateX(0);
-        }
-
-        .theme-notification-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .theme-notification-icon {
-            font-size: 1.5rem;
-        }
-
-        .theme-notification-text {
-            color: var(--text-primary);
             font-weight: 600;
         }
 
@@ -1200,22 +1104,8 @@
                                 <i class="fab fa-telegram me-2"></i>Telegram Бот
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link-tech" href="{% url 'theme_demo' %}">
-                                <i class="fas fa-palette me-2"></i>Демо дизайнов
-                            </a>
                         </li>
                     </ul>
-                    
-                    <!-- Переключатель дизайнов -->
-                    <div class="theme-switcher-container d-flex align-items-center me-3">
-                        <button class="theme-switcher-btn school-btn" data-theme="school" title="Дизайн для школьников">
-                            🎓 Школьник
-                        </button>
-                        <button class="theme-switcher-btn adult-btn" data-theme="adult" title="Дизайн для взрослых">
-                            👔 Взрослый
-                        </button>
-                    </div>
                     
                     <div class="d-flex align-items-center gap-3">
                         {% if user.is_authenticated %}
@@ -1390,7 +1280,7 @@
     {% block extra_js %}{% endblock %}
     
     <!-- Модуль управления дизайнами -->
-    <script src="{% static 'js/theme-switcher.js' %}"></script>
+    
     
     <!-- Скрытая административная ссылка -->
     {% if user.is_superuser %}
