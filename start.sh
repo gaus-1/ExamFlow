@@ -25,8 +25,8 @@ else
     python manage.py diagnose_bot
     echo "🔄 Перезагружаем данные бота..."
     python manage.py reload_bot_data --force
-    echo "🔄 Настраиваем webhook для бота..."
-    python manage.py setup_webhook
+    echo "🔄 Проверяем и настраиваем webhook..."
+    python manage.py check_webhook
 fi
 
 echo "🔄 Проверяем SITE_URL..."
