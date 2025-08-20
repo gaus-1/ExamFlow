@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
 
 # Импорты из legacy модулей (для обратной совместимости)
 from core.views import home, subject_list, subject_detail, task_detail
@@ -48,6 +49,9 @@ urlpatterns = [
     # Модуль управления дизайнами
     path('themes/', include('themes.urls')),
     
+    # Модуль ИИ-ассистента
+    path('ai/', include('ai.urls')),
+    
     # ==========================================
     # LEGACY МАРШРУТЫ (для обратной совместимости)
     # ==========================================
@@ -87,6 +91,9 @@ urlpatterns = [
     path('admin/parsing/', trigger_parsing, name='admin_trigger_parsing'),
     path('admin/start-parsing/', start_parsing, name='admin_start_parsing'),
     path('admin/parsing-status/', parsing_status, name='admin_parsing_status'),
+    
+    # Тестирование тем
+    path('test-themes/', lambda request: render(request, 'test_themes.html'), name='test_themes'),
 ]
 
 if settings.DEBUG:

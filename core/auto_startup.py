@@ -83,6 +83,14 @@ def run_startup_tasks():
             except Exception as e:
                 logger.warning(f"Ошибка генерации голоса: {str(e)}")
             
+            # 6. Запуск keep-alive (поддержание активности и еженедельные напоминания)
+            try:
+                from core.keepalive import start_keepalive  # ленивый импорт, чтобы избежать циклов
+                start_keepalive()
+                logger.info("🌐 Keep-alive запущен (пинги каждые 10 минут, напоминания по воскресеньям)")
+            except Exception as e:
+                logger.warning(f"Не удалось запустить keep-alive: {str(e)}")
+            
             _startup_executed = True
             logger.info("✅ Автозапуск завершен успешно!")
             

@@ -57,6 +57,12 @@ class KeepAliveService:
         
         # Планируем регулярные пинги
         schedule.every(self.ping_interval).minutes.do(self.ping_site)
+        # Раз в неделю — рассылка напоминаний неактивным (в воскресенье 10:00)
+        try:
+            from core.weekly_reminders import send_weekly_inactive_reminders
+            schedule.every().sunday.at("10:00").do(send_weekly_inactive_reminders)
+        except Exception as _:
+            logger.warning("Не удалось подключить weekly_reminders, пропускаю планирование")
         
         # Запускаем в отдельном потоке
         self.thread = threading.Thread(target=self._run_scheduler, daemon=True)

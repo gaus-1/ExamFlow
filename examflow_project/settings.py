@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'telegram_bot',       # Telegram бот функционал
     'analytics',          # Аналитика и статистика
     'themes',             # Управление дизайнами и темами
+    'ai.apps.AiConfig',    # ИИ-ассистент и голосовой помощник
     
     # Внешние библиотеки
     'corsheaders',

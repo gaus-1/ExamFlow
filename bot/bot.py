@@ -750,6 +750,20 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
     await start(update, context)
 
 
+async def ai(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Быстрый ответ ИИ: перенаправляем на сайт/даем подсказку и собираем вопрос"""
+    try:
+        text = (
+            "🤖 ИИ-ассистент ExamFlow\n\n"
+            "Задайте вопрос в чате на сайте (кнопка вверху) или отправьте ваш вопрос здесь, и мы ответим в ближайшее время.\n\n"
+            "Подсказка: чем конкретнее формулировка, тем полезнее ответ."
+        )
+        keyboard = [[InlineKeyboardButton("🌐 Открыть ИИ на сайте", url="https://examflow.ru/ai/")]]
+        await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+    except Exception:
+        pass
+
+
 def main():
     """Запуск бота"""
     token = settings.TELEGRAM_BOT_TOKEN
@@ -761,6 +775,7 @@ def main():
     
     # Обработчики команд
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("ai", ai))
     
     # Обработчики callback-кнопок
     application.add_handler(CallbackQueryHandler(subjects_menu, pattern="subjects"))

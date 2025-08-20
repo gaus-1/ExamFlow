@@ -197,3 +197,21 @@ class Subscription(TimeStampedModel):
     class Meta:
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
+
+
+class ReminderLog(TimeStampedModel):
+    """Логи отправленных напоминаний пользователям (чтобы не спамить).
+    reminder_type: например, 'weekly_inactive'
+    last_sent_at: когда в последний раз было отправлено напоминание данного типа.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reminder_type = models.CharField(max_length=50, default='weekly_inactive')
+    last_sent_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "Лог напоминаний"
+        verbose_name_plural = "Логи напоминаний"
+        unique_together = ['user', 'reminder_type']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.reminder_type} @ {self.last_sent_at.strftime('%Y-%m-%d %H:%M')}"

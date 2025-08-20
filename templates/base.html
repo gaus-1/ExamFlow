@@ -196,14 +196,6 @@
         }
 
         .logo-tech i {
-            font-size: 2rem;
-            margin-right: 0.5rem;
-            color: var(--accent-primary);
-        }
-
-
-
-        .logo-tech i {
             margin-right: 0.5rem;
             font-size: 2rem;
             background: var(--gradient-primary);
@@ -291,7 +283,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
             opacity: 0.1;
             transition: var(--transition-slow);
         }
@@ -344,22 +336,22 @@
         }
 
         .btn-neon-blue {
-            border-color: var(--neon-blue);
-            color: var(--neon-blue);
+            border-color: var(--accent-secondary);
+            color: var(--accent-secondary);
             box-shadow: 
-                0 0 20px rgba(0, 212, 255, 0.3),
-                inset 0 0 20px rgba(0, 212, 255, 0.1);
+                0 0 20px rgba(59, 130, 246, 0.3),
+                inset 0 0 20px rgba(59, 130, 246, 0.1);
         }
 
         .btn-neon-blue::before {
-            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            background: linear-gradient(90deg, transparent, var(--accent-secondary), transparent);
         }
 
         .btn-neon-blue:hover {
-            background: var(--neon-blue);
+            background: var(--accent-secondary);
             box-shadow: 
-                0 0 40px rgba(0, 212, 255, 0.6),
-                inset 0 0 40px rgba(0, 212, 255, 0.2);
+                0 0 40px rgba(59, 130, 246, 0.6),
+                inset 0 0 40px rgba(59, 130, 246, 0.2);
         }
 
         .btn-gradient {
@@ -377,7 +369,7 @@
             position: relative;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: var(--glow-green);
+            box-shadow: var(--glow-primary);
         }
 
         .btn-gradient:hover {
@@ -1015,7 +1007,7 @@
             left: 0;
             right: 0;
             background: var(--bg-card);
-            border-top: 2px solid var(--neon-green);
+            border-top: 2px solid var(--accent-primary);
             padding: 1rem;
             z-index: 1001;
             transform: translateY(100%);
@@ -1028,10 +1020,6 @@
 
         .pwa-install-banner .btn {
             margin-top: 0.5rem;
-        }
-
-
-            font-weight: 600;
         }
 
         /* Адаптивность для мобильных устройств */
@@ -1068,7 +1056,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body data-theme="school">
+<body data-theme="adult">
     <!-- Tech Navigation -->
     <nav class="header-tech">
         <div class="container">
@@ -1078,7 +1066,7 @@
                     ExamFlow
                 </a>
                 
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTech" style="color: var(--neon-green);">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTech" style="color: var(--accent-primary);">
                     <i class="fas fa-bars"></i>
                 </button>
                 
@@ -1104,6 +1092,10 @@
                                 <i class="fab fa-telegram me-2"></i>Telegram Бот
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link-tech" href="{% url 'ai:chat' %}">
+                                <i class="fas fa-robot me-2"></i>Спросить ИИ
+                            </a>
                         </li>
                     </ul>
                     
@@ -1192,6 +1184,9 @@
             observer.observe(card);
         });
     </script>
+    
+    <!-- Модуль управления дизайнами -->
+    <script src="{% static 'js/theme-switcher.js' %}"></script>
     
     <!-- PWA и мобильная оптимизация -->
     <script>

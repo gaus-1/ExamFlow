@@ -9,7 +9,10 @@
         ".pytest_cache",
         "static/images"
     ],
-    "ignore": [],
+    "ignore": [
+        "ai/models.py",
+        "themes/models.py"
+    ],
     "defineConstant": {},
     "stubPath": "",
     "reportMissingImports": "none",
