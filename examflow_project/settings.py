@@ -253,8 +253,15 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Keep-alive настройки
-SITE_URL = os.getenv('SITE_URL', 'https://examflow.ru')
+# Keep-alive настройки и базовый URL сайта
+# Если явно не задан SITE_URL, а Render предоставляет хост, используем его
+_ENV_SITE_URL = os.getenv('SITE_URL')
+if _ENV_SITE_URL:
+    SITE_URL = _ENV_SITE_URL
+elif RENDER_HOST:
+    SITE_URL = f"https://{RENDER_HOST}"
+else:
+    SITE_URL = 'https://examflow.ru'
 ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID', None)  # Telegram chat ID админа для уведомлений
 
 # Автозапуск парсинга при первом запросе (по умолчанию включен)

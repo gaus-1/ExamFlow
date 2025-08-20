@@ -72,7 +72,9 @@ def run_startup_tasks():
             # 4. Настройка webhook
             logger.info("🤖 Настройка Telegram webhook...")
             try:
-                call_command('setup_webhook', 'set', verbosity=0)
+                # Передаём вычисленный SITE_URL для корректного webhook
+                from django.conf import settings as dj_settings
+                call_command('setup_webhook', 'set', url=f"{dj_settings.SITE_URL}/bot/webhook/", verbosity=0)
             except Exception as e:
                 logger.warning(f"Ошибка настройки webhook: {str(e)}")
             
