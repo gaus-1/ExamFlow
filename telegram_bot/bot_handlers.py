@@ -23,6 +23,19 @@ from django.utils import timezone
 # Настройка логирования
 logger = logging.getLogger(__name__)
 
+# Функция для проверки соединения с базой данных
+def check_db_connection():
+    """Проверяет соединение с базой данных"""
+    try:
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+        return True
+    except Exception as e:
+        logger.error(f"Ошибка соединения с базой: {e}")
+        return False
+
 # Функция для получения текущего задания пользователя из профиля
 def get_current_task_id(user):
     """Получает ID текущего задания из профиля пользователя"""
@@ -80,6 +93,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Создает пользователя если его нет
     Показывает основные возможности бота
     """
+    # Проверяем соединение с базой данных
+    if not check_db_connection():
+        await update.message.reply_text(
+            "❌ Сервис временно недоступен. База данных не отвечает.\n"
+            "Попробуйте через 1-2 минуты."
+        )
+        return
+    
     try:
         user, created = get_or_create_user(update.effective_user)
         
