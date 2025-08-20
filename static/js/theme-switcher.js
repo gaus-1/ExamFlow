@@ -168,8 +168,11 @@ class ThemeManager {
      * Применение темы к странице
      */
     applyTheme(theme) {
-        // Устанавливаем атрибут data-theme на html элементе
+        // Устанавливаем атрибут data-theme на html и body для совместимости с CSS
         document.documentElement.setAttribute('data-theme', theme);
+        if (document.body) {
+            document.body.setAttribute('data-theme', theme);
+        }
         
         // Обновляем мета-тег theme-color для PWA
         this.updateThemeColor(theme);

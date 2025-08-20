@@ -68,10 +68,26 @@ def handle_telegram_update_sync(update: Update, bot):
             rating_sync, random_task_sync, handle_unknown_callback_sync
         )
         
-        # Обрабатываем команды
+        # Обрабатываем команды и текст
         if update.message:
-            if update.message.text == '/start':
+            text = (update.message.text or '').strip()
+            if text == '/start':
                 start_sync(update, bot)
+                return
+            if text in ('📚 Предметы',):
+                subjects_menu_sync(update, bot)
+                return
+            if text in ('🎯 Случайное',):
+                random_task_sync(update, bot)
+                return
+            if text in ('📊 Прогресс',):
+                progress_sync(update, bot)
+                return
+            if text in ('🏆 Рейтинг',):
+                rating_sync(update, bot)
+                return
+            if text in ('ℹ️ О боте',):
+                about_sync(update, bot)
                 return
         
         # Обрабатываем callback queries

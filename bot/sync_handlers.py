@@ -1,5 +1,5 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup  # type: ignore
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,14 @@ def start_sync(update, bot):
         "Решайте задания, следите за прогрессом и готовьтесь к ЕГЭ/ОГЭ."
     )
     chat_id = update.effective_chat.id
-    bot.send_message(chat_id=chat_id, text=text, reply_markup=_menu_keyboard())
+    # Постоянное меню снизу (ReplyKeyboard)
+    reply_kb = ReplyKeyboardMarkup(
+        [["📚 Предметы", "🎯 Случайное"], ["📊 Прогресс", "🏆 Рейтинг"], ["ℹ️ О боте"]],
+        resize_keyboard=True
+    )
+    bot.send_message(chat_id=chat_id, text=text, reply_markup=reply_kb)
+    # Сообщение с inline-кнопками
+    bot.send_message(chat_id=chat_id, text="Выберите действие:", reply_markup=_menu_keyboard())
 
 
 def subjects_menu_sync(update, bot):
