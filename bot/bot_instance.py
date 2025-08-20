@@ -4,8 +4,7 @@ Singleton экземпляр Telegram бота для webhook режима
 
 import os
 import django
-from telegram import Bot
-from telegram.constants import BotCommandScopeDefault  # type: ignore
+from telegram import Bot, BotCommand  # type: ignore
 from django.conf import settings
 import logging
 
@@ -39,8 +38,8 @@ class BotInstance:
                 try:
                     # Настроим команды бота (меню снизу)
                     self._bot.set_my_commands([
-                        ("start", "Главное меню"),
-                        ("ai", "Открыть ИИ на сайте"),
+                        BotCommand("start", "Главное меню"),
+                        BotCommand("ai", "Открыть ИИ на сайте"),
                     ])
                 except Exception as e:
                     logger.warning(f"Не удалось установить команды бота: {e}")
