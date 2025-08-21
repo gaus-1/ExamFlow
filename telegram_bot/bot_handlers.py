@@ -54,6 +54,11 @@ def db_get_all_tasks():
     return list(Task.objects.all())  # type: ignore
 
 @sync_to_async
+def db_get_subject_name_for_task(task):
+    """Получает название предмета для задания"""
+    return task.subject.name if task.subject else "Неизвестный предмет"
+
+@sync_to_async
 def db_get_subject_name(subject_id: int) -> str:
     name = Subject.objects.filter(id=subject_id).values_list('name', flat=True).first()  # type: ignore
     return name or "Предмет"
@@ -104,7 +109,7 @@ def get_current_task_id(user):
     try:
         profile = UserProfile.objects.get(user=user)  # type: ignore
         return profile.current_task_id
-    except UserProfile.DoesNotExist:
+    except UserProfile.DoesNotExist:  # type: ignore
         return None
 
 def set_current_task_id(user, task_id):
@@ -114,8 +119,8 @@ def set_current_task_id(user, task_id):
         profile.current_task_id = task_id
         profile.save()
         logger.info(f"Установлен current_task_id: {task_id} для пользователя {user.username}")
-    except UserProfile.DoesNotExist:
-        logger.error(f"Профиль не найден для пользователя {user.username}")
+    except Exception as e:
+        logger.error(f"Профиль не найден для пользователя {user.username}: {e}")
 
 
 def get_or_create_user(telegram_user):
@@ -295,9 +300,12 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     await db_set_current_task_id(user, task.id)
     logger.info(f"show_subject_topics: установлен current_task_id: {task.id}")
 
+    # Получаем название предмета безопасно
+    subject_name = await db_get_subject_name_for_task(task)
+    
     task_text = f"""
 📝 **Задание №{task.id}**
-**Предмет:** {task.subject.name}
+**Предмет:** {subject_name}
 
 **Заголовок:** {task.title}
 
@@ -336,8 +344,6 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     Отображает условие задания и кнопки для ответа
     """
-    global current_task_id
-    
     query = update.callback_query
     await query.answer()
     
@@ -375,15 +381,17 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         user, _ = await db_get_or_create_user(update.effective_user)
         await db_set_current_task_id(user, task.id)
+        logger.info(f"Установлен current_task_id: {task.id} для пользователя {user.username}")
     except Exception as prof_err:
         logger.warning(f"Не удалось сохранить current_task_id в профиль: {prof_err}")
-    current_task_id = task.id
-    logger.info(f"Установлен current_task_id: {current_task_id} для задания: {task.title}")
+    
+    # Получаем название предмета безопасно
+    subject_name = await db_get_subject_name_for_task(task)
     
     # Формируем текст задания
     task_text = f"""
 📝 **Задание №{task.id}**
-**Предмет:** {task.subject.name}
+**Предмет:** {subject_name}
 
 **Заголовок:** {task.title}
 
@@ -424,15 +432,17 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     Проверяет правильность ответа и сохраняет прогресс
     """
-    global current_task_id
+    logger.info(f"handle_answer вызван для пользователя {update.effective_user.id}")
     
-    logger.info(f"handle_answer вызван. current_task_id: {current_task_id}")
+    user, _ = await db_get_or_create_user(update.effective_user)
+    
+    # Получаем текущее задание из профиля пользователя
+    current_task_id = await sync_to_async(get_current_task_id)(user)
     
     if not current_task_id:
         await update.message.reply_text("❌ Сначала выберите задание!")
         return
     
-    user, _ = await db_get_or_create_user(update.effective_user)
     task = await db_get_task_by_id(current_task_id)  # type: ignore
     user_answer = (update.message.text or '').strip()
     
@@ -470,7 +480,8 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
     
-    current_task_id = None  # Сбрасываем текущее задание
+    # Сбрасываем текущее задание в профиле
+    await sync_to_async(set_current_task_id)(user, None)
 
 
 async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -482,14 +493,14 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     
-    user, _ = get_or_create_user(update.effective_user)
+    user, _ = await db_get_or_create_user(update.effective_user)
 
-    # Получаем статистику
-    total_attempts = UserProgress.objects.filter(user=user).count()  # type: ignore
-    correct_answers = UserProgress.objects.filter(user=user, is_correct=True).count()  # type: ignore
+    # Получаем статистику безопасно
+    total_attempts = await sync_to_async(lambda: UserProgress.objects.filter(user=user).count())()  # type: ignore
+    correct_answers = await sync_to_async(lambda: UserProgress.objects.filter(user=user, is_correct=True).count())()  # type: ignore
     accuracy = round((correct_answers / total_attempts * 100) if total_attempts > 0 else 0, 1)
     
-    rating, _ = UserRating.objects.get_or_create(user=user)  # type: ignore
+    rating = await sync_to_async(lambda: UserRating.objects.get_or_create(user=user)[0])()  # type: ignore
     
     stats_text = f"""
 📊 **Ваша статистика**
@@ -500,7 +511,7 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🎯 **Точность:** {accuracy}%
 ⭐ **Рейтинг:** {rating.total_points} очков
 
-🏆 **Достижения:** {Achievement.objects.filter(user=user).count()}
+🏆 **Достижения:** {await sync_to_async(lambda: len([ach for ach in user.achievements.all()]))()}
 
 Продолжайте решать задания для улучшения результатов!
 """
@@ -526,19 +537,20 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     Проверяет подписку пользователя и отправляет аудио
     """
-    global current_task_id
-    
     query = update.callback_query
     await query.answer()
+    
+    user, _ = await db_get_or_create_user(update.effective_user)
+    
+    # Получаем текущее задание из профиля пользователя
+    current_task_id = await sync_to_async(get_current_task_id)(user)
     
     if not current_task_id:
         await query.edit_message_text("❌ Задание не найдено")
         return
     
-    user, _ = get_or_create_user(update.effective_user)
-    
     # Проверяем подписку
-    subscription = Subscription.objects.filter(user=user, is_active=True).first() # type: ignore
+    subscription = await sync_to_async(lambda: Subscription.objects.filter(user=user, is_active=True).first())() # type: ignore
     if not subscription:
         await query.edit_message_text(
             "🔊 **Голосовые подсказки доступны только в Premium**\n\n"
@@ -549,18 +561,185 @@ async def voice_hint(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     
-    task = Task.objects.get(id=current_task_id) # type: ignore
+    task = await sync_to_async(lambda: Task.objects.get(id=current_task_id))() # type: ignore
     
     # Здесь должна быть логика отправки голосового файла
     # Пока отправляем текстовую подсказку
     await query.edit_message_text(
         f"🔊 **Голосовая подсказка для задания №{task.id}**\n\n"
-        f"📝 {task.explanation or 'Подсказка пока не добавлена'}\n\n"
+        f"📝 Подсказка пока не добавлена\n\n"
         "🎵 Голосовой файл будет добавлен в ближайшее время!",
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton("🔙 К заданию", callback_data=f"task_{task.id}")
         ]])
     )
+
+
+async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Показывает правильный ответ на задание
+    """
+    query = update.callback_query
+    await query.answer()
+    
+    # Извлекаем ID задания из callback_data
+    task_id = int(query.data.split('_')[1])
+    
+    # Получаем задание
+    try:
+        task = await db_get_task_by_id(task_id)
+    except Exception:
+        await query.edit_message_text("❌ Задание не найдено")
+        return
+    
+    # Получаем название предмета безопасно
+    subject_name = await db_get_subject_name_for_task(task)
+    
+    answer_text = f"""
+💡 **Ответ на задание №{task.id}**
+
+**Предмет:** {subject_name}
+**Заголовок:** {task.title}
+
+✅ **Правильный ответ:** {task.answer or 'Ответ не указан'}
+
+**Условие:**
+{task.description or 'Описание задания отсутствует'}
+
+**Источник:** {task.source or 'Не указан'}
+"""
+    
+    keyboard = [
+        [InlineKeyboardButton("🎯 Следующее задание", callback_data="random_task")],
+        [InlineKeyboardButton("📚 Предметы", callback_data="subjects")],
+        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+    ]
+    
+    try:
+        await query.edit_message_text(
+            answer_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as edit_err:
+        logger.warning(f"show_answer: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=answer_text,
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        except Exception as send_err:
+            logger.error(f"show_answer: send_message тоже не удался: {send_err}")
+
+
+async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Показывает случайное задание из всех доступных
+    """
+    query = update.callback_query
+    await query.answer()
+    
+    # Получаем все задания
+    tasks = await db_get_all_tasks()
+    if not tasks:
+        await query.edit_message_text("❌ Задания пока не загружены")
+        return
+    
+    import random
+    task = random.choice(list(tasks))
+    
+    # Сохраняем текущее задание в профиль пользователя
+    try:
+        user, _ = await db_get_or_create_user(update.effective_user)
+        await db_set_current_task_id(user, task.id)
+        logger.info(f"random_task: установлен current_task_id: {task.id} для пользователя {user.username}")
+    except Exception as prof_err:
+        logger.warning(f"Не удалось сохранить current_task_id в профиль: {prof_err}")
+    
+    # Получаем название предмета безопасно
+    subject_name = await db_get_subject_name_for_task(task)
+    
+    # Формируем текст задания
+    task_text = f"""
+📝 **Задание №{task.id}**
+**Предмет:** {subject_name}
+
+**Заголовок:** {task.title}
+
+**Условие:**
+{task.description or 'Описание задания отсутствует'}
+
+Введите ваш ответ:
+"""
+    
+    keyboard = [
+        [InlineKeyboardButton("🔊 Голосовая подсказка", callback_data=f"voice_{task.id}")],
+        [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
+        [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+    ]
+    
+    try:
+        await query.edit_message_text(
+            task_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as edit_err:
+        logger.warning(f"random_task: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=task_text,
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        except Exception as send_err:
+            logger.error(f"random_task: send_message тоже не удался: {send_err}")
+
+
+async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Возвращает пользователя в главное меню
+    """
+    query = update.callback_query
+    await query.answer()
+    
+    welcome_text = f"""
+🚀 **Добро пожаловать в ExamFlow!**
+
+Привет, {update.effective_user.first_name}! 
+
+Я помогу тебе подготовиться к ЕГЭ и ОГЭ:
+
+✅ Решать задания по всем предметам
+📊 Отслеживать прогресс
+🏆 Зарабатывать достижения
+🔊 Получать голосовые подсказки (Premium)
+
+Выбери действие:
+"""
+    
+    keyboard = [
+        [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
+        [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    try:
+        await query.edit_message_text(
+            welcome_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    except Exception as edit_err:
+        logger.warning(f"main_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=welcome_text,
+                reply_markup=reply_markup,
+                parse_mode='Markdown'
+            )
+        except Exception as send_err:
+            logger.error(f"main_menu: send_message тоже не удался: {send_err}")
 
 
 async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):

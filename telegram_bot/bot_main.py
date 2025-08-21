@@ -16,7 +16,8 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Mess
 from django.conf import settings
 from .bot_handlers import (
     start, subjects_menu, show_subject_topics, show_task,
-    handle_answer, show_stats, voice_hint, handle_unknown_callback
+    handle_answer, show_stats, voice_hint, handle_unknown_callback,
+    main_menu, random_task, show_answer
 )
 
 # Настройка логирования
@@ -51,8 +52,8 @@ def setup_bot_application():
     # Регистрируем обработчики callback-запросов
     application.add_handler(CallbackQueryHandler(subjects_menu, pattern="subjects"))
     application.add_handler(CallbackQueryHandler(show_stats, pattern="stats"))
-    application.add_handler(CallbackQueryHandler(show_task, pattern="random_task"))
-    application.add_handler(CallbackQueryHandler(start, pattern="main_menu"))
+    application.add_handler(CallbackQueryHandler(random_task, pattern="random_task"))
+    application.add_handler(CallbackQueryHandler(main_menu, pattern="main_menu"))
     
     # Обработчики для предметов и тем
     application.add_handler(CallbackQueryHandler(show_subject_topics, pattern=r"subject_\d+"))
@@ -61,7 +62,7 @@ def setup_bot_application():
     
     # Обработчики для заданий
     application.add_handler(CallbackQueryHandler(voice_hint, pattern=r"voice_\d+"))
-    application.add_handler(CallbackQueryHandler(show_task, pattern=r"answer_\d+"))
+    application.add_handler(CallbackQueryHandler(show_answer, pattern=r"answer_\d+"))
     
     # Обработчик текстовых сообщений (ответы на задания)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_answer))
