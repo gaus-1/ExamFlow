@@ -11,6 +11,7 @@
 import logging
 from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from asgiref.sync import sync_to_async
 from telegram.ext import ContextTypes
 from django.contrib.auth.models import User
 from core.models import (
@@ -23,18 +24,42 @@ from django.utils import timezone
 # Настройка логирования
 logger = logging.getLogger(__name__)
 
-# Функция для проверки соединения с базой данных
-def check_db_connection():
-    """Проверяет соединение с базой данных"""
-    try:
-        from django.db import connection
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-            cursor.fetchone()
-        return True
-    except Exception as e:
-        logger.error(f"Ошибка соединения с базой: {e}")
-        return False
+# Синхронные функции БД, обёрнутые для безопасного вызова в async-контексте
+@sync_to_async
+def db_check_connection() -> bool:
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+    return True
+
+@sync_to_async
+def db_get_subject_ids():
+    return list(Task.objects.values_list('subject_id', flat=True).distinct())  # type: ignore
+
+@sync_to_async
+def db_get_subjects_by_ids(ids):
+    return list(Subject.objects.filter(id__in=ids))  # type: ignore
+
+@sync_to_async
+def db_count_tasks_for_subject(subject_id: int) -> int:
+    return Task.objects.filter(subject_id=subject_id).count()  # type: ignore
+
+@sync_to_async
+def db_get_tasks_by_subject(subject_id: int):
+    return list(Task.objects.filter(subject_id=subject_id))  # type: ignore
+
+@sync_to_async
+def db_get_all_tasks():
+    return list(Task.objects.all())  # type: ignore
+
+@sync_to_async
+def db_set_current_task_id(user, task_id: int):
+    set_current_task_id(user, task_id)
+
+@sync_to_async
+def db_get_or_create_user(telegram_user):
+    return get_or_create_user(telegram_user)
 
 # Функция для получения текущего задания пользователя из профиля
 def get_current_task_id(user):
@@ -93,8 +118,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Создает пользователя если его нет
     Показывает основные возможности бота
     """
-    # Проверяем соединение с базой данных
-    if not check_db_connection():
+    # Проверяем соединение с базой данных (в async контексте)
+    try:
+        ok = await db_check_connection()
+    except Exception as e:
+        logger.error(f"Ошибка проверки БД: {e}")
+        ok = False
+    if not ok:
         await update.message.reply_text(
             "❌ Сервис временно недоступен. База данных не отвечает.\n"
             "Попробуйте через 1-2 минуты."
@@ -102,7 +132,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     try:
-        user, created = get_or_create_user(update.effective_user)
+        user, created = await db_get_or_create_user(update.effective_user)
         
         welcome_text = f"""
 🚀 **Добро пожаловать в ExamFlow!**
@@ -152,7 +182,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Надежное получение списка предметов, у которых есть хотя бы одно задание
         try:
-            subject_ids = list(Task.objects.values_list('subject_id', flat=True).distinct())  # type: ignore
+            subject_ids = await db_get_subject_ids()
         except Exception as id_err:
             logger.error(f"subjects_menu: ошибка выборки subject_ids: {id_err}")
             subject_ids = []
@@ -161,12 +191,12 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("📚 Предметы пока загружаются... Попробуйте позже.")
             return
 
-        subjects = Subject.objects.filter(id__in=subject_ids)  # type: ignore
+        subjects = await db_get_subjects_by_ids(subject_ids)
 
         keyboard = []
         for subject in subjects:
             try:
-                tasks_count = Task.objects.filter(subject_id=subject.id).count()  # type: ignore
+                tasks_count = await db_count_tasks_for_subject(subject.id)
             except Exception:
                 tasks_count = 0
             button_text = f"{subject.name} ({tasks_count} заданий)"
@@ -210,12 +240,11 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.answer()
 
     subject_id = int(query.data.split('_')[1])
-    subject = Subject.objects.get(id=subject_id)  # type: ignore
-
-    tasks = Task.objects.filter(subject=subject)  # type: ignore
+    # Получаем список заданий для предмета в безопасном режиме
+    tasks = await db_get_tasks_by_subject(subject_id)
     if not tasks:
         await query.edit_message_text(
-            f"❌ В предметe {subject.name} пока нет заданий",
+            f"❌ В выбранном предмете пока нет заданий",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]])
         )
         return
@@ -224,8 +253,8 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     task = random.choice(list(tasks))
 
     # Устанавливаем текущее задание в профиле пользователя
-    user, _ = get_or_create_user(update.effective_user)
-    set_current_task_id(user, task.id)
+    user, _ = await db_get_or_create_user(update.effective_user)
+    await db_set_current_task_id(user, task.id)
     logger.info(f"show_subject_topics: установлен current_task_id: {task.id}")
 
     task_text = f"""
@@ -281,7 +310,7 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception:
             await query.edit_message_text("❌ Некорректный выбор предмета")
             return
-        tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
+        tasks = await db_get_tasks_by_subject(subject_id)
         if not tasks:
             await query.edit_message_text(f"❌ В предмете пока нет заданий")
             return
@@ -289,14 +318,14 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         task = random.choice(list(tasks))
     elif query.data.startswith('random_subject_'):
         subject_id = int(query.data.split('_')[2])
-        tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
+        tasks = await db_get_tasks_by_subject(subject_id)
         if not tasks:
             await query.edit_message_text(f"❌ В предмете пока нет заданий")
             return
         import random
         task = random.choice(list(tasks))
     else:
-        tasks = Task.objects.all()  # type: ignore
+        tasks = await db_get_all_tasks()
         if not tasks:
             await query.edit_message_text("❌ Задания пока не загружены")
             return
@@ -306,8 +335,8 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Сохраняем текущее задание в профиль пользователя, чтобы не терять контекст
     try:
-        user, _ = get_or_create_user(update.effective_user)
-        set_current_task_id(user, task.id)
+        user, _ = await db_get_or_create_user(update.effective_user)
+        await db_set_current_task_id(user, task.id)
     except Exception as prof_err:
         logger.warning(f"Не удалось сохранить current_task_id в профиль: {prof_err}")
     current_task_id = task.id
