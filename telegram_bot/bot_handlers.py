@@ -149,35 +149,57 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         query = update.callback_query
         await query.answer()
-        
-        # Считаем задания через обратную связь Task.subject
-        subjects = Subject.objects.annotate(  # type: ignore
-            tasks_count=Count('task')
-        ).filter(tasks_count__gt=0)
-        
-        if not subjects:
-            await query.edit_message_text("📚 Предметы пока загружаются...")
+
+        # Надежное получение списка предметов, у которых есть хотя бы одно задание
+        try:
+            subject_ids = list(Task.objects.values_list('subject_id', flat=True).distinct())  # type: ignore
+        except Exception as id_err:
+            logger.error(f"subjects_menu: ошибка выборки subject_ids: {id_err}")
+            subject_ids = []
+
+        if not subject_ids:
+            await query.edit_message_text("📚 Предметы пока загружаются... Попробуйте позже.")
             return
-        
+
+        subjects = Subject.objects.filter(id__in=subject_ids)  # type: ignore
+
         keyboard = []
         for subject in subjects:
-            button_text = f"{subject.name} ({subject.tasks_count} заданий)"
-            keyboard.append([InlineKeyboardButton(
-                button_text, 
-                callback_data=f"subject_{subject.id}"
-            )])
-        
+            try:
+                tasks_count = Task.objects.filter(subject_id=subject.id).count()  # type: ignore
+            except Exception:
+                tasks_count = 0
+            button_text = f"{subject.name} ({tasks_count} заданий)"
+            keyboard.append([
+                InlineKeyboardButton(button_text, callback_data=f"subject_{subject.id}")
+            ])
+
         keyboard.append([InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")])
         reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        await query.edit_message_text(
-            "📚 **Выберите предмет:**\n\nДоступные предметы для изучения:",
-            reply_markup=reply_markup,
-            parse_mode='Markdown'
-        )
-        
+
+        try:
+            await query.edit_message_text(
+                "📚 Выберите предмет:\n\nДоступные предметы для изучения:",
+                reply_markup=reply_markup
+            )
+        except Exception as edit_err:
+            logger.warning(f"subjects_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
+            try:
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id,  # type: ignore
+                    text="📚 Выберите предмет:\n\nДоступные предметы для изучения:",
+                    reply_markup=reply_markup
+                )
+            except Exception as send_err:
+                logger.error(f"subjects_menu: send_message тоже не удался: {send_err}")
+
     except Exception as e:
         logger.error(f"Ошибка в subjects_menu: {e}")
+        # Попробуем сообщить пользователю, что произошла ошибка, чтобы не было тишины
+        try:
+            await update.effective_chat.send_message("❌ Не удалось загрузить предметы. Попробуйте /start или повторите попытку позже.")  # type: ignore
+        except Exception as send_err:
+            logger.error(f"subjects_menu: не удалось отправить сообщение об ошибке: {send_err}")
 
 
 async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -224,11 +246,21 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
         [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
     ]
 
-    await query.edit_message_text(
-        task_text,
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode='Markdown'
-    )
+    try:
+        await query.edit_message_text(
+            task_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as edit_err:
+        logger.warning(f"show_subject_topics: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=task_text,
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        except Exception as send_err:
+            logger.error(f"show_subject_topics: send_message тоже не удался: {send_err}")
 
 
 async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -244,7 +276,11 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Определяем источник: случайное по предмету или полностью случайное
     if query.data.startswith('subject_'):
-        subject_id = int(query.data.split('_')[1])
+        try:
+            subject_id = int(query.data.split('_')[1])
+        except Exception:
+            await query.edit_message_text("❌ Некорректный выбор предмета")
+            return
         tasks = Task.objects.filter(subject_id=subject_id)  # type: ignore
         if not tasks:
             await query.edit_message_text(f"❌ В предмете пока нет заданий")
@@ -268,6 +304,12 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         import random
         task = random.choice(list(tasks))
     
+    # Сохраняем текущее задание в профиль пользователя, чтобы не терять контекст
+    try:
+        user, _ = get_or_create_user(update.effective_user)
+        set_current_task_id(user, task.id)
+    except Exception as prof_err:
+        logger.warning(f"Не удалось сохранить current_task_id в профиль: {prof_err}")
     current_task_id = task.id
     logger.info(f"Установлен current_task_id: {current_task_id} для задания: {task.title}")
     
@@ -292,11 +334,21 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     reply_markup = InlineKeyboardMarkup(keyboard)
     
-    await query.edit_message_text(
-        task_text,
-        reply_markup=reply_markup,
-        parse_mode='Markdown'
-    )
+    try:
+        await query.edit_message_text(
+            task_text,
+            reply_markup=reply_markup
+        )
+    except Exception as edit_err:
+        logger.warning(f"show_task: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=task_text,
+                reply_markup=reply_markup
+            )
+        except Exception as send_err:
+            logger.error(f"show_task: send_message тоже не удался: {send_err}")
 
 
 async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):

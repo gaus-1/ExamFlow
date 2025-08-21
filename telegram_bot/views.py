@@ -150,10 +150,11 @@ def telegram_webhook(request):
                             [InlineKeyboardButton("📊 Статистика", callback_data="stats")],
                         ])
                         # Убираем await, так как мы находимся в синхронном контексте
-                        # Используем синхронный метод отправки сообщения
-                        import asyncio
-                        loop = asyncio.new_event_loop()
-                        asyncio.set_event_loop(loop)
+                        # Используем синхронный запуск event loop с локальным импортом,
+                        # чтобы не затенять asyncio во внешнем скоупе
+                        import asyncio as _aio
+                        loop = _aio.new_event_loop()
+                        _aio.set_event_loop(loop)
                         try:
                             loop.run_until_complete(bot.send_message(chat_id=chat_id, text="Добро пожаловать в ExamFlow! Выберите действие:", reply_markup=kb))
                             logger.info("Быстрый ответ на /start отправлен через PTB")
@@ -165,7 +166,8 @@ def telegram_webhook(request):
             # Обрабатываем обновление в отдельном потоке, чтобы мгновенно отвечать Telegram
             def _run_async(u: Update):
                 try:
-                    asyncio.run(handle_telegram_update(u))
+                    import asyncio as _aio
+                    _aio.run(handle_telegram_update(u))
                 except Exception as ex:
                     logger.error(f"Ошибка фоновой обработки обновления: {ex}")
 
@@ -228,28 +230,63 @@ async def handle_telegram_update(update: Update):
         
         # Обрабатываем callback-запросы
         elif update.callback_query:
-            callback_data = update.callback_query.data
-            
-            if callback_data == "subjects":
-                await subjects_menu(update, context)  # type: ignore
-            elif callback_data == "stats":
-                await show_stats(update, context)  # type: ignore
-            elif callback_data == "random_task":
-                await show_task(update, context)  # type: ignore
-            elif callback_data == "main_menu":
-                await start(update, context)  # type: ignore
-            elif callback_data.startswith("subject_"):
-                await show_subject_topics(update, context)  # type: ignore
-            elif callback_data.startswith("topic_"):
-                await show_task(update, context)  # type: ignore
-            elif callback_data.startswith("random_subject_"):
-                await show_task(update, context)  # type: ignore
-            elif callback_data.startswith("voice_"):
-                await voice_hint(update, context)  # type: ignore
-            elif callback_data.startswith("answer_"):
-                await show_task(update, context)  # type: ignore
-            else:
-                await handle_unknown_callback(update, context)  # type: ignore
+            # Всегда подтверждаем callback, чтобы убрать "часики" в Telegram
+            try:
+                await update.callback_query.answer()
+            except Exception as ack_err:
+                logger.warning(f"Не удалось ответить на callback_query: {ack_err}")
+
+            callback_data = update.callback_query.data or ""
+            chat_id = None
+            try:
+                chat_id = update.effective_chat.id  # type: ignore
+            except Exception:
+                try:
+                    chat_id = update.callback_query.message.chat_id  # type: ignore
+                except Exception:
+                    chat_id = None
+
+            try:
+                # Импортируем обработчики здесь, чтобы исключить циклические импорты при холодном старте
+                from .bot_handlers import (
+                    start as h_start,
+                    subjects_menu as h_subjects_menu,
+                    show_subject_topics as h_show_subject_topics,
+                    show_task as h_show_task,
+                    handle_answer as h_handle_answer,
+                    show_stats as h_show_stats,
+                    voice_hint as h_voice_hint,
+                    handle_unknown_callback as h_unknown
+                )
+
+                if callback_data == "subjects":
+                    await h_subjects_menu(update, context)  # type: ignore
+                elif callback_data == "stats":
+                    await h_show_stats(update, context)  # type: ignore
+                elif callback_data == "random_task":
+                    await h_show_task(update, context)  # type: ignore
+                elif callback_data == "main_menu":
+                    await h_start(update, context)  # type: ignore
+                elif callback_data.startswith("subject_"):
+                    await h_show_subject_topics(update, context)  # type: ignore
+                elif callback_data.startswith("topic_"):
+                    await h_show_task(update, context)  # type: ignore
+                elif callback_data.startswith("random_subject_"):
+                    await h_show_task(update, context)  # type: ignore
+                elif callback_data.startswith("voice_"):
+                    await h_voice_hint(update, context)  # type: ignore
+                elif callback_data.startswith("answer_"):
+                    await h_show_task(update, context)  # type: ignore
+                else:
+                    await h_unknown(update, context)  # type: ignore
+            except Exception as cb_err:
+                logger.error(f"Ошибка обработки callback '{callback_data}': {cb_err}")
+                # Отправим аккуратное сообщение пользователю, чтобы он не остался без ответа
+                try:
+                    if chat_id is not None:
+                        await context.bot.send_message(chat_id=chat_id, text="❌ Временная ошибка. Попробуйте ещё раз или отправьте /start")  # type: ignore
+                except Exception as send_err:
+                    logger.error(f"Не удалось отправить сообщение об ошибке: {send_err}")
                 
     except Exception as e:
         logger.error(f"Ошибка обработки обновления: {e}")
