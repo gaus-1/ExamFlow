@@ -54,12 +54,49 @@ def db_get_all_tasks():
     return list(Task.objects.all())  # type: ignore
 
 @sync_to_async
+def db_get_subject_name(subject_id: int) -> str:
+    name = Subject.objects.filter(id=subject_id).values_list('name', flat=True).first()  # type: ignore
+    return name or "Предмет"
+
+@sync_to_async
 def db_set_current_task_id(user, task_id: int):
     set_current_task_id(user, task_id)
 
 @sync_to_async
 def db_get_or_create_user(telegram_user):
     return get_or_create_user(telegram_user)
+
+@sync_to_async
+def db_get_task_by_id(task_id: int):
+    return Task.objects.get(id=task_id)  # type: ignore
+
+@sync_to_async
+def db_save_progress(user, task, user_answer: str, is_correct: bool):
+    progress, created = UserProgress.objects.get_or_create(  # type: ignore
+        user=user,
+        task=task,
+        defaults={
+            'user_answer': user_answer,
+            'is_correct': is_correct
+        }
+    )
+    if not created:
+        progress.user_answer = user_answer
+        progress.is_correct = is_correct
+        progress.save()
+    return progress
+
+@sync_to_async
+def db_update_rating_points(user, is_correct: bool):
+    rating, _ = UserRating.objects.get_or_create(user=user)  # type: ignore
+    if is_correct:
+        rating.total_points += 10
+        rating.correct_answers += 1
+    else:
+        rating.incorrect_answers += 1
+    rating.total_attempts += 1
+    rating.save()
+    return rating
 
 # Функция для получения текущего задания пользователя из профиля
 def get_current_task_id(user):
@@ -243,8 +280,9 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Получаем список заданий для предмета в безопасном режиме
     tasks = await db_get_tasks_by_subject(subject_id)
     if not tasks:
+        subject_name = await db_get_subject_name(subject_id)
         await query.edit_message_text(
-            f"❌ В выбранном предмете пока нет заданий",
+            f"❌ В предмете {subject_name} пока нет заданий",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]])
         )
         return
@@ -394,37 +432,22 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Сначала выберите задание!")
         return
     
-    user, _ = get_or_create_user(update.effective_user)
-    task = Task.objects.get(id=current_task_id) # type: ignore
+    user, _ = await db_get_or_create_user(update.effective_user)
+    task = await db_get_task_by_id(current_task_id)  # type: ignore
     user_answer = (update.message.text or '').strip()
     
     # Проверяем ответ (простая текстовая проверка)
     correct_value = (task.answer or '').strip()
     is_correct = bool(correct_value) and (user_answer.lower() == correct_value.lower())
     
-    # Сохраняем прогресс
-    progress, created = UserProgress.objects.get_or_create( # type: ignore
-        user=user,
-        task=task,
-        defaults={
-            'user_answer': user_answer,
-            'is_correct': is_correct
-        }
-    )
-    
-    if not created:
-        progress.user_answer = user_answer
-        progress.is_correct = is_correct
-        progress.save()
+    # Сохраняем прогресс (безопасно для async)
+    await db_save_progress(user, task, user_answer, is_correct)
     
     # Формируем ответ
     if is_correct:
         response = f"✅ **Правильно!** 🎉\n\n"
         # Обновляем рейтинг
-        rating, _ = UserRating.objects.get_or_create(user=user) # type: ignore
-        rating.total_points += 10
-        rating.correct_answers += 1
-        rating.save()
+        await db_update_rating_points(user, True)
     else:
         response = f"❌ **Неправильно**\n\n"
         response += f"**Правильный ответ:** {task.answer}\n\n"
