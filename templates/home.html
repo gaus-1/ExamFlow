@@ -5,62 +5,62 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section style="padding: 120px 0 80px; text-align: center; background: #fffef2;">
+<section class="section-padding-lg text-center" style="background: #fffef2;">
     <div class="container">
-        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 mb-4">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6" style="color: #252525;">
             Добро пожаловать в ExamFlow
-        </div>
+        </h1>
         
-        <div class="Paragraph_base__IUndo Paragraph_hero__x9brA mb-5" style="max-width: 800px; margin: 0 auto;">
+        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto" style="color: #666;">
             Современная платформа для подготовки к экзаменам с использованием искусственного интеллекта и персонального подхода к каждому студенту
-        </div>
+        </p>
         
-        <a href="#features" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_dark__Vllu2">
+        <a href="#features" class="btn-primary text-lg px-8 py-4">
             Начать обучение
         </a>
     </div>
 </section>
 
 <!-- Статистика -->
-<section id="features" style="padding: 80px 0; background: #f8f8f8;">
+<section id="features" class="section-padding" style="background: #f8f8f8;">
     <div class="container">
-        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_large__y1BpK text-center mb-5">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
             Статистика платформы
-        </div>
+        </h2>
         
-        <div class="AssetGrid_base__maqfC" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
-            <div class="ai-chat-container" style="text-align: center; background: #fffef2;">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 mb-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="card text-center card-hover">
+                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
                     {{ total_users|default:"1000+" }}
                 </div>
-                <div class="Paragraph_base__IUndo" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
+                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
                     Активных пользователей
                 </div>
             </div>
             
-            <div class="ai-chat-container" style="text-align: center; background: #fffef2;">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 mb-2">
+            <div class="card text-center card-hover">
+                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
                     {{ total_subjects|default:"8" }}
                 </div>
-                <div class="Paragraph_base__IUndo" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
+                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
                     Предметов
                 </div>
             </div>
             
-            <div class="ai-chat-container" style="text-align: center; background: #fffef2;">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 mb-2">
+            <div class="card text-center card-hover">
+                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
                     {{ total_tasks|default:"1000+" }}
                 </div>
-                <div class="Paragraph_base__IUndo" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
+                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
                     Заданий
                 </div>
             </div>
             
-            <div class="ai-chat-container" style="text-align: center; background: #fffef2;">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 mb-2">
+            <div class="card text-center card-hover">
+                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
                     {{ avg_score|default:"85%" }}
                 </div>
-                <div class="Paragraph_base__IUndo" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
+                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
                     Средний балл
                 </div>
             </div>
@@ -69,33 +69,33 @@
 </section>
 
 <!-- Предметы -->
-<section style="padding: 80px 0; background: #fffef2;">
+<section class="section-padding" style="background: #fffef2;">
     <div class="container">
-        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_large__y1BpK text-center mb-5">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
             Доступные предметы
-        </div>
+        </h2>
         
-        <div class="AssetGrid_base__maqfC" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for subject in subjects %}
-            <div class="ai-chat-container">
-                <div style="background: #f5f5f5; height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                    <i class="fas fa-graduation-cap" style="font-size: 48px; color: #999;"></i>
+            <div class="card card-hover">
+                <div class="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-6">
+                    <i class="fas fa-graduation-cap text-5xl" style="color: #999;"></i>
                 </div>
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     {{ subject.name }}
-                </div>
-                <div class="Paragraph_base__IUndo Paragraph_large__rowKZ mb-4">
+                </h3>
+                <p class="text-lg mb-6" style="color: #666;">
                     {{ subject.description|default:"Описание предмета" }}
-                </div>
-                <a href="{% url 'subject_detail' subject.id %}" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_dark__Vllu2">
+                </p>
+                <a href="{% url 'subject_detail' subject.id %}" class="btn-primary w-full text-center">
                     Изучать
                 </a>
             </div>
             {% empty %}
-            <div class="ai-chat-container text-center">
-                <div class="Paragraph_base__IUndo" style="color: #999;">
+            <div class="col-span-full text-center">
+                <p class="text-lg" style="color: #999;">
                     Предметы загружаются...
-                </div>
+                </p>
             </div>
             {% endfor %}
         </div>
@@ -103,128 +103,128 @@
 </section>
 
 <!-- Особенности платформы -->
-<section style="padding: 80px 0; background: #f8f8f8;">
+<section class="section-padding" style="background: #f8f8f8;">
     <div class="container">
-        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_large__y1BpK text-center mb-5">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
             Особенности платформы
-        </div>
+        </h2>
         
-        <div class="AssetGrid_base__maqfC" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;">
-            <div class="ai-chat-container">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     ИИ-ассистент
-                </div>
-                <div class="Paragraph_base__IUndo Paragraph_large__rowKZ">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Персональный помощник для каждого студента
-                </div>
+                </p>
             </div>
             
-            <div class="ai-chat-container">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     Аналитика прогресса
-                </div>
-                <div class="Paragraph_base__IUndo Paragraph_large__rowKZ">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Детальная статистика обучения
-                </div>
+                </p>
             </div>
             
-            <div class="ai-chat-container">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     Мобильное приложение
-                </div>
-                <div class="Paragraph_base__IUndo Paragraph_large__rowKZ">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Учитесь в любое время и в любом месте
-                </div>
+                </p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Как это работает -->
-<section style="padding: 80px 0; background: #fffef2;">
+<section class="section-padding" style="background: #fffef2;">
     <div class="container">
-        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_large__y1BpK text-center mb-5">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
             Как это работает
-        </div>
+        </h2>
         
-        <div class="AssetGrid_base__maqfC" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
-            <div class="ai-chat-container text-center">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     1. Регистрация
-                </div>
-                <div class="Paragraph_base__IUndo">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Создайте аккаунт за несколько секунд
-                </div>
+                </p>
             </div>
             
-            <div class="ai-chat-container text-center">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     2. Выбор предмета
-                </div>
-                <div class="Paragraph_base__IUndo">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Выберите интересующий вас предмет
-                </div>
+                </p>
             </div>
             
-            <div class="ai-chat-container text-center">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     3. Начало обучения
-                </div>
-                <div class="Paragraph_base__IUndo">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Приступайте к решению заданий
-                </div>
+                </p>
             </div>
             
-            <div class="ai-chat-container text-center">
-                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+            <div class="card text-center card-hover">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                     4. Достижение целей
-                </div>
-                <div class="Paragraph_base__IUndo">
+                </h3>
+                <p class="text-lg" style="color: #666;">
                     Отслеживайте свой прогресс
-                </div>
+                </p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- CTA Section -->
-<section style="padding: 80px 0; background: #252525; color: #fffef2;">
-    <div class="container text-center">
-        <div class="Heading_base__14byZ Heading_light__hLBo0 Heading_large__y1BpK mb-4">
+<section class="section-padding text-center" style="background: #252525; color: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #fffef2;">
             Готовы начать обучение?
-        </div>
+        </h2>
         
-        <div class="Paragraph_base__IUndo Paragraph_large__rowKZ mb-5" style="color: #bcbbb4;">
+        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto" style="color: #bcbbb4;">
             Присоединяйтесь к тысячам студентов, которые уже используют ExamFlow для подготовки к экзаменам
-        </div>
+        </p>
         
-        <a href="{% url 'register' %}" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_light__T1UVe">
+        <a href="{% url 'register' %}" class="btn-secondary text-lg px-8 py-4" style="background: #fffef2; color: #252525; border-color: #fffef2;">
             Начать сейчас
         </a>
     </div>
 </section>
 
 <!-- Telegram бот -->
-<section style="padding: 80px 0; background: #fffef2;">
-    <div class="container text-center">
-        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_large__y1BpK mb-4">
+<section class="section-padding text-center" style="background: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #252525;">
             Telegram бот
-        </div>
+        </h2>
         
-        <div class="Paragraph_base__IUndo Paragraph_large__rowKZ mb-4">
+        <p class="text-xl md:text-2xl mb-8" style="color: #666;">
             Получайте задания и подсказки прямо в Telegram
-        </div>
+        </p>
         
-        <div class="ai-chat-container" style="max-width: 400px; margin: 0 auto;">
-            <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+        <div class="card max-w-md mx-auto">
+            <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
                 @ExamFlowBot
-            </div>
+            </h3>
             
-            <div class="Paragraph_base__IUndo mb-4">
+            <p class="text-lg mb-6" style="color: #666;">
                 Нажмите на кнопку ниже, чтобы начать
-            </div>
+            </p>
             
-            <a href="https://t.me/ExamFlowBot" target="_blank" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_dark__Vllu2">
+            <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary w-full text-center">
                 Открыть бота
             </a>
         </div>

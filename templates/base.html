@@ -34,10 +34,10 @@
     <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/aesop-real-styles.css' %}">
+    <!-- Tailwind CSS для правильных отступов и размеров -->
+    <link rel="stylesheet" href="{% static 'css/tailwind-styles.css' %}">
     
-    <!-- Основные стили для ExamFlow -->
+    <!-- Основные стили для ExamFlow с нашими цветами и шрифтами -->
     <style>
         /* Основные стили */
         body {
@@ -165,42 +165,82 @@
             }
         }
         
-        /* Убираем Bootstrap стили */
+        /* Контейнер с правильными отступами */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
         
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -15px;
+        /* Секции с правильными отступами */
+        .section-padding {
+            padding: 80px 0;
         }
         
-        .col-12, .col-md-3, .col-md-4, .col-md-6, .col-lg-8 {
-            padding: 0 15px;
-            box-sizing: border-box;
+        .section-padding-sm {
+            padding: 60px 0;
         }
         
-        .col-12 { width: 100%; }
-        .col-md-3 { width: 25%; }
-        .col-md-4 { width: 33.333333%; }
-        .col-md-6 { width: 50%; }
-        .col-lg-8 { width: 66.666667%; }
-        
-        @media (max-width: 768px) {
-            .col-md-3, .col-md-4, .col-md-6, .col-lg-8 {
-                width: 100%;
-                margin-bottom: 20px;
-            }
+        .section-padding-lg {
+            padding: 120px 0;
         }
         
-        .py-5 { padding: 60px 0; }
-        .mb-4 { margin-bottom: 24px; }
-        .mb-5 { margin-bottom: 32px; }
-        .text-center { text-align: center; }
-        .bg-light { background-color: #f8f8f8; }
+        /* Карточки с правильными границами и отступами */
+        .card {
+            background: #fffef2;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card-hover:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Кнопки с правильными стилями */
+        .btn-primary {
+            background: #252525;
+            color: #fffef2;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background: #333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #252525;
+            border: 1px solid #e5e5e5;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f8f8;
+            border-color: #252525;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
