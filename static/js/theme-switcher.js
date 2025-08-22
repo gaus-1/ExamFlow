@@ -2,7 +2,7 @@
  * МОДУЛЬ УПРАВЛЕНИЯ ДИЗАЙНАМИ EXAMFLOW
  * 
  * Функционал:
- * - Переключение между темами "Школьник" и "Взрослый"
+ * - Переключение между темами "Светлая" и "Тёмная"
  * - Сохранение выбора в localStorage
  * - Автоматическое применение темы при загрузке
  * - Анимации и уведомления
@@ -11,11 +11,11 @@
 
 class ThemeManager {
     constructor() {
-        this.currentTheme = 'adult'; // Тема по умолчанию
-        this.themes = ['school', 'adult'];
+        this.currentTheme = 'dark'; // Тема по умолчанию теперь тёмная
+        this.themes = ['light', 'dark'];
         this.themeNames = {
-            'school': 'Школьник',
-            'adult': 'Взрослый'
+            'light': 'Светлая',
+            'dark': 'Тёмная'
         };
         
         this.init();
@@ -54,11 +54,11 @@ class ThemeManager {
         const switcherHTML = `
             <div class="theme-switcher" id="theme-switcher">
                 <div class="theme-switcher-container">
-                    <button class="theme-switcher-btn" data-theme="school" title="Дизайн для школьников">
-                        <i class="fas fa-graduation-cap"></i> Школьник
+                    <button class="theme-switcher-btn light" data-theme="light" title="Светлая тема">
+                        <i class="fas fa-sun"></i> Светлая
                     </button>
-                    <button class="theme-switcher-btn" data-theme="adult" title="Дизайн для взрослых">
-                        <i class="fas fa-briefcase"></i> Взрослый
+                    <button class="theme-switcher-btn dark" data-theme="dark" title="Тёмная тема">
+                        <i class="fas fa-moon"></i> Тёмная
                     </button>
                 </div>
             </div>
@@ -184,12 +184,12 @@ class ThemeManager {
      * Обновление цвета темы в мета-тегах
      */
     updateThemeColor(theme) {
-        let themeColor = '#00ff88'; // По умолчанию
+        let themeColor = '#0a0a0a'; // По умолчанию для тёмной
         
-        if (theme === 'school') {
-            themeColor = '#8B5CF6'; // Фиолетовый для школьников
-        } else if (theme === 'adult') {
-            themeColor = '#1E40AF'; // Синий для взрослых
+        if (theme === 'light') {
+            themeColor = '#8B5CF6'; // Фиолетовый для светлой темы
+        } else if (theme === 'dark') {
+            themeColor = '#1E40AF'; // Синий для тёмной темы
         }
         
         // Обновляем существующий мета-тег или создаем новый
@@ -293,17 +293,17 @@ class ThemeManager {
     }
     
     /**
-     * Проверка, является ли тема школьной
+     * Проверка, является ли тема светлой
      */
-    isSchoolTheme() {
-        return this.currentTheme === 'school';
+    isLightTheme() {
+        return this.currentTheme === 'light';
     }
     
     /**
-     * Проверка, является ли тема взрослой
+     * Проверка, является ли тема тёмной
      */
-    isAdultTheme() {
-        return this.currentTheme === 'adult';
+    isDarkTheme() {
+        return this.currentTheme === 'dark';
     }
     
     /**
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.themeManager) {
             return window.themeManager.getCurrentTheme();
         }
-        return 'adult';
+        return 'dark';
     };
     
     console.log('ThemeManager: DOM загружен, менеджер тем инициализирован');

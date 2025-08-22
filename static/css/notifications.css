@@ -1,0 +1,280 @@
+/* ========================================
+   СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ О СМЕНЕ ТЕМЫ
+   ======================================== */
+
+.theme-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border-accent);
+    border-radius: 16px;
+    padding: 1rem 1.5rem;
+    box-shadow: var(--shadow-elevated);
+    z-index: 1001;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.theme-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.theme-notification-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-notification-title i {
+    color: var(--accent-primary);
+}
+
+.theme-notification-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Анимации для уведомлений */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes slideOutUp {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+}
+
+.theme-notification.slide-in {
+    animation: slideInDown 0.3s ease-out;
+}
+
+.theme-notification.slide-out {
+    animation: slideOutUp 0.3s ease-out;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .theme-notification {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .theme-notification.show {
+        transform: none;
+    }
+    
+    .theme-notification.slide-in {
+        animation: slideInDown 0.3s ease-out;
+    }
+    
+    .theme-notification.slide-out {
+        animation: slideOutUp 0.3s ease-out;
+    }
+}
+
+/* Дополнительные стили для разных типов уведомлений */
+.theme-notification.success {
+    border-color: var(--accent-success);
+}
+
+.theme-notification.success .theme-notification-title i {
+    color: var(--accent-success);
+}
+
+.theme-notification.warning {
+    border-color: var(--accent-warning);
+}
+
+.theme-notification.warning .theme-notification-title i {
+    color: var(--accent-warning);
+}
+
+.theme-notification.error {
+    border-color: var(--accent-danger);
+}
+
+.theme-notification.error .theme-notification-title i {
+    color: var(--accent-danger);
+}
+
+/* Стили для прогресс-бара уведомления */
+.theme-notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent-primary);
+    border-radius: 0 0 16px 16px;
+    transition: width 3s linear;
+    width: 100%;
+}
+
+.theme-notification-progress.countdown {
+    animation: countdown 3s linear;
+}
+
+@keyframes countdown {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+/* Стили для иконок в уведомлениях */
+.theme-notification-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    color: var(--text-on-primary);
+    font-size: 0.8rem;
+}
+
+/* Стили для кнопки закрытия */
+.theme-notification-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-notification-close:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Стили для групповых уведомлений */
+.theme-notifications-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px;
+}
+
+.theme-notification.grouped {
+    position: relative;
+    transform: none;
+    left: auto;
+    margin-bottom: 0.5rem;
+}
+
+.theme-notification.grouped.show {
+    transform: none;
+}
+
+/* Стили для анимации появления/исчезновения */
+.theme-notification.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.theme-notification.fade-out {
+    animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.9);
+    }
+}
+
+/* Стили для мобильных устройств */
+@media (max-width: 480px) {
+    .theme-notification {
+        font-size: 0.9rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .theme-notification-title {
+        font-size: 0.95rem;
+    }
+    
+    .theme-notification-text {
+        font-size: 0.85rem;
+    }
+}
+
+/* Стили для темной темы */
+[data-theme="dark"] .theme-notification {
+    background: var(--bg-card);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-elevated);
+}
+
+[data-theme="dark"] .theme-notification-close:hover {
+    background: var(--bg-secondary);
+}
+
+/* Стили для светлой темы */
+[data-theme="light"] .theme-notification {
+    background: var(--bg-card);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-card);
+}
+
+[data-theme="light"] .theme-notification-close:hover {
+    background: var(--bg-secondary);
+}

@@ -21,7 +21,7 @@
     <meta property="og:locale" content="ru_RU">
     
     <!-- PWA мета-теги -->
-    <meta name="theme-color" content="#00ff88">
+    <meta name="theme-color" content="#1E40AF">
     <meta name="msapplication-TileColor" content="#0a0a0a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,157 +42,220 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/themes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modern-styles.css' %}">
+    
+    <!-- Дополнительные стили для плавных переходов -->
     <style>
-        :root {
-            /* Улучшенная Duolingo-вдохновленная цветовая схема */
-            --bg-primary: #F8FAFC;          /* Основной фон - светло-серый */
-            --bg-secondary: #F1F5F9;        /* Вторичный фон */
-            --bg-card: #FFFFFF;             /* Карточки - чистый белый */
-            --bg-elevated: #FFFFFF;         /* Поднятые элементы */
-            
-            /* Duolingo-стиль акценты (темнее и стильнее) */
-            --accent-primary: #22C55E;      /* Основной зеленый - благородный */
-            --accent-secondary: #3B82F6;    /* Синий для важных действий */
-            --accent-success: #16A34A;      /* Успех - темно-зеленый */
-            --accent-warning: #F59E0B;      /* Предупреждение - янтарный */
-            --accent-danger: #EF4444;       /* Ошибка - красный */
-            
-            /* Дополнительные акценты для школьной темы */
-            --accent-purple: #8B5CF6;       /* Фиолетовый для школьников */
-            --accent-orange: #F97316;       /* Оранжевый для школьников */
-            --accent-neon: #10B981;         /* Неоновый зеленый */
-            
-            /* Современные градиенты */
-            --gradient-primary: linear-gradient(135deg, #22C55E, #16A34A);
-            --gradient-secondary: linear-gradient(135deg, #3B82F6, #1D4ED8);
-            --gradient-success: linear-gradient(135deg, #16A34A, #15803D);
-            --gradient-warm: linear-gradient(135deg, #F59E0B, #D97706);
-            
-            /* Duolingo-стиль текстовые цвета */
-            --text-primary: #1E293B;        /* Основной текст - темно-серый */
-            --text-secondary: #64748B;      /* Вторичный текст */
-            --text-muted: #94A3B8;          /* Приглушенный текст */
-            --text-accent: #22C55E;         /* Акцентный текст - зеленый */
-            --text-on-primary: #FFFFFF;     /* Текст на цветном фоне */
-            
-            /* Duolingo-стиль тени (мягкие и стильные) */
-            --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08);
-            --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.08);
-            --shadow-button: 0 2px 4px rgba(34, 197, 94, 0.2);
-            --shadow-button-hover: 0 4px 12px rgba(34, 197, 94, 0.25);
-            
-            /* Цветные акценты для интерактивности */
-            --glow-primary: 0 0 0 3px rgba(34, 197, 94, 0.1);
-            --glow-secondary: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            --glow-danger: 0 0 0 3px rgba(239, 68, 68, 0.1);
-            
-            /* Границы в стиле Duolingo */
-            --border-light: #E2E8F0;
-            --border-medium: #CBD5E1;
-            --border-accent: #22C55E;
-            
-            /* Переходы */
-            --transition-fast: all 0.15s ease-out;
-            --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        .theme-transition * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
-
-        /* ========================================
-           ДИЗАЙН "ШКОЛЬНИК" (ТЕКУЩИЙ DUOLINGO-СТИЛЬ)
-           ======================================== */
-        [data-theme="school"] {
-            --accent-primary: #22C55E;      /* Яркий зеленый */
-            --accent-secondary: #3B82F6;    /* Синий */
-            --accent-purple: #8B5CF6;       /* Фиолетовый */
-            --accent-orange: #F97316;       /* Оранжевый */
-            --accent-neon: #10B981;         /* Неоновый зеленый */
-            --animation-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        /* ========================================
-           ДИЗАЙН "ВЗРОСЛЫЙ" (ПРОФЕССИОНАЛЬНЫЙ)
-           ======================================== */
-        [data-theme="adult"] {
-            --accent-primary: #1E40AF;      /* Темно-синий */
-            --accent-secondary: #475569;    /* Серый */
-            --accent-info: #0891B2;         /* Информационный синий */
-            --accent-success: #059669;      /* Темно-зеленый */
-            --animation-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background: var(--bg-primary);
-            font-size: 16px;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* Фоновые анимированные элементы */
-        /* Duolingo-стиль фоновые элементы */
-        body::before {
-            content: '';
+        
+        /* Стили для уведомлений о смене темы */
+        .theme-notification {
             position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-elevated);
+            z-index: 1001;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+        
+        .theme-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .theme-notification-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .theme-notification-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Дополнительные стили для современного дизайна */
+        .hero-section {
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.02) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.02) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.01) 0%, transparent 50%);
-            z-index: -1;
-            animation: gentleFloat 30s ease-in-out infinite alternate;
+                radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            z-index: 1;
         }
-
-        /* Duolingo-стиль анимации */
-        @keyframes gentleFloat {
-            0% { opacity: 0.5; transform: scale(1) translateY(0px); }
-            100% { opacity: 0.8; transform: scale(1.05) translateY(-10px); }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
         }
-
-        @keyframes bounceIn {
-            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        
+        /* Современные карточки */
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-base);
+            border: 1px solid var(--border-light);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
         }
-
-        /* Duolingo-стиль header */
-        .header-tech {
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: var(--transition-base);
+            transform-origin: left;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-elevated);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-card h5 {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Современные кнопки */
+        .btn-hero {
+            background: var(--gradient-primary);
+            color: var(--text-on-primary);
+            border: none;
+            border-radius: 16px;
+            padding: 1rem 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition-base);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-button);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .btn-hero:hover::before {
+            left: 100%;
+        }
+        
+        .btn-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-button-hover);
+            color: var(--text-on-primary);
+            text-decoration: none;
+        }
+        
+        /* Современные заголовки */
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .gradient-text {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Современная навигация */
+        .navbar-modern {
             background: var(--bg-elevated);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-soft);
-            padding: 1rem 0;
         }
-
-        /* Duolingo-стиль логотип */
-        .logo-tech {
-            display: flex;
-            align-items: center;
+        
+        .navbar-brand-modern {
             font-weight: 800;
             font-size: 1.8rem;
             color: var(--accent-primary);
             text-decoration: none;
             transition: var(--transition-base);
         }
-
-        .logo-tech:hover {
-            color: var(--accent-success);
+        
+        .navbar-brand-modern:hover {
+            color: var(--accent-secondary);
             transform: scale(1.05);
         }
-
-        .logo-tech i {
+        
+        .navbar-brand-modern i {
             margin-right: 0.5rem;
             font-size: 2rem;
             background: var(--gradient-primary);
@@ -200,853 +263,43 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        /* Навигация */
-        .navbar-tech {
-            background: transparent;
-            padding: 1rem 0;
-        }
-
-        .nav-link-tech {
-            color: var(--text-secondary) !important;
+        
+        .nav-link-modern {
+            color: var(--text-secondary);
             font-weight: 500;
-            padding: 0.75rem 1.5rem !important;
-            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
             transition: var(--transition-base);
-            text-decoration: none !important;
+            text-decoration: none;
             position: relative;
             margin: 0 0.25rem;
-            border: 1px solid transparent;
         }
-
-        .nav-link-tech::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--gradient-primary);
-            opacity: 0;
-            border-radius: 8px;
-            transition: var(--transition-base);
-            z-index: -1;
-        }
-
-        .nav-link-tech:hover {
-            color: var(--accent-primary) !important;
-            background: rgba(34, 197, 94, 0.08);
-            transform: translateY(-2px);
-            border-radius: 12px;
-        }
-
-        .nav-link-tech:hover::before {
-            opacity: 0.1;
-        }
-
-        .nav-link-tech.active {
-            color: var(--accent-primary) !important;
-            background: rgba(34, 197, 94, 0.12);
-            font-weight: 600;
-            border-radius: 12px;
-        }
-
-        /* Duolingo-стиль кнопки (яркие и дружелюбные) */
-        .btn-neon {
-            background: var(--accent-primary);
-            border: none;
-            color: var(--text-on-primary);
-            padding: 1rem 2rem;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-base);
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-button);
-            text-transform: none;
-            letter-spacing: 0;
-
-        }
-
-        .btn-neon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
-            opacity: 0.1;
-            transition: var(--transition-slow);
-        }
-
-        .btn-neon:hover {
-            background: var(--accent-success);
-            box-shadow: var(--shadow-button-hover);
-            transform: translateY(-2px) scale(1.02);
-            text-decoration: none;
-        }
-
-        .btn-neon:hover::before {
-            left: 100%;
-        }
-
-        /* Дополнительные Duolingo-стиль кнопки */
-        .btn-secondary-duolingo {
-            background: var(--accent-secondary);
-            border: none;
-            color: var(--text-on-primary);
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition-base);
-            box-shadow: var(--shadow-soft);
-        }
-
-        .btn-secondary-duolingo:hover {
-            background: #1D4ED8;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-card);
-        }
-
-        .btn-outline-duolingo {
-            background: transparent;
-            border: 2px solid var(--accent-primary);
+        
+        .nav-link-modern:hover {
             color: var(--accent-primary);
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition-base);
-        }
-
-        .btn-outline-duolingo:hover {
-            background: var(--accent-primary);
-            color: var(--text-on-primary);
+            background: rgba(99, 102, 241, 0.08);
             transform: translateY(-2px);
         }
-
-        .btn-neon-blue {
-            border-color: var(--accent-secondary);
-            color: var(--accent-secondary);
-            box-shadow: 
-                0 0 20px rgba(59, 130, 246, 0.3),
-                inset 0 0 20px rgba(59, 130, 246, 0.1);
-        }
-
-        .btn-neon-blue::before {
-            background: linear-gradient(90deg, transparent, var(--accent-secondary), transparent);
-        }
-
-        .btn-neon-blue:hover {
-            background: var(--accent-secondary);
-            box-shadow: 
-                0 0 40px rgba(59, 130, 246, 0.6),
-                inset 0 0 40px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn-gradient {
-            background: var(--gradient-primary);
-            border: none;
-            color: var(--bg-primary);
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-base);
-            position: relative;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: var(--glow-primary);
-        }
-
-        .btn-gradient:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 
-                0 0 30px rgba(0, 255, 136, 0.5),
-                0 10px 30px rgba(0, 0, 0, 0.3);
-            color: var(--bg-primary);
-            text-decoration: none;
-        }
-
-        /* Duolingo-стиль карточки (дружелюбные и яркие) */
-        .card-tech {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: var(--transition-base);
-            height: 100%;
-            box-shadow: var(--shadow-card);
-            position: relative;
-            overflow: hidden;
-            animation: bounceIn 0.6s ease-out;
-        }
-
-        .card-tech::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
-            transform: scaleX(0);
-            transition: var(--transition-base);
-            transform-origin: left;
-        }
-
-        .card-tech:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: var(--accent-primary);
-            box-shadow: var(--shadow-elevated);
-            background: var(--bg-elevated);
-        }
-
-        .card-tech:hover::before {
-            transform: scaleX(1);
-        }
-
-        /* Duolingo-стиль текст в карточках */
-        .card-tech h5,
-        .card-tech h6 {
-            color: var(--text-primary);
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .card-tech p,
-        .card-tech .text-secondary {
-            color: var(--text-secondary) !important;
-            line-height: 1.6;
-        }
-
-        .card-tech .gradient-text {
+        
+        .nav-link-modern.active {
             color: var(--accent-primary);
-            font-weight: 800;
-        }
-
-        /* Иконки в карточках */
-        .card-tech i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        /* Duolingo-стиль формы */
-        .form-control-duolingo {
-            background: var(--bg-card);
-            border: 2px solid var(--border-light);
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            transition: var(--transition-base);
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .form-control-duolingo:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: var(--glow-primary);
-            background: var(--bg-elevated);
-        }
-
-        .form-control-duolingo::placeholder {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        /* Подписи полей в Duolingo-стиле */
-        .form-label-duolingo {
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        /* Контейнер формы */
-        .form-container-duolingo {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: var(--shadow-elevated);
-            border: 1px solid var(--border-light);
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        /* Стили для изображений на главной странице */
-        .hero-with-image {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-        }
-
-        .hero-bg-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                135deg,
-                rgba(34, 197, 94, 0.15) 0%,
-                rgba(59, 130, 246, 0.1) 50%,
-                rgba(0, 0, 0, 0.3) 100%
-            );
-            z-index: -1;
-        }
-
-        /* Стили для секции "Как это работает" */
-        .feature-content {
-            position: relative;
-        }
-
-        .feature-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            background: var(--gradient-primary);
-            color: var(--text-on-primary);
-            border-radius: 50%;
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-button);
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .feature-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-
-        .feature-image {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-image img {
-            transition: var(--transition-base);
-        }
-
-        .feature-image:hover img {
-            transform: scale(1.05);
-        }
-
-        /* Стили для секции "О нас" */
-        .about-content {
-            padding: 2rem 0;
-        }
-
-        .stat-item {
-            padding: 1rem;
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border-light);
-            transition: var(--transition-base);
-        }
-
-        .stat-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-card);
-        }
-
-        .feature-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-card);
-            border-radius: 50%;
-            border: 1px solid var(--border-light);
-            font-size: 1.2rem;
-        }
-
-        .about-images {
-            position: relative;
-        }
-
-        .main-about-image {
-            position: relative;
-            z-index: 2;
-        }
-
-        .secondary-about-image {
-            position: relative;
-            transform: translateX(20px);
-            margin-top: -60px;
-            z-index: 1;
-        }
-
-        .secondary-about-image img {
-            opacity: 0.9;
-        }
-
-        /* Адаптивность для изображений */
-        @media (max-width: 768px) {
-            .hero-bg-image {
-                object-position: center top;
-            }
-            
-            .feature-image {
-                margin-bottom: 2rem;
-            }
-            
-            .secondary-about-image {
-                transform: none;
-                margin-top: 0;
-            }
-            
-            .feature-number {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-        }
-
-        .card-neon {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
-            border: 2px solid rgba(99, 102, 241, 0.2);
-            border-radius: 20px;
-            padding: 2.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: var(--transition-base);
-            backdrop-filter: blur(10px);
-            box-shadow: 
-                0 10px 15px -3px rgba(0, 0, 0, 0.1),
-                0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .card-neon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
-            border-radius: 20px;
-            transition: var(--transition-base);
-        }
-
-        .card-neon:hover {
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.15),
-                0 0 0 1px rgba(99, 102, 241, 0.1),
-                0 0 20px rgba(99, 102, 241, 0.2);
-            transform: translateY(-10px) scale(1.02);
-        }
-
-        .card-neon:hover::before {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-        }
-
-        /* Текст в neon карточках */
-        .card-neon h5,
-        .card-neon h6 {
-            color: #1e293b;
+            background: rgba(99, 102, 241, 0.12);
             font-weight: 600;
         }
-
-        .card-neon p,
-        .card-neon .text-muted {
-            color: #64748b !important;
-        }
-
-        .card-neon .text-white {
-            color: #1e293b !important;
-        }
-
-        /* Стили для иконок предметов */
-        .card-tech i.fa-dna {
-            color: #10b981; /* Зеленый для биологии */
-        }
-
-        .card-tech i.fa-code {
-            color: #3b82f6; /* Синий для информатики */
-        }
-
-        .card-tech i.fa-landmark {
-            color: #f59e0b; /* Желтый для истории */
-        }
-
-        .card-tech i.fa-calculator {
-            color: #8b5cf6; /* Фиолетовый для математики */
-        }
-
-        .card-tech i.fa-users {
-            color: #06b6d4; /* Голубой для обществознания */
-        }
-
-        .card-tech i.fa-language {
-            color: #ef4444; /* Красный для языков */
-        }
-
-        .card-tech i.fa-atom {
-            color: #f97316; /* Оранжевый для физики */
-        }
-
-        .card-tech i.fa-flask {
-            color: #84cc16; /* Лайм для химии */
-        }
-
-        /* Улучшенные статистические карточки */
-        .card-tech .stat-number {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-        }
-
-        /* Кнопки в светлых карточках */
-        .card-tech .btn-neon,
-        .card-neon .btn-neon {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
-        }
-
-        .card-tech .btn-neon:hover,
-        .card-neon .btn-neon:hover {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* Технологичная hero секция */
-        .hero-tech {
-            background: var(--bg-secondary);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-tech::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(45deg, transparent 30%, rgba(0, 255, 136, 0.1) 50%, transparent 70%),
-                linear-gradient(-45deg, transparent 30%, rgba(0, 212, 255, 0.1) 50%, transparent 70%);
-            animation: heroGlow 8s ease-in-out infinite alternate;
-        }
-
-        @keyframes heroGlow {
-            0% { opacity: 0.3; transform: rotate(0deg) scale(1); }
-            100% { opacity: 0.7; transform: rotate(2deg) scale(1.05); }
-        }
-
-        .hero-title {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 2rem;
-            line-height: 1.1;
-            text-align: center;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1.1rem, 2vw, 1.4rem);
-            color: var(--text-secondary);
-            margin-bottom: 3rem;
-            line-height: 1.6;
-            text-align: center;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Геометрические элементы */
-        .geometric-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .geometric-shape {
-            position: absolute;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            border-radius: 8px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .geometric-shape:nth-child(1) {
-            width: 100px;
-            height: 100px;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .geometric-shape:nth-child(2) {
-            width: 60px;
-            height: 60px;
-            top: 60%;
-            right: 15%;
-            animation-delay: 2s;
-            border-color: rgba(0, 212, 255, 0.2);
-        }
-
-        .geometric-shape:nth-child(3) {
-            width: 80px;
-            height: 80px;
-            bottom: 20%;
-            left: 20%;
-            animation-delay: 4s;
-            border-color: rgba(255, 0, 255, 0.2);
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
-        /* Градиентный текст */
-        .gradient-text {
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .gradient-text-secondary {
-            background: var(--gradient-secondary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        /* Stats */
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Footer */
-        .footer-custom {
-            background: var(--gray-900);
-            color: var(--gray-300);
-        }
-
-        .footer-custom a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .footer-custom a:hover {
-            color: var(--secondary-color);
-        }
-
-        /* Мобильная оптимизация */
+        
+        /* Адаптивность */
         @media (max-width: 768px) {
             .hero-title {
-                font-size: 2rem;
-                line-height: 1.2;
+                font-size: 2.5rem;
             }
             
             .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .btn-hero {
+                padding: 0.875rem 1.5rem;
                 font-size: 1rem;
-            }
-            
-            .stat-number {
-                font-size: 1.8rem;
-            }
-            
-            .card-tech {
-                padding: 1rem;
-            }
-            
-            .btn-neon,
-            .btn-gradient {
-                padding: 0.75rem 1.5rem;
-                font-size: 0.9rem;
-            }
-            
-            .navbar-tech {
-                padding: 0.5rem 0;
-            }
-            
-            .nav-link-tech {
-                padding: 0.5rem 1rem !important;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 1.5rem;
-            }
-            
-            .hero-subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .card-tech {
-                padding: 0.75rem;
-            }
-            
-            .btn-neon,
-            .btn-gradient {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.8rem;
-            }
-            
-            .logo-tech {
-                font-size: 1.3rem;
-            }
-            
-            .header-info {
-                display: none;
-            }
-            
-            .stat-number {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Touch-friendly элементы */
-        @media (pointer: coarse) {
-            .btn-neon,
-            .btn-gradient,
-            .btn-neon-blue {
-                min-height: 44px;
-                min-width: 44px;
-            }
-            
-            .nav-link-tech {
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-            }
-            
-            .card-tech {
-                padding: 1.5rem 1rem;
-            }
-        }
-
-        /* PWA стили */
-        .pwa-install-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-card);
-            border-top: 2px solid var(--accent-primary);
-            padding: 1rem;
-            z-index: 1001;
-            transform: translateY(100%);
-            transition: var(--transition-base);
-        }
-
-        .pwa-install-banner.show {
-            transform: translateY(0);
-        }
-
-        .pwa-install-banner .btn {
-            margin-top: 0.5rem;
-        }
-
-        /* Адаптивность для мобильных устройств */
-        @media (max-width: 768px) {
-            .theme-switcher-container {
-                flex-direction: column;
-                gap: 0.25rem;
-            }
-
-            .theme-switcher-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-
-            .theme-notification {
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                transform: translateY(-100%);
-            }
-
-            .theme-notification.show {
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 576px) {
-            .theme-switcher-btn {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.75rem;
             }
         }
     </style>
@@ -1056,236 +309,96 @@
     <!-- Модуль управления дизайнами (подключаем после инлайн-стилей, чтобы переопределения тем имели приоритет) -->
     <link rel="stylesheet" href="{% static 'css/themes.css' %}">
 </head>
-<body data-theme="adult">
-    <!-- Tech Navigation -->
-    <nav class="header-tech">
+<body data-theme="dark">
+    <!-- Переключатель тем -->
+    <div class="theme-switcher" id="theme-switcher">
+        <div class="theme-switcher-container">
+            <button class="theme-switcher-btn light" data-theme="light" title="Светлая тема">
+                <i class="fas fa-sun"></i> Светлая
+            </button>
+            <button class="theme-switcher-btn dark active" data-theme="dark" title="Тёмная тема">
+                <i class="fas fa-moon"></i> Тёмная
+            </button>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-modern">
         <div class="container">
-            <div class="navbar-tech navbar navbar-expand-lg">
-                <a href="{% url 'home' %}" class="logo-tech">
-                    <i class="fas fa-atom"></i>
-                    ExamFlow
-                </a>
-                
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTech" style="color: var(--accent-primary);">
-                    <i class="fas fa-bars"></i>
-                </button>
-                
-                <div class="collapse navbar-collapse" id="navbarTech">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link-tech" href="{% url 'home' %}">
-                                <i class="fas fa-home me-2"></i>Главная
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-tech" href="{% url 'subjects' %}">
-                                <i class="fas fa-book-open me-2"></i>Предметы
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-tech" href="#pricing">
-                                <i class="fas fa-crown me-2"></i>Подписка
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-tech" href="https://t.me/ExamFlowBot" target="_blank">
-                                <i class="fab fa-telegram me-2"></i>Telegram Бот
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-tech" href="{% url 'ai:chat' %}">
-                                <i class="fas fa-robot me-2"></i>Спросить ИИ
-                            </a>
-                        </li>
-                    </ul>
-                    
-                    <div class="d-flex align-items-center gap-3">
-                        {% if user.is_authenticated %}
-                            <a href="{% url 'dashboard' %}" class="nav-link-tech">
-                                <i class="fas fa-tachometer-alt me-2"></i>Кабинет
-                            </a>
-                            <a href="{% url 'logout' %}" class="btn-neon-blue">
-                                <i class="fas fa-sign-out-alt me-2"></i>Выход
-                            </a>
-                        {% else %}
-                            <a href="{% url 'login' %}" class="btn-neon-blue">
-                                <i class="fas fa-sign-in-alt me-2"></i>Войти
-                            </a>
-                            <a href="{% url 'register' %}" class="btn-gradient">
-                                <i class="fas fa-user-plus me-2"></i>Регистрация
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
+            <a class="navbar-brand navbar-brand-modern" href="{% url 'home' %}">
+                <i class="fas fa-graduation-cap"></i>ExamFlow
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-modern" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i>Главная
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-modern" href="{% url 'subjects' %}">
+                            <i class="fas fa-book me-1"></i>Предметы
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-modern" href="{% url 'random_task' %}">
+                            <i class="fas fa-random me-1"></i>Случайное
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-modern" href="{% url 'statistics' %}">
+                            <i class="fas fa-chart-bar me-1"></i>Статистика
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
-            </nav>
-    
+    </nav>
+
+    <!-- Основной контент -->
     <main>
         {% block content %}{% endblock %}
     </main>
-    
+
     <!-- Footer -->
-    <footer class="footer-custom py-5 mt-5">
+    <footer class="footer-modern">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="logo mb-3">
-                        <i class="fas fa-graduation-cap me-2"></i>ExamFlow
-                    </div>
-                    <p class="mb-3">Эффективная подготовка к ЕГЭ и ОГЭ с заданиями на основе открытых материалов ФИПИ</p>
-                    <p class="text-muted small">
-                        &copy; 2025 ExamFlow. Все права защищены. 
-                        Материалы основаны на открытых данных с <a href="https://fipi.ru" target="_blank">сайта ФИПИ</a>. Мы не являемся официальным партнером ФИПИ.
-                    </p>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h5>ExamFlow</h5>
+                    <p>Современная платформа для подготовки к экзаменам с использованием искусственного интеллекта и персонального подхода к каждому студенту.</p>
                 </div>
-                <div class="col-lg-4">
-                    <h6 class="text-white mb-3">Полезные ссылки</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="https://fipi.ru" target="_blank"><i class="fas fa-external-link-alt me-2"></i>ФИПИ</a></li>
-                        <li><a href="https://ege.sdamgia.ru" target="_blank"><i class="fas fa-external-link-alt me-2"></i>Решу ЕГЭ</a></li>
-                        <li><a href="https://t.me/ExamFlowBot" target="_blank"><i class="fab fa-telegram me-2"></i>Telegram Бот</a></li>
-                    </ul>
+                <div class="footer-section">
+                    <h5>Ссылки</h5>
+                    <a href="{% url 'home' %}">Главная</a>
+                    <a href="{% url 'subjects' %}">Предметы</a>
+                    <a href="{% url 'random_task' %}">Случайное задание</a>
+                    <a href="{% url 'statistics' %}">Статистика</a>
                 </div>
+                <div class="footer-section">
+                    <h5>Контакты</h5>
+                    <a href="https://t.me/ExamFlowBot">Telegram бот</a>
+                    <a href="mailto:info@examflow.ru">Email</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ExamFlow. Все права защищены.</p>
             </div>
         </div>
     </footer>
-    
-    <!-- Scripts -->
+
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        });
-
-        // Add animation classes on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in-up');
-                }
-            });
-        }, observerOptions);
-
-        // Observe all cards
-        document.querySelectorAll('.card-custom').forEach(card => {
-            observer.observe(card);
-        });
-    </script>
     
-    <!-- Модуль управления дизайнами -->
+    <!-- Theme Switcher -->
     <script src="{% static 'js/theme-switcher.js' %}"></script>
     
-    <!-- PWA и мобильная оптимизация -->
-    <script>
-        // Регистрация Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/static/sw.js')
-                    .then(registration => {
-                        console.log('ExamFlow SW: Registration successful', registration);
-                    })
-                    .catch(error => {
-                        console.log('ExamFlow SW: Registration failed', error);
-                    });
-            });
-        }
-
-        // PWA Install Banner
-        let deferredPrompt;
-        const pwaInstallBanner = document.createElement('div');
-        pwaInstallBanner.className = 'pwa-install-banner';
-        pwaInstallBanner.innerHTML = `
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-8">
-                        <strong class="text-white">📱 Установить ExamFlow</strong>
-                        <div class="small text-secondary">Получите быстрый доступ с главного экрана</div>
-                    </div>
-                    <div class="col-4 text-end">
-                        <button class="btn btn-neon btn-sm" id="pwa-install-btn">Установить</button>
-                        <button class="btn btn-link text-muted btn-sm ms-2" id="pwa-dismiss-btn">✕</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Показываем баннер через 3 секунды
-            setTimeout(() => {
-                if (!localStorage.getItem('pwa-dismissed')) {
-                    document.body.appendChild(pwaInstallBanner);
-                    pwaInstallBanner.classList.add('show');
-                }
-            }, 3000);
-        });
-
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'pwa-install-btn') {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            console.log('PWA: User accepted install');
-                        }
-                        deferredPrompt = null;
-                        pwaInstallBanner.remove();
-                    });
-                }
-            }
-            
-            if (e.target.id === 'pwa-dismiss-btn') {
-                localStorage.setItem('pwa-dismissed', 'true');
-                pwaInstallBanner.remove();
-            }
-        });
-
-        // Мобильная оптимизация
-        document.addEventListener('DOMContentLoaded', function() {
-            // Улучшенные touch события для кнопок
-            document.querySelectorAll('.btn-neon, .btn-gradient, .btn-neon-blue').forEach(btn => {
-                btn.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.98)';
-                });
-                
-                btn.addEventListener('touchend', function() {
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 100);
-                });
-            });
-        });
-    </script>
-    
+    <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}
-    
-    <!-- Модуль управления дизайнами -->
-    
-    
-    <!-- Скрытая административная ссылка -->
-    {% if user.is_superuser %}
-    <div style="position: fixed; bottom: 10px; right: 10px; z-index: 9999;">
-        <a href="/admin/parsing/" 
-           style="background: rgba(0,255,136,0.8); color: #000; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-size: 12px; box-shadow: 0 2px 10px rgba(0,255,136,0.3);"
-           title="Запуск парсинга ФИПИ">
-            🔥 Парсинг
-        </a>
-    </div>
-    {% endif %}
 </body>
 </html>

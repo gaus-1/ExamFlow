@@ -1,479 +1,191 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}
+{% block title %}ExamFlow - Платформа для подготовки к экзаменам{% endblock %}
 
 {% block content %}
-<!-- Hero Section с фоновым изображением -->
-<section class="hero-tech hero-with-image">
-    <!-- Фоновое изображение: Вечернее рабочее место у окна с видом на город -->
-    <div class="hero-background">
-        <img src="{% static 'images/hero/evening-workspace.jpg' %}" alt="Вечернее рабочее место" class="hero-bg-image">
-        <div class="hero-overlay"></div>
-    </div>
-    
+<!-- Hero Section -->
+<section class="hero-section">
     <div class="container">
-        <div class="row align-items-center min-vh-100">
-            <div class="col-lg-8 mx-auto text-center">
-                <h1 class="hero-title animate-fade-in-up">
-                    Современная платформа подготовки к <span class="gradient-text-secondary">ЕГЭ и ОГЭ</span>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="hero-title">
+                    Добро пожаловать в <span class="gradient-text">ExamFlow</span>
                 </h1>
-                
-                <p class="hero-subtitle animate-fade-in-up" style="animation-delay: 0.2s;">
-                    Актуальные задания на основе открытых материалов ФИПИ. 
-                    Голосовые подсказки, персонализация и геймификация для максимальной эффективности.
+                <p class="hero-subtitle">
+                    Современная платформа для подготовки к экзаменам с использованием искусственного интеллекта и персонального подхода к каждому студенту
                 </p>
-                
-                <div class="d-flex flex-wrap justify-content-center gap-4 mb-5 animate-fade-in-up" style="animation-delay: 0.4s;">
-                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-gradient">
-                        <i class="fab fa-telegram me-2"></i>
-                        Начать подготовку
-                    </a>
-                    <a href="{% url 'subjects' %}" class="btn-neon">
-                        <i class="fas fa-book-open me-2"></i>
-                        Выбрать предмет
-                    </a>
-                </div>
-                
-                <!-- Статистика -->
-                <div class="row g-4 mt-5 animate-fade-in-up" style="animation-delay: 0.6s;">
-                    <div class="col-md-4">
-                        <div class="card-tech text-center">
-                            <div class="h1 gradient-text mb-2">{{ total_subjects }}+</div>
-                            <div class="text-muted">предметов ЕГЭ/ОГЭ</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card-tech text-center">
-                            <div class="h1 gradient-text mb-2">{{ total_tasks }}+</div>
-                            <div class="text-muted">актуальных заданий</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card-tech text-center">
-                            <div class="h1 gradient-text mb-2">24/7</div>
-                            <div class="text-muted">доступ в Telegram</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 text-center mt-5 mt-lg-0">
-                <div class="card-neon animate-fade-in-up" style="animation-delay: 0.8s;">
-                    <h5 class="gradient-text mb-4">
-                        <i class="fas fa-qrcode me-2"></i>
-                        Быстрый доступ к боту
-                    </h5>
-                    <div class="position-relative d-inline-block">
-                        <img src="{{ qr_code }}" alt="QR-код для Telegram-бота" 
-                             class="img-fluid mb-3" 
-                             style="max-width: 200px; border: 2px solid var(--neon-green); border-radius: 12px; box-shadow: var(--glow-green);">
-                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.7); opacity: 0; transition: var(--transition-base); border-radius: 12px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
-                            <i class="fas fa-expand text-white fa-2x"></i>
-                        </div>
-                    </div>
-                    <p class="text-muted mb-3">Отсканируйте камерой телефона</p>
-                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-neon-blue btn-sm">
-                        <i class="fab fa-telegram me-2"></i>
-                        Открыть бота
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- How It Works Section -->
-<section class="py-5" style="background: var(--bg-primary);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="gradient-text fw-bold mb-3">Как это работает</h2>
-            <p class="text-secondary">Простой и эффективный процесс обучения</p>
-        </div>
-        
-        <div class="row g-5 align-items-center">
-            <!-- Шаг 1: Регистрация -->
-            <div class="col-lg-6">
-                <div class="feature-content">
-                    <div class="feature-number">01</div>
-                    <h3 class="fw-bold mb-3">Быстрая регистрация</h3>
-                    <p class="text-secondary mb-4">
-                        Всего 3 поля: имя, email и пароль. Никаких лишних вопросов - 
-                        начинайте учиться через минуту после регистрации.
-                    </p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-check text-success me-2"></i>Простая форма регистрации</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Мгновенный доступ к заданиям</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Синхронизация с Telegram ботом</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="feature-image">
-                    <img src="{% static 'images/features/registration-interface.jpg' %}" 
-                         alt="Интерфейс ExamFlow" 
-                         class="img-fluid rounded-4 shadow-lg">
-                </div>
-            </div>
-            
-            <!-- Шаг 2: Групповое обучение -->
-            <div class="col-lg-6 order-lg-2">
-                <div class="feature-content">
-                    <div class="feature-number">02</div>
-                    <h3 class="fw-bold mb-3">Обучение в группе</h3>
-                    <p class="text-secondary mb-4">
-                        Присоединяйтесь к сообществу учеников. Решайте задания вместе, 
-                        обменивайтесь опытом и мотивируйте друг друга.
-                    </p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-users text-primary me-2"></i>Сообщество учеников</li>
-                        <li><i class="fas fa-comments text-primary me-2"></i>Обмен опытом</li>
-                        <li><i class="fas fa-trophy text-primary me-2"></i>Соревновательный элемент</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-6 order-lg-1">
-                <div class="feature-image">
-                    <img src="{% static 'images/features/group-study.jpg' %}" 
-                         alt="Групповое обучение" 
-                         class="img-fluid rounded-4 shadow-lg">
-                </div>
-            </div>
-            
-            <!-- Шаг 3: Индивидуальная работа -->
-            <div class="col-lg-6">
-                <div class="feature-content">
-                    <div class="feature-number">03</div>
-                    <h3 class="fw-bold mb-3">Персональный прогресс</h3>
-                    <p class="text-secondary mb-4">
-                        Отслеживайте свои успехи, анализируйте слабые места и 
-                        получайте персональные рекомендации для улучшения результатов.
-                    </p>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-chart-line text-warning me-2"></i>Детальная аналитика</li>
-                        <li><i class="fas fa-target text-warning me-2"></i>Персональные рекомендации</li>
-                        <li><i class="fas fa-brain text-warning me-2"></i>Адаптивное обучение</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="feature-image">
-                    <img src="{% static 'images/features/individual-study.jpg' %}" 
-                         alt="Индивидуальное обучение" 
-                         class="img-fluid rounded-4 shadow-lg">
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="py-5" style="background: var(--bg-secondary);">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="gradient-text fw-bold mb-3">Преимущества ExamFlow</h2>
-            <p class="text-secondary">Технологии будущего для подготовки к экзаменам</p>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-certificate fa-3x gradient-text"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3 text-white">На основе ФИПИ</h5>
-                    <p class="text-secondary">Задания и демоверсии, созданные на основе открытых материалов ФИПИ для эффективной подготовки</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-volume-up fa-3x" style="color: var(--neon-blue);"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3 text-white">Голосовые подсказки</h5>
-                    <p class="text-secondary">Озвучивание заданий и объяснений для лучшего восприятия материала</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-user-cog fa-3x" style="color: var(--neon-purple);"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3 text-white">Персонализация</h5>
-                    <p class="text-secondary">ИИ анализирует ваши ответы и создает индивидуальный план подготовки</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-gamepad fa-3x" style="color: var(--neon-yellow);"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3 text-white">Геймификация</h5>
-                    <p class="text-secondary">Система уровней, достижений и рейтингов делает обучение увлекательным</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fab fa-telegram fa-3x gradient-text"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3 text-white">Telegram интеграция</h5>
-                    <p class="text-secondary">Полноценный бот с синхронизацией прогресса и push-уведомлениями</p>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-chart-line fa-3x" style="color: var(--neon-green);"></i>
-                    </div>
-                    <h5 class="fw-bold mb-3 text-white">Аналитика прогресса</h5>
-                    <p class="text-secondary">Детальная статистика с выявлением слабых мест и рекомендациями</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Pricing Section -->
-<section class="py-5" id="pricing">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="gradient-text fw-bold mb-3">Тарифные планы</h2>
-            <p class="text-secondary">Выберите подходящий план для эффективной подготовки</p>
-        </div>
-        
-        <div class="row g-4 justify-content-center">
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-gift fa-3x text-secondary"></i>
-                    </div>
-                    <h3 class="fw-bold mb-3 text-white">Бесплатный</h3>
-                    <div class="h2 gradient-text mb-4">0 ₽</div>
-                    <ul class="list-unstyled text-start text-secondary mb-4">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>5 заданий в день</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Базовая статистика</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Доступ к боту</li>
-                        <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>Голосовые подсказки</li>
-                        <li class="mb-2"><i class="fas fa-times text-danger me-2"></i>Персонализация</li>
-                    </ul>
-                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-neon w-100">
-                        <i class="fab fa-telegram me-2"></i>Начать бесплатно
-                    </a>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-neon text-center position-relative">
-                    <div class="position-absolute top-0 start-50 translate-middle">
-                        <span class="badge" style="background: var(--gradient-primary); padding: 0.5rem 1rem; border-radius: 20px;">ПОПУЛЯРНЫЙ</span>
-                    </div>
-                    <div class="mb-4 mt-3">
-                        <i class="fas fa-crown fa-3x" style="color: var(--neon-yellow);"></i>
-                    </div>
-                    <h3 class="fw-bold mb-3 text-white">Месячный</h3>
-                    <div class="h2 gradient-text mb-4">990 ₽<small class="text-muted">/мес</small></div>
-                    <ul class="list-unstyled text-start text-secondary mb-4">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Неограниченные задания</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Полная статистика</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Голосовые подсказки</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>ИИ персонализация</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Приоритетная поддержка</li>
-                    </ul>
-                    <a href="#subscribe-monthly" class="btn-gradient w-100">
-                        <i class="fas fa-credit-card me-2"></i>Оформить подписку
-                    </a>
-                </div>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <div class="card-tech text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-star fa-3x" style="color: var(--neon-purple);"></i>
-                    </div>
-                    <h3 class="fw-bold mb-3 text-white">Годовой</h3>
-                    <div class="h2 gradient-text mb-1">9900 ₽<small class="text-muted">/год</small></div>
-                    <div class="small text-success mb-4">Экономия 17%</div>
-                    <ul class="list-unstyled text-start text-secondary mb-4">
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Все возможности месячного</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Скидка 17%</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Эксклюзивный контент</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Персональный куратор</li>
-                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Сертификат о прохождении</li>
-                    </ul>
-                    <a href="#subscribe-yearly" class="btn-neon-blue w-100">
-                        <i class="fas fa-gem me-2"></i>Купить со скидкой
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Subjects Section -->
-<section class="py-5 hero-gradient">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold mb-3">Доступные предметы</h2>
-            <p class="text-muted">Выберите предмет для начала подготовки</p>
-        </div>
-        
-        {% if subjects %}
-            <div class="row g-4">
-                {% for subject in subjects %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="card-custom">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="me-3">
-                                {% if subject.name == "Математика" %}
-                                    <i class="fas fa-calculator fa-2x" style="color: var(--primary-color);"></i>
-                                {% elif subject.name == "Русский язык" %}
-                                    <i class="fas fa-language fa-2x" style="color: var(--secondary-color);"></i>
-                                {% elif subject.name == "Физика" %}
-                                    <i class="fas fa-atom fa-2x" style="color: var(--success-color);"></i>
-                                {% elif subject.name == "Химия" %}
-                                    <i class="fas fa-flask fa-2x" style="color: var(--warning-color);"></i>
-                                {% elif subject.name == "Биология" %}
-                                    <i class="fas fa-dna fa-2x" style="color: var(--success-color);"></i>
-                                {% elif subject.name == "История" %}
-                                    <i class="fas fa-landmark fa-2x" style="color: var(--error-color);"></i>
-                                {% elif subject.name == "Обществознание" %}
-                                    <i class="fas fa-users fa-2x" style="color: var(--primary-color);"></i>
-                                {% elif subject.name == "Информатика" %}
-                                    <i class="fas fa-code fa-2x" style="color: var(--secondary-color);"></i>
-                                {% else %}
-                                    <i class="fas fa-book fa-2x" style="color: var(--primary-color);"></i>
-                                {% endif %}
-                            </div>
-                            <div>
-                                <h5 class="fw-bold mb-1">{{ subject.name }}</h5>
-                                <div class="small text-muted">{{ subject.exam_type }}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="small text-muted">
-                                <i class="fas fa-tasks me-1"></i>
-                                Задания доступны
-                            </div>
-                            <a href="{% url 'subject_detail' subject.id %}" class="btn-outline-custom btn-sm">
-                                Изучать <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            
-            <div class="text-center mt-4">
-                <a href="{% url 'subjects' %}" class="btn-primary-custom">
-                    <i class="fas fa-th-large me-2"></i>
-                    Посмотреть все предметы
+                <a href="#features" class="btn-hero">
+                    <i class="fas fa-rocket"></i> Начать обучение
                 </a>
             </div>
-        {% else %}
-            <div class="text-center py-5">
-                <div class="card-custom">
-                    <i class="fas fa-spinner fa-spin fa-3x mb-3" style="color: var(--primary-color);"></i>
-                    <h4>Загрузка данных...</h4>
-                    <p class="text-muted">Подготавливаем материалы для изучения</p>
-                </div>
-            </div>
-        {% endif %}
+        </div>
     </div>
 </section>
 
-<!-- About Section с атмосферными изображениями -->
-<section class="py-5" style="background: var(--bg-primary);">
+<!-- Статистика -->
+<section class="py-5" id="features">
     <div class="container">
-        <div class="row g-5 align-items-center">
-            <div class="col-lg-6">
-                <div class="about-content">
-                    <h2 class="gradient-text fw-bold mb-4">Создано для успеха</h2>
-                    <p class="text-secondary mb-4 lead">
-                        ExamFlow — это результат глубокого анализа потребностей современных учеников. 
-                        Мы создали платформу, которая объединяет лучшие практики образования 
-                        с современными технологиями.
-                    </p>
-                    
-                    <div class="row g-4 mb-4">
-                        <div class="col-6">
-                            <div class="stat-item text-center">
-                                <div class="h3 gradient-text mb-1">12+</div>
-                                <div class="small text-muted">предметов ЕГЭ/ОГЭ</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="stat-item text-center">
-                                <div class="h3 gradient-text mb-1">1000+</div>
-                                <div class="small text-muted">активных учеников</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="stat-item text-center">
-                                <div class="h3 gradient-text mb-1">95%</div>
-                                <div class="small text-muted">довольных пользователей</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="stat-item text-center">
-                                <div class="h3 gradient-text mb-1">24/7</div>
-                                <div class="small text-muted">поддержка</div>
-                            </div>
-                        </div>
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="heading-modern">Статистика платформы</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
                     </div>
-                    
-                    <div class="feature-highlights">
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="feature-icon me-3">
-                                <i class="fas fa-brain text-primary"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Научный подход</h6>
-                                <p class="text-secondary mb-0 small">Основано на исследованиях в области педагогики</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="feature-icon me-3">
-                                <i class="fas fa-chart-line text-success"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Измеримые результаты</h6>
-                                <p class="text-secondary mb-0 small">Отслеживайте прогресс в реальном времени</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <div class="feature-icon me-3">
-                                <i class="fas fa-users text-warning"></i>
-                            </div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Сообщество</h6>
-                                <p class="text-secondary mb-0 small">Учитесь вместе с единомышленниками</p>
-                            </div>
-                        </div>
-                    </div>
+                    <h5>Активных пользователей</h5>
+                    <p class="text-muted">{{ total_users|default:"1000+" }}</p>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="about-images">
-                    <!-- Основное изображение: Книги на подоконнике -->
-                    <div class="main-about-image mb-4">
-                        <img src="{% static 'images/about/books-windowsill.jpg' %}" 
-                             alt="Книги на подоконнике с растениями" 
-                             class="img-fluid rounded-4 shadow-lg">
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-book"></i>
                     </div>
-                    
-                    <!-- Дополнительное изображение: Школьная доска -->
-                    <div class="secondary-about-image">
-                        <img src="{% static 'images/about/classroom-blackboard.jpg' %}" 
-                             alt="Школьная доска с формулами" 
-                             class="img-fluid rounded-4 shadow-lg">
+                    <h5>Предметов</h5>
+                    <p class="text-muted">{{ total_subjects|default:"8" }}</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-tasks"></i>
                     </div>
+                    <h5>Заданий</h5>
+                    <p class="text-muted">{{ total_tasks|default:"1000+" }}</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h5>Средний балл</h5>
+                    <p class="text-muted">{{ avg_score|default:"85%" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Предметы -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="heading-modern">Доступные предметы</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% for subject in subjects %}
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h5>{{ subject.name }}</h5>
+                    <p class="text-muted">{{ subject.description|default:"Описание предмета" }}</p>
+                    <a href="{% url 'subject_detail' subject.id %}" class="btn btn-primary btn-sm">
+                        Изучать
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Предметы загружаются...</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Особенности платформы -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="heading-modern">Особенности платформы</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h5>ИИ-ассистент</h5>
+                    <p class="text-muted">Персональный помощник для каждого студента</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5>Аналитика прогресса</h5>
+                    <p class="text-muted">Детальная статистика обучения</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h5>Мобильное приложение</h5>
+                    <p class="text-muted">Учитесь в любое время и в любом месте</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Как это работает -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="heading-modern">Как это работает</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h5>1. Регистрация</h5>
+                    <p class="text-muted">Создайте аккаунт за несколько секунд</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h5>2. Выбор предмета</h5>
+                    <p class="text-muted">Выберите интересующий вас предмет</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <h5>3. Начало обучения</h5>
+                    <p class="text-muted">Приступайте к решению заданий</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h5>4. Достижение целей</h5>
+                    <p class="text-muted">Отслеживайте свой прогресс</p>
                 </div>
             </div>
         </div>
@@ -483,13 +195,40 @@
 <!-- CTA Section -->
 <section class="py-5">
     <div class="container">
-        <div class="card-custom text-center" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
-            <h2 class="fw-bold mb-3">Начните подготовку прямо сейчас!</h2>
-            <p class="mb-4 opacity-90">Присоединяйтесь к тысячам учеников, которые уже готовятся с ExamFlow</p>
-            <a href="https://t.me/ExamFlowBot" target="_blank" class="btn btn-light btn-lg">
-                <i class="fab fa-telegram me-2"></i>
-                Открыть Telegram-бота
-            </a>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="heading-modern">Готовы начать обучение?</h2>
+                <p class="hero-subtitle">
+                    Присоединяйтесь к тысячам студентов, которые уже используют ExamFlow для подготовки к экзаменам
+                </p>
+                <a href="#features" class="btn-hero">
+                    <i class="fas fa-rocket"></i> Начать сейчас
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- QR код для Telegram бота -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <h2 class="heading-modern">Telegram бот</h2>
+                <p class="hero-subtitle">
+                    Получайте задания и подсказки прямо в Telegram
+                </p>
+                <div class="feature-card">
+                    <div class="icon">
+                        <i class="fab fa-telegram"></i>
+                    </div>
+                    <h5>@ExamFlowBot</h5>
+                    <p class="text-muted">Нажмите на кнопку ниже, чтобы начать</p>
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn btn-primary">
+                        <i class="fab fa-telegram"></i> Открыть бота
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
