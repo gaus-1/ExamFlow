@@ -5,6 +5,7 @@ from typing import Optional, Dict, Any
 from dataclasses import dataclass
 
 from django.utils import timezone
+from django.conf import settings
 
 try:
     import requests  # type: ignore
@@ -40,16 +41,27 @@ class OllamaProvider(BaseProvider):
 
     name = "ollama"
 
-    def __init__(self) -> None:
-        self.api_url = "http://localhost:11434/api/generate"
-        self.model = "llama3.1:8b"  # Легкая и быстрая модель
+    def __init__(self, model: str = None, task_type: str = 'chat') -> None:
+        # Используем настройки из Django settings
+        self.base_url = getattr(settings, 'OLLAMA_BASE_URL', 'http://127.0.0.1:11434')
+        self.api_url = f"{self.base_url}/api/generate"
+        self.timeout = getattr(settings, 'OLLAMA_TIMEOUT', 30)
+        
+        # Выбираем модель и настройки для конкретного типа задачи
+        task_configs = getattr(settings, 'OLLAMA_TASK_CONFIGS', {})
+        task_config = task_configs.get(task_type, task_configs.get('chat', {}))
+        
+        self.model = model or task_config.get('model', getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama2:7b'))
+        self.temperature = task_config.get('temperature', 0.7)
+        self.max_tokens = task_config.get('max_tokens', 1000)
+        self.system_prompt = task_config.get('system_prompt', '')
 
     def is_available(self) -> bool:
         """Проверяем доступность Ollama сервера"""
         try:
             if not requests:
                 return False
-            response = requests.get("http://localhost:11434/api/tags", timeout=5)
+            response = requests.get(f"{self.base_url}/api/tags", timeout=5)
             return response.status_code == 200
         except:
             return False
@@ -58,24 +70,32 @@ class OllamaProvider(BaseProvider):
         """Генерируем ответ через Ollama API"""
         if not self.is_available():
             return AiResult(
-                text="❌ **Ollama недоступен!**\n\nУбедитесь, что:\n1. Ollama установлен и запущен\n2. Сервер работает на localhost:11434\n3. Модель llama3.1:8b загружена\n\n**Команда для запуска:**\n```bash\nollama run llama3.1:8b\n```",
+                text=f"❌ **Ollama недоступен!**\n\nУбедитесь, что:\n1. Ollama установлен и запущен\n2. Сервер работает на {self.base_url}\n3. Модель {self.model} загружена\n\n**Команды для запуска:**\n```bash\nollama serve\nollama run {self.model}\n```",
                 tokens_used=0,
                 cost=0.0,
                 provider_name=self.name
             )
 
         try:
+            # Формируем полный промпт с системным промптом
+            full_prompt = prompt
+            if self.system_prompt:
+                full_prompt = f"{self.system_prompt}\n\nПользователь: {prompt}\n\nОтвет:"
+            
+            # Используем настройки из конфигурации
+            actual_max_tokens = min(max_tokens, self.max_tokens)
+            
             payload = {
                 "model": self.model,
-                "prompt": prompt,
+                "prompt": full_prompt,
                 "stream": False,
                 "options": {
-                    "num_predict": max_tokens,
-                    "temperature": 0.7
+                    "num_predict": actual_max_tokens,
+                    "temperature": self.temperature
                 }
             }
 
-            response = requests.post(self.api_url, json=payload, timeout=60)
+            response = requests.post(self.api_url, json=payload, timeout=self.timeout)
             
             if response.status_code == 200:
                 data = response.json()
@@ -134,6 +154,13 @@ class AiService:
         # Только Ollama - бесплатный и мощный!
         ordered: list[BaseProvider] = [OllamaProvider()]
         return ordered
+    
+    def get_provider_for_task(self, task_type: str = 'chat') -> Optional[BaseProvider]:
+        """Получить провайдера для конкретного типа задачи"""
+        provider = OllamaProvider(task_type=task_type)
+        if provider.is_available():
+            return provider
+        return None
 
     @staticmethod
     def _hash_prompt(prompt: str) -> str:
@@ -238,4 +265,68 @@ class AiService:
         # Сохраняем кэш - ВРЕМЕННО ОТКЛЮЧЕНО
         # self._set_cache(prompt, result, None)
 
+        return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}
+    
+    def chat(self, message: str, user=None, session_id: Optional[str] = None) -> Dict[str, Any]:
+        """Обычный чат с ИИ-ассистентом"""
+        return self.ask(message, user, session_id)
+    
+    def explain_task(self, task_text: str, user=None, session_id: Optional[str] = None) -> Dict[str, Any]:
+        """Объяснение решения задачи"""
+        prompt = f"Объясни подробно, как решить эту задачу:\n\n{task_text}"
+        
+        # Используем специальный провайдер для объяснения задач
+        provider = self.get_provider_for_task('task_explanation')
+        if not provider:
+            return {"error": "Нет доступных ИИ провайдеров для объяснения задач."}
+        
+        # Проверяем лимиты
+        limit = self._get_or_create_limits(user, session_id)
+        if not limit.can_make_request():
+            return {"error": "Лимит запросов на сегодня исчерпан. Попробуйте завтра."}
+        
+        # Генерируем ответ
+        result = provider.generate(prompt)
+        
+        # Логируем
+        AiRequest.objects.create(  # type: ignore
+            user=user, session_id=session_id, request_type="task_explanation", 
+            prompt=prompt, response=result.text, tokens_used=result.tokens_used, 
+            cost=result.cost, ip_address=None
+        )
+        
+        # Обновляем лимит
+        limit.current_usage += 1  # type: ignore
+        limit.save()  # type: ignore
+        
+        return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}
+    
+    def get_hint(self, task_text: str, user=None, session_id: Optional[str] = None) -> Dict[str, Any]:
+        """Получение подсказки для решения задачи"""
+        prompt = f"Дай краткую подсказку (не полное решение!) для этой задачи:\n\n{task_text}"
+        
+        # Используем специальный провайдер для подсказок
+        provider = self.get_provider_for_task('hint_generation')
+        if not provider:
+            return {"error": "Нет доступных ИИ провайдеров для генерации подсказок."}
+        
+        # Проверяем лимиты
+        limit = self._get_or_create_limits(user, session_id)
+        if not limit.can_make_request():
+            return {"error": "Лимит запросов на сегодня исчерпан. Попробуйте завтра."}
+        
+        # Генерируем ответ
+        result = provider.generate(prompt, max_tokens=300)  # Краткие подсказки
+        
+        # Логируем
+        AiRequest.objects.create(  # type: ignore
+            user=user, session_id=session_id, request_type="hint_generation", 
+            prompt=prompt, response=result.text, tokens_used=result.tokens_used, 
+            cost=result.cost, ip_address=None
+        )
+        
+        # Обновляем лимит
+        limit.current_usage += 1  # type: ignore
+        limit.save()  # type: ignore
+        
         return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}

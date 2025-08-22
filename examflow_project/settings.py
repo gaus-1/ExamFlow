@@ -398,3 +398,50 @@ LOGGING = {
 
 # Create logs directory if it doesn't exist
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+
+# ==========================================
+# НАСТРОЙКИ OLLAMA
+# ==========================================
+
+# Базовые настройки Ollama
+OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://127.0.0.1:11434')
+OLLAMA_DEFAULT_MODEL = os.getenv('OLLAMA_DEFAULT_MODEL', 'llama2:7b')
+OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '30'))
+
+# Доступные модели Ollama
+OLLAMA_MODELS = {
+    'llama2:7b': {
+        'name': 'Llama 2 7B',
+        'description': 'Быстрая и эффективная модель для общих задач',
+        'context_length': 4096,
+        'temperature': 0.7,
+    },
+    'llama3.1:8b': {
+        'name': 'Llama 3.1 8B',
+        'description': 'Более мощная модель с улучшенными возможностями',
+        'context_length': 8192,
+        'temperature': 0.7,
+    },
+}
+
+# Настройки для различных типов задач
+OLLAMA_TASK_CONFIGS = {
+    'chat': {
+        'model': OLLAMA_DEFAULT_MODEL,
+        'temperature': 0.7,
+        'max_tokens': 1000,
+        'system_prompt': 'Ты - полезный ИИ-ассистент для образовательной платформы ExamFlow. Отвечай на русском языке, будь дружелюбным и информативным.',
+    },
+    'task_explanation': {
+        'model': OLLAMA_DEFAULT_MODEL,
+        'temperature': 0.5,
+        'max_tokens': 800,
+        'system_prompt': 'Ты - преподаватель, который объясняет решения задач ЕГЭ и ОГЭ. Давай подробные, понятные объяснения на русском языке.',
+    },
+    'hint_generation': {
+        'model': OLLAMA_DEFAULT_MODEL,
+        'temperature': 0.6,
+        'max_tokens': 300,
+        'system_prompt': 'Ты даешь краткие подсказки для решения задач ЕГЭ и ОГЭ. Подсказки должны направлять ученика, но не давать полное решение.',
+    },
+}
