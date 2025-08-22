@@ -4,31 +4,51 @@
 {% block title %}ИИ-ассистент — ExamFlow{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="form-aesop mb-4">
-                <h3 class="form-title-aesop">ИИ-ассистент</h3>
-                <p class="text-aesop">Задайте вопрос по теме ЕГЭ/ОГЭ. Бесплатная версия с ограничениями. Премиум — без лимитов.</p>
-                <div id="ai-limits" class="text-aesop-small mb-2">Загрузка лимита...</div>
-                <form id="ai-form" class="mt-2">
-                    <div class="form-group-aesop">
-                        <label class="form-label-aesop">Ваш вопрос</label>
-                        <textarea id="ai-prompt" class="form-input-aesop" rows="4" placeholder="Например: Объясни теорему синусов простыми словами..."></textarea>
-                    </div>
-                    <div class="d-flex gap-2 mt-2">
-                        <button type="submit" id="ask-button" class="btn-aesop">СПРОСИТЬ</button>
-                        <a href="/ai/voice/" class="btn-aesop-outline">Голосовой</a>
-                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-aesop-outline">Telegram</a>
-                    </div>
-                </form>
-            </div>
-            <div id="ai-result" class="lesson-card-aesop d-none">
-                <h5 class="heading-aesop-3">Ответ</h5>
-                <div id="ai-answer" class="text-aesop"></div>
-                <div class="text-aesop-small mt-2" id="ai-meta"></div>
-            </div>
+<div class="ai-chat-container">
+    <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 mb-4">
+        ИИ-ассистент
+    </div>
+    
+    <div class="Paragraph_base__IUndo Paragraph_large__rowKZ mb-4">
+        Задайте вопрос по теме ЕГЭ/ОГЭ. Бесплатная версия с ограничениями. Премиум — без лимитов.
+    </div>
+    
+    <div id="ai-limits" class="Paragraph_base__IUndo mb-3" style="color: #666; font-size: 0.875rem;">
+        Загрузка лимита...
+    </div>
+    
+    <form id="ai-form" class="mb-4">
+        <div class="mb-3">
+            <label class="Paragraph_base__IUndo" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                Ваш вопрос
+            </label>
+            <textarea 
+                id="ai-prompt" 
+                class="ai-chat-input" 
+                rows="4" 
+                placeholder="Например: Объясни теорему синусов простыми словами..."
+            ></textarea>
         </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" id="ask-button" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_dark__Vllu2">
+                СПРОСИТЬ
+            </button>
+            <a href="/ai/voice/" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_light__T1UVe">
+                Голосовой
+            </a>
+            <a href="https://t.me/ExamFlowBot" target="_blank" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_light__T1UVe">
+                Telegram
+            </a>
+        </div>
+    </form>
+    
+    <div id="ai-result" class="ai-response d-none">
+        <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-3">
+            Ответ
+        </div>
+        <div id="ai-answer" class="Paragraph_base__IUndo Paragraph_large__rowKZ"></div>
+        <div id="ai-meta" class="Paragraph_base__IUndo" style="color: #666; font-size: 0.875rem; margin-top: 16px;"></div>
     </div>
 </div>
 

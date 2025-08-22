@@ -3,256 +3,133 @@
 
 {% block title %}Присоединяйтесь к ExamFlow{% endblock %}
 
-{% block extra_css %}
-<style>
-    /* Duolingo-стиль страница регистрации */
-    .auth-container {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        background: var(--bg-primary);
-        padding: 2rem 0;
-    }
-
-    .auth-hero {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .auth-hero h1 {
-        color: var(--accent-primary);
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        animation: bounceIn 0.8s ease-out;
-    }
-
-    .auth-hero p {
-        color: var(--text-secondary);
-        font-size: 1.2rem;
-        font-weight: 500;
-    }
-
-    .auth-benefits {
-        background: var(--bg-card);
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: var(--shadow-card);
-        margin-bottom: 2rem;
-        animation: bounceIn 1s ease-out;
-    }
-
-    .auth-benefits h6 {
-        color: var(--accent-primary);
-        font-weight: 700;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .auth-benefits ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .auth-benefits li {
-        color: var(--text-secondary);
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        font-weight: 500;
-    }
-
-    .auth-benefits i {
-        color: var(--accent-success);
-        margin-right: 0.75rem;
-        width: 20px;
-    }
-
-    .form-errors {
-        background: rgba(239, 68, 68, 0.1);
-        border: 2px solid rgba(239, 68, 68, 0.2);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        color: var(--accent-danger);
-        font-weight: 600;
-    }
-
-    .form-errors ul {
-        margin: 0;
-        padding-left: 1.5rem;
-    }
-
-    .auth-footer {
-        text-align: center;
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 1px solid var(--border-light);
-    }
-
-    .auth-footer a {
-        color: var(--accent-primary);
-        text-decoration: none;
-        font-weight: 600;
-        transition: var(--transition-base);
-    }
-
-    .auth-footer a:hover {
-        color: var(--accent-success);
-        transform: scale(1.05);
-    }
-
-    /* Мобильная адаптация */
-    @media (max-width: 768px) {
-        .auth-hero h1 {
-            font-size: 2rem;
-        }
-        
-        .form-container-duolingo {
-            padding: 2rem;
-            margin: 1rem;
-        }
-        
-        .auth-benefits {
-            padding: 1.5rem;
-            margin: 1rem;
-        }
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="auth-container">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <!-- Hero секция -->
-                <div class="auth-hero">
-                    <h1>
-                        <i class="fas fa-rocket me-3"></i>
-                        Присоединяйтесь к ExamFlow!
-                    </h1>
-                    <p>Всего 3 поля - и вы готовы к эффективной подготовке к ЕГЭ и ОГЭ</p>
-                </div>
+<div class="ai-chat-container" style="max-width: 1200px; margin: 40px auto;">
+    <!-- Hero секция -->
+    <div class="Heading_base__14byZ Heading_dark__VO0za Heading_xLarge__9kBY8 text-center mb-4">
+        Присоединяйтесь к ExamFlow!
+    </div>
+    
+    <div class="Paragraph_base__IUndo Paragraph_large__rowKZ text-center mb-5">
+        Всего 3 поля - и вы готовы к эффективной подготовке к ЕГЭ и ОГЭ
+    </div>
 
-                <div class="row">
-                    <!-- Форма регистрации -->
-                    <div class="col-lg-6">
-                        <div class="form-aesop">
-                            <h3 class="form-title-aesop">
-                                Создать аккаунт
-                            </h3>
-                            
-                            {% if form.errors %}
-                                <div class="form-errors">
-                                    <strong><i class="fas fa-exclamation-triangle me-2"></i>Исправьте ошибки:</strong>
-                                    {% for field, errors in form.errors.items %}
-                                        <ul>
-                                            {% for error in errors %}
-                                                <li>{{ error }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            
-                            <form method="post" id="registerForm">
-                                {% csrf_token %}
-                                
-                                <!-- Имя -->
-                                <div class="form-group-aesop">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label-aesop">
-                                        {{ form.first_name.label }}
-                                    </label>
-                                    {{ form.first_name }}
-                                </div>
-                                
-                                <!-- Email -->
-                                <div class="form-group-aesop">
-                                    <label for="{{ form.email.id_for_label }}" class="form-label-aesop">
-                                        {{ form.email.label }}
-                                    </label>
-                                    {{ form.email }}
-                                </div>
-                                
-                                <!-- Пароль -->
-                                <div class="form-group-aesop">
-                                    <label for="{{ form.password1.id_for_label }}" class="form-label-aesop">
-                                        {{ form.password1.label }}
-                                    </label>
-                                    {{ form.password1 }}
-                                </div>
-                                
-                                <!-- Подтверждение пароля -->
-                                <div class="form-group-aesop">
-                                    <label for="{{ form.password2.id_for_label }}" class="form-label-aesop">
-                                        {{ form.password2.label }}
-                                    </label>
-                                    {{ form.password2 }}
-                                </div>
-                                
-                                <!-- Кнопка регистрации -->
-                                <button type="submit" class="btn-aesop-hero w-100">
-                                    Начать обучение!
-                                </button>
-                                
-                                <div class="auth-footer">
-                                    <span style="color: var(--text-muted);">Уже есть аккаунт? </span>
-                                    <a href="{% url 'login' %}">Войти</a>
-                                </div>
-                            </form>
-                        </div>
+    <div class="AssetGrid_base__maqfC" style="grid-template-columns: 1fr 1fr; gap: 60px;">
+        <!-- Форма регистрации -->
+        <div>
+            <div class="ai-chat-container">
+                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_large__y1BpK mb-4">
+                    Создать аккаунт
+                </div>
+                
+                {% if form.errors %}
+                    <div class="ai-response" style="background: rgba(239, 68, 68, 0.1); border-left-color: #ef4444; margin-bottom: 24px;">
+                        <strong style="color: #ef4444;">Исправьте ошибки:</strong>
+                        {% for field, errors in form.errors.items %}
+                            <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                                {% for error in errors %}
+                                    <li style="color: #ef4444;">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <form method="post" id="registerForm">
+                    {% csrf_token %}
+                    
+                    <!-- Имя -->
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="Paragraph_base__IUndo" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                            {{ form.first_name.label }}
+                        </label>
+                        {{ form.first_name }}
                     </div>
                     
-                    <!-- Преимущества -->
-                    <div class="col-lg-6">
-                        <div class="lesson-card-aesop">
-                            <h4 class="heading-aesop-2">Что вы получите бесплатно</h4>
-                            <div class="text-aesop">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-tasks text-primary me-2"></i>
-                                            <span>Задания ЕГЭ и ОГЭ</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-chart-line text-primary me-2"></i>
-                                            <span>Отслеживание прогресса</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-robot text-primary me-2"></i>
-                                            <span>Telegram бот</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-trophy text-primary me-2"></i>
-                                            <span>Система достижений</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-sync text-primary me-2"></i>
-                                            <span>Синхронизация</span>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-volume-up text-primary me-2"></i>
-                                            <span>Голосовые подсказки</span>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="Paragraph_base__IUndo" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                            {{ form.email.label }}
+                        </label>
+                        {{ form.email }}
+                    </div>
+                    
+                    <!-- Пароль -->
+                    <div class="mb-3">
+                        <label for="{{ form.password1.id_for_label }}" class="Paragraph_base__IUndo" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                            {{ form.password1.label }}
+                        </label>
+                        {{ form.password1 }}
+                    </div>
+                    
+                    <!-- Подтверждение пароля -->
+                    <div class="mb-4">
+                        <label for="{{ form.password2.id_for_label }}" class="Paragraph_base__IUndo" style="display: block; margin-bottom: 8px; font-weight: 500;">
+                            {{ form.password2.label }}
+                        </label>
+                        {{ form.password2 }}
+                    </div>
+                    
+                    <!-- Кнопка регистрации -->
+                    <button type="submit" class="Button_base__7AwOF Button_blockStyle__J9_bT Button_dark__Vllu2 w-100">
+                        Начать обучение!
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <span style="color: #666;">Уже есть аккаунт? </span>
+                        <a href="{% url 'login' %}" style="color: #252525; text-decoration: underline;">Войти</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Преимущества -->
+        <div>
+            <div class="ai-chat-container">
+                <div class="Heading_base__14byZ Heading_dark__VO0za Heading_medium__wAIJJ mb-4">
+                    Что вы получите бесплатно
+                </div>
+                
+                <div class="Paragraph_base__IUndo Paragraph_large__rowKZ">
+                    <div class="AssetGrid_base__maqfC" style="grid-template-columns: 1fr 1fr; gap: 20px; padding: 0;">
+                        <div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-tasks" style="color: #252525; margin-right: 12px; width: 20px;"></i>
+                                <span>Задания ЕГЭ и ОГЭ</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-chart-line" style="color: #252525; margin-right: 12px; width: 20px;"></i>
+                                <span>Отслеживание прогресса</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-robot" style="color: #252525; margin-right: 12px; width: 20px;"></i>
+                                <span>Telegram бот</span>
                             </div>
                         </div>
-                        
-                        <!-- Дополнительная мотивация -->
-                        <div class="text-center mt-4">
-                            <p style="color: var(--text-secondary); font-weight: 500;">
-                                <i class="fas fa-clock me-2"></i>
-                                Регистрация займет меньше минуты
-                            </p>
+                        <div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-trophy" style="color: #252525; margin-right: 12px; width: 20px;"></i>
+                                <span>Система достижений</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-sync" style="color: #252525; margin-right: 12px; width: 20px;"></i>
+                                <span>Синхронизация</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-volume-up" style="color: #252525; margin-right: 12px; width: 20px;"></i>
+                                <span>Голосовые подсказки</span>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Дополнительная мотивация -->
+            <div class="text-center mt-4">
+                <p style="color: #666; font-weight: 500;">
+                    <i class="fas fa-clock me-2"></i>
+                    Регистрация займет меньше минуты
+                </p>
             </div>
         </div>
     </div>
@@ -261,15 +138,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Фокус на первое поле при загрузке
-    const firstInput = document.querySelector('.form-control-modern');
+    const firstInput = document.querySelector('input[type="text"], input[type="email"]');
     if (firstInput) {
         firstInput.focus();
     }
     
     // Анимация появления элементов
-    const elements = document.querySelectorAll('.feature-card-modern, .form-container-modern');
+    const elements = document.querySelectorAll('.ai-chat-container');
     elements.forEach((el, index) => {
-        el.classList.add('fade-in-up');
+        el.classList.add('fade-in');
         el.style.animationDelay = `${0.2 * (index + 1)}s`;
     });
 });
