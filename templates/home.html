@@ -1,139 +1,249 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}ExamFlow - Платформа для подготовки к экзаменам{% endblock %}
+{% block title %}ExamFlow - Современная платформа подготовки к ЕГЭ и ОГЭ{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="section-padding-lg text-center" style="background: #fffef2;">
     <div class="container">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6" style="color: #252525;">
-            Добро пожаловать в ExamFlow
+        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6" style="color: #252525;">
+            Современная платформа<br>подготовки к ЕГЭ и ОГЭ
         </h1>
         
-        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto" style="color: #666;">
-            Современная платформа для подготовки к экзаменам с использованием искусственного интеллекта и персонального подхода к каждому студенту
+        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed" style="color: #666;">
+            Актуальные задания на основе открытых материалов ФИПИ. Голосовые подсказки, персонализация и геймификация для максимальной эффективности.
         </p>
         
-        <a href="#features" class="btn-primary text-lg px-8 py-4">
-            Начать обучение
-        </a>
+        <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12">
+            <a href="{% url 'register' %}" class="btn-primary text-lg px-8 py-4">
+                Начать подготовку
+            </a>
+            <a href="{% url 'subjects' %}" class="btn-secondary text-lg px-8 py-4">
+                Выбрать предмет
+            </a>
+        </div>
     </div>
 </section>
 
 <!-- Статистика -->
-<section id="features" class="section-padding" style="background: #f8f8f8;">
+<section class="section-padding text-center" style="background: #fffef2;">
     <div class="container">
-        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
-            Статистика платформы
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="card text-center card-hover">
-                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
-                    {{ total_users|default:"1000+" }}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
+            <div class="text-center">
+                <div class="text-6xl md:text-7xl font-bold mb-2" style="color: #252525;">
+                    8<span class="text-4xl">+</span>
                 </div>
-                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
-                    Активных пользователей
+                <div class="text-lg font-semibold" style="color: #666;">
+                    предметов ЕГЭ/ОГЭ
                 </div>
             </div>
             
-            <div class="card text-center card-hover">
-                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
-                    {{ total_subjects|default:"8" }}
+            <div class="text-center">
+                <div class="text-6xl md:text-7xl font-bold mb-2" style="color: #252525;">
+                    10<span class="text-4xl">+</span>
                 </div>
-                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
-                    Предметов
-                </div>
-            </div>
-            
-            <div class="card text-center card-hover">
-                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
-                    {{ total_tasks|default:"1000+" }}
-                </div>
-                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
-                    Заданий
+                <div class="text-lg font-semibold" style="color: #666;">
+                    актуальных заданий
                 </div>
             </div>
             
-            <div class="card text-center card-hover">
-                <div class="text-4xl md:text-5xl font-bold mb-3" style="color: #252525;">
-                    {{ avg_score|default:"85%" }}
+            <div class="text-center">
+                <div class="text-6xl md:text-7xl font-bold mb-2" style="color: #252525;">
+                    24<span class="text-4xl">/7</span>
                 </div>
-                <div class="text-sm font-semibold" style="color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
-                    Средний балл
+                <div class="text-lg font-semibold" style="color: #666;">
+                    доступ в Telegram
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Предметы -->
-<section class="section-padding" style="background: #fffef2;">
+<!-- QR-код секция -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-4" style="color: #252525;">
+                Быстрый доступ к боту
+            </h2>
+            <p class="text-lg mb-8" style="color: #666;">
+                Отсканируйте камерой телефона
+            </p>
+            
+            <div class="bg-white rounded-2xl p-8 shadow-lg inline-block mb-6">
+                <!-- QR код placeholder -->
+                <div class="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-qrcode text-6xl" style="color: #ccc;"></i>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary text-lg px-8 py-4">
+                    Открыть бота
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Доступные предметы -->
+<section class="section-padding" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
             Доступные предметы
         </h2>
+        <p class="text-xl text-center mb-16 max-w-2xl mx-auto" style="color: #666;">
+            Выберите предмет для начала подготовки
+        </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for subject in subjects %}
             <div class="card card-hover">
-                <div class="bg-gray-100 rounded-lg h-48 flex items-center justify-center mb-6">
-                    <i class="fas fa-graduation-cap text-5xl" style="color: #999;"></i>
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">
+                        {{ subject.name }}
+                    </h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+                        ЕГЭ
+                    </span>
                 </div>
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    {{ subject.name }}
-                </h3>
-                <p class="text-lg mb-6" style="color: #666;">
-                    {{ subject.description|default:"Описание предмета" }}
+                <p class="text-sm mb-4" style="color: #666;">
+                    Задания доступны
                 </p>
-                <a href="{% url 'subject_detail' subject.id %}" class="btn-primary w-full text-center">
+                <a href="{% url 'subject_detail' subject.id %}" class="btn-primary w-full text-center text-sm">
                     Изучать
                 </a>
             </div>
             {% empty %}
-            <div class="col-span-full text-center">
-                <p class="text-lg" style="color: #999;">
-                    Предметы загружаются...
-                </p>
+            <!-- Демо предметы если нет в базе -->
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">Математика</h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
+                </div>
+                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
+                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+            </div>
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">Русский язык</h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
+                </div>
+                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
+                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+            </div>
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">Физика</h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
+                </div>
+                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
+                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+            </div>
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">Химия</h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
+                </div>
+                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
+                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+            </div>
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">Биология</h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
+                </div>
+                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
+                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+            </div>
+            <div class="card card-hover">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold" style="color: #252525;">История</h3>
+                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
+                </div>
+                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
+                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
             {% endfor %}
+        </div>
+        
+        <div class="text-center mt-12">
+            <a href="{% url 'subjects' %}" class="btn-secondary">
+                Посмотреть все предметы
+            </a>
         </div>
     </div>
 </section>
 
-<!-- Особенности платформы -->
+<!-- Преимущества ExamFlow -->
 <section class="section-padding" style="background: #f8f8f8;">
     <div class="container">
         <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
-            Особенности платформы
+            Преимущества ExamFlow
         </h2>
+        <p class="text-xl text-center mb-16 max-w-3xl mx-auto" style="color: #666;">
+            Технологии будущего для подготовки к экзаменам
+        </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div class="card text-center card-hover">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    ИИ-ассистент
+                <div class="text-4xl mb-4">📚</div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">
+                    На основе ФИПИ
                 </h3>
                 <p class="text-lg" style="color: #666;">
-                    Персональный помощник для каждого студента
+                    Задания и демоверсии, созданные на основе открытых материалов ФИПИ для эффективной подготовки
                 </p>
             </div>
             
             <div class="card text-center card-hover">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
+                <div class="text-4xl mb-4">🔊</div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">
+                    Голосовые подсказки
+                </h3>
+                <p class="text-lg" style="color: #666;">
+                    Озвучивание заданий и объяснений для лучшего восприятия материала
+                </p>
+            </div>
+            
+            <div class="card text-center card-hover">
+                <div class="text-4xl mb-4">🤖</div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">
+                    Персонализация
+                </h3>
+                <p class="text-lg" style="color: #666;">
+                    ИИ анализирует ваши ответы и создает индивидуальный план подготовки
+                </p>
+            </div>
+            
+            <div class="card text-center card-hover">
+                <div class="text-4xl mb-4">🎮</div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">
+                    Геймификация
+                </h3>
+                <p class="text-lg" style="color: #666;">
+                    Система уровней, достижений и рейтингов делает обучение увлекательным
+                </p>
+            </div>
+            
+            <div class="card text-center card-hover">
+                <div class="text-4xl mb-4">📱</div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">
+                    Telegram интеграция
+                </h3>
+                <p class="text-lg" style="color: #666;">
+                    Полноценный бот с синхронизацией прогресса и push-уведомлениями
+                </p>
+            </div>
+            
+            <div class="card text-center card-hover">
+                <div class="text-4xl mb-4">📊</div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">
                     Аналитика прогресса
                 </h3>
                 <p class="text-lg" style="color: #666;">
-                    Детальная статистика обучения
-                </p>
-            </div>
-            
-            <div class="card text-center card-hover">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    Мобильное приложение
-                </h3>
-                <p class="text-lg" style="color: #666;">
-                    Учитесь в любое время и в любом месте
+                    Детальная статистика с выявлением слабых мест и рекомендациями
                 </p>
             </div>
         </div>
@@ -143,45 +253,244 @@
 <!-- Как это работает -->
 <section class="section-padding" style="background: #fffef2;">
     <div class="container">
-        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-16" style="color: #252525;">
             Как это работает
         </h2>
+        <p class="text-xl text-center mb-16 max-w-2xl mx-auto" style="color: #666;">
+            Простой и эффективный процесс обучения
+        </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="card text-center card-hover">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    1. Регистрация
-                </h3>
-                <p class="text-lg" style="color: #666;">
-                    Создайте аккаунт за несколько секунд
-                </p>
+        <div class="space-y-20">
+            <!-- Шаг 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1">
+                    <div class="text-6xl font-bold mb-4" style="color: #252525;">01</div>
+                    <h3 class="text-3xl font-bold mb-6" style="color: #252525;">
+                        Быстрая регистрация
+                    </h3>
+                    <p class="text-xl mb-6 leading-relaxed" style="color: #666;">
+                        Всего 3 поля: имя, email и пароль. Никаких лишних вопросов - начинайте учиться через минуту после регистрации.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Простая форма регистрации</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Мгновенный доступ к заданиям</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Синхронизация с Telegram ботом</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="bg-gray-100 rounded-2xl h-80 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-user-plus text-6xl mb-4" style="color: #ccc;"></i>
+                            <p class="text-lg" style="color: #999;">Интерфейс ExamFlow</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="card text-center card-hover">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    2. Выбор предмета
-                </h3>
-                <p class="text-lg" style="color: #666;">
-                    Выберите интересующий вас предмет
-                </p>
+            <!-- Шаг 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="bg-gray-100 rounded-2xl h-80 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-users text-6xl mb-4" style="color: #ccc;"></i>
+                            <p class="text-lg" style="color: #999;">Групповое обучение</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-6xl font-bold mb-4" style="color: #252525;">02</div>
+                    <h3 class="text-3xl font-bold mb-6" style="color: #252525;">
+                        Обучение в группе
+                    </h3>
+                    <p class="text-xl mb-6 leading-relaxed" style="color: #666;">
+                        Присоединяйтесь к сообществу учеников. Решайте задания вместе, обменивайтесь опытом и мотивируйте друг друга.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Сообщество учеников</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Обмен опытом</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Соревновательный элемент</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
             
-            <div class="card text-center card-hover">
+            <!-- Шаг 3 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1">
+                    <div class="text-6xl font-bold mb-4" style="color: #252525;">03</div>
+                    <h3 class="text-3xl font-bold mb-6" style="color: #252525;">
+                        Персональный прогресс
+                    </h3>
+                    <p class="text-xl mb-6 leading-relaxed" style="color: #666;">
+                        Отслеживайте свои успехи, анализируйте слабые места и получайте персональные рекомендации для улучшения результатов.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Детальная аналитика</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Персональные рекомендации</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span style="color: #666;">Адаптивное обучение</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="bg-gray-100 rounded-2xl h-80 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line text-6xl mb-4" style="color: #ccc;"></i>
+                            <p class="text-lg" style="color: #999;">Индивидуальное обучение</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Тарифные планы -->
+<section class="section-padding" style="background: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12" style="color: #252525;">
+            Тарифные планы
+        </h2>
+        <p class="text-xl text-center mb-16 max-w-3xl mx-auto" style="color: #666;">
+            Выберите подходящий план для эффективной подготовки
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- Бесплатный план -->
+            <div class="card text-center">
                 <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    3. Начало обучения
+                    Бесплатный
                 </h3>
-                <p class="text-lg" style="color: #666;">
-                    Приступайте к решению заданий
-                </p>
+                <div class="text-4xl font-bold mb-6" style="color: #252525;">
+                    0 ₽
+                </div>
+                <ul class="space-y-3 mb-8 text-left">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">5 заданий в день</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Базовая статистика</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Доступ к боту</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Голосовые подсказки</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Персонализация</span>
+                    </li>
+                </ul>
+                <a href="{% url 'register' %}" class="btn-secondary w-full text-center">
+                    Начать бесплатно
+                </a>
             </div>
             
-            <div class="card text-center card-hover">
+            <!-- Месячный план -->
+            <div class="card text-center relative" style="border: 2px solid #252525;">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-bold">
+                    ПОПУЛЯРНЫЙ
+                </div>
                 <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                    4. Достижение целей
+                    Месячный
                 </h3>
-                <p class="text-lg" style="color: #666;">
-                    Отслеживайте свой прогресс
-                </p>
+                <div class="text-4xl font-bold mb-2" style="color: #252525;">
+                    990 ₽
+                </div>
+                <div class="text-lg mb-6" style="color: #666;">/мес</div>
+                <ul class="space-y-3 mb-8 text-left">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Неограниченные задания</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Полная статистика</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Голосовые подсказки</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">ИИ персонализация</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Приоритетная поддержка</span>
+                    </li>
+                </ul>
+                <a href="{% url 'subscribe' %}" class="btn-primary w-full text-center">
+                    Оформить подписку
+                </a>
+            </div>
+            
+            <!-- Годовой план -->
+            <div class="card text-center">
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
+                    Годовой
+                </h3>
+                <div class="text-4xl font-bold mb-2" style="color: #252525;">
+                    9900 ₽
+                </div>
+                <div class="text-lg mb-2" style="color: #666;">/год</div>
+                <div class="text-sm mb-6 text-green-600 font-semibold">
+                    Экономия 17%
+                </div>
+                <ul class="space-y-3 mb-8 text-left">
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Все возможности месячного</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Скидка 17%</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Эксклюзивный контент</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Персональный куратор</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-green-500 mr-3"></i>
+                        <span style="color: #666;">Сертификат о прохождении</span>
+                    </li>
+                </ul>
+                <a href="{% url 'subscribe' %}" class="btn-secondary w-full text-center">
+                    Купить со скидкой
+                </a>
             </div>
         </div>
     </div>
@@ -191,42 +500,97 @@
 <section class="section-padding text-center" style="background: #252525; color: #fffef2;">
     <div class="container">
         <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #fffef2;">
-            Готовы начать обучение?
+            Начните подготовку прямо сейчас!
         </h2>
         
         <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto" style="color: #bcbbb4;">
-            Присоединяйтесь к тысячам студентов, которые уже используют ExamFlow для подготовки к экзаменам
+            Присоединяйтесь к тысячам учеников, которые уже готовятся с ExamFlow
         </p>
         
-        <a href="{% url 'register' %}" class="btn-secondary text-lg px-8 py-4" style="background: #fffef2; color: #252525; border-color: #fffef2;">
-            Начать сейчас
+        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-secondary text-lg px-8 py-4" style="background: #fffef2; color: #252525; border-color: #fffef2;">
+            Открыть Telegram-бота
         </a>
     </div>
 </section>
 
-<!-- Telegram бот -->
-<section class="section-padding text-center" style="background: #fffef2;">
+<!-- Создано для успеха -->
+<section class="section-padding" style="background: #fffef2;">
     <div class="container">
-        <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #252525;">
-            Telegram бот
-        </h2>
-        
-        <p class="text-xl md:text-2xl mb-8" style="color: #666;">
-            Получайте задания и подсказки прямо в Telegram
-        </p>
-        
-        <div class="card max-w-md mx-auto">
-            <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
-                @ExamFlowBot
-            </h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-4xl md:text-5xl font-bold mb-8" style="color: #252525;">
+                    Создано для успеха
+                </h2>
+                <p class="text-xl mb-8 leading-relaxed" style="color: #666;">
+                    ExamFlow — это результат глубокого анализа потребностей современных учеников. Мы создали платформу, которая объединяет лучшие практики образования с современными технологиями.
+                </p>
+                
+                <div class="grid grid-cols-2 gap-8 mb-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2" style="color: #252525;">
+                            12<span class="text-2xl">+</span>
+                        </div>
+                        <div class="text-sm" style="color: #666;">предметов ЕГЭ/ОГЭ</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2" style="color: #252525;">
+                            1000<span class="text-2xl">+</span>
+                        </div>
+                        <div class="text-sm" style="color: #666;">активных учеников</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2" style="color: #252525;">
+                            95<span class="text-2xl">%</span>
+                        </div>
+                        <div class="text-sm" style="color: #666;">довольных пользователей</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold mb-2" style="color: #252525;">
+                            24<span class="text-2xl">/7</span>
+                        </div>
+                        <div class="text-sm" style="color: #666;">поддержка</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="text-2xl mr-4">🔬</div>
+                        <div>
+                            <h4 class="font-bold mb-1" style="color: #252525;">Научный подход</h4>
+                            <p class="text-sm" style="color: #666;">Основано на исследованиях в области педагогики</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="text-2xl mr-4">📈</div>
+                        <div>
+                            <h4 class="font-bold mb-1" style="color: #252525;">Измеримые результаты</h4>
+                            <p class="text-sm" style="color: #666;">Отслеживайте прогресс в реальном времени</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="text-2xl mr-4">👥</div>
+                        <div>
+                            <h4 class="font-bold mb-1" style="color: #252525;">Сообщество</h4>
+                            <p class="text-sm" style="color: #666;">Учитесь вместе с единомышленниками</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
-            <p class="text-lg mb-6" style="color: #666;">
-                Нажмите на кнопку ниже, чтобы начать
-            </p>
-            
-            <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary w-full text-center">
-                Открыть бота
-            </a>
+            <div class="space-y-8">
+                <div class="bg-gray-100 rounded-2xl h-48 flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-book-open text-6xl mb-4" style="color: #ccc;"></i>
+                        <p class="text-lg" style="color: #999;">Книги на подоконнике с растениями</p>
+                    </div>
+                </div>
+                <div class="bg-gray-100 rounded-2xl h-48 flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-chalkboard text-6xl mb-4" style="color: #ccc;"></i>
+                        <p class="text-lg" style="color: #999;">Школьная доска с формулами</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
