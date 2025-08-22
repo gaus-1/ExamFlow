@@ -1,0 +1,458 @@
+/* ========================================
+   СТИЛИ EXAMFLOW - АДАПТАЦИЯ AESOP
+   На основе оригинального дизайна Aesop
+   ======================================== */
+
+/* ========================================
+   КНОПКИ В СТИЛЕ AESOP
+   ======================================== */
+
+/* Основная кнопка - точная копия стиля Aesop */
+.btn-aesop {
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 0;
+    padding: 12px 24px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    text-transform: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.btn-aesop:hover {
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #000000;
+    text-decoration: none;
+}
+
+.btn-aesop:focus {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
+/* Вторичная кнопка - белая с черной рамкой */
+.btn-aesop-outline {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+    border-radius: 0;
+    padding: 12px 24px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    text-transform: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.btn-aesop-outline:hover {
+    background-color: #000000;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* Большая кнопка героя */
+.btn-aesop-hero {
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 0;
+    padding: 16px 32px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    text-transform: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+    min-width: 160px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.btn-aesop-hero:hover {
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #000000;
+    text-decoration: none;
+}
+
+/* ========================================
+   ФОРМЫ В СТИЛЕ AESOP
+   ======================================== */
+
+/* Контейнер формы */
+.form-aesop {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0;
+    padding: 40px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Заголовок формы */
+.form-title-aesop {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 32px;
+    text-align: left;
+    line-height: 1.3;
+}
+
+/* Группа полей */
+.form-group-aesop {
+    margin-bottom: 24px;
+}
+
+/* Лейблы */
+.form-label-aesop {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    display: block;
+    letter-spacing: 0.3px;
+}
+
+/* Поля ввода */
+.form-input-aesop {
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 0;
+    padding: 12px 16px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: #000000;
+    width: 100%;
+    transition: border-color 0.2s ease;
+    line-height: 1.4;
+}
+
+.form-input-aesop:focus {
+    outline: none;
+    border-color: #000000;
+}
+
+.form-input-aesop::placeholder {
+    color: #999999;
+    font-style: italic;
+}
+
+/* ========================================
+   КАРТОЧКИ ПРОДУКТОВ В СТИЛЕ AESOP
+   ======================================== */
+
+/* Карточка продукта */
+.product-card-aesop {
+    background: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: left;
+    transition: none;
+    margin-bottom: 40px;
+}
+
+/* Изображение продукта */
+.product-image-aesop {
+    width: 100%;
+    height: 300px;
+    background: #f5f5f5;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: #999999;
+}
+
+/* Название продукта */
+.product-title-aesop {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+/* Описание продукта */
+.product-description-aesop {
+    color: #666666;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+/* Цена продукта */
+.product-price-aesop {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 16px;
+}
+
+/* ========================================
+   НАВИГАЦИЯ В СТИЛЕ AESOP
+   ======================================== */
+
+/* Навигационная панель */
+.navbar-aesop {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 20px 0;
+}
+
+/* Навигационные ссылки */
+.nav-link-aesop {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    text-decoration: none;
+    padding: 8px 16px;
+    transition: color 0.2s ease;
+    letter-spacing: 0.3px;
+}
+
+.nav-link-aesop:hover {
+    color: #666666;
+    text-decoration: none;
+}
+
+.nav-link-aesop.active {
+    color: #000000;
+    text-decoration: underline;
+}
+
+/* ========================================
+   ТИПОГРАФИКА В СТИЛЕ AESOP
+   ======================================== */
+
+/* Заголовки */
+.heading-aesop-1 {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 24px;
+}
+
+.heading-aesop-2 {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 20px;
+}
+
+.heading-aesop-3 {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 16px;
+}
+
+/* Основной текст */
+.text-aesop {
+    color: #666666;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+/* Мелкий текст */
+.text-aesop-small {
+    color: #999999;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* ========================================
+   СЕТКА И МАКЕТ В СТИЛЕ AESOP
+   ======================================== */
+
+/* Контейнер */
+.container-aesop {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Сетка из двух колонок */
+.grid-aesop-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+/* Сетка из трех колонок */
+.grid-aesop-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+/* Отступы */
+.spacing-aesop-sm { margin-bottom: 16px; }
+.spacing-aesop-md { margin-bottom: 24px; }
+.spacing-aesop-lg { margin-bottom: 40px; }
+.spacing-aesop-xl { margin-bottom: 60px; }
+
+/* ========================================
+   АДАПТИВНОСТЬ
+   ======================================== */
+
+@media (max-width: 768px) {
+    .grid-aesop-2,
+    .grid-aesop-3 {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .form-aesop {
+        padding: 24px;
+    }
+    
+    .btn-aesop,
+    .btn-aesop-outline,
+    .btn-aesop-hero {
+        width: 100%;
+        padding: 14px 24px;
+    }
+    
+    .heading-aesop-1 {
+        font-size: 28px;
+    }
+    
+    .heading-aesop-2 {
+        font-size: 22px;
+    }
+    
+    .container-aesop {
+        padding: 0 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-aesop {
+        padding: 20px;
+    }
+    
+    .btn-aesop,
+    .btn-aesop-outline,
+    .btn-aesop-hero {
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+    
+    .heading-aesop-1 {
+        font-size: 24px;
+    }
+    
+    .heading-aesop-2 {
+        font-size: 20px;
+    }
+}
+
+/* ========================================
+   СПЕЦИАЛЬНЫЕ ЭЛЕМЕНТЫ ДЛЯ EXAMFLOW
+   ======================================== */
+
+/* Карточка урока в стиле Aesop */
+.lesson-card-aesop {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0;
+    padding: 32px;
+    margin-bottom: 24px;
+    transition: border-color 0.2s ease;
+}
+
+.lesson-card-aesop:hover {
+    border-color: #000000;
+}
+
+/* Статистика в стиле Aesop */
+.stats-card-aesop {
+    background: #f8f8f8;
+    border: none;
+    border-radius: 0;
+    padding: 24px;
+    text-align: center;
+}
+
+.stats-number-aesop {
+    color: #000000;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 400;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.stats-label-aesop {
+    color: #666666;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Уведомления в стиле Aesop */
+.alert-aesop {
+    background: #f8f8f8;
+    border: 1px solid #e5e5e5;
+    border-radius: 0;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.alert-aesop-success {
+    background: #f0f8f0;
+    border-color: #d0e8d0;
+}
+
+.alert-aesop-error {
+    background: #f8f0f0;
+    border-color: #e8d0d0;
+}
+
+.alert-aesop-warning {
+    background: #f8f8f0;
+    border-color: #e8e8d0;
+}

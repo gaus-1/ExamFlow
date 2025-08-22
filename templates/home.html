@@ -15,8 +15,8 @@
                 <p class="hero-subtitle">
                     Современная платформа для подготовки к экзаменам с использованием искусственного интеллекта и персонального подхода к каждому студенту
                 </p>
-                <a href="#features" class="btn-hero">
-                    <i class="fas fa-rocket"></i> Начать обучение
+                <a href="#features" class="btn-aesop-hero">
+                    Начать обучение
                 </a>
             </div>
         </div>
@@ -33,39 +33,27 @@
         </div>
         <div class="row">
             <div class="col-md-3 mb-4">
-                <div class="feature-card">
-                    <div class="icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h5>Активных пользователей</h5>
-                    <p class="text-muted">{{ total_users|default:"1000+" }}</p>
+                <div class="stats-card-aesop">
+                    <span class="stats-number-aesop">{{ total_users|default:"1000+" }}</span>
+                    <span class="stats-label-aesop">Активных пользователей</span>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="feature-card">
-                    <div class="icon">
-                        <i class="fas fa-book"></i>
-                    </div>
-                    <h5>Предметов</h5>
-                    <p class="text-muted">{{ total_subjects|default:"8" }}</p>
+                <div class="stats-card-aesop">
+                    <span class="stats-number-aesop">{{ total_subjects|default:"8" }}</span>
+                    <span class="stats-label-aesop">Предметов</span>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="feature-card">
-                    <div class="icon">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <h5>Заданий</h5>
-                    <p class="text-muted">{{ total_tasks|default:"1000+" }}</p>
+                <div class="stats-card-aesop">
+                    <span class="stats-number-aesop">{{ total_tasks|default:"1000+" }}</span>
+                    <span class="stats-label-aesop">Заданий</span>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
-                <div class="feature-card">
-                    <div class="icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <h5>Средний балл</h5>
-                    <p class="text-muted">{{ avg_score|default:"85%" }}</p>
+                <div class="stats-card-aesop">
+                    <span class="stats-number-aesop">{{ avg_score|default:"85%" }}</span>
+                    <span class="stats-label-aesop">Средний балл</span>
                 </div>
             </div>
         </div>
@@ -83,13 +71,13 @@
         <div class="row">
             {% for subject in subjects %}
             <div class="col-md-4 mb-4">
-                <div class="feature-card">
-                    <div class="icon">
+                <div class="product-card-aesop">
+                    <div class="product-image-aesop">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <h5>{{ subject.name }}</h5>
-                    <p class="text-muted">{{ subject.description|default:"Описание предмета" }}</p>
-                    <a href="{% url 'subject_detail' subject.id %}" class="btn btn-primary btn-sm">
+                    <h5 class="product-title-aesop">{{ subject.name }}</h5>
+                    <p class="product-description-aesop">{{ subject.description|default:"Описание предмета" }}</p>
+                    <a href="{% url 'subject_detail' subject.id %}" class="btn-aesop">
                         Изучать
                     </a>
                 </div>

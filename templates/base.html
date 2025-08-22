@@ -45,6 +45,8 @@
     <link rel="stylesheet" href="{% static 'css/themes.css' %}">
     <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
     <link rel="stylesheet" href="{% static 'css/modern-styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/aesop-inspired.css' %}">
+    <link rel="stylesheet" href="{% static 'css/aesop-real-styles.css' %}">
     
     <!-- Дополнительные стили для плавных переходов -->
     <style>
@@ -323,10 +325,10 @@
     </div>
 
     <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg navbar-modern">
+    <nav class="navbar navbar-expand-lg navbar-aesop">
         <div class="container">
-            <a class="navbar-brand navbar-brand-modern" href="{% url 'home' %}">
-                <i class="fas fa-graduation-cap"></i>ExamFlow
+            <a class="navbar-brand" href="{% url 'home' %}" style="color: #000000; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 24px; font-weight: 400; text-decoration: none;">
+                ExamFlow
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -336,28 +338,33 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link nav-link-modern" href="{% url 'home' %}">
-                            <i class="fas fa-home me-1"></i>Главная
+                        <a class="nav-link nav-link-aesop" href="{% url 'home' %}">
+                            Главная
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-modern" href="{% url 'subjects' %}">
-                            <i class="fas fa-book me-1"></i>Предметы
+                        <a class="nav-link nav-link-aesop" href="{% url 'subjects' %}">
+                            Предметы
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-modern" href="{% url 'learning:random_task' %}">
-                            <i class="fas fa-random me-1"></i>Случайное
+                        <a class="nav-link nav-link-aesop" href="{% url 'learning:random_task' %}">
+                            Случайное
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-modern" href="{% url 'api_statistics' %}">
-                            <i class="fas fa-chart-bar me-1"></i>Статистика
+                        <a class="nav-link nav-link-aesop" href="{% url 'api_statistics' %}">
+                            Статистика
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-modern" href="{% url 'ai:chat' %}">
-                            <i class="fas fa-brain me-1"></i>ИИ Помощник
+                        <a class="nav-link nav-link-aesop" href="{% url 'ai:chat' %}">
+                            ИИ Помощник
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-aesop" href="{% url 'aesop_showcase' %}">
+                            Стили
                         </a>
                     </li>
                 </ul>

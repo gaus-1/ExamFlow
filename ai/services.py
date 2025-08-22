@@ -35,106 +35,93 @@ class BaseProvider:
         raise NotImplementedError
 
 
-class LocalSimpleProvider(BaseProvider):
-    """Локальный бесплатный провайдер (правила/заглушка). Не требует интернета и денег."""
+class OllamaProvider(BaseProvider):
+    """Провайдер Ollama - бесплатный локальный ИИ!"""
 
-    name = "local-simple"
-
-    def generate(self, prompt: str, max_tokens: int = 512) -> AiResult:
-        # Простейшая имитация рассуждения: перефразирование и структурирование
-        prompt_clean = prompt.strip()
-        if not prompt_clean:
-            return AiResult(text="Пожалуйста, напишите ваш вопрос подробнее.")
-
-        base_reply = (
-            "Я понял запрос. Ниже краткий план ответа:\n"
-            "1) Определим цель вопроса.\n"
-            "2) Разложим на шаги решение.\n"
-            "3) Дадим пример и проверку.\n\n"
-        )
-        text = f"{base_reply}Ваш запрос: {prompt_clean}\n\nПредварительный ответ: этот модуль в стадии разработки. " \
-            f"Скоро здесь будет развёрнутая подсказка с примерами."
-        return AiResult(text=text, tokens_used=len(prompt_clean.split()), cost=0.0, provider_name=self.name)
-
-
-class DeepSeekProvider(BaseProvider):
-    """DeepSeek Chat (при наличии ключа)."""
-
-    name = "deepseek"
+    name = "ollama"
 
     def __init__(self) -> None:
-        self.api_key = os.getenv("DEEPSEEK_API_KEY", "")
-        self.api_url = os.getenv("DEEPSEEK_API_URL", "https://api.deepseek.com/chat/completions")
+        self.api_url = "http://localhost:11434/api/generate"
+        self.model = "llama3.1:8b"  # Легкая и быстрая модель
 
     def is_available(self) -> bool:
-        return bool(self.api_key and requests)
+        """Проверяем доступность Ollama сервера"""
+        try:
+            if not requests:
+                return False
+            response = requests.get("http://localhost:11434/api/tags", timeout=5)
+            return response.status_code == 200
+        except:
+            return False
 
     def generate(self, prompt: str, max_tokens: int = 512) -> AiResult:
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-        payload = {
-            "model": os.getenv("DEEPSEEK_MODEL", "deepseek-chat"),
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens,
-        }
-        try:
-            resp = requests.post(self.api_url, headers=headers, json=payload, timeout=30)  # type: ignore
-            resp.raise_for_status()
-            data = resp.json()
-            # Унифицированный разбор; формат может отличаться — оставляем гибко
-            text = (
-                data.get("choices", [{}])[0]
-                .get("message", {})
-                .get("content", "")
+        """Генерируем ответ через Ollama API"""
+        if not self.is_available():
+            return AiResult(
+                text="❌ **Ollama недоступен!**\n\nУбедитесь, что:\n1. Ollama установлен и запущен\n2. Сервер работает на localhost:11434\n3. Модель llama3.1:8b загружена\n\n**Команда для запуска:**\n```bash\nollama run llama3.1:8b\n```",
+                tokens_used=0,
+                cost=0.0,
+                provider_name=self.name
             )
-            usage = data.get("usage", {})
-            tokens = int(usage.get("total_tokens", 0))
-            return AiResult(text=text or "", tokens_used=tokens, cost=0.0, provider_name=self.name)
-        except Exception:
-            # При ошибке — даём мягкий откат на локальный провайдер
-            fallback = LocalSimpleProvider()
-            return fallback.generate(prompt, max_tokens)
 
-
-class GigaChatProvider(BaseProvider):
-    """GigaChat (при наличии ключа)."""
-
-    name = "gigachat"
-
-    def __init__(self) -> None:
-        self.api_key = os.getenv("GIGACHAT_API_KEY", "")
-        self.api_url = os.getenv("GIGACHAT_API_URL", "https://gigachat.devices.sberbank.ru/api/v1/chat/completions")
-
-    def is_available(self) -> bool:
-        return bool(self.api_key and requests)
-
-    def generate(self, prompt: str, max_tokens: int = 512) -> AiResult:
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-        payload = {
-            "model": os.getenv("GIGACHAT_MODEL", "GigaChat:latest"),
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens,
-        }
         try:
-            resp = requests.post(self.api_url, headers=headers, json=payload, timeout=30)  # type: ignore
-            resp.raise_for_status()
-            data = resp.json()
-            text = (
-                data.get("choices", [{}])[0]
-                .get("message", {})
-                .get("content", "")
+            payload = {
+                "model": self.model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "num_predict": max_tokens,
+                    "temperature": 0.7
+                }
+            }
+
+            response = requests.post(self.api_url, json=payload, timeout=60)
+            
+            if response.status_code == 200:
+                data = response.json()
+                text = data.get("response", "")
+                tokens_used = len(prompt.split()) + len(text.split())
+                
+                return AiResult(
+                    text=text,
+                    tokens_used=tokens_used,
+                    cost=0.0,  # Ollama бесплатный!
+                    provider_name=self.name
+                )
+            else:
+                return AiResult(
+                    text=f"❌ **Ошибка Ollama API: {response.status_code}**\n\nПопробуйте перезапустить Ollama сервер.",
+                    tokens_used=0,
+                    cost=0.0,
+                    provider_name=self.name
+                )
+                
+        except requests.exceptions.RequestException as e:
+            return AiResult(
+                text=f"❌ **Ошибка сети Ollama:** {str(e)}\n\nПроверьте, что Ollama сервер запущен.",
+                tokens_used=0,
+                cost=0.0,
+                provider_name=self.name
             )
-            usage = data.get("usage", {})
-            tokens = int(usage.get("total_tokens", 0))
-            return AiResult(text=text or "", tokens_used=tokens, cost=0.0, provider_name=self.name)
-        except Exception:
-            fallback = LocalSimpleProvider()
-            return fallback.generate(prompt, max_tokens)
+        except Exception as e:
+            return AiResult(
+                text=f"❌ **Неожиданная ошибка Ollama:** {str(e)}\n\nПопробуйте перезапустить сервер.",
+                tokens_used=0,
+                cost=0.0,
+                provider_name=self.name
+            )
+
+
+
+
+
+# DeepSeekProvider удален - заменен на Ollama
+
+
+
+
+
+
 
 
 class AiService:
@@ -144,9 +131,8 @@ class AiService:
         self.providers: list[BaseProvider] = self._load_providers()
 
     def _load_providers(self) -> list[BaseProvider]:
-        # Порядок важен: сначала бесплатные локальные, затем внешние
-        ordered: list[BaseProvider] = [LocalSimpleProvider(), DeepSeekProvider(), GigaChatProvider()]
-        # Можно ещё учитывать приоритеты из БД AiProvider
+        # Только Ollama - бесплатный и мощный!
+        ordered: list[BaseProvider] = [OllamaProvider()]
         return ordered
 
     @staticmethod
@@ -204,39 +190,31 @@ class AiService:
         if not limit.can_make_request():
             return {"error": "Лимит запросов на сегодня исчерпан. Попробуйте завтра."}
 
-        # Кэш ответа
-        if use_cache:
-            cached = self._get_cache(prompt)
-            if cached:
-                cached.increment_usage()
-                AiRequest.objects.create(  # type: ignore
-                    user=user, session_id=session_id, request_type="question", prompt=prompt,
-                    response=cached.response, tokens_used=cached.tokens_used, cost=0, ip_address=None
-                )
-                limit.current_usage += 1  # type: ignore
-                limit.save()  # type: ignore
-                return {"response": cached.response, "provider": cached.provider.name, "cached": True, "tokens_used": cached.tokens_used}
+        # Кэш ответа - ВРЕМЕННО ОТКЛЮЧЕН
+        # if use_cache:
+        #     cached = self._get_cache(prompt)
+        #     if cached:
+        #         cached.increment_usage()
+        #         AiRequest.objects.create(  # type: ignore
+        #             user=user, session_id=session_id, request_type="question", prompt=prompt,
+        #             response=cached.response, tokens_used=cached.tokens_used, cost=0, ip_address=None
+        #         )
+        #         limit.current_usage += 1  # type: ignore
+        #         limit.save()  # type: ignore
+        #         return {"response": cached.response, "provider": cached.provider.name if cached.provider else "local", "cached": True, "tokens_used": cached.tokens_used}
 
-        # Выбор провайдера: сначала БД активных, затем локально определённые
-        provider_obj = AiProvider.objects.filter(is_active=True).order_by("priority").first()  # type: ignore
-        provider_client: BaseProvider
-        if provider_obj:
-            # Мэпим тип на клиента
-            mapping = {
-                "deepseek": DeepSeekProvider,
-                "gigachat": GigaChatProvider,
-                "fallback": LocalSimpleProvider,
-                "llama": LocalSimpleProvider,   # заглушки на локальные модели
-                "falcon": LocalSimpleProvider,
-            }
-            provider_client = mapping.get(provider_obj.provider_type, LocalSimpleProvider)()
-        else:
-            # Если нет записей в БД — используем порядок по умолчанию
-            provider_client = LocalSimpleProvider()
-
-        # Если выбранный клиент недоступен — fallback
-        if not provider_client.is_available():
-            provider_client = LocalSimpleProvider()
+        # Выбор провайдера: используем локальный список в порядке приоритета
+        provider_client = None
+        
+        # Проходим по провайдерам в порядке приоритета
+        for provider in self.providers:
+            if provider.is_available():
+                provider_client = provider
+                break
+        
+        # Если ни один не доступен, возвращаем ошибку
+        if not provider_client:
+            return {"error": "Нет доступных ИИ провайдеров. Проверьте настройки API."}
 
         # Генерация ответа
         result = provider_client.generate(prompt)
@@ -257,7 +235,7 @@ class AiService:
         limit.current_usage += 1  # type: ignore
         limit.save()  # type: ignore
 
-        # Сохраняем кэш
-        self._set_cache(prompt, result, provider_obj)
+        # Сохраняем кэш - ВРЕМЕННО ОТКЛЮЧЕНО
+        # self._set_cache(prompt, result, None)
 
         return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}

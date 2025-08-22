@@ -49,37 +49,10 @@ def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
 @receiver(post_save, sender=AiRequest)
 def update_provider_statistics(sender, instance, **kwargs):
     """Обновляет статистику провайдера ИИ после каждого запроса"""
-    if instance.provider:
-        try:
-            provider = instance.provider
-            
-            # Обновляем счетчик использования
-            provider.daily_usage += 1
-            provider.last_used = timezone.now()
-            
-            # Обновляем среднее время ответа (если есть)
-            if hasattr(instance, 'response_time') and instance.response_time:
-                if provider.response_time_avg:
-                    # Вычисляем новое среднее
-                    total_time = provider.response_time_avg * (provider.daily_usage - 1)
-                    new_avg = (total_time + instance.response_time) / provider.daily_usage
-                    provider.response_time_avg = new_avg
-                else:
-                    provider.response_time_avg = instance.response_time
-            
-            # Обновляем процент успешных запросов
-            if instance.response:
-                success_count = AiRequest.objects.filter(  # type: ignore[attr-defined]
-                    provider=provider,
-                    response__isnull=False,
-                    created_at__date=timezone.now().date()
-                ).count()
-                provider.success_rate = (success_count / provider.daily_usage) * 100
-            
-            provider.save()
-            
-        except Exception as e:
-            logger.error(f"Ошибка при обновлении статистики провайдера: {e}")
+    # Временно отключаем обновление статистики провайдера
+    # так как у AiRequest нет поля provider
+    # TODO: Добавить поле provider в модель или переработать логику
+    pass
 
 
 # ========================================

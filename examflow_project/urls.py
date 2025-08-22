@@ -91,6 +91,10 @@ urlpatterns = [
     
     # Тестирование тем
     path('test-themes/', lambda request: render(request, 'test_themes.html'), name='test_themes'),
+    
+    # Демонстрация стилей
+    path('style-showcase/', lambda request: render(request, 'style-showcase.html'), name='style_showcase'),
+    path('aesop-showcase/', lambda request: render(request, 'aesop-showcase.html'), name='aesop_showcase'),
 ]
 
 if settings.DEBUG:

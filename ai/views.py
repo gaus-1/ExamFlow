@@ -7,6 +7,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib import messages
+from django.utils import timezone
 import json
 import logging
 
@@ -16,7 +17,10 @@ try:
     # Сервис ИИ: провайдеры, кэш и лимиты
     from .services import AiService
     ai_service = AiService()
-except Exception:
+except Exception as e:
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.error(f"Ошибка импорта AiService: {e}")
     ai_service = None  # Фолбэк, чтобы не падать на импорте
 
 from .models import AiLimit  # для получения лимитов
@@ -26,7 +30,6 @@ from .models import AiLimit  # для получения лимитов
 # ОСНОВНЫЕ СТРАНИЦЫ ИИ
 # ========================================
 
-@login_required
 def ai_dashboard(request):
     """Главная страница ИИ-ассистента"""
     context = {
@@ -207,7 +210,6 @@ def api_generate(request):
 # УПРАВЛЕНИЕ ЛИМИТАМИ
 # ========================================
 
-@login_required
 def ai_limits(request):
     """Страница управления лимитами ИИ"""
     context = {
@@ -262,7 +264,6 @@ def api_limits(request):
 # ГОЛОСОВОЙ ПОМОЩНИК
 # ========================================
 
-@login_required
 def voice_assistant(request):
     """Страница голосового помощника"""
     context = {

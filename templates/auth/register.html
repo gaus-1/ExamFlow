@@ -140,8 +140,8 @@
                 <div class="row">
                     <!-- Форма регистрации -->
                     <div class="col-lg-6">
-                        <div class="form-container-duolingo">
-                            <h3 class="text-center mb-4" style="color: var(--text-primary); font-weight: 700;">
+                        <div class="form-aesop">
+                            <h3 class="form-title-aesop">
                                 Создать аккаунт
                             </h3>
                             
@@ -162,40 +162,39 @@
                                 {% csrf_token %}
                                 
                                 <!-- Имя -->
-                                <div class="mb-3">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label-duolingo">
-                                        <i class="fas fa-user me-2"></i>{{ form.first_name.label }}
+                                <div class="form-group-aesop">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label-aesop">
+                                        {{ form.first_name.label }}
                                     </label>
                                     {{ form.first_name }}
                                 </div>
                                 
                                 <!-- Email -->
-                                <div class="mb-3">
-                                    <label for="{{ form.email.id_for_label }}" class="form-label-duolingo">
-                                        <i class="fas fa-envelope me-2"></i>{{ form.email.label }}
+                                <div class="form-group-aesop">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label-aesop">
+                                        {{ form.email.label }}
                                     </label>
                                     {{ form.email }}
                                 </div>
                                 
                                 <!-- Пароль -->
-                                <div class="mb-3">
-                                    <label for="{{ form.password1.id_for_label }}" class="form-label-duolingo">
-                                        <i class="fas fa-lock me-2"></i>{{ form.password1.label }}
+                                <div class="form-group-aesop">
+                                    <label for="{{ form.password1.id_for_label }}" class="form-label-aesop">
+                                        {{ form.password1.label }}
                                     </label>
                                     {{ form.password1 }}
                                 </div>
                                 
                                 <!-- Подтверждение пароля -->
-                                <div class="mb-4">
-                                    <label for="{{ form.password2.id_for_label }}" class="form-label-duolingo">
-                                        <i class="fas fa-lock me-2"></i>{{ form.password2.label }}
+                                <div class="form-group-aesop">
+                                    <label for="{{ form.password2.id_for_label }}" class="form-label-aesop">
+                                        {{ form.password2.label }}
                                     </label>
                                     {{ form.password2 }}
                                 </div>
                                 
                                 <!-- Кнопка регистрации -->
-                                <button type="submit" class="btn-neon w-100 mb-3">
-                                    <i class="fas fa-user-plus me-2"></i>
+                                <button type="submit" class="btn-aesop-hero w-100">
                                     Начать обучение!
                                 </button>
                                 
@@ -209,41 +208,44 @@
                     
                     <!-- Преимущества -->
                     <div class="col-lg-6">
-                        <div class="auth-benefits">
-                            <h6>
-                                <i class="fas fa-gift me-2"></i>
-                                Что вы получите бесплатно:
-                            </h6>
-                            <ul>
-                                <li>
-                                    <i class="fas fa-tasks"></i>
-                                    Доступ к заданиям ЕГЭ и ОГЭ
-                                </li>
-                                <li>
-                                    <i class="fas fa-chart-line"></i>
-                                    Отслеживание прогресса
-                                </li>
-                                <li>
-                                    <i class="fas fa-robot"></i>
-                                    Telegram бот с уведомлениями
-                                </li>
-                                <li>
-                                    <i class="fas fa-trophy"></i>
-                                    Система достижений
-                                </li>
-                                <li>
-                                    <i class="fas fa-sync"></i>
-                                    Синхронизация на всех устройствах
-                                </li>
-                                <li>
-                                    <i class="fas fa-volume-up"></i>
-                                    Голосовые подсказки (Premium)
-                                </li>
-                            </ul>
+                        <div class="lesson-card-aesop">
+                            <h4 class="heading-aesop-2">Что вы получите бесплатно</h4>
+                            <div class="text-aesop">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-tasks text-primary me-2"></i>
+                                            <span>Задания ЕГЭ и ОГЭ</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-chart-line text-primary me-2"></i>
+                                            <span>Отслеживание прогресса</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-robot text-primary me-2"></i>
+                                            <span>Telegram бот</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-trophy text-primary me-2"></i>
+                                            <span>Система достижений</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-sync text-primary me-2"></i>
+                                            <span>Синхронизация</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-volume-up text-primary me-2"></i>
+                                            <span>Голосовые подсказки</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Дополнительная мотивация -->
-                        <div class="text-center">
+                        <div class="text-center mt-4">
                             <p style="color: var(--text-secondary); font-weight: 500;">
                                 <i class="fas fa-clock me-2"></i>
                                 Регистрация займет меньше минуты
@@ -259,14 +261,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Фокус на первое поле при загрузке
-    const firstInput = document.querySelector('.form-control-duolingo');
+    const firstInput = document.querySelector('.form-control-modern');
     if (firstInput) {
         firstInput.focus();
     }
     
     // Анимация появления элементов
-    const elements = document.querySelectorAll('.auth-benefits, .form-container-duolingo');
+    const elements = document.querySelectorAll('.feature-card-modern, .form-container-modern');
     elements.forEach((el, index) => {
+        el.classList.add('fade-in-up');
         el.style.animationDelay = `${0.2 * (index + 1)}s`;
     });
 });

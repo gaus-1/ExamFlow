@@ -7,30 +7,33 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card-modern mb-4">
-                <h3 class="mb-3"><i class="fas fa-robot me-2"></i> ИИ-ассистент</h3>
-                <p class="text-secondary">Задайте вопрос по теме ЕГЭ/ОГЭ. Бесплатная версия с ограничениями. Премиум — без лимитов.</p>
-                <div id="ai-limits" class="small text-muted mb-2">Загрузка лимита...</div>
+            <div class="form-aesop mb-4">
+                <h3 class="form-title-aesop">ИИ-ассистент</h3>
+                <p class="text-aesop">Задайте вопрос по теме ЕГЭ/ОГЭ. Бесплатная версия с ограничениями. Премиум — без лимитов.</p>
+                <div id="ai-limits" class="text-aesop-small mb-2">Загрузка лимита...</div>
                 <form id="ai-form" class="mt-2">
-                    <label class="form-label">Ваш вопрос</label>
-                    <textarea id="ai-prompt" class="form-control" rows="4" placeholder="Например: Объясни теорему синусов простыми словами..."></textarea>
+                    <div class="form-group-aesop">
+                        <label class="form-label-aesop">Ваш вопрос</label>
+                        <textarea id="ai-prompt" class="form-input-aesop" rows="4" placeholder="Например: Объясни теорему синусов простыми словами..."></textarea>
+                    </div>
                     <div class="d-flex gap-2 mt-2">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-2"></i>Спросить</button>
-                        <a href="/ai/voice/" class="btn btn-secondary"><i class="fas fa-microphone me-2"></i>Голосовой</a>
-                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn btn-info"><i class="fab fa-telegram me-2"></i>Telegram</a>
+                        <button type="submit" id="ask-button" class="btn-aesop">СПРОСИТЬ</button>
+                        <a href="/ai/voice/" class="btn-aesop-outline">Голосовой</a>
+                        <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-aesop-outline">Telegram</a>
                     </div>
                 </form>
             </div>
-            <div id="ai-result" class="card-modern d-none">
-                <h5 class="mb-3">Ответ</h5>
-                <div id="ai-answer" class="text-body"></div>
-                <div class="small text-muted mt-2" id="ai-meta"></div>
+            <div id="ai-result" class="lesson-card-aesop d-none">
+                <h5 class="heading-aesop-3">Ответ</h5>
+                <div id="ai-answer" class="text-aesop"></div>
+                <div class="text-aesop-small mt-2" id="ai-meta"></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Загрузка лимитов
     async function loadLimits() {
         try {
             const res = await fetch('/ai/api/limits/');
@@ -38,33 +41,88 @@
             const d = data.daily || { used: 0, max: 0, remaining: 0 };
             document.getElementById('ai-limits').textContent = `Лимит на сегодня: ${d.used}/${d.max}. Осталось: ${d.remaining}`;
         } catch (e) {
-            document.getElementById('ai-limits').textContent = '';
+            document.getElementById('ai-limits').textContent = 'Лимит: недоступен';
         }
     }
-    loadLimits();
 
-    document.getElementById('ai-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // Отправка вопроса
+    async function sendQuestion() {
         const prompt = document.getElementById('ai-prompt').value.trim();
-        if (!prompt) return;
-        const btn = e.submitter; if (btn) btn.disabled = true;
+        if (!prompt) {
+            alert('Введите вопрос!');
+            return;
+        }
+
+        const askButton = document.getElementById('ask-button');
+        const originalText = askButton.textContent;
+        
+        // Блокируем кнопку и показываем загрузку
+        askButton.disabled = true;
+        askButton.textContent = 'Обрабатываю...';
+        
         try {
+            // Показываем результат
+            document.getElementById('ai-result').classList.remove('d-none');
+            document.getElementById('ai-answer').textContent = '🤔 Думаю над ответом...';
+            document.getElementById('ai-meta').textContent = '';
+
             const res = await fetch('/ai/api/chat/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/)||[])[1] },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRFToken': (document.cookie.match(/csrftoken=([^;]+)/)||[])[1] 
+                },
                 body: JSON.stringify({ prompt })
             });
+
             const data = await res.json();
-            document.getElementById('ai-answer').textContent = data.response || data.error || 'Ошибка';
+            
+            if (data.error) {
+                document.getElementById('ai-answer').textContent = `❌ Ошибка: ${data.error}`;
+            } else {
+                document.getElementById('ai-answer').textContent = data.response || 'Ответ получен';
+            }
+            
             document.getElementById('ai-meta').textContent = `Токенов: ${data.tokens_used || 0}`;
-            document.getElementById('ai-result').classList.remove('d-none');
+            
+            // Обновляем лимиты
             loadLimits();
+            
         } catch (e) {
-            document.getElementById('ai-answer').textContent = 'Сеть недоступна';
-            document.getElementById('ai-result').classList.remove('d-none');
+            console.error('Ошибка:', e);
+            document.getElementById('ai-answer').textContent = '❌ Ошибка сети. Проверьте подключение.';
+            document.getElementById('ai-meta').textContent = '';
         } finally {
-            if (btn) btn.disabled = false;
+            // Восстанавливаем кнопку
+            askButton.disabled = false;
+            askButton.textContent = originalText;
         }
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        // Загружаем лимиты
+        loadLimits();
+        
+        // Обработчик отправки формы
+        document.getElementById('ai-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendQuestion();
+        });
+        
+        // Обработчик нажатия Enter в текстовом поле
+        document.getElementById('ai-prompt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendQuestion();
+            }
+        });
+        
+        // Обработчик клика по кнопке (дополнительная защита)
+        document.getElementById('ask-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            sendQuestion();
+        });
     });
 </script>
 {% endblock %}
