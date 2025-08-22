@@ -36,7 +36,6 @@ def ai_dashboard(request):
     return render(request, 'ai/dashboard.html', context)
 
 
-@login_required
 def ai_chat(request):
     """Страница чата с ИИ"""
     context = {
@@ -46,7 +45,6 @@ def ai_chat(request):
     return render(request, 'ai/chat.html', context)
 
 
-@login_required
 def ai_explain(request):
     """Страница объяснения тем ИИ"""
     context = {
@@ -56,7 +54,6 @@ def ai_explain(request):
     return render(request, 'ai/explain.html', context)
 
 
-@login_required
 def ai_search(request):
     """Страница поиска заданий ИИ"""
     context = {
@@ -66,7 +63,6 @@ def ai_search(request):
     return render(request, 'ai/search.html', context)
 
 
-@login_required
 def ai_generate(request):
     """Страница генерации заданий ИИ"""
     context = {

@@ -7,20 +7,20 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card-tech mb-4">
+            <div class="card-modern mb-4">
                 <h3 class="mb-3"><i class="fas fa-microphone me-2"></i> Голосовой помощник</h3>
                 <p class="text-secondary">Нажмите “Слушать”, задайте вопрос голосом. Если распознавание недоступно в браузере — используйте ввод текста.</p>
                 <div class="d-flex gap-2 mb-3">
-                    <button id="btn-listen" class="btn-neon"><i class="fas fa-play me-2"></i>Слушать</button>
-                    <button id="btn-stop" class="btn-secondary-duolingo"><i class="fas fa-stop me-2"></i>Стоп</button>
+                    <button id="btn-listen" class="btn btn-primary"><i class="fas fa-play me-2"></i>Слушать</button>
+                    <button id="btn-stop" class="btn btn-secondary"><i class="fas fa-stop me-2"></i>Стоп</button>
                 </div>
-                <label class="form-label-duolingo">Распознанный текст</label>
-                <textarea id="voice-text" class="form-control-duolingo" rows="3" placeholder="Скажите или напишите вопрос..."></textarea>
+                <label class="form-label">Распознанный текст</label>
+                <textarea id="voice-text" class="form-control" rows="3" placeholder="Скажите или напишите вопрос..."></textarea>
                 <div class="mt-2">
-                    <button id="btn-ask" class="btn-neon"><i class="fas fa-paper-plane me-2"></i>Спросить ИИ</button>
+                    <button id="btn-ask" class="btn btn-primary"><i class="fas fa-paper-plane me-2"></i>Спросить ИИ</button>
                 </div>
             </div>
-            <div id="voice-result" class="card-tech d-none">
+            <div id="voice-result" class="card-modern d-none">
                 <h5 class="mb-3">Ответ</h5>
                 <div id="voice-answer" class="text-body"></div>
             </div>
