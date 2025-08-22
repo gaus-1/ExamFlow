@@ -406,7 +406,7 @@ os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 # Базовые настройки Ollama
 OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://127.0.0.1:11434')
 OLLAMA_DEFAULT_MODEL = os.getenv('OLLAMA_DEFAULT_MODEL', 'llama2:7b')
-OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '30'))
+OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '60'))
 
 # Доступные модели Ollama
 OLLAMA_MODELS = {
