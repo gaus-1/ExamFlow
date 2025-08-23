@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.decorators.cache import cache_page
 from django.core import management
-from .models import Task, Subject
+from learning.models import Task, Subject
 from .utils import generate_qr_code
 
 

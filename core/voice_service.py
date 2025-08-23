@@ -203,7 +203,7 @@ voice_service = VoiceService()
 
 def generate_task_voices():
     """Генерирует голосовые файлы для всех активных заданий"""
-    from .models import Task
+    from learning.models import Task
     
     logger.info("Начинаем генерацию голосовых файлов...")
     

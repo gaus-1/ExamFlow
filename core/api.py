@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Q
-from .models import Subject, Task
+from learning.models import Subject, Task
 
 
 def _serialize_task(task: Task) -> dict:

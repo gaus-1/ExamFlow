@@ -15,10 +15,11 @@ from django.db.models import Count, Avg, Q
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
-from core.models import (
+from learning.models import (
     Subject, Task, UserProgress, UserRating, 
-    Achievement, Topic, Subscription
+    Achievement, Topic
 )
+from authentication.models import Subscription
 
 
 def is_staff_or_superuser(user):

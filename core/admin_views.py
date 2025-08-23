@@ -11,7 +11,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.management import call_command
 from django.shortcuts import render
-from core.models import Subject, Task
+from learning.models import Subject, Task
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ _parsing_status = {
 def admin_panel(request):
     """Административная панель управления"""
     try:
-        from core.models import Subject, Task
+        from learning.models import Subject, Task
         subjects_count = Subject.objects.count()  # type: ignore
     except Exception:
         subjects_count = 0
@@ -125,7 +125,7 @@ def start_parsing(request):
                     logger.warning(f"Ошибка генерации голоса: {str(e)}")
             
             # Финиш
-            from core.models import Subject, Task
+            from learning.models import Subject, Task
             subjects_count = Subject.objects.count()  # type: ignore
             tasks_count = Task.objects.count()  # type: ignore
             

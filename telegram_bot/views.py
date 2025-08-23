@@ -256,6 +256,10 @@ async def handle_telegram_update(update: Update):
                     handle_answer as h_handle_answer,
                     show_stats as h_show_stats,
                     voice_hint as h_voice_hint,
+                    learning_plan_menu as h_learning_plan_menu,
+                    ai_help_handler as h_ai_help,
+                    ai_hint_handler as h_ai_hint,
+                    similar_tasks_handler as h_similar_tasks,
                     handle_unknown_callback as h_unknown
                 )
 
@@ -263,6 +267,8 @@ async def handle_telegram_update(update: Update):
                     await h_subjects_menu(update, context)  # type: ignore
                 elif callback_data == "stats":
                     await h_show_stats(update, context)  # type: ignore
+                elif callback_data == "learning_plan":
+                    await h_learning_plan_menu(update, context)  # type: ignore
                 elif callback_data == "random_task":
                     await h_show_task(update, context)  # type: ignore
                 elif callback_data == "main_menu":
@@ -275,6 +281,14 @@ async def handle_telegram_update(update: Update):
                     await h_show_task(update, context)  # type: ignore
                 elif callback_data.startswith("voice_"):
                     await h_voice_hint(update, context)  # type: ignore
+                elif callback_data.startswith("ai_help_"):
+                    await h_ai_help(update, context)  # type: ignore
+                elif callback_data.startswith("ai_hint_"):
+                    await h_ai_hint(update, context)  # type: ignore
+                elif callback_data.startswith("similar_"):
+                    await h_similar_tasks(update, context)  # type: ignore
+                elif callback_data.startswith("show_task_"):
+                    await h_show_task(update, context)  # type: ignore
                 elif callback_data.startswith("answer_"):
                     await h_show_task(update, context)  # type: ignore
                 else:

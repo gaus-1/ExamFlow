@@ -1,6 +1,6 @@
 import os
-import dj_database_url  # type: ignore
-from dotenv import load_dotenv  # type: ignore
+import dj_database_url
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -91,10 +91,10 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Database
-# В продакшене используем DATABASE_URL, локально по умолчанию SQLite
+# Настройки базы данных
 DATABASE_URL = os.getenv('DATABASE_URL')
 RUNNING_TESTS = os.getenv('RUNNING_TESTS') == '1'
-USE_SQLITE = os.getenv('USE_SQLITE', '1' if os.getenv('DEBUG', 'True').lower() == 'true' else '0') == '1'
+USE_SQLITE = os.getenv('USE_SQLITE', 'False').lower() == 'true'
 
 def _sqlite_db():
     return {
@@ -152,7 +152,26 @@ else:
         except Exception:
             DATABASES = _sqlite_db()
     else:
-        DATABASES = _sqlite_db()
+        # Fallback на отдельные переменные PostgreSQL
+        db_name = os.getenv('DB_NAME')
+        db_user = os.getenv('DB_USER')
+        db_password = os.getenv('DB_PASSWORD')
+        db_host = os.getenv('DB_HOST')
+        db_port = os.getenv('DB_PORT')
+        
+        if all([db_name, db_user, db_password, db_host]):
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': db_name,
+                    'USER': db_user,
+                    'PASSWORD': db_password,
+                    'HOST': db_host,
+                    'PORT': db_port or '5432',
+                }
+            }
+        else:
+            DATABASES = _sqlite_db()
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -400,48 +419,85 @@ LOGGING = {
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 
 # ==========================================
-# НАСТРОЙКИ OLLAMA
+# НАСТРОЙКИ GOOGLE GEMINI AI
 # ==========================================
 
-# Базовые настройки Ollama
-OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://127.0.0.1:11434')
-OLLAMA_DEFAULT_MODEL = os.getenv('OLLAMA_DEFAULT_MODEL', 'llama2:7b')
-OLLAMA_TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '60'))
+# API ключ для Google Gemini
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+GEMINI_TIMEOUT = int(os.getenv('GEMINI_TIMEOUT', '30'))
 
-# Доступные модели Ollama
-OLLAMA_MODELS = {
-    'llama2:7b': {
-        'name': 'Llama 2 7B',
-        'description': 'Быстрая и эффективная модель для общих задач',
-        'context_length': 4096,
-        'temperature': 0.7,
-    },
-    'llama3.1:8b': {
-        'name': 'Llama 3.1 8B',
-        'description': 'Более мощная модель с улучшенными возможностями',
-        'context_length': 8192,
-        'temperature': 0.7,
-    },
-}
-
-# Настройки для различных типов задач
-OLLAMA_TASK_CONFIGS = {
+# Настройки для различных типов задач с улучшенными промптами
+GEMINI_TASK_CONFIGS = {
     'chat': {
-        'model': OLLAMA_DEFAULT_MODEL,
+        'model': 'gemini-2.0-flash',
         'temperature': 0.7,
         'max_tokens': 1000,
-        'system_prompt': 'Ты - полезный ИИ-ассистент для образовательной платформы ExamFlow. Отвечай на русском языке, будь дружелюбным и информативным.',
+        'system_prompt': '''Ты - умный ИИ-ассистент для образовательной платформы ExamFlow. 
+
+Твои задачи:
+1. Отвечай на русском языке
+2. Будь дружелюбным и мотивирующим
+3. Адаптируй сложность под уровень ученика
+4. Используй примеры и аналогии
+5. Поощряй самостоятельное мышление
+
+Стиль общения: добрый наставник, который верит в успех ученика.''',
     },
     'task_explanation': {
-        'model': OLLAMA_DEFAULT_MODEL,
+        'model': 'gemini-2.0-flash',
         'temperature': 0.5,
         'max_tokens': 800,
-        'system_prompt': 'Ты - преподаватель, который объясняет решения задач ЕГЭ и ОГЭ. Давай подробные, понятные объяснения на русском языке.',
+        'system_prompt': '''Ты - опытный преподаватель, который объясняет решения задач ЕГЭ и ОГЭ.
+
+Твои принципы:
+1. Объясняй пошагово, как решать задачу
+2. Объясняй, ПОЧЕМУ каждый шаг правильный
+3. Указывай на типичные ошибки и как их избежать
+4. Давай практические советы для экзамена
+5. Мотивируй ученика не сдаваться
+
+Формат ответа:
+- Краткое понимание задачи
+- Пошаговое решение с объяснением
+- Проверка ответа
+- Похожие задачи для практики''',
     },
     'hint_generation': {
-        'model': OLLAMA_DEFAULT_MODEL,
+        'model': 'gemini-2.0-flash',
         'temperature': 0.6,
         'max_tokens': 300,
-        'system_prompt': 'Ты даешь краткие подсказки для решения задач ЕГЭ и ОГЭ. Подсказки должны направлять ученика, но не давать полное решение.',
+        'system_prompt': '''Ты даешь умные подсказки для решения задач ЕГЭ и ОГЭ.
+
+Принципы подсказок:
+1. НЕ давай полное решение
+2. Направляй ученика в правильную сторону
+3. Задавай наводящие вопросы
+4. Напоминай важные формулы/правила
+5. Объясняй, что искать в условии
+
+Подсказка должна быть достаточно конкретной, чтобы помочь, но не решить задачу за ученика.''',
+    },
+    'personalized_learning': {
+        'model': 'gemini-2.0-flash',
+        'temperature': 0.7,
+        'max_tokens': 600,
+        'system_prompt': '''Ты - персональный AI-куратор для ученика ExamFlow.
+
+Твои задачи:
+1. Анализируй прогресс ученика
+2. Давай персональные рекомендации
+3. Подбирай сложность заданий
+4. Объясняй слабые места
+5. Создавай план обучения
+
+Стиль: заботливый наставник, который знает твои сильные и слабые стороны.''',
     },
 }
+
+# ==========================================
+# НАСТРОЙКИ OPENAI GPT - УДАЛЕНЫ
+# ==========================================
+
+# OpenAI провайдер удален - используем только Gemini
+# Все настройки перенесены в GEMINI_TASK_CONFIGS

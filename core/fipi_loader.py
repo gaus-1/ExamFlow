@@ -11,7 +11,7 @@ from urllib.parse import urljoin, urlparse
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
-from core.models import ExamType, Subject, Topic, Task
+from learning.models import ExamType, Subject, Topic, Task
 import logging
 
 logger = logging.getLogger(__name__)

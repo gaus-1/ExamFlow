@@ -10,7 +10,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from core.models import UserProfile
+from .models import UserProfile
 
 
 class TechRegisterForm(UserCreationForm):

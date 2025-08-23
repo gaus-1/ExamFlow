@@ -6,7 +6,7 @@
 """
 
 from django import forms
-from .models import UserProfile
+from authentication.models import UserProfile
 
 # Импортируем формы из нового модуля для обратной совместимости
 try:

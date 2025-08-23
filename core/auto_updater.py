@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.conf import settings
 from core.fipi_loader import FipiLoader
 from core.voice_service import generate_task_voices
-from core.models import Task, Subject
+from learning.models import Task, Subject
 
 logger = logging.getLogger(__name__)
 

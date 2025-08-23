@@ -21,7 +21,8 @@ try:
 except ImportError:
     # Если модуль недоступен, используем заглушки
     from .forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
-from .models import UserProfile, UserRating, Achievement, Subscription
+from authentication.models import UserProfile, Subscription
+from learning.models import UserRating, Achievement
 
 
 def register_view(request):
@@ -106,7 +107,7 @@ def dashboard_view(request):
     achievements = Achievement.objects.filter(user=user).order_by('-created_at')
     
     # Статистика пользователя
-    from .models import UserProgress, Task, Subject
+    from learning.models import UserProgress, Task, Subject
     total_tasks_solved = UserProgress.objects.filter(user=user, is_correct=True).count()
     total_subjects = Subject.objects.count()
     user_subjects = UserProgress.objects.filter(user=user).values('task__subject').distinct().count()

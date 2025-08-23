@@ -9,7 +9,7 @@ import threading
 from django.core.management import call_command
 from django.conf import settings
 from django.db import connection
-from core.models import Subject, Task
+from learning.models import Subject, Task
 
 logger = logging.getLogger(__name__)
 

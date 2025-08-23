@@ -14,12 +14,14 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 from telegram.ext import ContextTypes
 from django.contrib.auth.models import User
-from core.models import (
-    Subject, Task, UserProgress, UserRating,
-    Achievement, UserProfile, Subscription
+from learning.models import (
+    Subject, Task, UserProgress, UserRating, Achievement
 )
+from authentication.models import UserProfile, Subscription
 from django.db.models import Count, Q
 from django.utils import timezone
+from ai.services import AiService
+from ai.rag_service import rag_service
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
@@ -33,13 +35,58 @@ def db_check_connection() -> bool:
         cursor.fetchone()
     return True
 
+# ИИ сервис для асинхронного использования
+@sync_to_async
+def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
+    """Получает ответ от ИИ с использованием RAG системы"""
+    try:
+        ai_service = AiService()
+        
+        # Если есть задание и пользователь, используем RAG
+        if task and user:
+            result = ai_service.ask_with_rag(prompt, user, task, task_type)
+        else:
+            result = ai_service.ask(prompt, user, task_type=task_type)
+        
+        if 'error' in result:
+            return f"❌ Ошибка: {result['error']}"
+        
+        response = result['response']
+        provider = result.get('provider', 'AI')
+        
+        # Добавляем информацию о провайдере
+        response += f"\n\n🤖 Ответ сгенерирован через {provider}"
+        
+        # Если есть RAG контекст, добавляем его
+        if 'rag_context' in result:
+            rag = result['rag_context']
+            
+            # Добавляем похожие задания
+            if rag.get('similar_tasks'):
+                response += "\n\n📚 **Похожие задания для практики:**"
+                for i, similar_task in enumerate(rag['similar_tasks'][:2], 1):
+                    response += f"\n{i}. {similar_task['title']} (сложность {similar_task['difficulty']}/5)"
+                    response += f"\n   Темы: {', '.join(similar_task['topics'])}"
+            
+            # Добавляем рекомендации
+            if rag.get('recommendations'):
+                response += "\n\n💡 **Персональные рекомендации:**"
+                for rec in rag['recommendations'][:2]:
+                    response += f"\n• {rec['title']}"
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Ошибка при получении ответа от ИИ: {e}")
+        return f"❌ Ошибка ИИ-ассистента: {str(e)}"
+
 @sync_to_async
 def db_get_subject_ids():
-    return list(Task.objects.values_list('subject_id', flat=True).distinct())  # type: ignore
+    return list(Task.objects.values_list('subject_id', flat=True).distinct())
 
 @sync_to_async
 def db_get_subjects_by_ids(ids):
-    return list(Subject.objects.filter(id__in=ids))  # type: ignore
+    return list(Subject.objects.filter(id__in=ids))
 
 @sync_to_async
 def db_count_tasks_for_subject(subject_id: int) -> int:
@@ -193,7 +240,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         keyboard = [
             [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
-            [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
+            [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan")],
+            [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -209,6 +257,102 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"Ошибка в команде start: {e}")
         await update.message.reply_text(
             "❌ Произошла ошибка. Попробуйте позже."
+        )
+
+
+async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Показывает персональный план обучения пользователя
+    
+    Использует RAG систему для анализа прогресса и рекомендаций
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем пользователя
+        user, created = await db_get_or_create_user(update.effective_user)
+        if not user:
+            await query.edit_message_text("❌ Не удалось получить данные пользователя.")
+            return
+        
+        # Получаем план обучения через RAG
+        ai_service = AiService()
+        learning_plan = await sync_to_async(ai_service.get_personalized_learning_plan)(user)
+        
+        if 'error' in learning_plan:
+            await query.edit_message_text(f"❌ Ошибка: {learning_plan['error']}")
+            return
+        
+        # Формируем текст плана
+        plan_text = f"""
+🎓 **ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН ОБУЧЕНИЯ**
+
+📊 **Текущий уровень:** {learning_plan.get('current_level', 1)}/5
+🎯 **Точность:** {learning_plan.get('accuracy', 0)}%
+📚 **Решено заданий:** {learning_plan.get('total_tasks', 0)}
+
+🔴 **Слабые темы:**
+"""
+        
+        weak_topics = learning_plan.get('weak_topics', [])
+        if weak_topics:
+            for topic in weak_topics[:3]:
+                plan_text += f"• {topic}\n"
+        else:
+            plan_text += "• Нет данных\n"
+        
+        plan_text += "\n🟢 **Сильные темы:**\n"
+        strong_topics = learning_plan.get('strong_topics', [])
+        if strong_topics:
+            for topic in strong_topics[:3]:
+                plan_text += f"• {topic}\n"
+        else:
+            plan_text += "• Нет данных\n"
+        
+        plan_text += "\n💡 **Рекомендации:**\n"
+        recommendations = learning_plan.get('recommendations', [])
+        if recommendations:
+            for rec in recommendations[:3]:
+                plan_text += f"• {rec['title']}\n"
+        else:
+            plan_text += "• Начните с базовых заданий\n"
+        
+        plan_text += f"""
+
+📅 **Цели:**
+• Ежедневно: {learning_plan.get('daily_goal', 3)} заданий
+• Еженедельно: {learning_plan.get('weekly_goal', 15)} заданий
+
+🎯 **Следующие шаги:**\n"""
+        
+        next_steps = learning_plan.get('next_steps', [])
+        if next_steps:
+            for step in next_steps[:3]:
+                plan_text += f"• {step['description']}\n"
+        else:
+            plan_text += "• Продолжайте решать задания\n"
+        
+        # Кнопки для навигации
+        keyboard = [
+            [InlineKeyboardButton("🎯 Начать обучение", callback_data="subjects")],
+            [InlineKeyboardButton("📊 Детальная статистика", callback_data="stats")],
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            plan_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+        logger.info(f"Пользователь {user.id} получил план обучения")
+        
+    except Exception as e:
+        logger.error(f"Ошибка в learning_plan_menu: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка при получении плана обучения. Попробуйте позже."
         )
 
 
@@ -403,6 +547,7 @@ async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [InlineKeyboardButton("🔊 Голосовая подсказка", callback_data=f"voice_{task.id}")],
+        [InlineKeyboardButton("🤖 Спросить AI", callback_data=f"ai_help_{task.id}")],
         [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
         [InlineKeyboardButton("🔙 Назад", callback_data="subjects")]
     ]
@@ -435,6 +580,220 @@ async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"handle_answer вызван для пользователя {update.effective_user.id}")
     
     user, _ = await db_get_or_create_user(update.effective_user)
+
+
+async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обрабатывает запрос на помощь от AI
+    
+    Использует RAG систему для персонализированной помощи
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем ID задания из callback_data
+        task_id = int(query.data.split('_')[2])
+        
+        # Получаем пользователя и задание
+        user, _ = await db_get_or_create_user(update.effective_user)
+        task = await db_get_task_by_id(task_id)
+        
+        if not task:
+            await query.edit_message_text("❌ Задание не найдено.")
+            return
+        
+        # Показываем сообщение о том, что AI думает
+        thinking_message = await query.edit_message_text(
+            "🤔 **AI анализирует задание и ваш прогресс...**\n\n"
+            "Это может занять несколько секунд.",
+            parse_mode='Markdown'
+        )
+        
+        # Получаем помощь от AI через RAG
+        ai_response = await get_ai_response(
+            "Объясни, как решить это задание. Дай пошаговое решение с объяснением каждого шага.",
+            task_type='task_explanation',
+            user=user,
+            task=task
+        )
+        
+        # Формируем ответ с кнопками
+        response_text = f"""
+🤖 **AI ПОМОЩЬ ДЛЯ ЗАДАНИЯ №{task.id}**
+
+{ai_response}
+
+---
+💡 **Хотите получить подсказку вместо полного решения?**
+"""
+        
+        keyboard = [
+            [InlineKeyboardButton("💡 Только подсказка", callback_data=f"ai_hint_{task.id}")],
+            [InlineKeyboardButton("📚 Похожие задания", callback_data=f"similar_{task.id}")],
+            [InlineKeyboardButton("🔙 К заданию", callback_data=f"show_task_{task.id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await thinking_message.edit_text(
+            response_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+        logger.info(f"Пользователь {user.id} получил AI помощь для задания {task.id}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка в ai_help_handler: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка при получении AI помощи. Попробуйте позже."
+        )
+
+
+async def ai_hint_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обрабатывает запрос на подсказку от AI
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем ID задания из callback_data
+        task_id = int(query.data.split('_')[2])
+        
+        # Получаем пользователя и задание
+        user, _ = await db_get_or_create_user(update.effective_user)
+        task = await db_get_task_by_id(task_id)
+        
+        if not task:
+            await query.edit_message_text("❌ Задание не найдено.")
+            return
+        
+        # Показываем сообщение о том, что AI думает
+        thinking_message = await query.edit_message_text(
+            "💡 **AI готовит подсказку...**\n\n"
+            "Это может занять несколько секунд.",
+            parse_mode='Markdown'
+        )
+        
+        # Получаем подсказку от AI через RAG
+        ai_response = await get_ai_response(
+            "Дай подсказку для решения этого задания. НЕ давай полное решение, только направляй ученика.",
+            task_type='hint_generation',
+            user=user,
+            task=task
+        )
+        
+        # Формируем ответ с кнопками
+        response_text = f"""
+💡 **AI ПОДСКАЗКА ДЛЯ ЗАДАНИЯ №{task.id}**
+
+{ai_response}
+
+---
+🤖 **Нужна более подробная помощь?**
+"""
+        
+        keyboard = [
+            [InlineKeyboardButton("🤖 Полное решение", callback_data=f"ai_help_{task.id}")],
+            [InlineKeyboardButton("📚 Похожие задания", callback_data=f"similar_{task.id}")],
+            [InlineKeyboardButton("🔙 К заданию", callback_data=f"show_task_{task.id}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await thinking_message.edit_text(
+            response_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+        logger.info(f"Пользователь {user.id} получил AI подсказку для задания {task.id}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка в ai_hint_handler: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка при получении AI подсказки. Попробуйте позже."
+        )
+
+
+async def similar_tasks_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Показывает похожие задания для практики
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем ID задания из callback_data
+        task_id = int(query.data.split('_')[2])
+        
+        # Получаем задание
+        task = await db_get_task_by_id(task_id)
+        
+        if not task:
+            await query.edit_message_text("❌ Задание не найдено.")
+            return
+        
+        # Получаем похожие задания через RAG
+        similar_tasks = await sync_to_async(rag_service.find_similar_tasks)(task, limit=5)
+        
+        if not similar_tasks:
+            await query.edit_message_text(
+                "📚 **Похожих заданий не найдено**\n\n"
+                "Попробуйте решить другие задания по этому предмету.",
+                parse_mode='Markdown'
+            )
+            return
+        
+        # Формируем список похожих заданий
+        response_text = f"""
+📚 **ПОХОЖИЕ ЗАДАНИЯ ДЛЯ ПРАКТИКИ**
+
+**Текущее задание:** {task.title}
+**Предмет:** {task.subject.name if task.subject else 'Неизвестно'}
+
+**Похожие задания:**
+"""
+        
+        for i, similar_task in enumerate(similar_tasks[:5], 1):
+            topics = [topic.name for topic in similar_task.topics.all()] if similar_task.topics.exists() else []
+            response_text += f"""
+{i}. **{similar_task.title}**
+   • Сложность: {similar_task.difficulty}/5
+   • Темы: {', '.join(topics) if topics else 'Не указаны'}
+"""
+        
+        response_text += "\n💡 **Выберите задание для решения:**"
+        
+        # Создаем кнопки для похожих заданий
+        keyboard = []
+        for similar_task in similar_tasks[:5]:
+            keyboard.append([
+                InlineKeyboardButton(
+                    f"📝 {similar_task.title[:30]}...",
+                    callback_data=f"show_task_{similar_task.id}"
+                )
+            ])
+        
+        keyboard.append([InlineKeyboardButton("🔙 К заданию", callback_data=f"show_task_{task.id}")])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            response_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+        logger.info(f"Пользователь получил список похожих заданий для {task.id}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка в similar_tasks_handler: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка при поиске похожих заданий. Попробуйте позже."
+        )
+
+
+        user, _ = await db_get_or_create_user(update.effective_user)
     
     # Получаем текущее задание из профиля пользователя
     current_task_id = await sync_to_async(get_current_task_id)(user)
