@@ -11,4 +11,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         limit = options['limit']
         sent = send_weekly_inactive_reminders(limit=limit)
-        self.stdout.write(self.style.SUCCESS(f'✅ Отправлено напоминаний: {sent}'))
+        self.stdout.write(self.style.SUCCESS(f'✅ Отправлено напоминаний: {sent}'))  # type: ignore

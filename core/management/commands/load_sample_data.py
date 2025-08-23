@@ -19,35 +19,35 @@ class Command(BaseCommand):
                     subjects_data = [
                         {
                             'name': 'Математика',
-                            'description': 'Алгебра, геометрия, тригонометрия'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'Физика',
-                            'description': 'Механика, электричество, оптика'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'Химия',
-                            'description': 'Органическая и неорганическая химия'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'Биология',
-                            'description': 'Анатомия, экология, генетика'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'История',
-                            'description': 'Российская и всемирная история'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'География',
-                            'description': 'Физическая и экономическая география'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'Литература',
-                            'description': 'Русская и зарубежная литература'
+                            'exam_type': 'ЕГЭ'
                         },
                         {
                             'name': 'Информатика',
-                            'description': 'Программирование и алгоритмы'
+                            'exam_type': 'ЕГЭ'
                         }
                     ]
                     
@@ -55,37 +55,37 @@ class Command(BaseCommand):
                     for data in subjects_data:
                         subject = Subject(**data)
                         subjects.append(subject)
-                    Subject.objects.bulk_create(subjects)
-                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(subjects)} предметов'))
+                    Subject.objects.bulk_create(subjects)  # type: ignore
+                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(subjects)} предметов'))  # type: ignore
                     
                     # Создаем темы для математики
-                    math_subject = Subject.objects.get(name='Математика')
+                    math_subject = Subject.objects.get(name='Математика')  # type: ignore
                     topics_data = [
-                        {'name': 'Алгебра', 'subject': math_subject},
-                        {'name': 'Геометрия', 'subject': math_subject},
-                        {'name': 'Тригонометрия', 'subject': math_subject}
+                        {'name': 'Алгебра', 'subject': math_subject, 'code': 'ALG001'},
+                        {'name': 'Геометрия', 'subject': math_subject, 'code': 'GEO001'},
+                        {'name': 'Тригонометрия', 'subject': math_subject, 'code': 'TRIG001'}
                     ]
                     
                     topics = []
                     for data in topics_data:
                         topic = Topic(**data)
                         topics.append(topic)
-                    Topic.objects.bulk_create(topics)
-                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(topics)} тем для математики'))
+                    Topic.objects.bulk_create(topics)  # type: ignore
+                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(topics)} тем для математики'))  # type: ignore
                     
                     # Создаем образцы заданий
                     self.stdout.write('📝 Создаем образцы заданий...')
                     tasks_data = [
                         {
                             'title': 'Решите квадратное уравнение: x² + 5x + 6 = 0',
-                            'content': 'Найдите корни квадратного уравнения x² + 5x + 6 = 0',
+                            'description': 'Найдите корни квадратного уравнения x² + 5x + 6 = 0',
                             'answer': 'x₁ = -2, x₂ = -3',
                             'difficulty': 2,
                             'subject': math_subject
                         },
                         {
                             'title': 'Найдите площадь прямоугольника со сторонами 5 и 8',
-                            'content': 'Вычислите площадь прямоугольника, если его стороны равны 5 и 8 единиц',
+                            'description': 'Вычислите площадь прямоугольника, если его стороны равны 5 и 8 единиц',
                             'answer': '40 квадратных единиц',
                             'difficulty': 1,
                             'subject': math_subject
@@ -96,11 +96,13 @@ class Command(BaseCommand):
                     for data in tasks_data:
                         task = Task(**data)
                         tasks.append(task)
+                    
                     Task.objects.bulk_create(tasks)  # type: ignore
-                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(tasks)} образцов заданий'))  # type: ignore
+                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(tasks)} образцов заданий'))  # type: ignore  
                     
                 else:
                     self.stdout.write('ℹ️ Данные уже существуют, пропускаем создание')
+                
                 # Показываем статистику
                 self.stdout.write('📊 СТАТИСТИКА БАЗЫ ДАННЫХ:')
                 self.stdout.write(f'   Предметы: {Subject.objects.count()}')  # type: ignore

@@ -46,11 +46,10 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
         if task and user:
             result = ai_service.ask_with_rag(prompt, user, task, task_type)
         else:
-            result = ai_service.ask(prompt, user, task_type=task_type)
+            result = ai_service.ask(prompt, user)  # type: ignore
         
         if 'error' in result:
             return f"❌ Ошибка: {result['error']}"
-        
         response = result['response']
         provider = result.get('provider', 'AI')
         
@@ -82,11 +81,11 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
 
 @sync_to_async
 def db_get_subject_ids():
-    return list(Task.objects.values_list('subject_id', flat=True).distinct())
+    return list(Task.objects.values_list('subject_id', flat=True).distinct())  # type: ignore
 
 @sync_to_async
 def db_get_subjects_by_ids(ids):
-    return list(Subject.objects.filter(id__in=ids))
+    return list(Subject.objects.filter(id__in=ids))  # type: ignore
 
 @sync_to_async
 def db_count_tasks_for_subject(subject_id: int) -> int:
@@ -635,7 +634,7 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await thinking_message.edit_text(
+        await thinking_message.edit_text(  # type: ignore
             response_text,
             reply_markup=reply_markup,
             parse_mode='Markdown'
@@ -701,7 +700,7 @@ async def ai_hint_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
-        await thinking_message.edit_text(
+        await thinking_message.edit_text(  # type: ignore
             response_text,
             reply_markup=reply_markup,
             parse_mode='Markdown'
@@ -756,7 +755,7 @@ async def similar_tasks_handler(update: Update, context: ContextTypes.DEFAULT_TY
 """
         
         for i, similar_task in enumerate(similar_tasks[:5], 1):
-            topics = [topic.name for topic in similar_task.topics.all()] if similar_task.topics.exists() else []
+            topics = [topic.name for topic in similar_task.topics.all()] if similar_task.topics.exists() else []  # type: ignore
             response_text += f"""
 {i}. **{similar_task.title}**
    • Сложность: {similar_task.difficulty}/5
@@ -770,8 +769,8 @@ async def similar_tasks_handler(update: Update, context: ContextTypes.DEFAULT_TY
         for similar_task in similar_tasks[:5]:
             keyboard.append([
                 InlineKeyboardButton(
-                    f"📝 {similar_task.title[:30]}...",
-                    callback_data=f"show_task_{similar_task.id}"
+                    f"📝 {similar_task.title[:30]}...",  # type: ignore
+                    callback_data=f"show_task_{similar_task.id}"  # type: ignore
                 )
             ])
         

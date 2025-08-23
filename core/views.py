@@ -2,11 +2,13 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.decorators.cache import cache_page
 from django.core import management
+from django_ratelimit.decorators import ratelimit
 from learning.models import Task, Subject
 from .utils import generate_qr_code
 
 
 @cache_page(30)
+@ratelimit(key='ip', rate='10/m', method='GET')  # 10 запросов в минуту с одного IP
 def home(request):
     # Принудительная загрузка демо-данных при пустой базе
     if Subject.objects.count() == 0:  # type: ignore
@@ -28,12 +30,14 @@ def home(request):
 
 
 @cache_page(30)
+@ratelimit(key='ip', rate='20/m', method='GET')  # 20 запросов в минуту
 def subject_list(request):
     items = Subject.objects.all().order_by('name')  # type: ignore
     return render(request, 'core/subject_list.html', {'subjects': items})
 
 
 @cache_page(30)
+@ratelimit(key='ip', rate='30/m', method='GET')  # 30 запросов в минуту
 def subject_detail(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     tasks = Task.objects.filter(subject=subject).order_by('-created_at', '-id')  # type: ignore
@@ -47,6 +51,7 @@ def subject_detail(request, subject_id):
     return render(request, 'core/subject_detail.html', context)
 
 
+@ratelimit(key='ip', rate='50/m', method='GET')  # 50 запросов в минуту
 def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     similar_tasks = Task.objects.filter(subject=task.subject).exclude(id=task.id).order_by('-created_at')[:3]  # type: ignore

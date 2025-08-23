@@ -21,3 +21,6 @@ lxml>=6.0.0
 requests==2.31.0
 # Планировщик задач для keep-alive
 schedule==1.2.0
+
+# 🔒 БЕЗОПАСНОСТЬ - Rate Limiting
+django-ratelimit==4.1.0

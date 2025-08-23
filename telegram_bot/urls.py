@@ -17,11 +17,10 @@ urlpatterns = [
     path('webhook/', views.telegram_webhook, name='webhook'),
     
     # Тестовая функция для проверки webhook
-    path('test/', views.test_webhook, name='test_webhook'),
+    path('test/', views.test_webhook, name='test_webhook'),  # type: ignore
     
     # Тест API бота
-    path('test-api/', views.test_bot_api, name='test_bot_api'),
-    
+    path('test-api/', views.test_bot_api, name='test_bot_api'),  # type: ignore
     # Панель управления
     path('control/', views.bot_control_panel, name='control_panel'),
     

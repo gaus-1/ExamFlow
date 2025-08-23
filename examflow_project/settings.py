@@ -53,17 +53,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.middleware.gzip.GZipMiddleware',
-    'core.auto_startup.trigger_startup_on_first_request',  # Автозапуск парсинга
+    'django.middleware.security.SecurityMiddleware',  # Безопасность
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Защита от clickjacking
+    'csp.middleware.CSPMiddleware',  # Content Security Policy
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
@@ -365,6 +362,32 @@ else:
         'https://*.onrender.com',
     ]))
 
+# 🔒 БЕЗОПАСНОСТЬ - БЕСПЛАТНЫЕ НАСТРОЙКИ
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Content Security Policy (CSP) - защита от XSS
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com")
+CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
+
+# Безопасные cookies
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = 31536000  # 1 год
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 # Logging configuration
 LOGGING = {
     'version': 1,
@@ -422,77 +445,37 @@ os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 # НАСТРОЙКИ GOOGLE GEMINI AI
 # ==========================================
 
-# API ключ для Google Gemini
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
-GEMINI_TIMEOUT = int(os.getenv('GEMINI_TIMEOUT', '30'))
+# 🤖 GEMINI AI - НАСТРОЙКИ
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta'
+GEMINI_TIMEOUT = 30
 
-# Настройки для различных типов задач с улучшенными промптами
+# Конфигурация для разных типов задач
 GEMINI_TASK_CONFIGS = {
     'chat': {
         'model': 'gemini-2.0-flash',
         'temperature': 0.7,
         'max_tokens': 1000,
-        'system_prompt': '''Ты - умный ИИ-ассистент для образовательной платформы ExamFlow. 
-
-Твои задачи:
-1. Отвечай на русском языке
-2. Будь дружелюбным и мотивирующим
-3. Адаптируй сложность под уровень ученика
-4. Используй примеры и аналогии
-5. Поощряй самостоятельное мышление
-
-Стиль общения: добрый наставник, который верит в успех ученика.''',
+        'system_prompt': 'Ты - умный помощник для подготовки к экзаменам. Отвечай кратко, но по существу.'
     },
     'task_explanation': {
         'model': 'gemini-2.0-flash',
-        'temperature': 0.5,
+        'temperature': 0.3,
         'max_tokens': 800,
-        'system_prompt': '''Ты - опытный преподаватель, который объясняет решения задач ЕГЭ и ОГЭ.
-
-Твои принципы:
-1. Объясняй пошагово, как решать задачу
-2. Объясняй, ПОЧЕМУ каждый шаг правильный
-3. Указывай на типичные ошибки и как их избежать
-4. Давай практические советы для экзамена
-5. Мотивируй ученика не сдаваться
-
-Формат ответа:
-- Краткое понимание задачи
-- Пошаговое решение с объяснением
-- Проверка ответа
-- Похожие задачи для практики''',
+        'system_prompt': 'Ты - эксперт по объяснению учебных заданий. Объясняй понятно, с примерами и пошагово.'
     },
     'hint_generation': {
         'model': 'gemini-2.0-flash',
-        'temperature': 0.6,
-        'max_tokens': 300,
-        'system_prompt': '''Ты даешь умные подсказки для решения задач ЕГЭ и ОГЭ.
-
-Принципы подсказок:
-1. НЕ давай полное решение
-2. Направляй ученика в правильную сторону
-3. Задавай наводящие вопросы
-4. Напоминай важные формулы/правила
-5. Объясняй, что искать в условии
-
-Подсказка должна быть достаточно конкретной, чтобы помочь, но не решить задачу за ученика.''',
+        'temperature': 0.5,
+        'max_tokens': 400,
+        'system_prompt': 'Ты - помощник, который дает подсказки к заданиям. Не давай прямого ответа, только направляй к решению.'
     },
     'personalized_learning': {
         'model': 'gemini-2.0-flash',
-        'temperature': 0.7,
+        'temperature': 0.4,
         'max_tokens': 600,
-        'system_prompt': '''Ты - персональный AI-куратор для ученика ExamFlow.
-
-Твои задачи:
-1. Анализируй прогресс ученика
-2. Давай персональные рекомендации
-3. Подбирай сложность заданий
-4. Объясняй слабые места
-5. Создавай план обучения
-
-Стиль: заботливый наставник, который знает твои сильные и слабые стороны.''',
-    },
+        'system_prompt': 'Ты - персональный тренер по обучению. Анализируй прогресс ученика и давай рекомендации.'
+    }
 }
 
 # ==========================================

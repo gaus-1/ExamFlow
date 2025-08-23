@@ -21,57 +21,30 @@ from django.contrib.auth.decorators import user_passes_test
 from telegram import Update
 from .bot_main import setup_bot_application, get_bot
 from django.conf import settings
+from django_ratelimit.decorators import ratelimit
 
 logger = logging.getLogger(__name__)
 
+# 🔒 БЕЗОПАСНОСТЬ: Разрешенные IP для webhook (опционально)
+ALLOWED_IPS = [
+    '149.154.160.0/20',  # Telegram IP range
+    '91.108.4.0/22',     # Telegram IP range
+    '127.0.0.1',         # Localhost для разработки
+]
 
-def test_webhook(request):
-    """
-    Тестовая функция для проверки доступности webhook
-    """
-    return JsonResponse({
-        'status': 'ok',
-        'message': 'Webhook endpoint доступен',
-        'timestamp': datetime.now().isoformat(),
-        'token_exists': bool(settings.TELEGRAM_BOT_TOKEN),
-        'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None,
-        'bot_available': False  # Будем проверять доступность бота
-    })
-
-
-def test_bot_api(request):
-    """
-    Тестирует API бота напрямую
-    """
-    try:
-        bot = get_bot()
-        if not bot:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Бот не может быть создан',
-                'token_exists': bool(settings.TELEGRAM_BOT_TOKEN)
-            }, status=500)
-        
-        # Тестируем API бота
-        import asyncio
-        bot_info = asyncio.run(bot.get_me())
-        
-        return JsonResponse({
-            'status': 'ok',
-            'message': 'Бот доступен',
-            'bot_username': bot_info.username,
-            'bot_id': bot_info.id,
-            'token_preview': settings.TELEGRAM_BOT_TOKEN[:10] + '...' if settings.TELEGRAM_BOT_TOKEN else None
-        })
-        
-    except Exception as e:
-        logger.error(f"Ошибка тестирования API бота: {e}")
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Ошибка API бота: {str(e)}',
-            'token_exists': bool(settings.TELEGRAM_BOT_TOKEN)
-        }, status=500)
-
+def is_allowed_ip(ip):
+    """Проверяет, разрешен ли IP для webhook"""
+    if not ALLOWED_IPS:  # Если список пустой - разрешаем все
+        return True
+    
+    for allowed_ip in ALLOWED_IPS:
+        if '/' in allowed_ip:  # CIDR notation
+            # Простая проверка CIDR (для продакшена лучше использовать ipaddress)
+            if ip.startswith(allowed_ip.split('/')[0]):
+                return True
+        elif ip == allowed_ip:
+            return True
+    return False
 
 @csrf_exempt
 @require_POST
@@ -88,6 +61,17 @@ def telegram_webhook(request):
     logger.info(f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
     
     try:
+        # 🔒 БЕЗОПАСНОСТЬ: Проверка IP
+        client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+        if not is_allowed_ip(client_ip):
+            logger.warning(f"Webhook заблокирован с IP: {client_ip}")
+            return HttpResponse(b"Forbidden", status=403)  # type: ignore
+        
+        # 🔒 БЕЗОПАСНОСТЬ: Проверка размера данных
+        if request.content_length and request.content_length > 1024 * 1024:  # 1MB limit
+            logger.warning(f"Webhook заблокирован - слишком большой размер: {request.content_length}")
+            return HttpResponse(b"Payload too large", status=413)  # type: ignore
+
         # Детальное логирование входящего webhook
         logger.info(f"Webhook получен: {request.method} {request.path}")
         logger.info(f"Headers: {dict(request.headers)}")

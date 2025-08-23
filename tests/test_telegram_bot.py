@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from unittest.mock import Mock, patch
 from telegram_bot.bot_handlers import get_or_create_user
-from core.models import UserProfile, UserRating, Subject, Task, Topic, ExamType
+from core.models import UserProfile, UserRating, Subject, Task, Topic, ExamType  # type: ignore
 
 
 class TestTelegramBot(TestCase):
