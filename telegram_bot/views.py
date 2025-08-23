@@ -22,6 +22,7 @@ from telegram import Update
 from .bot_main import setup_bot_application, get_bot
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -307,17 +308,69 @@ def is_superuser(user):
     return user.is_superuser
 
 
-@user_passes_test(is_superuser)
-def bot_control_panel(request):
-    """
-    Панель управления ботом для администраторов
-    
-    Показывает статус бота и позволяет управлять им
-    """
-    return render(request, 'telegram_bot/control_panel.html', {
-        'bot_status': 'Webhook режим',
-        'bot_mode': 'webhook'
+def test_webhook(request):
+    """Тестовая функция для проверки webhook endpoint"""
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'Webhook endpoint доступен',
+        'timestamp': timezone.now().isoformat(),
+        'token_exists': bool(settings.TELEGRAM_BOT_TOKEN),
+        'token_preview': f"{settings.TELEGRAM_BOT_TOKEN[:12]}..." if settings.TELEGRAM_BOT_TOKEN else None,
+        'bot_available': True
     })
+
+
+def test_bot_api(request):
+    """Тест API бота"""
+    try:
+        bot = get_bot()
+        bot_info = bot.get_me()
+        return JsonResponse({
+            'status': 'ok',
+            'bot_info': {
+                'id': bot_info.id,  # type: ignore
+                'username': bot_info.username,  # type: ignore
+                'first_name': bot_info.first_name,  # type: ignore
+                'is_bot': bot_info.is_bot  # type: ignore
+            },
+            'timestamp': timezone.now().isoformat()
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e),
+            'timestamp': timezone.now().isoformat()
+        }, status=500)
+
+
+def bot_control_panel(request):
+    """Панель управления ботом"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    try:
+        bot = get_bot()
+        bot_info = bot.get_me()
+        
+        # Получаем статистику
+        stats = {
+            'bot_id': bot_info.id,  # type: ignore
+            'bot_username': bot_info.username,  # type: ignore
+            'bot_name': bot_info.first_name,  # type: ignore
+            'webhook_url': f"{settings.SITE_URL}/bot/webhook/",
+            'timestamp': timezone.now().isoformat()
+        }
+        
+        return JsonResponse({
+            'status': 'ok',
+            'data': stats
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e),
+            'timestamp': timezone.now().isoformat()
+        }, status=500)
 
 
 def bot_api_status(request):
