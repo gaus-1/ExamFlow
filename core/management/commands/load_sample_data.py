@@ -17,38 +17,14 @@ class Command(BaseCommand):
                     self.stdout.write('📖 Создаем предметы...')
                     
                     subjects_data = [
-                        {
-                            'name': 'Математика',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'Физика',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'Химия',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'Биология',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'История',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'География',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'Литература',
-                            'exam_type': 'ЕГЭ'
-                        },
-                        {
-                            'name': 'Информатика',
-                            'exam_type': 'ЕГЭ'
-                        }
+                        {'name': 'Математика'},
+                        {'name': 'Физика'},
+                        {'name': 'Химия'},
+                        {'name': 'Биология'},
+                        {'name': 'История'},
+                        {'name': 'География'},
+                        {'name': 'Литература'},
+                        {'name': 'Информатика'}
                     ]
                     
                     subjects = []
@@ -98,7 +74,7 @@ class Command(BaseCommand):
                         tasks.append(task)
                     
                     Task.objects.bulk_create(tasks)  # type: ignore
-                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(tasks)} образцов заданий'))  # type: ignore  
+                    self.stdout.write(self.style.SUCCESS(f'✅ Создано {len(tasks)} образцов заданий'))  # type: ignore
                     
                 else:
                     self.stdout.write('ℹ️ Данные уже существуют, пропускаем создание')
