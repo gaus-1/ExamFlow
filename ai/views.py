@@ -13,15 +13,21 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-try:
-    # Сервис ИИ: провайдеры, кэш и лимиты
-    from .services import AiService
-    ai_service = AiService()
-except Exception as e:
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.error(f"Ошибка импорта AiService: {e}")
-    ai_service = None  # Фолбэк, чтобы не падать на импорте
+# Сервис ИИ: провайдеры, кэш и лимиты
+ai_service = None
+
+def get_ai_service():
+    """Получает или создает экземпляр AiService"""
+    global ai_service
+    if ai_service is None:
+        try:
+            from .services import AiService
+            ai_service = AiService()
+            logger.info("AiService успешно создан")
+        except Exception as e:
+            logger.error(f"Ошибка создания AiService: {e}")
+            return None
+    return ai_service
 
 from .models import AiLimit  # для получения лимитов
 
@@ -94,10 +100,11 @@ def api_chat(request):
             request.session.save()
         session_id = request.session.session_key
 
-        if ai_service is None:
+        ai_service_instance = get_ai_service()
+        if ai_service_instance is None:
             return JsonResponse({'error': 'ИИ временно недоступен'}, status=503)
 
-        result = ai_service.ask(prompt=prompt, user=request.user if request.user.is_authenticated else None, session_id=session_id)
+        result = ai_service_instance.ask(prompt=prompt, user=request.user if request.user.is_authenticated else None, session_id=session_id)
         if 'error' in result:
             return JsonResponse({'error': result['error']}, status=429)
 

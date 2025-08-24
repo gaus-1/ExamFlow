@@ -316,9 +316,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-link-aesop" href="{% url 'aesop_showcase' %}">
-                            Стили
-                        </a>
+                        <button id="theme-toggle" class="nav-link nav-link-aesop theme-toggle-btn" title="Переключить тему (Ctrl+T)">
+                            🌙
+                        </button>
                     </li>
                 </ul>
             </div>
@@ -361,7 +361,67 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Менеджер тем и анимаций -->
+    <script src="{% static 'js/theme-manager.js' %}"></script>
+    
     <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}
+    
+    <style>
+        /* Стили для кнопки переключения темы */
+        .theme-toggle-btn {
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            font-size: 1.2rem !important;
+            padding: 8px 12px !important;
+            border-radius: 50% !important;
+            transition: all var(--transition-speed, 0.3s) var(--transition-timing, ease) !important;
+        }
+        
+        .theme-toggle-btn:hover {
+            background: var(--secondary-bg) !important;
+            transform: rotate(180deg) scale(1.1) !important;
+        }
+        
+        /* Анимация для кнопки темы */
+        .theme-toggle-btn[data-theme="dark"] {
+            animation: moonRotate 0.5s ease-in-out;
+        }
+        
+        .theme-toggle-btn[data-theme="light"] {
+            animation: sunRotate 0.5s ease-in-out;
+        }
+        
+        @keyframes moonRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(180deg); }
+        }
+        
+        @keyframes sunRotate {
+            from { transform: rotate(180deg); }
+            to { transform: rotate(0deg); }
+        }
+        
+        /* Стили для уведомлений */
+        .theme-notification {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.875rem;
+        }
+        
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .notification-icon {
+            font-size: 1rem;
+        }
+        
+        .notification-text {
+            flex: 1;
+        }
+    </style>
 </body>
 </html>

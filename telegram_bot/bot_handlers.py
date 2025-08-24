@@ -240,6 +240,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
             [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan")],
+            [InlineKeyboardButton("🤖 Спросить ИИ", callback_data="ai_help")],
             [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -257,6 +258,532 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             "❌ Произошла ошибка. Попробуйте позже."
         )
+
+
+async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Показывает персональный план обучения пользователя
+    
+    Использует RAG систему для анализа прогресса и рекомендаций
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем пользователя
+        user, created = await db_get_or_create_user(update.effective_user)
+        if not user:
+            await query.edit_message_text("❌ Не удалось получить данные пользователя.")
+            return
+        
+        # Получаем план обучения через RAG
+        ai_service = AiService()
+        learning_plan = await sync_to_async(ai_service.get_personalized_learning_plan)(user)
+        
+        if 'error' in learning_plan:
+            await query.edit_message_text(f"❌ Ошибка: {learning_plan['error']}")
+            return
+        
+        # Формируем текст плана
+        plan_text = f"""
+🎓 **ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН ОБУЧЕНИЯ**
+
+📊 **Текущий уровень:** {learning_plan.get('current_level', 1)}/5
+🎯 **Точность:** {learning_plan.get('accuracy', 0)}%
+📚 **Решено заданий:** {learning_plan.get('total_tasks', 0)}
+
+🔴 **Слабые темы:**
+"""
+        
+        weak_topics = learning_plan.get('weak_topics', [])
+        if weak_topics:
+            for topic in weak_topics[:3]:
+                plan_text += f"• {topic}\n"
+        else:
+            plan_text += "• Нет данных\n"
+        
+        plan_text += "\n🟢 **Сильные темы:**\n"
+        strong_topics = learning_plan.get('strong_topics', [])
+        if strong_topics:
+            for topic in strong_topics[:3]:
+                plan_text += f"• {topic}\n"
+        else:
+            plan_text += "• Нет данных\n"
+        
+        plan_text += "\n💡 **Рекомендации:**\n"
+        recommendations = learning_plan.get('recommendations', [])
+        if recommendations:
+            for rec in recommendations[:3]:
+                plan_text += f"• {rec['title']}\n"
+        else:
+            plan_text += "• Начните с базовых заданий\n"
+        
+        plan_text += f"""
+
+📅 **Цели:**
+• Ежедневно: {learning_plan.get('daily_goal', 3)} заданий
+• Еженедельно: {learning_plan.get('weekly_goal', 15)} заданий
+
+🎯 **Следующие шаги:**\n"""
+        
+        next_steps = learning_plan.get('next_steps', [])
+        if next_steps:
+            for step in next_steps[:3]:
+                plan_text += f"• {step['description']}\n"
+        else:
+            plan_text += "• Продолжайте решать задания\n"
+        
+        # Кнопки для навигации
+        keyboard = [
+            [InlineKeyboardButton("🎯 Начать обучение", callback_data="subjects")],
+            [InlineKeyboardButton("📊 Детальная статистика", callback_data="stats")],
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            plan_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+        logger.info(f"Пользователь {user.id} получил план обучения")
+        
+    except Exception as e:
+        logger.error(f"Ошибка в learning_plan_menu: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка при получении плана обучения. Попробуйте позже."
+        )
+
+
+async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Показывает меню выбора предметов
+    
+    Отображает все доступные предметы с количеством заданий
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+
+        # Надежное получение списка предметов, у которых есть хотя бы одно задание
+        try:
+            subject_ids = await db_get_subject_ids()
+        except Exception as id_err:
+            logger.error(f"subjects_menu: ошибка выборки subject_ids: {id_err}")
+            subject_ids = []
+
+        if not subject_ids:
+            await query.edit_message_text("📚 Предметы пока загружаются... Попробуйте позже.")
+            return
+
+        subjects = await db_get_subjects_by_ids(subject_ids)
+
+        keyboard = []
+        for subject in subjects:
+            try:
+                tasks_count = await db_count_tasks_for_subject(subject.id)
+            except Exception:
+                tasks_count = 0
+            button_text = f"{subject.name} ({tasks_count} заданий)"
+            keyboard.append([
+                InlineKeyboardButton(button_text, callback_data=f"subject_{subject.id}")
+            ])
+
+        keyboard.append([InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")])
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+        try:
+            await query.edit_message_text(
+                "📚 Выберите предмет:\n\nДоступные предметы для изучения:",
+                reply_markup=reply_markup
+            )
+        except Exception as edit_err:
+            logger.warning(f"subjects_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
+            try:
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id,  # type: ignore
+                    text="📚 Выберите предмет:\n\nДоступные предметы для изучения:",
+                    reply_markup=reply_markup
+                )
+            except Exception as send_err:
+                logger.error(f"subjects_menu: send_message тоже не удался: {send_err}")
+
+    except Exception as e:
+        logger.error(f"Ошибка в subjects_menu: {e}")
+        # Попробуем сообщить пользователю, что произошла ошибка, чтобы не было тишины
+        try:
+            await update.effective_chat.send_message("❌ Не удалось загрузить предметы. Попробуйте /start или повторите попытку позже.")  # type: ignore
+        except Exception as send_err:
+            logger.error(f"subjects_menu: не удалось отправить сообщение об ошибке: {send_err}")
+
+
+async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Показывает случайное задание выбранного предмета (упрощенный режим без тем)
+    """
+    query = update.callback_query
+    await query.answer()
+
+    subject_id = int(query.data.split('_')[1])
+    # Получаем список заданий для предмета в безопасном режиме
+    tasks = await db_get_tasks_by_subject(subject_id)
+    if not tasks:
+        subject_name = await db_get_subject_name(subject_id)
+        await query.edit_message_text(
+            f"❌ В предмете {subject_name} пока нет заданий",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]])
+        )
+        return
+
+    import random
+    task = random.choice(list(tasks))
+
+    # Устанавливаем текущее задание в профиле пользователя
+    user, _ = await db_get_or_create_user(update.effective_user)
+    await db_set_current_task_id(user, task.id)
+    logger.info(f"show_subject_topics: установлен current_task_id: {task.id}")
+
+    # Получаем название предмета безопасно
+    subject_name = await db_get_subject_name_for_task(task)
+    
+    task_text = f"""
+📝 **Задание №{task.id}**
+**Предмет:** {subject_name}
+
+**Заголовок:** {task.title}
+
+**Условие:**
+{task.description or 'Описание задания отсутствует'}
+
+Введите ваш ответ:
+"""
+
+    keyboard = [
+        [InlineKeyboardButton("🔊 Голосовая подсказка", callback_data=f"voice_{task.id}")],
+        [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
+        [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+    ]
+
+    try:
+        await query.edit_message_text(
+            task_text,
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    except Exception as edit_err:
+        logger.warning(f"show_subject_topics: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=task_text,
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        except Exception as send_err:
+            logger.error(f"show_subject_topics: send_message тоже не удался: {send_err}")
+
+
+async def show_task(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Показывает задание пользователю
+    
+    Отображает условие задания и кнопки для ответа
+    """
+    query = update.callback_query
+    await query.answer()
+    
+    # Определяем источник: случайное по предмету или полностью случайное
+    if query.data.startswith('subject_'):
+        try:
+            subject_id = int(query.data.split('_')[1])
+        except Exception:
+            await query.edit_message_text("❌ Некорректный выбор предмета")
+            return
+        tasks = await db_get_tasks_by_subject(subject_id)
+        if not tasks:
+            await query.edit_message_text(f"❌ В предмете пока нет заданий")
+            return
+        import random
+        task = random.choice(list(tasks))
+    elif query.data.startswith('random_subject_'):
+        subject_id = int(query.data.split('_')[2])
+        tasks = await db_get_tasks_by_subject(subject_id)
+        if not tasks:
+            await query.edit_message_text(f"❌ В предмете пока нет заданий")
+            return
+        import random
+        task = random.choice(list(tasks))
+    else:
+        tasks = await db_get_all_tasks()
+        if not tasks:
+            await query.edit_message_text("❌ Задания пока не загружены")
+            return
+        
+        import random
+        task = random.choice(list(tasks))
+    
+    # Сохраняем текущее задание в профиль пользователя, чтобы не терять контекст
+    try:
+        user, _ = await db_get_or_create_user(update.effective_user)
+        await db_set_current_task_id(user, task.id)
+        logger.info(f"Установлен current_task_id: {task.id} для пользователя {user.username}")
+    except Exception as prof_err:
+        logger.warning(f"Не удалось сохранить current_task_id в профиль: {prof_err}")
+    
+    # Получаем название предмета безопасно
+    subject_name = await db_get_subject_name_for_task(task)
+    
+    # Формируем текст задания
+    task_text = f"""
+📝 **Задание №{task.id}**
+**Предмет:** {subject_name}
+
+**Заголовок:** {task.title}
+
+**Условие:**
+{task.description or 'Описание задания отсутствует'}
+
+Введите ваш ответ:
+"""
+    
+    keyboard = [
+        [InlineKeyboardButton("🔊 Голосовая подсказка", callback_data=f"voice_{task.id}")],
+        [InlineKeyboardButton("🤖 Спросить AI", callback_data=f"ai_help_{task.id}")],
+        [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
+        [InlineKeyboardButton("🔙 Назад", callback_data="subjects")]
+    ]
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    try:
+        await query.edit_message_text(
+            task_text,
+            reply_markup=reply_markup
+        )
+    except Exception as edit_err:
+        logger.warning(f"show_task: edit_message_text не удался: {edit_err}. Пробуем send_message")
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,  # type: ignore
+                text=task_text,
+                reply_markup=reply_markup
+            )
+        except Exception as send_err:
+            logger.error(f"show_task: send_message тоже не удался: {send_err}")
+
+
+async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Обрабатывает ответ пользователя на задание
+    
+    Проверяет правильность ответа и сохраняет прогресс
+    """
+    logger.info(f"handle_answer вызван для пользователя {update.effective_user.id}")
+    
+    user, _ = await db_get_or_create_user(update.effective_user)
+
+
+async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Обработчик для кнопки "Спросить ИИ"
+    Показывает меню с возможностями ИИ
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем пользователя
+        user, created = await db_get_or_create_user(update.effective_user)
+        
+        ai_menu_text = """
+🤖 **ИИ-ПОМОЩНИК EXAMFLOW**
+
+Я могу помочь тебе с:
+
+📚 **Объяснение тем** - простыми словами
+💡 **Подсказки к заданиям** - направляю к решению
+🎯 **Персональные рекомендации** - на основе твоего прогресса
+🔍 **Поиск похожих заданий** - для практики
+
+**Выбери что нужно:**
+"""
+        
+        keyboard = [
+            [InlineKeyboardButton("📚 Объяснить тему", callback_data="ai_explain")],
+            [InlineKeyboardButton("💡 Дать подсказку", callback_data="ai_hint")],
+            [InlineKeyboardButton("🎯 Персональные советы", callback_data="ai_personal")],
+            [InlineKeyboardButton("🔍 Похожие задания", callback_data="similar_tasks")],
+            [InlineKeyboardButton("⬅️ Назад", callback_data="back_to_main")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            ai_menu_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+    except Exception as e:
+        logger.error(f"Ошибка в ai_help_handler: {e}")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+
+
+async def ai_hint_handler(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Обработчик для получения подсказки от ИИ
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем пользователя
+        user, created = await db_get_or_create_user(update.effective_user)
+        
+        # Получаем текущее задание пользователя
+        current_task_id = get_current_task_id(user)
+        
+        if current_task_id:
+            # Есть текущее задание - даем подсказку к нему
+            task = await db_get_task_by_id(current_task_id)
+            hint_prompt = f"Дай подсказку к заданию: {task.title}. Не давай полный ответ, только направляй к решению."
+            
+            hint = await get_ai_response(hint_prompt, 'hint_generation', user, task)
+            
+            keyboard = [
+                [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")],
+                [InlineKeyboardButton("🏠 Главное меню", callback_data="back_to_main")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(
+                f"💡 **ПОДСКАЗКА К ЗАДАНИЮ:**\n\n{hint}",
+                reply_markup=reply_markup,
+                parse_mode='Markdown'
+            )
+        else:
+            # Нет текущего задания - предлагаем выбрать
+            keyboard = [
+                [InlineKeyboardButton("📚 Выбрать предмет", callback_data="subjects")],
+                [InlineKeyboardButton("🎯 Случайное задание", callback_data="random_task")],
+                [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(
+                "💡 **Для получения подсказки нужно выбрать задание!**\n\n"
+                "Сначала выбери предмет или возьми случайное задание, "
+                "а потом я смогу дать тебе подсказку.",
+                reply_markup=reply_markup,
+                parse_mode='Markdown'
+            )
+        
+    except Exception as e:
+        logger.error(f"Ошибка в ai_hint_handler: {e}")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+
+
+async def similar_tasks_handler(update: Update, context: ContextTypes.DEFAULT_TYPE): # type: ignore
+    """
+    Обработчик для поиска похожих заданий
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        # Получаем пользователя
+        user, created = await db_get_or_create_user(update.effective_user)
+        
+        # Получаем текущее задание пользователя
+        current_task_id = get_current_task_id(user)
+        
+        if current_task_id:
+            # Есть текущее задание - ищем похожие
+            task = await db_get_task_by_id(current_task_id)
+            
+            # Используем RAG для поиска похожих заданий
+            ai_service = AiService()
+            similar_tasks = await sync_to_async(ai_service.find_similar_tasks)(task, user, limit=3)  # type: ignore
+            
+            if similar_tasks:
+                similar_text = f"🔍 **ПОХОЖИЕ ЗАДАНИЯ ДЛЯ ПРАКТИКИ:**\n\n"
+                
+                for i, similar_task in enumerate(similar_tasks, 1):
+                    similar_text += f"{i}. **{similar_task['title']}**\n"  # type: ignore
+                    similar_text += f"   Сложность: {similar_task['difficulty']}/5\n"
+                    similar_text += f"   Предмет: {similar_task['subject']}\n\n"  # type: ignore    
+                
+                keyboard = [
+                    [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")],
+                    [InlineKeyboardButton("🏠 Главное меню", callback_data="back_to_main")]
+                ]
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                
+                await query.edit_message_text(
+                    similar_text,  # type: ignore
+                    reply_markup=reply_markup,
+                    parse_mode='Markdown'
+                )
+            else:
+                await query.edit_message_text(
+                    "🔍 **Похожие задания не найдены.**\n\n"  # type: ignore
+                    "Попробуйте решить другие задания по этому предмету.",
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")]
+                    ]),
+                    parse_mode='Markdown'  # type: ignore
+                )
+        else:
+            # Нет текущего задания
+            keyboard = [
+                [InlineKeyboardButton("📚 Выбрать предмет", callback_data="subjects")],
+                [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            
+            await query.edit_message_text(
+                "🔍 **Для поиска похожих заданий нужно выбрать задание!**\n\n"
+                "Сначала выбери предмет или возьми случайное задание.",
+                reply_markup=reply_markup,
+                parse_mode='Markdown'  # type: ignore
+            )
+        
+    except Exception as e:
+        logger.error(f"Ошибка в similar_tasks_handler: {e}")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
+
+
+async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Возврат в главное меню
+    """
+    try:
+        query = update.callback_query
+        await query.answer()
+        
+        welcome_text = f"""
+🚀 **ГЛАВНОЕ МЕНЮ EXAMFLOW**
+
+Привет, {update.effective_user.first_name}! 
+
+Выбери действие:
+"""
+        
+        keyboard = [
+            [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
+            [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan")],
+            [InlineKeyboardButton("🤖 Спросить ИИ", callback_data="ai_help")],
+            [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await query.edit_message_text(
+            welcome_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+        
+    except Exception as e:
+        logger.error(f"Ошибка в back_to_main: {e}")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
 
 
 async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1077,7 +1604,9 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("🎯 Случайное", callback_data="random_task")],
-        [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
+        [InlineKeyboardButton("📊 Статистика", callback_data="stats"), InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan")],
+        [InlineKeyboardButton("🤖 Спросить ИИ", callback_data="ai_help")],
+        [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
