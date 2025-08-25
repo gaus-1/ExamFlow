@@ -2,6 +2,7 @@
 Представления для модуля обучения
 
 Обрабатывает:
+- Главную страницу
 - Просмотр списка предметов
 - Детальный просмотр предмета
 - Просмотр тем предмета
@@ -17,6 +18,36 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from .models import Subject, Topic, Task, UserProgress
 import random
+
+
+def home(request):
+    """
+    Главная страница ExamFlow
+    
+    Показывает:
+    - Hero секцию с описанием платформы
+    - Статистику предметов и заданий
+    - QR-код для Telegram бота
+    - Преимущества платформы
+    - Тарифные планы
+    - Блок персонализации (для авторизованных)
+    """
+    # Получаем статистику
+    subjects_count = Subject.objects.count()  # type: ignore
+    tasks_count = Task.objects.count()  # type: ignore
+    
+    # Получаем предметы для отображения
+    subjects = Subject.objects.annotate(  # type: ignore
+        tasks_count=Count('topics__tasks')
+    ).filter(tasks_count__gt=0)[:8]  # Показываем первые 8 предметов
+    
+    context = {
+        'subjects_count': subjects_count,
+        'tasks_count': tasks_count,
+        'subjects': subjects,
+    }
+    
+    return render(request, 'home.html', context)
 
 
 def subjects_list(request):

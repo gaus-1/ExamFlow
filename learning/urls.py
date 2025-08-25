@@ -2,6 +2,7 @@
 URL-маршруты для модуля обучения
 
 Определяет пути для:
+- Главной страницы (/)
 - Списка предметов (/subjects/)
 - Детального просмотра предмета (/subject/<id>/)
 - Детального просмотра темы (/topic/<id>/)
@@ -16,6 +17,9 @@ from . import views
 app_name = 'learning'
 
 urlpatterns = [
+    # Главная страница
+    path('', views.home, name='home'),
+    
     # Предметы
     path('subjects/', views.subjects_list, name='subjects_list'),
     path('subject/<int:subject_id>/', views.subject_detail, name='subject_detail'),
