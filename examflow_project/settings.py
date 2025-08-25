@@ -50,11 +50,13 @@ INSTALLED_APPS = [
     # Внешние библиотеки
     'corsheaders',
     'django_redis',
+    'django_csp',  # Content Security Policy
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
+    'django_csp.middleware.CSPMiddleware',  # CSP middleware
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
@@ -364,17 +367,47 @@ else:
     ]))
 
 # 🔒 БЕЗОПАСНОСТЬ - БЕСПЛАТНЫЕ НАСТРОЙКИ
+# Content Security Policy (CSP) - защита от XSS
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net")
+CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net")
+CSP_IMG_SRC = ("'self'", "data:", "https:", "https://api.qrserver.com")
+CSP_FONT_SRC = ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net")
+CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com")
+CSP_FRAME_ANCESTORS = ("'none'",)  # Защита от clickjacking
+
+# Дополнительные заголовки безопасности
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# Content Security Policy (CSP) - защита от XSS
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com")
-CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
-CSP_IMG_SRC = ("'self'", "data:", "https:")
-CSP_FONT_SRC = ("'self'", "https://cdnjs.cloudflare.com")
+# CORS настройки
+CORS_ALLOWED_ORIGINS = [
+    "https://examflow.ru",
+    "https://www.examflow.ru",
+    "https://*.onrender.com",
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # Безопасные cookies
 SESSION_COOKIE_SECURE = True
@@ -402,6 +435,10 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
+        'security': {
+            'format': '[SECURITY] {levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
         'file': {
@@ -415,6 +452,12 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'security.log'),
+            'formatter': 'security',
+        },
     },
     'root': {
         'handlers': ['console', 'file'],
@@ -426,6 +469,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'django.security': {
+            'handlers': ['security_file', 'console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
         'bot': {
             'handlers': ['console', 'file'],
             'level': 'INFO',
@@ -433,6 +481,11 @@ LOGGING = {
         },
         'core': {
             'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'telegram_bot': {
+            'handlers': ['console', 'file', 'security_file'],
             'level': 'INFO',
             'propagate': False,
         },

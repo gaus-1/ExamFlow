@@ -24,3 +24,6 @@ schedule==1.2.0
 
 # 🔒 БЕЗОПАСНОСТЬ - Rate Limiting
 django-ratelimit==4.1.0
+
+# 🔒 БЕЗОПАСНОСТЬ - Content Security Policy
+django-csp==3.7

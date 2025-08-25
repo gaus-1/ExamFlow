@@ -7,6 +7,9 @@
 import os
 import django
 import logging
+import hashlib
+import hmac
+from urllib.parse import parse_qs
 
 # Настройка Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
@@ -30,6 +33,40 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# 🔒 БЕЗОПАСНОСТЬ: Проверка токена бота
+def validate_bot_token():
+    """
+    Проверяет валидность токена бота
+    """
+    token = settings.TELEGRAM_BOT_TOKEN
+    if not token or len(token) < 40:
+        logger.error("❌ НЕДЕЙСТВИТЕЛЬНЫЙ ТОКЕН БОТА!")
+        return False
+    
+    # Проверяем формат токена Telegram
+    if not token.count(':') == 1:
+        logger.error("❌ НЕПРАВИЛЬНЫЙ ФОРМАТ ТОКЕНА!")
+        return False
+    
+    logger.info("✅ Токен бота валиден")
+    return True
+
+# 🔒 БЕЗОПАСНОСТЬ: Проверка webhook
+def validate_webhook_secret(secret_token, request_body, signature):
+    """
+    Проверяет подпись webhook для безопасности
+    """
+    if not secret_token:
+        return False
+    
+    expected_signature = hmac.new(
+        secret_token.encode('utf-8'),
+        request_body,
+        hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(f"sha256={expected_signature}", signature)
+
 
 def get_bot():
     """
@@ -45,8 +82,16 @@ def setup_bot_application():
     
     Регистрирует все обработчики команд и callback-запросов
     """
+    # 🔒 БЕЗОПАСНОСТЬ: Проверяем токен перед созданием приложения
+    if not validate_bot_token():
+        logger.error("❌ Невозможно создать приложение бота - недействительный токен!")
+        return None
+    
     # Создаем приложение бота
     application = Application.builder().token(settings.TELEGRAM_BOT_TOKEN).build()
+    
+    # 🔒 БЕЗОПАСНОСТЬ: Логируем успешное создание
+    logger.info("✅ Приложение бота создано с проверкой безопасности")
     
     # Регистрируем обработчики команд
     application.add_handler(CommandHandler("start", start))  # type: ignore
