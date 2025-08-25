@@ -50,20 +50,24 @@
     <!-- Адаптивный дизайн -->
     <link rel="stylesheet" href="{% static 'css/responsive-design.css' %}">
     <style>
-        /* Основные стили */
-        body {
-            background-color: #fffef2;
-            color: #252525;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
+        /* Основные цвета и переменные */
+        :root {
+            --primary-bg: #fffef2;
+            --primary-text: #252525;
+            --secondary-text: #666;
+            --border-color: #e5e5e5;
+            --footer-bg: #f8f8f8;
         }
         
-        /* Навигация в стиле Aesop */
+        body {
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+        }
+        
+        /* Навигация */
         .navbar-aesop {
-            background: #fffef2;
-            border-bottom: 1px solid #e5e5e5;
+            background: var(--primary-bg);
+            border-bottom: 1px solid var(--border-color);
             padding: 20px 0;
             position: sticky;
             top: 0;
@@ -71,63 +75,24 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
-        .navbar-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-        
-        .navbar-user {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .navbar-nav {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            gap: 0;
-            flex: 1;
-            justify-content: center;
-        }
-        
-        .nav-item {
-            margin: 0;
-        }
-        
         .navbar-brand {
-            color: #252525 !important;
-            font-family: 'Helvetica Neue', Arial, sans-serif !important;
+            color: var(--primary-text) !important;
             font-size: 1.8rem !important;
             font-weight: 400 !important;
             text-decoration: none !important;
             letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
-
-        /* Явно отключаем любые псевдо-иконки до текста */
-        .navbar-brand::before {
-            content: none !important;
-        }
-
-        /* Класс логотипа рядом с названием */
+        
         .brand-logo {
             width: 48px;
             height: 48px;
             margin-right: 10px;
             border-radius: 8px;
             object-fit: contain;
-            display: inline-block;
         }
         
         .nav-link-aesop {
-            color: #333 !important;
-            font-family: 'Helvetica Neue', Arial, sans-serif !important;
+            color: var(--secondary-text) !important;
             font-size: 0.875rem !important;
             font-weight: 400 !important;
             text-decoration: none !important;
@@ -137,136 +102,77 @@
         }
         
         .nav-link-aesop:hover {
-            color: #666 !important;
-            text-decoration: none !important;
+            color: var(--primary-text) !important;
         }
         
-        .nav-link-aesop.active {
-            color: #252525 !important;
-            text-decoration: underline !important;
-        }
-        
-        /* Footer в стиле Aesop */
+        /* Footer */
         .footer-modern {
-            background: #f8f8f8;
-            border-top: 1px solid #e5e5e5;
+            background: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
             padding: 60px 0 30px;
             margin-top: 80px;
         }
         
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
         .footer-section h5 {
-            color: #252525;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: var(--primary-text);
             font-size: 1.125rem;
             font-weight: 400;
             margin-bottom: 20px;
             letter-spacing: 0.3px;
         }
         
-        .footer-section p {
-            color: #666;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+        .footer-section p, .footer-section a {
+            color: var(--secondary-text);
             font-size: 0.875rem;
             line-height: 1.6;
             margin-bottom: 16px;
-        }
-        
-        .footer-section a {
-            color: #666;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            font-size: 0.875rem;
             text-decoration: none;
-            display: block;
-            margin-bottom: 8px;
             transition: color 0.2s ease;
         }
         
         .footer-section a:hover {
-            color: #252525;
+            color: var(--primary-text);
         }
         
         .footer-bottom {
-            border-top: 1px solid #e5e5e5;
+            border-top: 1px solid var(--border-color);
             padding-top: 30px;
             text-align: center;
         }
         
         .footer-bottom p {
             color: #999;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 0.875rem;
             margin: 0;
         }
         
         /* Адаптивность */
         @media (max-width: 768px) {
-            .navbar-aesop {
-                padding: 16px 0;
-            }
-            
-            .navbar-brand {
-                font-size: 1.5rem !important;
-            }
-            
-            .navbar-content {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .navbar-nav {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 8px;
-                flex: none;
-            }
-            
-            .navbar-user {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .nav-link-aesop {
-                font-size: 0.8rem !important;
-                padding: 6px 12px !important;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
+            .navbar-aesop { padding: 16px 0; }
+            .navbar-brand { font-size: 1.5rem !important; }
+            .navbar-content { flex-direction: column; gap: 16px; }
+            .navbar-nav { flex-wrap: wrap; justify-content: center; gap: 8px; flex: none; }
+            .navbar-user { flex-direction: column; gap: 8px; }
+            .nav-link-aesop { font-size: 0.8rem !important; padding: 6px 12px !important; }
+            .footer-content { grid-template-columns: 1fr; gap: 30px; }
         }
         
-        /* Контейнер с правильными отступами */
+        /* Контейнер */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
         
-        /* Секции с правильными отступами */
-        .section-padding {
-            padding: 80px 0;
-        }
+        /* Секции */
+        .section-padding { padding: 80px 0; }
+        .section-padding-sm { padding: 60px 0; }
+        .section-padding-lg { padding: 120px 0; }
         
-        .section-padding-sm {
-            padding: 60px 0;
-        }
-        
-        .section-padding-lg {
-            padding: 120px 0;
-        }
-        
-        /* Карточки с правильными границами и отступами */
+        /* Карточки */
         .card {
-            background: #fffef2;
-            border: 1px solid #e5e5e5;
+            background: var(--primary-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 24px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -278,14 +184,13 @@
             transition: all 0.3s ease;
         }
         
-        /* Кнопки с правильными стилями */
+        /* Кнопки */
         .btn-primary {
-            background: #252525;
-            color: #fffef2;
+            background: var(--primary-text);
+            color: var(--primary-bg);
             border: none;
             padding: 12px 24px;
             border-radius: 6px;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -302,11 +207,10 @@
         
         .btn-secondary {
             background: transparent;
-            color: #252525;
-            border: 1px solid #e5e5e5;
+            color: var(--primary-text);
+            border: 1px solid var(--border-color);
             padding: 12px 24px;
             border-radius: 6px;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
@@ -316,8 +220,8 @@
         }
         
         .btn-secondary:hover {
-            background: #f8f8f8;
-            border-color: #252525;
+            background: var(--footer-bg);
+            border-color: var(--primary-text);
         }
     </style>
     
