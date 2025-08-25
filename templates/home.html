@@ -104,7 +104,7 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for subject in subjects %}
-            <div class="subject-card card-hover text-reveal">
+            <div class="subject-card card-hover text-reveal text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">
                         {{ subject.name }}
@@ -120,7 +120,7 @@
             </div>
             {% empty %}
             <!-- Демо предметы если нет в базе -->
-            <div class="subject-card card-hover">
+            <div class="subject-card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Математика</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -128,7 +128,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="subject-card card-hover">
+            <div class="subject-card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Русский язык</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -136,7 +136,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover">
+            <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Физика</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -144,7 +144,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover">
+            <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Химия</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -152,7 +152,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover">
+            <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Биология</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -160,7 +160,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-                        <div class="card card-hover">
+                        <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">История</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -169,16 +169,17 @@
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
             
-            <div class="card card-hover">
+            <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">География</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
                 </div>
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+>
             </div>
             
-            <div class="card card-hover">
+            <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Литература</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -187,7 +188,7 @@
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
             
-            <div class="card card-hover">
+            <div class="card card-hover text-center">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Информатика</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -217,37 +218,37 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="feature-card card-hover text-reveal">
+            <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">📚</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">На основе ФИПИ</h3>
                 <p class="text-gray-600">Задания и демоверсии, созданные на основе открытых материалов ФИПИ для эффективной подготовки</p>
             </div>
             
-            <div class="feature-card card-hover text-reveal">
+            <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">🎯</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">Умный ИИ-помощник</h3>
                 <p class="text-gray-600">Искусственный интеллект анализирует ваши ответы и создает индивидуальный план подготовки</p>
             </div>
             
-            <div class="feature-card card-hover text-reveal">
+            <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">🤖</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">Персонализация</h3>
                 <p class="text-gray-600">ИИ анализирует ваши ответы и создает индивидуальный план подготовки</p>
             </div>
             
-            <div class="feature-card card-hover text-reveal">
+            <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">🎮</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">Геймификация</h3>
                 <p class="text-gray-600">Система уровней, достижений и рейтингов делает обучение увлекательным</p>
             </div>
             
-            <div class="feature-card card-hover text-reveal">
+            <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">📱</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">Telegram интеграция</h3>
                 <p class="text-gray-600">Полноценный бот с синхронизацией прогресса и push-уведомлениями</p>
             </div>
             
-            <div class="feature-card card-hover text-reveal">
+            <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">📊</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">Аналитика прогресса</h3>
                 <p class="text-gray-600">Детальная статистика с выявлением слабых мест и рекомендациями</p>
@@ -267,7 +268,7 @@
         </p>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="step-item text-reveal">
+            <div class="step-item text-reveal text-center">
                 <div class="text-6xl font-bold mb-4" style="color: #252525;">01</div>
                 <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Быстрая регистрация</h3>
                 <p class="text-lg mb-4" style="color: #666;">
@@ -280,7 +281,7 @@
                 </ul>
             </div>
             
-            <div class="step-item text-reveal">
+            <div class="step-item text-reveal text-center">
                 <div class="text-6xl font-bold mb-4" style="color: #252525;">02</div>
                 <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Обучение в группе</h3>
                 <p class="text-lg mb-4" style="color: #666;">
@@ -293,7 +294,7 @@
                 </ul>
             </div>
             
-            <div class="step-item text-reveal">
+            <div class="step-item text-reveal text-center">
                 <div class="text-6xl font-bold mb-4" style="color: #252525;">03</div>
                 <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Персональный прогресс</h3>
                 <p class="text-lg mb-4" style="color: #666;">

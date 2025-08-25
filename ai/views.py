@@ -48,11 +48,21 @@ def ai_dashboard(request):
 
 def ai_chat(request):
     """Страница чата с ИИ"""
-    context = {
-        'title': 'Чат с ИИ - ExamFlow',
-        'user': request.user,
-    }
-    return render(request, 'ai/chat.html', context)
+    try:
+        context = {
+            'title': 'Чат с ИИ - ExamFlow',
+            'user': request.user,
+        }
+        return render(request, 'ai/chat.html', context)
+    except Exception as e:  # type: ignore
+        # Мягкий fallback: не отдаём 500, показываем информативную страницу
+        logger.error(f"Ошибка рендера страницы чата: {e}")
+        context = {
+            'title': 'Чат с ИИ - ExamFlow',
+            'user': request.user,
+            'error_message': 'Временная ошибка загрузки чата ИИ. Повторите попытку через минуту.',
+        }
+        return render(request, 'ai/chat.html', context)
 
 
 def ai_explain(request):
