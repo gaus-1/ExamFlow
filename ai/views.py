@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils import timezone
 import json
 import logging
+from django_ratelimit.decorators import ratelimit
 
 logger = logging.getLogger(__name__)
 
@@ -87,6 +88,7 @@ def ai_generate(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@ratelimit(key='ip', rate='20/m', block=True)
 def api_chat(request):
     """API для чата с ИИ"""
     try:
@@ -125,6 +127,7 @@ def api_chat(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@ratelimit(key='ip', rate='30/m', block=True)
 def api_explain(request):
     """API для объяснения тем ИИ"""
     try:
@@ -150,6 +153,7 @@ def api_explain(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@ratelimit(key='ip', rate='30/m', block=True)
 def api_search(request):
     """API для поиска заданий ИИ"""
     try:
@@ -184,6 +188,7 @@ def api_search(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@ratelimit(key='ip', rate='15/m', block=True)
 def api_generate(request):
     """API для генерации заданий ИИ"""
     try:
@@ -228,6 +233,7 @@ def ai_limits(request):
 
 @csrf_exempt
 @require_http_methods(["GET"])
+@ratelimit(key='ip', rate='60/m', block=True)
 def api_limits(request):
     """API для получения лимитов пользователя"""
     try:

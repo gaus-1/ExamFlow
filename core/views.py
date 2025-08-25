@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import logging
+from django_ratelimit.decorators import ratelimit
 
 from .personalization_system import (
     get_user_insights,
@@ -143,6 +144,7 @@ def weak_topics_view(request):
 # API endpoints для AJAX запросов
 @login_required
 @require_http_methods(["GET"])
+@ratelimit(key='user', rate='30/m', block=True)
 def api_user_insights(request):
     """API для получения персональных данных пользователя"""
     try:
@@ -155,6 +157,7 @@ def api_user_insights(request):
 
 @login_required
 @require_http_methods(["GET"])
+@ratelimit(key='user', rate='30/m', block=True)
 def api_recommended_tasks(request):
     """API для получения рекомендуемых задач"""
     try:
@@ -169,6 +172,7 @@ def api_recommended_tasks(request):
 
 @login_required
 @require_http_methods(["GET"])
+@ratelimit(key='user', rate='30/m', block=True)
 def api_study_plan(request):
     """API для получения плана обучения"""
     try:
@@ -182,6 +186,7 @@ def api_study_plan(request):
 
 @login_required
 @require_http_methods(["GET"])
+@ratelimit(key='user', rate='30/m', block=True)
 def api_weak_topics(request):
     """API для получения слабых тем"""
     try:
@@ -195,6 +200,7 @@ def api_weak_topics(request):
 
 @login_required
 @require_http_methods(["GET"])
+@ratelimit(key='user', rate='30/m', block=True)
 def api_user_preferences(request):
     """API для получения предпочтений пользователя"""
     try:
