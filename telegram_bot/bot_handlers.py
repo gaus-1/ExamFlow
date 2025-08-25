@@ -268,23 +268,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"Ошибка создания нижнего меню: {e}")
     
-    # Проверяем соединение с базой данных (в async контексте)
+    # Временно отключаем проверку БД для отладки
     try:
-        ok = await db_check_connection()
-    except Exception as e:
-        logger.error(f"Ошибка проверки БД: {e}")
-        ok = False
-    if not ok:
-        error_text = "❌ Сервис временно недоступен. База данных не отвечает.\nПопробуйте через 1-2 минуты."
-        if is_callback:
-            await update.callback_query.answer()
-            await update.callback_query.edit_message_text(error_text)
-        else:
-            await update.message.reply_text(error_text)
-        return
-    
-    try:
-        user_obj, created = await db_get_or_create_user(user)
+        # user_obj, created = await db_get_or_create_user(user)
+        user_obj = None
+        created = False
         
         welcome_text = f"""
 🚀 **Добро пожаловать в ExamFlow!**
