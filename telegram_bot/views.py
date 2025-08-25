@@ -69,8 +69,9 @@ def telegram_webhook(request):
             return HttpResponse(b"Forbidden", status=403)  # type: ignore
         
         # 🔒 БЕЗОПАСНОСТЬ: Проверка размера данных
-        if request.content_length and request.content_length > 1024 * 1024:  # 1MB limit
-            logger.warning(f"Webhook заблокирован - слишком большой размер: {request.content_length}")
+        content_length = getattr(request, 'content_length', None)
+        if content_length and content_length > 1024 * 1024:  # 1MB limit
+            logger.warning(f"Webhook заблокирован - слишком большой размер: {content_length}")
             return HttpResponse(b"Payload too large", status=413)  # type: ignore
 
         # Детальное логирование входящего webhook
