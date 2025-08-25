@@ -374,11 +374,11 @@
                         🌙
                     </button>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'auth:dashboard' %}" class="nav-link nav-link-aesop">
+                        <a href="{% url 'authentication:dashboard' %}" class="nav-link nav-link-aesop">
                             <i class="fas fa-user"></i> Профиль
                         </a>
                     {% else %}
-                        <a href="{% url 'auth:login' %}" class="nav-link nav-link-aesop">
+                        <a href="{% url 'authentication:login' %}" class="nav-link nav-link-aesop">
                             <i class="fas fa-sign-in-alt"></i> Войти
                         </a>
                     {% endif %}
