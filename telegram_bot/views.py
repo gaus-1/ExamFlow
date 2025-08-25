@@ -198,7 +198,7 @@ async def handle_telegram_update(update: Update):
 
         # Импортируем обработчики
         from .bot_handlers import (
-            start, subjects_menu, show_subject_topics, show_task, # type: ignore
+            start, subjects_menu, show_subject_topics, show_task_handler, # type: ignore
             handle_answer, show_stats, voice_hint, handle_unknown_callback # type: ignore
         )
         
@@ -242,7 +242,7 @@ async def handle_telegram_update(update: Update):
                     start as h_start,
                     subjects_menu as h_subjects_menu,
                     show_subject_topics as h_show_subject_topics,
-                    show_task as h_show_task, # type: ignore
+                    show_task_handler as h_show_task, # type: ignore
                     handle_answer as h_handle_answer, # type: ignore
                     show_stats as h_show_stats,
                     voice_hint as h_voice_hint, # type: ignore
