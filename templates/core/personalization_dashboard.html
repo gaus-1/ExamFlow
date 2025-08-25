@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    .progress-ring-circle {
+        transition: stroke-dasharray 0.35s;
+        transform-origin: 50% 50%;
+    }
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <!-- Заголовок страницы -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Персонализация</h1>
+                    <p class="mt-2 text-gray-600">Ваш персональный помощник в изучении ЕГЭ и ОГЭ</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Статистика и прогресс -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Общий прогресс -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Общий прогресс</p>
+                        <p class="text-2xl font-bold text-gray-900" id="overall-progress">0%</p>
+                    </div>
+                    <div class="w-16 h-16">
+                        <svg class="progress-ring w-16 h-16" viewBox="0 0 64 64">
+                            <circle class="progress-ring-circle" stroke="#e5e7eb" stroke-width="4" fill="transparent" r="28" cx="32" cy="32"></circle>
+                            <circle class="progress-ring-circle" stroke="#3b82f6" stroke-width="4" fill="transparent" r="28" cx="32" cy="32" 
+                                    stroke-dasharray="0 175.84" stroke-dashoffset="0" id="progress-circle"></circle>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Решенные задачи -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Решено задач</p>
+                        <p class="text-2xl font-bold text-gray-900" id="solved-tasks">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Любимые предметы -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Любимый предмет</p>
+                        <p class="text-2xl font-bold text-gray-900" id="favorite-subject">-</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Время обучения -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.4s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Время обучения</p>
+                        <p class="text-2xl font-bold text-gray-900" id="study-time">0ч</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Рекомендуемые задачи -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.5s">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Рекомендуемые задачи</h2>
+                        <a href="{% url 'core:my_recommendations' %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            Посмотреть все →
+                        </a>
+                    </div>
+                    
+                    <div id="recommended-tasks" class="space-y-4">
+                        <!-- Задачи будут загружены через JavaScript -->
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                            <p class="mt-2 text-gray-500">Загружаем рекомендации...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Слабые темы -->
+                <div class="bg-white rounded-xl shadow-sm border p-6 mt-6 fade-in" style="animation-delay: 0.6s">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Слабые темы</h2>
+                        <a href="{% url 'core:weak_topics' %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            Подробнее →
+                        </a>
+                    </div>
+                    
+                    <div id="weak-topics" class="space-y-3">
+                        <!-- Темы будут загружены через JavaScript -->
+                        <div class="text-center py-6">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600 mx-auto"></div>
+                            <p class="mt-2 text-gray-500">Анализируем слабые места...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Боковая панель -->
+            <div class="space-y-6">
+                <!-- План обучения -->
+                <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.7s">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">План обучения</h3>
+                        <a href="{% url 'core:study_plan' %}" class="text-blue-600 hover:text-blue-700 text-sm">
+                            Подробнее →
+                        </a>
+                    </div>
+                    
+                    <div id="study-plan" class="space-y-3">
+                        <!-- План будет загружен через JavaScript -->
+                        <div class="text-center py-4">
+                            <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600 mx-auto"></div>
+                            <p class="mt-2 text-gray-500 text-sm">Составляем план...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Быстрые действия -->
+                <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.8s">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Быстрые действия</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'core:my_analytics' %}" class="flex items-center p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <span class="text-gray-700">Моя аналитика</span>
+                        </a>
+                        
+                        <a href="/" class="flex items-center p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span class="text-gray-700">Найти предмет</span>
+                        </a>
+                        
+                        <a href="/" class="flex items-center p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            <span class="text-gray-700">На главную</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем данные при загрузке страницы
+    loadUserInsights();
+    loadRecommendedTasks();
+    loadWeakTopics();
+    loadStudyPlan();
+    
+    // Функция загрузки инсайтов пользователя
+    function loadUserInsights() {
+        fetch('{% url "core:api_user_insights" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateDashboard(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки инсайтов:', error);
+            });
+    }
+    
+    // Функция загрузки рекомендуемых задач
+    function loadRecommendedTasks() {
+        fetch('{% url "core:api_recommended_tasks" %}?limit=3')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayRecommendedTasks(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки рекомендаций:', error);
+            });
+    }
+    
+    // Функция загрузки слабых тем
+    function loadWeakTopics() {
+        fetch('{% url "core:api_weak_topics" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayWeakTopics(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки слабых тем:', error);
+            });
+    }
+    
+    // Функция загрузки плана обучения
+    function loadStudyPlan() {
+        fetch('{% url "core:api_study_plan" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayStudyPlan(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки плана обучения:', error);
+            });
+    }
+    
+    // Обновление дашборда
+    function updateDashboard(insights) {
+        const progress = insights.progress_summary?.overall_progress || 0;
+        const solvedTasks = insights.progress_summary?.solved_tasks || 0;
+        const favoriteSubject = insights.preferences?.favorite_subjects?.[0] || '-';
+        const studyTime = insights.progress_summary?.total_study_time || 0;
+        
+        // Обновляем прогресс
+        document.getElementById('overall-progress').textContent = `${Math.round(progress)}%`;
+        document.getElementById('solved-tasks').textContent = solvedTasks;
+        document.getElementById('favorite-subject').textContent = favoriteSubject;
+        document.getElementById('study-time').textContent = `${Math.round(studyTime)}ч`;
+        
+        // Обновляем круговую диаграмму
+        const circle = document.getElementById('progress-circle');
+        const circumference = 2 * Math.PI * 28;
+        const offset = circumference - (progress / 100) * circumference;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = offset;
+    }
+    
+    // Отображение рекомендуемых задач
+    function displayRecommendedTasks(tasks) {
+        const container = document.getElementById('recommended-tasks');
+        
+        if (!tasks || tasks.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p>Пока нет рекомендаций</p>
+                    <p class="text-sm">Решите несколько задач, чтобы получить персональные рекомендации</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const tasksHtml = tasks.map(task => `
+            <div class="flex items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-blue-600 font-semibold text-sm">${task.difficulty}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">${task.title}</p>
+                    <p class="text-sm text-gray-500">${task.subject_name}</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-blue-600 hover:text-blue-700 text-sm font-medium" onclick="alert('Функция решения задач будет добавлена позже')">
+                        Решить →
+                    </a>
+                </div>
+            </div>
+        `).join('');
+        
+        container.innerHTML = tasksHtml;
+    }
+    
+    // Отображение слабых тем
+    function displayWeakTopics(topics) {
+        const container = document.getElementById('weak-topics');
+        
+        if (!topics || topics.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-6 text-gray-500">
+                    <svg class="w-10 h-10 mx-auto mb-2 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-sm">Отличная работа!</p>
+                    <p class="text-xs">Слабых тем не обнаружено</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const topicsHtml = topics.slice(0, 3).map(topic => `
+            <div class="flex items-center justify-between p-3 rounded-lg bg-red-50 border border-red-200">
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                    <span class="text-sm text-gray-700">${topic.name}</span>
+                </div>
+                <span class="text-xs text-red-600 font-medium">${topic.error_rate}%</span>
+            </div>
+        `).join('');
+        
+        container.innerHTML = topicsHtml;
+    }
+    
+    // Отображение плана обучения
+    function displayStudyPlan(plan) {
+        const container = document.getElementById('study-plan');
+        
+        if (!plan || !plan.topics || plan.topics.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-gray-500">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 00-2 2"></path>
+                    </svg>
+                    <p class="text-xs">План формируется</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const planHtml = plan.topics.slice(0, 3).map((topic, index) => `
+            <div class="flex items-center p-2 rounded-lg bg-green-50 border border-green-200">
+                <div class="w-6 h-6 bg-green-500 text-white text-xs rounded-full flex items-center justify-center mr-3">
+                    ${index + 1}
+                </div>
+                <span class="text-sm text-gray-700">${topic.name}</span>
+            </div>
+        `).join('');
+        
+        container.innerHTML = planHtml;
+    }
+});
+</script>
+{% endblock %}

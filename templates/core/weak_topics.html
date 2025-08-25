@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .topic-card {
+        transition: all 0.3s ease;
+    }
+    .topic-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    .progress-ring-circle {
+        transition: stroke-dasharray 0.35s;
+        transform-origin: 50% 50%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <!-- Заголовок страницы -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Слабые темы</h1>
+                    <p class="mt-2 text-gray-600">Анализ ваших слабых мест и рекомендации по их устранению</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'core:personalization_dashboard' %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        ← Назад к дашборду
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Общая статистика -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border p-6 text-center fade-in" style="animation-delay: 0.1s">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Всего слабых тем</h3>
+                <p class="text-3xl font-bold text-red-600" id="total-weak-topics">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border p-6 text-center fade-in" style="animation-delay: 0.2s">
+                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Средний % ошибок</h3>
+                <p class="text-3xl font-bold text-orange-600" id="avg-error-rate">0%</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border p-6 text-center fade-in" style="animation-delay: 0.3s">
+                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">В процессе</h3>
+                <p class="text-3xl font-bold text-yellow-600" id="in-progress-topics">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border p-6 text-center fade-in" style="animation-delay: 0.4s">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Улучшено</h3>
+                <p class="text-3xl font-bold text-green-600" id="improved-topics">0</p>
+            </div>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8 fade-in" style="animation-delay: 0.5s">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <label class="text-sm font-medium text-gray-700">Предмет:</label>
+                    <select id="subject-filter" class="rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Все предметы</option>
+                        <option value="mathematics">Математика</option>
+                        <option value="russian">Русский язык</option>
+                        <option value="physics">Физика</option>
+                        <option value="chemistry">Химия</option>
+                        <option value="biology">Биология</option>
+                    </select>
+                    
+                    <label class="text-sm font-medium text-gray-700">Приоритет:</label>
+                    <select id="priority-filter" class="rounded-lg border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Любой</option>
+                        <option value="high">Высокий</option>
+                        <option value="medium">Средний</option>
+                        <option value="low">Низкий</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center space-x-2">
+                    <button id="refresh-btn" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                        Обновить
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список слабых тем -->
+        <div class="bg-white rounded-xl shadow-sm border p-6 mb-8 fade-in" style="animation-delay: 0.6s">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Слабые темы по приоритету</h2>
+            <div id="weak-topics-list" class="space-y-6">
+                <!-- Темы будут загружены через JavaScript -->
+                <div class="text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+                    <p class="text-lg text-gray-600">Анализируем ваши слабые места...</p>
+                    <p class="text-sm text-gray-500 mt-2">Это поможет составить план по их устранению</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Рекомендации по улучшению -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Стратегии улучшения -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.7s">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Стратегии улучшения</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-blue-600 font-semibold text-sm">1</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Фокус на основах</h4>
+                            <p class="text-sm text-gray-600">Повторите базовые концепции перед решением сложных задач</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-green-600 font-semibold text-sm">2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Постепенное усложнение</h4>
+                            <p class="text-sm text-gray-600">Начните с простых задач и постепенно переходите к сложным</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-purple-600 font-semibold text-sm">3</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Анализ ошибок</h4>
+                            <p class="text-sm text-gray-600">Разбирайте каждую ошибку и понимайте её причину</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-yellow-600 font-semibold text-sm">4</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Регулярная практика</h4>
+                            <p class="text-sm text-gray-600">Решайте задачи по слабым темам каждый день</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- План действий -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.8s">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">План действий</h3>
+                <div class="space-y-4">
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h4 class="font-medium text-blue-900 mb-2">Неделя 1-2</h4>
+                        <p class="text-sm text-blue-700">Изучите теорию по самым слабым темам</p>
+                    </div>
+                    
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <h4 class="font-medium text-green-900 mb-2">Неделя 3-4</h4>
+                        <p class="text-sm text-green-700">Решайте простые задачи для закрепления</p>
+                    </div>
+                    
+                    <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <h4 class="font-medium text-yellow-900 mb-2">Неделя 5-6</h4>
+                        <p class="text-sm text-yellow-700">Переходите к задачам средней сложности</p>
+                    </div>
+                    
+                    <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <h4 class="font-medium text-purple-900 mb-2">Неделя 7-8</h4>
+                        <p class="text-sm text-purple-700">Решайте сложные задачи и тесты</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t">
+                    <button id="generate-plan" class="w-full px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                        Сгенерировать персональный план
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем данные при загрузке страницы
+    loadWeakTopics();
+    
+    // Обработчики фильтров
+    document.getElementById('subject-filter').addEventListener('change', filterTopics);
+    document.getElementById('priority-filter').addEventListener('change', filterTopics);
+    document.getElementById('refresh-btn').addEventListener('click', refreshTopics);
+    document.getElementById('generate-plan').addEventListener('click', generatePersonalPlan);
+    
+    // Функция загрузки слабых тем
+    function loadWeakTopics() {
+        fetch('{% url "core:api_weak_topics" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayWeakTopics(data.data);
+                    updateStatistics(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки слабых тем:', error);
+                showError('Ошибка загрузки слабых тем');
+            });
+    }
+    
+    // Отображение слабых тем
+    function displayWeakTopics(topics) {
+        const container = document.getElementById('weak-topics-list');
+        
+        if (!topics || topics.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Отличная работа!</h3>
+                    <p class="text-gray-500">Слабых тем не обнаружено</p>
+                    <p class="text-sm text-gray-400 mt-2">Продолжайте в том же духе!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Группируем темы по приоритету
+        const groupedTopics = groupTopicsByPriority(topics);
+        
+        let topicsHtml = '';
+        
+        // Высокий приоритет
+        if (groupedTopics.high.length > 0) {
+            topicsHtml += createPrioritySection('high', 'Высокий приоритет', groupedTopics.high);
+        }
+        
+        // Средний приоритет
+        if (groupedTopics.medium.length > 0) {
+            topicsHtml += createPrioritySection('medium', 'Средний приоритет', groupedTopics.medium);
+        }
+        
+        // Низкий приоритет
+        if (groupedTopics.low.length > 0) {
+            topicsHtml += createPrioritySection('low', 'Низкий приоритет', groupedTopics.low);
+        }
+        
+        container.innerHTML = topicsHtml;
+        
+        // Добавляем обработчики для кнопок
+        addButtonHandlers();
+    }
+    
+    // Группировка тем по приоритету
+    function groupTopicsByPriority(topics) {
+        const grouped = { high: [], medium: [], low: [] };
+        
+        topics.forEach(topic => {
+            if (topic.error_rate >= 70) {
+                grouped.high.push(topic);
+            } else if (topic.error_rate >= 40) {
+                grouped.medium.push(topic);
+            } else {
+                grouped.low.push(topic);
+            }
+        });
+        
+        return grouped;
+    }
+    
+    // Создание секции по приоритету
+    function createPrioritySection(priority, title, topics) {
+        const priorityColors = {
+            high: 'bg-red-50 border-red-200 text-red-800',
+            medium: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+            low: 'bg-blue-50 border-blue-200 text-blue-800'
+        };
+        
+        const topicsHtml = topics.map(topic => `
+            <div class="topic-card bg-white rounded-lg border p-6 hover:shadow-md transition-all duration-300" 
+                 data-subject="${topic.subject_name.toLowerCase()}" 
+                 data-priority="${priority}">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${priorityColors[priority]}">
+                            ${priority === 'high' ? 'Высокий' : priority === 'medium' ? 'Средний' : 'Низкий'}
+                        </span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            ${topic.subject_name}
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-12 h-12">
+                            <svg class="progress-ring w-12 h-12" viewBox="0 0 48 48">
+                                <circle class="progress-ring-circle" stroke="#e5e7eb" stroke-width="3" fill="transparent" r="20" cx="24" cy="24"></circle>
+                                <circle class="progress-ring-circle" stroke="${priority === 'high' ? '#ef4444' : priority === 'medium' ? '#f59e0b' : '#3b82f6'}" stroke-width="3" fill="transparent" r="20" cx="24" cy="24" 
+                                        stroke-dasharray="0 125.6" stroke-dashoffset="0" id="progress-${topic.id}"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 class="text-lg font-semibold text-gray-900 mb-3">${topic.name}</h4>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-red-600">${topic.error_rate}%</div>
+                        <div class="text-xs text-gray-500">Ошибок</div>
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600">${topic.attempts}</div>
+                        <div class="text-xs text-gray-500">Попыток</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600">Последняя попытка:</span>
+                        <span class="text-gray-900">${topic.last_attempt || 'Недавно'}</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-600">Время на задачу:</span>
+                        <span class="text-gray-900">${topic.avg_time || '5-10'} мин</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex items-center space-x-2">
+                    <button onclick="startPractice(${topic.id})" class="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                        Начать практику
+                    </button>
+                    <button onclick="showTheory(${topic.id})" class="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                        Теория
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+        return `
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">${title}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${topicsHtml}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Обновление статистики
+    function updateStatistics(topics) {
+        if (!topics || topics.length === 0) {
+            document.getElementById('total-weak-topics').textContent = '0';
+            document.getElementById('avg-error-rate').textContent = '0%';
+            document.getElementById('in-progress-topics').textContent = '0';
+            document.getElementById('improved-topics').textContent = '0';
+            return;
+        }
+        
+        const totalTopics = topics.length;
+        const avgErrorRate = Math.round(topics.reduce((sum, topic) => sum + topic.error_rate, 0) / totalTopics);
+        const inProgressTopics = topics.filter(topic => topic.status === 'in_progress').length;
+        const improvedTopics = topics.filter(topic => topic.error_rate < 30).length;
+        
+        document.getElementById('total-weak-topics').textContent = totalTopics;
+        document.getElementById('avg-error-rate').textContent = `${avgErrorRate}%`;
+        document.getElementById('in-progress-topics').textContent = inProgressTopics;
+        document.getElementById('improved-topics').textContent = improvedTopics;
+        
+        // Обновляем прогресс-кольца
+        setTimeout(() => {
+            topics.forEach(topic => {
+                const circle = document.getElementById(`progress-${topic.id}`);
+                if (circle) {
+                    const circumference = 2 * Math.PI * 20;
+                    const progress = 100 - topic.error_rate;
+                    const offset = circumference - (progress / 100) * circumference;
+                    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+                    circle.style.strokeDashoffset = offset;
+                }
+            });
+        }, 100);
+    }
+    
+    // Фильтрация тем
+    function filterTopics() {
+        const subjectFilter = document.getElementById('subject-filter').value.toLowerCase();
+        const priorityFilter = document.getElementById('priority-filter').value;
+        
+        const topicCards = document.querySelectorAll('.topic-card');
+        
+        topicCards.forEach(card => {
+            const subject = card.dataset.subject;
+            const priority = card.dataset.priority;
+            
+            const subjectMatch = !subjectFilter || subject.includes(subjectFilter);
+            const priorityMatch = !priorityFilter || priority === priorityFilter;
+            
+            if (subjectMatch && priorityMatch) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    // Обновление тем
+    function refreshTopics() {
+        const btn = document.getElementById('refresh-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div>';
+        
+        loadWeakTopics();
+        
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = 'Обновить';
+        }, 2000);
+    }
+    
+    // Генерация персонального плана
+    function generatePersonalPlan() {
+        const btn = document.getElementById('generate-plan');
+        btn.disabled = true;
+        btn.textContent = 'Генерируем...';
+        
+        // Мокаем генерацию плана
+        setTimeout(() => {
+            alert('Персональный план по устранению слабых тем сгенерирован! Проверьте раздел "План обучения".');
+            btn.disabled = false;
+            btn.textContent = 'Сгенерировать персональный план';
+        }, 2000);
+    }
+    
+    // Добавление обработчиков для кнопок
+    function addButtonHandlers() {
+        // Обработчики уже добавлены через onclick в HTML
+    }
+    
+    // Обработка ошибок
+    function showError(message) {
+        const container = document.getElementById('weak-topics-list');
+        container.innerHTML = `
+            <div class="text-center py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Произошла ошибка</h3>
+                <p class="text-gray-500">${message}</p>
+                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    Попробовать снова
+                </button>
+            </div>
+        `;
+    }
+});
+
+// Глобальные функции для взаимодействия с темами
+function startPractice(topicId) {
+    alert(`Функция практики по теме ${topicId} будет добавлена позже`);
+}
+
+function showTheory(topicId) {
+    alert(`Функция показа теории по теме ${topicId} будет добавлена позже`);
+}
+</script>
+{% endblock %}

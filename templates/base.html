@@ -7,7 +7,7 @@
     <title>{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}</title>
     
     <!-- SEO мета-теги -->
-    <meta name="description" content="Эффективная подготовка к ЕГЭ и ОГЭ с заданиями на основе материалов ФИПИ. Голосовые подсказки, персонализация, Telegram бот.">
+    <meta name="description" content="Эффективная подготовка к ЕГЭ и ОГЭ с заданиями на основе материалов ФИПИ. Умный ИИ-помощник, персонализация, Telegram бот.">
     <meta name="keywords" content="ЕГЭ, ОГЭ, подготовка, ФИПИ, экзамены, задания, математика, русский язык, физика, химия">
     <meta name="author" content="ExamFlow">
     
@@ -39,6 +39,8 @@
     
     <!-- Основные стили для ExamFlow с нашими цветами и шрифтами -->
     <link rel="stylesheet" href="{% static 'css/examflow-styles.css' %}">
+    <!-- Адаптивный дизайн -->
+    <link rel="stylesheet" href="{% static 'css/responsive-design.css' %}">
     <style>
         /* Основные стили */
         body {
@@ -315,6 +317,13 @@
                             ИИ Помощник
                         </a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-aesop" href="{% url 'core:personalization_dashboard' %}">
+                            Персонализация
+                        </a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <button id="theme-toggle" class="nav-link nav-link-aesop theme-toggle-btn" title="Переключить тему (Ctrl+T)">
                             🌙
@@ -363,6 +372,8 @@
     
     <!-- Менеджер тем и анимаций -->
     <script src="{% static 'js/theme-manager.js' %}"></script>
+    <!-- AI Learning System -->
+    <script src="{% static 'js/ai-learning.js' %}"></script>
     
     <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}

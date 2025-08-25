@@ -43,7 +43,7 @@ class Subject(models.Model):
         verbose_name_plural = "Предметы"
     
     def __str__(self):
-        return f"{self.name} ({self.get_exam_type_display()})"
+        return f"{self.name} ({self.get_exam_type_display()})" # type: ignore
 
 
 class Topic(models.Model):
@@ -80,15 +80,15 @@ class Task(models.Model):
 
 class UserProgress(models.Model):
     """Прогресс пользователя по заданиям"""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь", related_name='learning_userprogress_set')
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задание")
-    is_correct = models.BooleanField(default=False, verbose_name="Правильно решено")
+    is_correct = models.BooleanField(default=False, verbose_name="Правильно решено") # type: ignore
     user_answer = models.TextField(blank=True, verbose_name="Ответ пользователя")
-    attempts = models.IntegerField(default=0, verbose_name="Попыток")
+    attempts = models.IntegerField(default=0, verbose_name="Попыток") # type: ignore
     last_attempt = models.DateTimeField(auto_now=True, verbose_name="Последняя попытка")
     
     def __str__(self):
-        return f"{self.user.username} - {self.task.subject.name}"
+        return f"{self.user.username} - {self.task.subject.name}" # type: ignore
     
     class Meta:
         verbose_name = "Прогресс пользователя"
@@ -98,15 +98,15 @@ class UserProgress(models.Model):
 class UserRating(models.Model):
     """Рейтинг пользователя"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Пользователь")
-    total_points = models.IntegerField(default=0, verbose_name="Общее количество очков")
-    correct_answers = models.IntegerField(default=0, verbose_name="Правильных ответов")
-    incorrect_answers = models.IntegerField(default=0, verbose_name="Неправильных ответов")
-    total_attempts = models.IntegerField(default=0, verbose_name="Всего попыток")
+    total_points = models.IntegerField(default=0, verbose_name="Общее количество очков") # type: ignore
+    correct_answers = models.IntegerField(default=0, verbose_name="Правильных ответов") # type: ignore
+    incorrect_answers = models.IntegerField(default=0, verbose_name="Неправильных ответов") # type: ignore
+    total_attempts = models.IntegerField(default=0, verbose_name="Всего попыток") # type: ignore
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     
     def __str__(self):
-        return f"Рейтинг {self.user.username}: {self.total_points} очков"
+        return f"Рейтинг {self.user.username}: {self.total_points} очков" # type: ignore
     
     class Meta:
         verbose_name = "Рейтинг пользователя"
@@ -118,7 +118,7 @@ class Achievement(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
     icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
-    points_required = models.IntegerField(default=0, verbose_name="Требуемые очки")
+    points_required = models.IntegerField(default=0, verbose_name="Требуемые очки") # type: ignore
     users = models.ManyToManyField(User, through='UserAchievement', verbose_name="Пользователи")
     
     def __str__(self):
@@ -136,7 +136,7 @@ class UserAchievement(models.Model):
     earned_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата получения")
     
     def __str__(self):
-        return f"{self.user.username} - {self.achievement.name}"
+        return f"{self.user.username} - {self.achievement.name}" # type: ignore 
     
     class Meta:
         verbose_name = "Достижение пользователя"

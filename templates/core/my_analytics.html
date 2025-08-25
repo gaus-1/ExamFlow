@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .progress-bar {
+        transition: width 0.8s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <!-- Заголовок страницы -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Моя аналитика</h1>
+                    <p class="mt-2 text-gray-600">Детальный анализ вашего прогресса и предпочтений</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'core:personalization_dashboard' %}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        ← Назад к дашборду
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Основные метрики -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Общий прогресс -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Общий прогресс</p>
+                        <p class="text-2xl font-bold text-gray-900" id="overall-progress">0%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="progress-bar bg-blue-600 h-2 rounded-full" id="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Решенные задачи -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Решено задач</p>
+                        <p class="text-2xl font-bold text-gray-900" id="solved-tasks">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500">из <span id="total-tasks">0</span> доступных</p>
+            </div>
+
+            <!-- Точность ответов -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Точность</p>
+                        <p class="text-2xl font-bold text-gray-900" id="accuracy">0%</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500">правильных ответов</p>
+            </div>
+
+            <!-- Время обучения -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.4s">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Время обучения</p>
+                        <p class="text-2xl font-bold text-gray-900" id="study-time">0ч</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500">за последние 30 дней</p>
+            </div>
+        </div>
+
+        <!-- Графики и детальная аналитика -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- График прогресса по предметам -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.5s">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Прогресс по предметам</h3>
+                <div class="chart-container">
+                    <canvas id="subjects-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- График активности по дням -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.6s">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Активность по дням</h3>
+                <div class="chart-container">
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Детальная статистика -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Предпочтения по сложности -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.7s">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Предпочтения по сложности</h3>
+                <div id="difficulty-preferences" class="space-y-4">
+                    <!-- Данные будут загружены через JavaScript -->
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-2 text-gray-500">Загружаем данные...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Любимые предметы -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 fade-in" style="animation-delay: 0.8s">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Любимые предметы</h3>
+                <div id="favorite-subjects" class="space-y-3">
+                    <!-- Данные будут загружены через JavaScript -->
+                    <div class="text-center py-6">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
+                        <p class="mt-2 text-gray-500">Анализируем предпочтения...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Паттерны обучения -->
+        <div class="bg-white rounded-xl shadow-sm border p-6 mt-8 fade-in" style="animation-delay: 0.9s">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Паттерны обучения</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="font-medium text-gray-900 mb-1">Лучшее время</h4>
+                    <p class="text-sm text-gray-600" id="best-time">Анализируем...</p>
+                </div>
+                
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="font-medium text-gray-900 mb-1">Стиль обучения</h4>
+                    <p class="text-sm text-gray-600" id="learning-style">Анализируем...</p>
+                </div>
+                
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="font-medium text-gray-900 mb-1">Средняя сессия</h4>
+                    <p class="text-sm text-gray-600" id="avg-session">Анализируем...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Загружаем данные при загрузке страницы
+    loadUserPreferences();
+    loadUserInsights();
+    
+    // Функция загрузки предпочтений пользователя
+    function loadUserPreferences() {
+        fetch('{% url "core:api_user_preferences" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayPreferences(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки предпочтений:', error);
+            });
+    }
+    
+    // Функция загрузки инсайтов пользователя
+    function loadUserInsights() {
+        fetch('{% url "core:api_user_insights" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateAnalytics(data.data);
+                    createCharts(data.data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки инсайтов:', error);
+            });
+    }
+    
+    // Обновление аналитики
+    function updateAnalytics(insights) {
+        const progress = insights.progress_summary?.overall_progress || 0;
+        const solvedTasks = insights.progress_summary?.solved_tasks || 0;
+        const totalTasks = insights.progress_summary?.total_tasks || 0;
+        const accuracy = insights.progress_summary?.accuracy || 0;
+        const studyTime = insights.progress_summary?.total_study_time || 0;
+        
+        // Обновляем метрики
+        document.getElementById('overall-progress').textContent = `${Math.round(progress)}%`;
+        document.getElementById('solved-tasks').textContent = solvedTasks;
+        document.getElementById('total-tasks').textContent = totalTasks;
+        document.getElementById('accuracy').textContent = `${Math.round(accuracy)}%`;
+        document.getElementById('study-time').textContent = `${Math.round(studyTime)}ч`;
+        
+        // Обновляем прогресс-бар
+        const progressBar = document.getElementById('progress-bar');
+        progressBar.style.width = `${progress}%`;
+    }
+    
+    // Отображение предпочтений
+    function displayPreferences(data) {
+        const { preferences, patterns } = data;
+        
+        // Предпочтения по сложности
+        displayDifficultyPreferences(preferences.difficulty_preference);
+        
+        // Любимые предметы
+        displayFavoriteSubjects(preferences.favorite_subjects);
+        
+        // Паттерны обучения
+        displayLearningPatterns(patterns);
+    }
+    
+    // Отображение предпочтений по сложности
+    function displayDifficultyPreferences(difficulty) {
+        const container = document.getElementById('difficulty-preferences');
+        
+        const difficultyText = {
+            1: 'Легкие',
+            2: 'Легкие-средние',
+            3: 'Средние',
+            4: 'Средние-сложные',
+            5: 'Сложные'
+        };
+        
+        const difficultyColor = {
+            1: 'bg-green-500',
+            2: 'bg-green-400',
+            3: 'bg-yellow-500',
+            4: 'bg-orange-500',
+            5: 'bg-red-500'
+        };
+        
+        container.innerHTML = `
+            <div class="text-center mb-4">
+                <div class="inline-flex items-center px-4 py-2 rounded-full ${difficultyColor[difficulty]} text-white text-sm font-medium">
+                    ${difficultyText[difficulty] || 'Средние'}
+                </div>
+            </div>
+            <div class="space-y-3">
+                ${[1, 2, 3, 4, 5].map(level => `
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">${difficultyText[level]}</span>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full ${level <= difficulty ? 'bg-blue-600' : 'bg-gray-300'}" 
+                                     style="width: ${level <= difficulty ? '100%' : '0%'}"></div>
+                            </div>
+                            <span class="text-xs text-gray-500 w-8">${level}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    // Отображение любимых предметов
+    function displayFavoriteSubjects(subjects) {
+        const container = document.getElementById('favorite-subjects');
+        
+        if (!subjects || subjects.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-6 text-gray-500">
+                    <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-sm">Пока нет данных</p>
+                    <p class="text-xs">Решите несколько задач по разным предметам</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const subjectsHtml = subjects.map((subject, index) => `
+            <div class="flex items-center justify-between p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center mr-3">
+                        ${index + 1}
+                    </div>
+                    <span class="text-sm text-gray-700">${subject}</span>
+                </div>
+                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+            </div>
+        `).join('');
+        
+        container.innerHTML = subjectsHtml;
+    }
+    
+    // Отображение паттернов обучения
+    function displayLearningPatterns(patterns) {
+        if (patterns) {
+            document.getElementById('best-time').textContent = patterns.best_time || 'Вечер';
+            document.getElementById('learning-style').textContent = patterns.learning_style || 'Смешанный';
+            document.getElementById('avg-session').textContent = patterns.avg_session || '45 мин';
+        }
+    }
+    
+    // Создание графиков
+    function createCharts(data) {
+        createSubjectsChart(data);
+        createActivityChart(data);
+    }
+    
+    // График прогресса по предметам
+    function createSubjectsChart(data) {
+        const ctx = document.getElementById('subjects-chart').getContext('2d');
+        
+        // Мокаем данные для демонстрации
+        const subjects = ['Математика', 'Русский', 'Физика', 'Химия', 'Биология'];
+        const progress = [75, 60, 45, 30, 20];
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: subjects,
+                datasets: [{
+                    data: progress,
+                    backgroundColor: [
+                        '#3B82F6',
+                        '#10B981',
+                        '#F59E0B',
+                        '#EF4444',
+                        '#8B5CF6'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // График активности по дням
+    function createActivityChart(data) {
+        const ctx = document.getElementById('activity-chart').getContext('2d');
+        
+        // Мокаем данные для демонстрации
+        const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        const activity = [3, 5, 2, 7, 4, 6, 1];
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Решенные задачи',
+                    data: activity,
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,73 +1,81 @@
 """
-Основные модели для ExamFlow
-
-Содержит только уникальные модели, которые не дублируются в других приложениях:
-- ReminderLog (логи напоминаний)
-- VoiceMessage (голосовые сообщения)
-- FipiTask (задания из ФИПИ)
+Модели для приложения core
 """
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
-class TimeStampedModel(models.Model):
-    """Абстрактная модель с временными метками"""
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        abstract = True
-
-
-class ReminderLog(TimeStampedModel):
-    """Логи отправленных напоминаний пользователям (чтобы не спамить).
-    reminder_type: например, 'weekly_inactive'
-    last_sent_at: когда в последний раз было отправлено напоминание данного типа.
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    reminder_type = models.CharField(max_length=50, default='weekly_inactive')
-    last_sent_at = models.DateTimeField(default=timezone.now)
+class Subject(models.Model):
+    """Модель предмета"""
+    name = models.CharField(max_length=100, verbose_name="Название")
+    code = models.CharField(max_length=10, unique=True, verbose_name="Код предмета")
+    exam_type = models.CharField(max_length=20, choices=[
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
+    ], verbose_name="Тип экзамена")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
     class Meta:
-        verbose_name = "Лог напоминаний"
-        verbose_name_plural = "Логи напоминаний"
-        unique_together = ['user', 'reminder_type']
-    
+        verbose_name = "Предмет"
+        verbose_name_plural = "Предметы"
+        ordering = ['name']
+
     def __str__(self):
-        return f"{self.user.username} - {self.reminder_type} @ {self.last_sent_at.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
+
+    @property
+    def task_count(self):
+        """Количество задач по предмету"""
+        return self.task_set.count()  # type: ignore
 
 
-class VoiceMessage(TimeStampedModel):
-    """Голосовые сообщения для заданий"""
-    task_id = models.IntegerField(verbose_name="ID задания")
-    audio_file = models.FileField(upload_to='voice_hints/', verbose_name="Аудио файл")
-    duration = models.IntegerField(verbose_name="Длительность в секундах")
-    is_active = models.BooleanField(default=True, verbose_name="Активно")
-    
+class Task(models.Model):
+    """Модель задачи"""
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name="Предмет")
+    title = models.CharField(max_length=200, verbose_name="Название")
+    text = models.TextField(verbose_name="Текст задачи")
+    solution = models.TextField(blank=True, verbose_name="Решение")
+    answer = models.CharField(max_length=100, blank=True, verbose_name="Ответ")
+    difficulty = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=3,  # type: ignore
+        verbose_name="Сложность"
+    )
+    source = models.CharField(max_length=100, blank=True, verbose_name="Источник")
+    year = models.IntegerField(blank=True, null=True, verbose_name="Год")
+    topics = models.JSONField(default=list, blank=True, verbose_name="Темы")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
     class Meta:
-        verbose_name = "Голосовое сообщение"
-        verbose_name_plural = "Голосовые сообщения"
-    
+        verbose_name = "Задача"
+        verbose_name_plural = "Задачи"
+        ordering = ['subject', 'difficulty', 'title']
+
     def __str__(self):
-        return f"Голосовая подсказка для задания {self.task_id}"
+        return f"{self.subject.name}: {self.title}"
 
 
-class FipiTask(TimeStampedModel):
-    """Задания из ФИПИ (Федеральный институт педагогических измерений)"""
-    subject = models.CharField(max_length=100, verbose_name="Предмет")
-    exam_type = models.CharField(max_length=10, verbose_name="Тип экзамена")
-    task_number = models.IntegerField(verbose_name="Номер задания")
-    content = models.TextField(verbose_name="Содержание задания")
-    answer = models.TextField(blank=True, null=True, verbose_name="Ответ")
-    explanation = models.TextField(blank=True, null=True, verbose_name="Объяснение")
-    source_url = models.URLField(blank=True, verbose_name="Источник")
-    
+class UserProgress(models.Model):
+    """Модель прогресса пользователя по задаче"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь", related_name='core_userprogress_set')
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
+    is_correct = models.BooleanField(default=False, verbose_name="Правильно решено")  # type: ignore
+    attempts = models.IntegerField(default=1, verbose_name="Количество попыток")  # type: ignore
+    time_spent = models.IntegerField(default=0, verbose_name="Время в секундах")  # type: ignore
+    last_attempt = models.DateTimeField(auto_now=True, verbose_name="Последняя попытка")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
     class Meta:
-        verbose_name = "Задание ФИПИ"
-        verbose_name_plural = "Задания ФИПИ"
-        unique_together = ['subject', 'exam_type', 'task_number']
-    
+        verbose_name = "Прогресс пользователя"
+        verbose_name_plural = "Прогресс пользователей"
+        unique_together = ['user', 'task']
+        ordering = ['-last_attempt']
+
     def __str__(self):
-        return f"{self.subject} {self.exam_type} - Задание {self.task_number}"
+        return f"{self.user.username} - {self.task.title}"  # type: ignore

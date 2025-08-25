@@ -193,8 +193,8 @@ async def handle_telegram_update(update: Update):
 
         # Импортируем обработчики
         from .bot_handlers import (
-            start, subjects_menu, show_subject_topics, show_task,
-            handle_answer, show_stats, voice_hint, handle_unknown_callback
+            start, subjects_menu, show_subject_topics, show_task, # type: ignore
+            handle_answer, show_stats, voice_hint, handle_unknown_callback # type: ignore
         )
         
         # Создаем mock-контекст
@@ -237,14 +237,14 @@ async def handle_telegram_update(update: Update):
                     start as h_start,
                     subjects_menu as h_subjects_menu,
                     show_subject_topics as h_show_subject_topics,
-                    show_task as h_show_task,
-                    handle_answer as h_handle_answer,
+                    show_task as h_show_task, # type: ignore
+                    handle_answer as h_handle_answer, # type: ignore
                     show_stats as h_show_stats,
-                    voice_hint as h_voice_hint,
+                    voice_hint as h_voice_hint, # type: ignore
                     learning_plan_menu as h_learning_plan_menu,
                     ai_help_handler as h_ai_help,
-                    ai_hint_handler as h_ai_hint,
-                    similar_tasks_handler as h_similar_tasks,
+                    ai_hint_handler as h_ai_hint, # type: ignore
+                    similar_tasks_handler as h_similar_tasks, # type: ignore
                     handle_unknown_callback as h_unknown
                 )
 

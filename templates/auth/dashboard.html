@@ -274,7 +274,9 @@
                         </div>
                         <div class="progress-bar-tech" style="width: 150px;">
                             <div class="progress-fill-tech" 
-                                 style="width: {{ profile.tasks_solved_today|floatformat:0|mul:100|div:profile.daily_tasks_limit }}%"></div>
+                                 id="progress-fill" 
+                                 data-solved="{{ profile.tasks_solved_today }}" 
+                                 data-limit="{{ profile.daily_tasks_limit }}"></div>
                         </div>
                     </div>
                     {% if not can_solve_tasks %}
@@ -296,7 +298,8 @@
                 {% if achievements %}
                     {% for achievement in achievements %}
                     <div class="achievement-item">
-                        <div class="achievement-icon" style="background-color: {{ achievement.color }}20; color: {{ achievement.color }};">
+                        <div class="achievement-icon" 
+                             data-color="{{ achievement.color }}">
                             <i class="{{ achievement.icon }}"></i>
                         </div>
                         <div>
@@ -362,7 +365,7 @@
                     </div>
                     <div class="small text-success">
                         <i class="fas fa-check me-1"></i>
-                        Голосовые подсказки
+                        Умный ИИ-помощник
                     </div>
                     <div class="small text-success">
                         <i class="fas fa-check me-1"></i>
@@ -401,4 +404,27 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Прогресс-бар
+    const progressFill = document.getElementById('progress-fill');
+    if (progressFill) {
+        const solved = parseInt(progressFill.dataset.solved) || 0;
+        const limit = parseInt(progressFill.dataset.limit) || 1;
+        const percentage = Math.min((solved / limit) * 100, 100);
+        progressFill.style.width = percentage + '%';
+    }
+    
+    // Цвета достижений
+    const achievementIcons = document.querySelectorAll('.achievement-icon');
+    achievementIcons.forEach(icon => {
+        const color = icon.dataset.color;
+        if (color) {
+            icon.style.backgroundColor = color + '20';
+            icon.style.color = color;
+        }
+    });
+});
+</script>
 {% endblock %}

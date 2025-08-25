@@ -5,7 +5,6 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 
 # Импорты из legacy модулей (для обратной совместимости)
-from core.views import home, subject_list, subject_detail, task_detail
 from core.auth_views import (
     register_view, login_view, logout_view, dashboard_view,
     profile_view, subscribe_view, achievements_view, telegram_auth
@@ -26,9 +25,6 @@ from core.api import (
 urlpatterns = [
     # Админка
     path('admin/', admin.site.urls),
-
-    # Главная страница (legacy)
-    path('', home, name='home'),
 
     # ==========================================
     # НОВЫЕ МОДУЛЬНЫЕ ПРИЛОЖЕНИЯ
@@ -52,15 +48,12 @@ urlpatterns = [
     # Модуль ИИ-ассистента
     path('ai/', include('ai.urls')),
     
+    # Модуль core (персонализация)
+    path('core/', include('core.urls')),
+    
     # ==========================================
     # LEGACY МАРШРУТЫ (для обратной совместимости)
     # ==========================================
-
-    # Основные страницы (legacy)
-    path('subjects/', subject_list, name='subjects'),
-    path('subjects/<int:subject_id>/', subject_detail, name='subject_detail'),
-    path('tasks/<int:task_id>/', task_detail, name='task_detail'),
-    path('theme-demo/', include('core.urls')),
 
     # Аутентификация (legacy)
     path('register/', register_view, name='register'),
@@ -70,8 +63,6 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('achievements/', achievements_view, name='achievements'),
     path('subscribe/', subscribe_view, name='subscribe'),
-
-    # Бот (legacy) - УБРАНО, теперь используется модульный telegram_bot
 
     # API
     path('api/tasks/random/', get_random_task, name='api_random_task'),

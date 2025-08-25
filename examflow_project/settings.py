@@ -448,7 +448,7 @@ os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 
 # 🤖 GEMINI AI - НАСТРОЙКИ
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta'
+GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 GEMINI_TIMEOUT = 30
 
 # Конфигурация для разных типов задач

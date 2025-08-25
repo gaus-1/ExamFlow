@@ -80,7 +80,7 @@ def subject_detail(request, subject_id):
         
         # Прогресс по темам
         for topic in topics:
-            topic_solved = UserProgress.objects.filter(
+            topic_solved = UserProgress.objects.filter(  # type: ignore
                 user=request.user,
                 task__topic=topic,
                 is_correct=True
@@ -104,7 +104,7 @@ def topic_detail(request, topic_id):
     - Возможность решать задания
     """
     topic = get_object_or_404(Topic, id=topic_id)
-    tasks_list = Task.objects.filter(topic=topic).order_by('id')
+    tasks_list = Task.objects.filter(topic=topic).order_by('id')  # type: ignore
     
     # Пагинация заданий
     paginator = Paginator(tasks_list, 10)  # 10 заданий на страницу
@@ -113,7 +113,7 @@ def topic_detail(request, topic_id):
     
     # Отмечаем решенные задания для авторизованных пользователей
     if request.user.is_authenticated:
-        solved_task_ids = UserProgress.objects.filter(
+        solved_task_ids = UserProgress.objects.filter(  # type: ignore
             user=request.user,
             task__in=tasks,
             is_correct=True
@@ -143,7 +143,7 @@ def task_detail(request, task_id):
     # Проверяем, решал ли пользователь это задание
     user_progress = None
     if request.user.is_authenticated:
-        user_progress = UserProgress.objects.filter(
+        user_progress = UserProgress.objects.filter(  # type: ignore
             user=request.user,
             task=task
         ).first()
@@ -174,7 +174,7 @@ def solve_task(request, task_id):
     is_correct = task.check_answer(user_answer)
     
     # Сохраняем прогресс пользователя
-    progress, created = UserProgress.objects.get_or_create(
+    progress, created = UserProgress.objects.get_or_create(  # type: ignore
         user=request.user,
         task=task,
         defaults={
@@ -204,7 +204,7 @@ def random_task(request, subject_id=None):
     Если указан subject_id, выбирает задание из этого предмета
     Иначе выбирает из всех доступных заданий
     """
-    tasks_query = Task.objects.all()
+    tasks_query = Task.objects.all()  # type: ignore    
     
     if subject_id:
         subject = get_object_or_404(Subject, id=subject_id)
@@ -212,7 +212,7 @@ def random_task(request, subject_id=None):
     
     # Исключаем уже решенные задания для авторизованных пользователей
     if request.user.is_authenticated:
-        solved_task_ids = UserProgress.objects.filter(
+        solved_task_ids = UserProgress.objects.filter(  # type: ignore
             user=request.user,
             is_correct=True
         ).values_list('task_id', flat=True)
