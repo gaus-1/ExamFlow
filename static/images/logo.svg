@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-label="ExamFlow">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#252525"/>
+      <stop offset="100%" stop-color="#444"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="24" fill="#fffef2"/>
+  <g transform="translate(16,24)">
+    <path d="M80 10L0 44l80 34 80-34-80-34z" fill="url(#g)"/>
+    <path d="M24 64v26c0 10 25 22 56 22s56-12 56-22V64L80 92 24 64z" fill="#2e2e2e"/>
+    <circle cx="150" cy="56" r="6" fill="#c9a227"/>
+    <path d="M150 56v48" stroke="#c9a227" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <circle cx="160" cy="32" r="10" fill="#c9a227"/>
+</svg>

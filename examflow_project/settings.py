@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     # Внешние библиотеки
     'corsheaders',
     'django_redis',
-    'django_csp',  # Content Security Policy
+    'csp',  # Content Security Policy (django-csp)
 ]
 
 MIDDLEWARE = [
@@ -64,7 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
-    'django_csp.middleware.CSPMiddleware',  # CSP middleware
+    'csp.middleware.CSPMiddleware',  # CSP middleware
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
