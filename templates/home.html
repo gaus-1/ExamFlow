@@ -73,8 +73,12 @@
             </p>
             
             <div class="bg-white rounded-2xl p-8 shadow-lg inline-block mb-6 text-reveal">
-                <!-- QR код placeholder -->
-                <div class="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center">
+                <!-- QR код для Telegram бота -->
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/ExamFlowBot" 
+                     alt="QR код для Telegram бота" 
+                     class="w-48 h-48 mx-auto rounded-lg"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center" style="display: none;">
                     <i class="fas fa-qrcode text-6xl" style="color: #ccc;"></i>
                 </div>
             </div>

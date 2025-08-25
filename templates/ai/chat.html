@@ -54,17 +54,21 @@
             const d = data.daily || { used: 0, max: 0, remaining: 0 };
             document.getElementById('ai-limits').textContent = `Лимит на сегодня: ${d.used}/${d.max}. Осталось: ${d.remaining}`;
         } catch (e) {
+            console.log('Ошибка загрузки лимитов:', e);
             document.getElementById('ai-limits').textContent = 'Лимит: недоступен';
         }
     }
 
     // Отправка вопроса
     async function sendQuestion() {
+        console.log('Отправка вопроса...');
         const prompt = document.getElementById('ai-prompt').value.trim();
         if (!prompt) {
             alert('Введите вопрос!');
             return;
         }
+
+        console.log('Вопрос:', prompt);
 
         const askButton = document.getElementById('ask-button');
         const originalText = askButton.textContent;
@@ -89,6 +93,7 @@
             });
 
             const data = await res.json();
+            console.log('Ответ API:', data);
             
             if (data.error) {
                 document.getElementById('ai-answer').textContent = `❌ Ошибка: ${data.error}`;
@@ -114,28 +119,49 @@
 
     // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('ИИ чат инициализируется...');
+        
         // Загружаем лимиты
         loadLimits();
         
         // Обработчик отправки формы
-        document.getElementById('ai-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            sendQuestion();
-        });
-        
-        // Обработчик нажатия Enter в текстовом поле
-        document.getElementById('ai-prompt').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
+        const form = document.getElementById('ai-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Форма отправлена');
                 e.preventDefault();
                 sendQuestion();
-            }
-        });
+            });
+        }
+        
+        // Обработчик нажатия Enter в текстовом поле
+        const promptField = document.getElementById('ai-prompt');
+        if (promptField) {
+            promptField.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    console.log('Enter нажат');
+                    e.preventDefault();
+                    sendQuestion();
+                }
+            });
+            
+            // Дополнительная обработка ввода
+            promptField.addEventListener('input', function(e) {
+                console.log('Ввод в поле:', e.target.value);
+            });
+        }
         
         // Обработчик клика по кнопке (дополнительная защита)
-        document.getElementById('ask-button').addEventListener('click', function(e) {
-            e.preventDefault();
-            sendQuestion();
-        });
+        const askButton = document.getElementById('ask-button');
+        if (askButton) {
+            askButton.addEventListener('click', function(e) {
+                console.log('Кнопка нажата');
+                e.preventDefault();
+                sendQuestion();
+            });
+        }
+        
+        console.log('ИИ чат инициализирован');
     });
 </script>
 {% endblock %}
