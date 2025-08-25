@@ -18,7 +18,7 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'learning:home' %}">Главная</a></li>
             <li class="breadcrumb-item"><a href="{% url 'subjects' %}">Предметы</a></li>
             <li class="breadcrumb-item"><a href="{% url 'subject_detail' task.subject.id %}">{{ task.subject.name }}</a></li>
             <li class="breadcrumb-item active">Задание #{{ task.id }}</li>

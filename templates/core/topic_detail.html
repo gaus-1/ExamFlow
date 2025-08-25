@@ -30,7 +30,7 @@
     <!-- Хлебные крошки -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Главная</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'learning:home' %}" class="text-decoration-none">Главная</a></li>
             <li class="breadcrumb-item"><a href="{% url 'subjects' %}" class="text-decoration-none">Предметы</a></li>
             <li class="breadcrumb-item"><a href="{% url 'subject_detail' topic.subject.id %}" class="text-decoration-none">{{ topic.subject.name }}</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ topic.name }}</li>
