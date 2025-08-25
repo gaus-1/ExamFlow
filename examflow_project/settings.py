@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b=8q90=se^7twm97htmj$v2n-(
 # В продакшене принудительно выключаем DEBUG
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,.onrender.com,localhost,127.0.0.1').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,.onrender.com,localhost,127.0.0.1,testserver').split(',') if h.strip()]
 # Добавим хост Render автоматически, если предоставлен платформой
 RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
