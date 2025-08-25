@@ -22,9 +22,13 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from ai.services import AiService
 from ai.rag_service import rag_service
+from .gamification import TelegramGamification
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
+
+# Инициализация системы геймификации
+gamification = TelegramGamification()
 
 def clean_markdown_text(text: str) -> str:
     """
@@ -300,6 +304,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("📊 Статистика", callback_data="stats")],
             [InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan"), InlineKeyboardButton("🎯 Персонализация", callback_data="personalization_menu")],
+            [InlineKeyboardButton("🎮 Геймификация", callback_data=f"gamification_{update.effective_user.id}")],
             [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
             [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
@@ -368,6 +373,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("📊 Статистика", callback_data="stats")],
         [InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan"), InlineKeyboardButton("🎯 Персонализация", callback_data="personalization_menu")],
+        [InlineKeyboardButton("🎮 Геймификация", callback_data=f"gamification_{update.effective_user.id}")], 
         [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
         [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
     ]
@@ -1354,4 +1360,363 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
         reply_markup=InlineKeyboardMarkup([[
             InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")
         ]])
+    )
+
+# 🎮 ОБРАБОТЧИКИ ГЕЙМИФИКАЦИИ
+
+async def gamification_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает меню геймификации"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    keyboard = gamification.create_gamification_keyboard(user_id)
+    
+    await query.edit_message_text(
+        "🎮 **ГЕЙМИФИКАЦИЯ**\n\n"
+        "Выберите, что хотите посмотреть:",
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает статистику пользователя"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    stats = await gamification.get_user_stats(user_id)
+    
+    if not stats.get('success'):
+        await query.edit_message_text(
+            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")
+            ]])
+        )
+        return
+    
+    # Формируем текст статистики
+    stats_text = f"""
+📊 **ВАША СТАТИСТИКА**
+
+🏆 **Уровень:** {stats['level']}
+💎 **Очки:** {stats['points']}
+🌟 **Всего очков:** {stats['total_points']}
+🏅 **Ранг:** {stats['rank']}
+
+📚 **Прогресс по предметам:**
+"""
+    
+    for progress in stats['subjects_progress'][:3]:
+        subject_name = progress.get('subject__name', 'Неизвестно')
+        solved = progress.get('solved_tasks', 0)
+        total = progress.get('total_tasks', 0)
+        percentage = (solved / total * 100) if total > 0 else 0
+        
+        stats_text += f"• {subject_name}: {solved}/{total} ({percentage:.1f}%)\n"
+    
+    if stats['achievements']:
+        stats_text += "\n🏅 **Последние достижения:**\n"
+        for achievement in stats['achievements'][:3]:
+            title = achievement.get('title', 'Достижение')
+            icon = achievement.get('icon', '🏆')
+            stats_text += f"{icon} {title}\n"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        stats_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает достижения пользователя"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    stats = await gamification.get_user_stats(user_id)
+    
+    if not stats.get('success'):
+        await query.edit_message_text(
+            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")
+            ]])
+        )
+        return
+    
+    achievements = stats.get('achievements', [])
+    
+    if not achievements:
+        achievements_text = """
+🏅 **ДОСТИЖЕНИЯ**
+
+У вас пока нет достижений. Решайте задания, чтобы получить их!
+"""
+    else:
+        achievements_text = "🏅 **ВАШИ ДОСТИЖЕНИЯ**\n\n"
+        for achievement in achievements:
+            title = achievement.get('title', 'Достижение')
+            description = achievement.get('description', '')
+            icon = achievement.get('icon', '🏆')
+            date = achievement.get('date_earned', '')
+            
+            achievements_text += f"{icon} **{title}**\n"
+            if description:
+                achievements_text += f"   {description}\n"
+            if date:
+                achievements_text += f"   📅 {date.strftime('%d.%m.%Y')}\n"
+            achievements_text += "\n"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        achievements_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает прогресс пользователя"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    keyboard = gamification.create_progress_keyboard(user_id)
+    
+    await query.edit_message_text(
+        "📊 **ПРОГРЕСС ОБУЧЕНИЯ**\n\n"
+        "Выберите тип прогресса для просмотра:",
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает общий прогресс пользователя"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    stats = await gamification.get_user_stats(user_id)
+    
+    if not stats.get('success'):
+        await query.edit_message_text(
+            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")
+            ]])
+        )
+        return
+    
+    # Создаём визуальный прогресс-бар
+    level = stats['level']
+    points = stats['points']
+    next_level_points = level * 100
+    progress_percentage = (points % 100) / 100 * 100
+    
+    progress_bar = "█" * int(progress_percentage / 10) + "░" * (10 - int(progress_percentage / 10))
+    
+    progress_text = f"""
+📈 **ОБЩИЙ ПРОГРЕСС**
+
+🏆 **Текущий уровень:** {level}
+💎 **Очки:** {points}
+🎯 **До следующего уровня:** {next_level_points - points} очков
+
+{progress_bar} {progress_percentage:.1f}%
+
+📊 **Детализация:**
+• Уровень 1: 0-99 очков ✅
+"""
+    
+    for i in range(2, min(level + 3, 11)):
+        if i <= level:
+            progress_text += f"• Уровень {i}: {(i-1)*100}-{i*100-1} очков ✅\n"
+        elif i == level + 1:
+            progress_text += f"• Уровень {i}: {(i-1)*100}-{i*100-1} очков 🔄\n"
+        else:
+            progress_text += f"• Уровень {i}: {(i-1)*100}-{i*100-1} очков ⏳\n"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        progress_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает прогресс по предметам"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    stats = await gamification.get_user_stats(user_id)
+    
+    if not stats.get('success'):
+        await query.edit_message_text(
+            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")
+            ]])
+        )
+        return
+    
+    subjects_progress = stats.get('subjects_progress', [])
+    
+    if not subjects_progress:
+        progress_text = """
+📚 **ПРОГРЕСС ПО ПРЕДМЕТАМ**
+
+У вас пока нет прогресса по предметам. Начните решать задания!
+"""
+    else:
+        progress_text = "📚 **ПРОГРЕСС ПО ПРЕДМЕТАМ**\n\n"
+        
+        for progress in subjects_progress:
+            subject_name = progress.get('subject__name', 'Неизвестно')
+            solved = progress.get('solved_tasks', 0)
+            total = progress.get('total_tasks', 0)
+            percentage = (solved / total * 100) if total > 0 else 0
+            
+            # Создаём прогресс-бар
+            progress_bars = int(percentage / 10)
+            progress_bar = "█" * progress_bars + "░" * (10 - progress_bars)
+            
+            progress_text += f"**{subject_name}**\n"
+            progress_text += f"{progress_bar} {percentage:.1f}%\n"
+            progress_text += f"Решено: {solved}/{total}\n\n"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        progress_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает ежедневные задания"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    challenges = await gamification.get_daily_challenges(user_id)
+    
+    if not challenges:
+        challenges_text = """
+📅 **ЕЖЕДНЕВНЫЕ ЗАДАНИЯ**
+
+У вас пока нет доступных ежедневных заданий.
+Повышайте уровень, чтобы получить больше заданий!
+"""
+    else:
+        challenges_text = "📅 **ЕЖЕДНЕВНЫЕ ЗАДАНИЯ**\n\n"
+        
+        for challenge in challenges:
+            icon = challenge.get('icon', '📋')
+            title = challenge.get('title', 'Задание')
+            description = challenge.get('description', '')
+            reward = challenge.get('reward', 0)
+            progress = challenge.get('progress', 0)
+            target = challenge.get('target', 1)
+            
+            challenges_text += f"{icon} **{title}**\n"
+            if description:
+                challenges_text += f"   {description}\n"
+            challenges_text += f"   💎 Награда: {reward} очков\n"
+            challenges_text += f"   📊 Прогресс: {progress}/{target}\n\n"
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        challenges_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает таблицу лидеров"""
+    query = update.callback_query
+    await query.answer()
+    
+    leaderboard = await gamification.get_leaderboard(10)
+    
+    if not leaderboard:
+        leaderboard_text = """
+🏅 **ТАБЛИЦА ЛИДЕРОВ**
+
+Пока нет данных для отображения.
+Будьте первым в рейтинге!
+"""
+    else:
+        leaderboard_text = "🏅 **ТАБЛИЦА ЛИДЕРОВ**\n\n"
+        
+        for user in leaderboard:
+            rank = user.get('rank', 0)
+            emoji = user.get('emoji', '📊')
+            username = user.get('username', 'Неизвестно')
+            level = user.get('level', 1)
+            points = user.get('points', 0)
+            
+            leaderboard_text += f"{emoji} **#{rank}** {username}\n"
+            leaderboard_text += f"   🏆 Уровень: {level} | 💎 Очки: {points}\n\n"
+    
+    # Получаем user_id для кнопки "Назад"
+    user_id = update.effective_user.id
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        leaderboard_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
+    )
+
+async def bonus_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает доступные бонусы"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    
+    bonus_text = """
+🎁 **ДОСТУПНЫЕ БОНУСЫ**
+
+💎 **Ежедневный бонус за вход** - 10 очков
+🔥 **Серия правильных ответов** - 5 очков за каждое
+⭐ **Повышение уровня** - 50 очков
+🏆 **Первое достижение** - 25 очков
+🌟 **Изучение нового предмета** - 100 очков
+
+💡 **Советы для получения бонусов:**
+• Решайте задания каждый день
+• Старайтесь отвечать правильно подряд
+• Изучайте разные предметы
+• Достигайте новых уровней
+"""
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
+    ])
+    
+    await query.edit_message_text(
+        bonus_text,
+        reply_markup=keyboard,
+        parse_mode='Markdown'
     )

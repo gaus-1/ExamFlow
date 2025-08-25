@@ -23,7 +23,11 @@ from .bot_handlers import (
     main_menu, random_task, show_answer, ai_help_handler,
     ai_explain_handler, ai_personal_handler, ai_hint_general_handler,
     handle_ai_message, handle_text_message, learning_plan_menu,
-    search_subject_handler, random_subject_handler, show_task_handler
+    search_subject_handler, random_subject_handler, show_task_handler,
+    # 🎮 Геймификация
+    gamification_menu_handler, user_stats_handler, achievements_handler,
+    progress_handler, overall_progress_handler, subjects_progress_handler,
+    daily_challenges_handler, leaderboard_handler, bonus_handler
 )
 
 # Настройка логирования
@@ -126,6 +130,17 @@ def setup_bot_application():
     
     # Обработчики для заданий
     application.add_handler(CallbackQueryHandler(show_answer, pattern=r"answer_\d+"))
+    
+    # 🎮 Обработчики геймификации
+    application.add_handler(CallbackQueryHandler(gamification_menu_handler, pattern=r"gamification_\d+"))
+    application.add_handler(CallbackQueryHandler(user_stats_handler, pattern=r"stats_\d+"))
+    application.add_handler(CallbackQueryHandler(achievements_handler, pattern=r"achievements_\d+"))
+    application.add_handler(CallbackQueryHandler(progress_handler, pattern=r"progress_\d+"))
+    application.add_handler(CallbackQueryHandler(overall_progress_handler, pattern=r"overall_progress_\d+"))
+    application.add_handler(CallbackQueryHandler(subjects_progress_handler, pattern=r"subjects_progress_\d+"))
+    application.add_handler(CallbackQueryHandler(daily_challenges_handler, pattern=r"daily_\d+"))
+    application.add_handler(CallbackQueryHandler(leaderboard_handler, pattern="leaderboard"))
+    application.add_handler(CallbackQueryHandler(bonus_handler, pattern=r"bonus_\d+"))
     
     # Обработчик текстовых сообщений (для прямого общения с ИИ и нижнего меню)
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text_message))
