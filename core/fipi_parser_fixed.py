@@ -4,6 +4,7 @@
 """
 
 import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 import logging
 import time
@@ -93,16 +94,42 @@ class ReshuEGEParser:
     
     def __init__(self):
         self.base_url = "https://ege.sdamgia.ru"
-        self.session = requests.Session()
+        # Используем cloudscraper для обхода Cloudflare
+        self.session = cloudscraper.create_scraper(
+            browser={
+                "browser": "chrome",
+                "platform": "windows",
+                "mobile": False,
+            }
+        )
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
         })
+
+    def _get_with_retry(self, url: str, max_retries: int = 3, backoff_seconds: float = 2.0):
+        """GET с простыми ретраями и паузами при 403/5xx"""
+        last_exc: Optional[Exception] = None
+        for attempt in range(1, max_retries + 1):
+            try:
+                resp = self.session.get(url, timeout=20)
+                if resp.status_code in (403, 429):
+                    # Небольшая пауза и повторная попытка
+                    time.sleep(backoff_seconds * attempt)
+                    continue
+                resp.raise_for_status()
+                return resp
+            except Exception as exc:  # noqa: BLE001
+                last_exc = exc
+                time.sleep(backoff_seconds * attempt)
+        if last_exc:
+            raise last_exc
+        raise RuntimeError("Не удалось выполнить запрос без исключения")
     
     def get_subjects(self) -> List[Dict]:
         """Получает список предметов с РешуЕГЭ"""
         try:
-            response = self.session.get(self.base_url)
-            response.raise_for_status()
+            response = self._get_with_retry(self.base_url)
             
             soup = BeautifulSoup(response.content, 'html.parser')
             subjects = []
@@ -131,8 +158,7 @@ class ReshuEGEParser:
     def get_tasks_for_subject(self, subject_url: str, max_tasks: int = 20) -> List[Dict]:
         """Получает задания для конкретного предмета"""
         try:
-            response = self.session.get(subject_url)
-            response.raise_for_status()
+            response = self._get_with_retry(subject_url)
             
             soup = BeautifulSoup(response.content, 'html.parser')
             tasks = []
@@ -228,56 +254,8 @@ class DataIntegrator:
                     results['errors'].append(error_msg)
                     logger.error(error_msg)
             
-            # Получаем данные с РешуЕГЭ
-            logger.info("🔍 Получение данных с РешуЕГЭ...")
-            reshu_subjects = self.reshu_parser.get_subjects()
-            
-            for subject_data in reshu_subjects:
-                try:
-                    with transaction.atomic():
-                        # Создаем или получаем предмет
-                        subject, created = Subject.objects.get_or_create(  # type: ignore
-                            name=subject_data['name'],
-                            defaults={
-                                'exam_type': 'ЕГЭ'
-                            }
-                        )
-                        
-                        if created:
-                            results['subjects_created'] += 1
-                            logger.info(f"✅ Создан предмет: {subject_data['name']}")
-                        
-                        # Получаем задания для предмета
-                        tasks = self.reshu_parser.get_tasks_for_subject(
-                            subject_data['url'], 
-                            max_tasks_per_subject
-                        )
-                        
-                        # Создаем задания
-                        for task_data in tasks:
-                            task, created = Task.objects.get_or_create(  # type: ignore 
-                                title=task_data['title'],
-                                subject=subject,
-                                defaults={
-                                    'description': task_data['description'],
-                                    'difficulty': task_data['difficulty'],
-                                    'source': task_data['source'],
-                                    'created_at': task_data['created_at']
-                                }
-                            )
-                            
-                            if created:
-                                results['tasks_created'] += 1
-                        
-                        logger.info(f"📚 Обработано {len(tasks)} заданий для {subject_data['name']}")
-                        
-                        # Небольшая задержка между запросами
-                        time.sleep(random.uniform(1, 3))
-                        
-                except Exception as e:
-                    error_msg = f"Ошибка при обработке предмета {subject_data['name']}: {e}"
-                    results['errors'].append(error_msg)
-                    logger.error(error_msg)
+            # Парсинг РешуЕГЭ временно отключен по запросу пользователя
+            logger.info("⏸️ Парсинг РешуЕГЭ отключён. Обрабатываем только ФИПИ.")
             
             logger.info("🎉 Интеграция данных завершена!")
             return results

@@ -16,6 +16,14 @@
     --shadow-color: rgba(0, 0, 0, 0.1);
     --card-bg: #fff;
     
+    /* Мягкие фоны для блоков */
+    --block-bg-light: #fafafa;
+    --block-bg-medium: #f5f5f5;
+    --block-bg-accent: #f0f8ff;
+    --block-bg-success: #f0fff4;
+    --block-bg-warning: #fffbf0;
+    --block-bg-info: #f0f9ff;
+    
     /* Переходы */
     --transition-speed: 0.3s;
     --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
@@ -31,6 +39,14 @@
     --border-color: #404040;
     --shadow-color: rgba(0, 0, 0, 0.3);
     --card-bg: #2d2d2d;
+    
+    /* Мягкие фоны для блоков (тёмная тема) */
+    --block-bg-light: #333333;
+    --block-bg-medium: #3a3a3a;
+    --block-bg-accent: #2a3a4a;
+    --block-bg-success: #2a3a2a;
+    --block-bg-warning: #3a3a2a;
+    --block-bg-info: #2a2a3a;
 }
 
 /* Утренняя схема (6:00 - 12:00) */
@@ -67,6 +83,94 @@ body {
     color: var(--primary-text);
     transition: background-color var(--transition-speed) var(--transition-timing),
                 color var(--transition-speed) var(--transition-timing);
+}
+
+/* ========================================
+   МЯГКИЕ ФОНЫ ДЛЯ БЛОКОВ
+   ======================================== */
+
+/* Основные блоки с мягкими фонами */
+.content-block {
+    background: var(--block-bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.content-block:hover {
+    background: var(--block-bg-medium);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+/* Карточки с мягкими фонами */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.card:hover {
+    background: var(--block-bg-light);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px var(--shadow-color);
+}
+
+/* Специальные блоки с акцентными фонами */
+.info-block {
+    background: var(--block-bg-info);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.success-block {
+    background: var(--block-bg-success);
+    border-left: 4px solid #28a745;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.warning-block {
+    background: var(--block-bg-warning);
+    border-left: 4px solid #ffc107;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+/* Навигационные блоки */
+.nav-block {
+    background: var(--block-bg-accent);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+}
+
+/* Блоки статистики */
+.stats-block {
+    background: var(--block-bg-light);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+/* Блоки с градиентами */
+.gradient-block {
+    background: linear-gradient(135deg, var(--block-bg-light) 0%, var(--block-bg-accent) 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    border: 1px solid var(--border-color);
 }
 
 /* ========================================
@@ -588,4 +692,982 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ========================================
+   СТРОКА ОБЩЕНИЯ С ИИ (СТИЛЬ PERPLEXITY)
+   ======================================== */
+
+.ai-chat-input-container {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.ai-chat-input-container:focus-within {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 50px var(--shadow-color);
+    border-color: var(--accent-color);
+}
+
+.ai-chat-input {
+    width: 100%;
+    min-height: 60px;
+    padding: 1rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    font-size: 1.1rem;
+    background: var(--block-bg-light);
+    color: var(--primary-text);
+    transition: all var(--transition-speed) var(--transition-timing);
+    resize: vertical;
+}
+
+.ai-chat-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: var(--card-bg);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+}
+
+.ai-chat-input::placeholder {
+    color: var(--secondary-text);
+    font-style: italic;
+}
+
+.ai-chat-submit {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-timing);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-chat-submit:hover {
+    background: var(--accent-color);
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Примеры запросов */
+.ai-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.ai-example {
+    background: var(--block-bg-accent);
+    color: var(--primary-text);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.ai-example:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   АНИМАЦИИ ПЕРЕХОДОВ (СТИЛЬ SUPERHUMAN)
+   ======================================== */
+
+/* Плавное появление блоков */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s var(--transition-timing) forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Анимация появления с задержкой */
+.fade-in-delayed {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUpDelayed 0.8s var(--transition-timing) forwards;
+}
+
+@keyframes fadeInUpDelayed {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    50% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Анимация масштабирования */
+.scale-in {
+    opacity: 0;
+    transform: scale(0.8);
+    animation: scaleIn 0.6s var(--transition-timing) forwards;
+}
+
+@keyframes scaleIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Анимация слайдера */
+.slide-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: slideInLeft 0.8s var(--transition-timing) forwards;
+}
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideInRight 0.8s var(--transition-timing) forwards;
+}
+
+@keyframes slideInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Анимация вращения */
+.rotate-in {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0.5);
+    animation: rotateIn 1s var(--transition-timing) forwards;
+}
+
+@keyframes rotateIn {
+    to {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+}
+
+/* Анимация волны */
+.wave {
+    position: relative;
+    overflow: hidden;
+}
+
+.wave::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: wave 2s infinite;
+}
+
+@keyframes wave {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* ========================================
+   ВКЛАДКА "ЗАДАНИЯ ФИПИ" С АККОРДЕОНАМИ
+   ======================================== */
+
+.fipi-tabs {
+    max-width: 1000px;
+    margin: 2rem auto;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 4px 25px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.fipi-tab-header {
+    display: flex;
+    background: var(--block-bg-accent);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.fipi-tab {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    color: var(--primary-text);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-timing);
+    position: relative;
+}
+
+.fipi-tab:hover {
+    background: var(--block-bg-light);
+}
+
+.fipi-tab.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+.fipi-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color);
+}
+
+.fipi-tab-content {
+    padding: 2rem;
+    display: none;
+}
+
+.fipi-tab-content.active {
+    display: block;
+    animation: fadeInUp 0.5s var(--transition-timing);
+}
+
+/* Аккордеоны */
+.accordion {
+    margin: 1rem 0;
+}
+
+.accordion-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.accordion-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.accordion-header {
+    background: var(--block-bg-light);
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.accordion-header:hover {
+    background: var(--block-bg-medium);
+}
+
+.accordion-title {
+    font-weight: 500;
+    color: var(--primary-text);
+    margin: 0;
+}
+
+.accordion-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-speed) var(--transition-timing);
+}
+
+.accordion-item.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition-speed) var(--transition-timing);
+    background: var(--card-bg);
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 500px;
+    padding: 1rem 1.5rem;
+}
+
+/* Предметы и задания */
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.subject-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all var(--transition-speed) var(--transition-timing);
+    cursor: pointer;
+}
+
+.subject-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px var(--shadow-color);
+    border-color: var(--accent-color);
+}
+
+.subject-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--block-bg-accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.subject-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin-bottom: 0.5rem;
+}
+
+.subject-description {
+    color: var(--secondary-text);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.subject-stats {
+    display: flex;
+    justify-content: space-between;
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+}
+
+/* Фильтры и поиск */
+.fipi-filters {
+    background: var(--block-bg-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border: 1px solid var(--border-color);
+}
+
+.filter-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-select {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--primary-text);
+    min-width: 150px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.search-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--primary-text);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+/* ========================================
+   АНИМАЦИЯ СКЕЛЕТОНА ЗАГРУЗКИ
+   ======================================== */
+
+.skeleton-pulse {
+    animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   АДАПТИВНОСТЬ И МОБИЛЬНЫЕ УЛУЧШЕНИЯ
+   ======================================== */
+
+@media (max-width: 768px) {
+    .ai-chat-input-container {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+    }
+    
+    .ai-chat-input {
+        min-height: 50px;
+        font-size: 1rem;
+    }
+    
+    .fipi-tabs {
+        margin: 1rem;
+    }
+    
+    .fipi-tab-header {
+        flex-direction: column;
+    }
+    
+    .fipi-tab {
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .subject-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .filter-group {
+        flex-direction: column;
+    }
+    
+    .filter-select,
+    .search-input {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .ai-chat-input-container {
+        margin: 1rem 0.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+    }
+    
+    .ai-chat-input {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .ai-examples {
+        flex-direction: column;
+    }
+    
+    .ai-example {
+        text-align: center;
+    }
+    
+    .fipi-tab-content {
+        padding: 1rem;
+    }
+    
+    .accordion-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .accordion-content {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* ========================================
+   ДОПОЛНИТЕЛЬНЫЕ УТИЛИТЫ
+   ======================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mb-5 { margin-bottom: 3rem; }
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mt-5 { margin-top: 3rem; }
+
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 1rem; }
+.p-4 { padding: 1.5rem; }
+.p-5 { padding: 3rem; }
+
+.rounded { border-radius: 0.375rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-2xl { border-radius: 1rem; }
+
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+
+/* ========================================
+   СИСТЕМА ГЕЙМИФИКАЦИИ
+   ======================================== */
+
+/* Прогресс-бары */
+.progress-container {
+    background: var(--block-bg-light);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 1px solid var(--border-color);
+}
+
+.progress-bar-container {
+    background: var(--block-bg-medium);
+    border-radius: 20px;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+    margin: 0.5rem 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color), #4dabf7);
+    border-radius: 20px;
+    transition: width 1s var(--transition-timing);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--secondary-text);
+}
+
+/* Достижения */
+.achievements-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.achievement-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.achievement-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.achievement-item.locked {
+    opacity: 0.6;
+    filter: grayscale(1);
+}
+
+.achievement-item.unlocked {
+    border-color: var(--accent-color);
+    background: var(--block-bg-accent);
+}
+
+.achievement-icon {
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--block-bg-light);
+    border-radius: 12px;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-text);
+    font-size: 1.1rem;
+}
+
+.achievement-info p {
+    margin: 0 0 0.5rem 0;
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.achievement-points {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.achievement-status {
+    font-size: 1.5rem;
+}
+
+/* Ежедневные задания */
+.daily-challenges {
+    margin: 1.5rem 0;
+}
+
+.challenge-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.challenge-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.challenge-info {
+    flex: 1;
+}
+
+.challenge-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-text);
+    font-size: 1.1rem;
+}
+
+.challenge-progress {
+    background: var(--block-bg-medium);
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+}
+
+.challenge-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 10px;
+    transition: width 0.5s var(--transition-timing);
+}
+
+.challenge-reward {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    background: var(--block-bg-success);
+    border-radius: 20px;
+}
+
+/* Уведомления */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 8px 25px var(--shadow-color);
+    z-index: 1000;
+    transform: translateX(400px);
+    transition: transform 0.3s var(--transition-timing);
+    max-width: 350px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.notification-message {
+    color: var(--primary-text);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--secondary-text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.notification-close:hover {
+    background: var(--block-bg-medium);
+    color: var(--primary-text);
+}
+
+/* Типы уведомлений */
+.notification-success {
+    border-left: 4px solid #28a745;
+    background: var(--block-bg-success);
+}
+
+.notification-levelup {
+    border-left: 4px solid #ffc107;
+    background: var(--block-bg-warning);
+}
+
+.notification-achievement {
+    border-left: 4px solid #9c27b0;
+    background: var(--block-bg-info);
+}
+
+.notification-bonus {
+    border-left: 4px solid #17a2b8;
+    background: var(--block-bg-info);
+}
+
+/* Таблица лидеров */
+.leaderboard {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.user-rank {
+    text-align: center;
+}
+
+.user-rank h3 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-text);
+    font-size: 1.3rem;
+}
+
+.rank-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.rank-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.rank-score {
+    font-size: 1.2rem;
+    color: var(--secondary-text);
+}
+
+/* Статистика пользователя */
+.user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Прогресс по предметам */
+.subjects-progress {
+    margin: 2rem 0;
+}
+
+.subject-progress-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.subject-progress-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.subject-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.subject-name {
+    font-weight: 600;
+    color: var(--primary-text);
+    font-size: 1.1rem;
+}
+
+.subject-count {
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+}
+
+/* Анимации для геймификации */
+@keyframes levelUp {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.level-up-animation {
+    animation: levelUp 0.6s var(--transition-timing);
+}
+
+@keyframes achievementUnlock {
+    0% { transform: scale(0.8) rotate(-10deg); opacity: 0; }
+    50% { transform: scale(1.1) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.achievement-unlock-animation {
+    animation: achievementUnlock 0.8s var(--transition-timing);
+}
+
+@keyframes scoreIncrease {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); color: var(--accent-color); }
+    100% { transform: scale(1); }
+}
+
+.score-increase-animation {
+    animation: scoreIncrease 0.5s var(--transition-timing);
 }

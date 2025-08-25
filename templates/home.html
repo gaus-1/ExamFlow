@@ -27,6 +27,204 @@
     </div>
 </section>
 
+<!-- Строка общения с ИИ (стиль Perplexity) -->
+<section class="section-padding" style="background: #fffef2;">
+    <div class="container">
+        <div class="ai-chat-input-container" data-animation="fade-in">
+            <div class="relative">
+                <textarea 
+                    class="ai-chat-input" 
+                    placeholder="Задайте вопрос по ЕГЭ или ОГЭ..."
+                    rows="3"></textarea>
+                <button class="ai-chat-submit" title="Отправить">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            
+            <div class="ai-examples">
+                <div class="ai-example">Как решать задачи по геометрии?</div>
+                <div class="ai-example">Объясни теорию вероятности</div>
+                <div class="ai-example">Подготовка к ЕГЭ по математике</div>
+                <div class="ai-example">Советы по написанию сочинения</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Вкладка "Задания ФИПИ" с аккордеонами -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Задания ФИПИ
+        </h2>
+        
+        <div class="fipi-tabs" data-animation="fade-in-delayed" data-delay="200">
+            <div class="fipi-tab-header">
+                <button class="fipi-tab active">Все предметы</button>
+                <button class="fipi-tab">Математика</button>
+                <button class="fipi-tab">Русский язык</button>
+                <button class="fipi-tab">Физика</button>
+            </div>
+            
+            <div class="fipi-tab-content active">
+                <div class="fipi-filters">
+                    <div class="filter-group">
+                        <select class="filter-select">
+                            <option value="">Выберите предмет</option>
+                            <option value="math">Математика</option>
+                            <option value="russian">Русский язык</option>
+                            <option value="physics">Физика</option>
+                            <option value="chemistry">Химия</option>
+                        </select>
+                        <select class="filter-select">
+                            <option value="">Сложность</option>
+                            <option value="easy">Легкая</option>
+                            <option value="medium">Средняя</option>
+                            <option value="hard">Сложная</option>
+                        </select>
+                        <input type="text" class="search-input" placeholder="Поиск заданий...">
+                    </div>
+                </div>
+                
+                <div class="subject-grid">
+                    <div class="subject-card" data-animation="scale-in" data-delay="100">
+                        <div class="subject-icon">📐</div>
+                        <h3 class="subject-title">Математика</h3>
+                        <p class="subject-description">Алгебра, геометрия, тригонометрия</p>
+                        <div class="subject-stats">
+                            <span>350 заданий</span>
+                            <span>ЕГЭ/ОГЭ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-animation="scale-in" data-delay="200">
+                        <div class="subject-icon">📚</div>
+                        <h3 class="subject-title">Русский язык</h3>
+                        <p class="subject-description">Грамматика, сочинение, тесты</p>
+                        <div class="subject-stats">
+                            <span>280 заданий</span>
+                            <span>ЕГЭ/ОГЭ</span>
+                        </div>
+                    </div>
+                    
+                    <div class="subject-card" data-animation="scale-in" data-delay="300">
+                        <div class="subject-icon">⚡</div>
+                        <h3 class="subject-title">Физика</h3>
+                        <p class="subject-description">Механика, электричество, оптика</p>
+                        <div class="subject-stats">
+                            <span>320 заданий</span>
+                            <span>ЕГЭ/ОГЭ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fipi-tab-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Алгебра</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Уравнения, неравенства, функции, прогрессии</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Геометрия</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Планиметрия, стереометрия, векторы</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Тригонометрия</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Синусы, косинусы, тангенсы, уравнения</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fipi-tab-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Грамматика</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Части речи, синтаксис, пунктуация</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Сочинение</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Структура, аргументы, примеры</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="fipi-tab-content">
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Механика</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Кинематика, динамика, статика</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3 class="accordion-title">Электричество</h3>
+                            <i class="fas fa-chevron-down accordion-icon"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Электростатика, ток, магнетизм</p>
+                            <div class="mt-4">
+                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Статистика -->
 <section class="section-padding text-center" style="background: #fffef2;">
     <div class="container">
@@ -263,49 +461,130 @@
         <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
             Как это работает
         </h2>
-        <p class="text-xl text-center mb-16 max-w-2xl mx-auto text-reveal" style="color: #666;">
-            Простой и эффективный процесс обучения
-        </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="step-item text-reveal text-center">
-                <div class="text-6xl font-bold mb-4" style="color: #252525;">01</div>
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Быстрая регистрация</h3>
-                <p class="text-lg mb-4" style="color: #666;">
-                    Всего 3 поля: имя, email и пароль. Никаких лишних вопросов - начинайте учиться через минуту после регистрации.
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div class="text-center step-item" data-animation="fade-in" data-delay="100">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-search text-3xl" style="color: #007bff;"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Выберите предмет</h3>
+                <p class="text-lg" style="color: #666;">
+                    Выберите интересующий вас предмет из списка доступных
                 </p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>• Простая форма регистрации</li>
-                    <li>• Мгновенный доступ к заданиям</li>
-                    <li>• Синхронизация с Telegram ботом</li>
-                </ul>
             </div>
             
-            <div class="step-item text-reveal text-center">
-                <div class="text-6xl font-bold mb-4" style="color: #252525;">02</div>
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Обучение в группе</h3>
-                <p class="text-lg mb-4" style="color: #666;">
-                    Присоединяйтесь к сообществу учеников. Решайте задания вместе, обменивайтесь опытом и мотивируйте друг друга.
+            <div class="text-center step-item" data-animation="fade-in" data-delay="200">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-tasks text-3xl" style="color: #28a745;"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Решайте задания</h3>
+                <p class="text-lg" style="color: #666;">
+                    Проходите задания и получайте мгновенную обратную связь
                 </p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>• Сообщество учеников</li>
-                    <li>• Обмен опытом</li>
-                    <li>• Соревновательный элемент</li>
-                </ul>
             </div>
             
-            <div class="step-item text-reveal text-center">
-                <div class="text-6xl font-bold mb-4" style="color: #252525;">03</div>
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Персональный прогресс</h3>
-                <p class="text-lg mb-4" style="color: #666;">
-                    Отслеживайте свои успехи, анализируйте слабые места и получайте персональные рекомендации для улучшения результатов.
+            <div class="text-center step-item" data-animation="fade-in" data-delay="300">
+                <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-chart-line text-3xl" style="color: #6f42c1;"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Отслеживайте прогресс</h3>
+                <p class="text-lg" style="color: #666;">
+                    Анализируйте свои результаты и улучшайте навыки
                 </p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>• Детальная аналитика</li>
-                    <li>• Персональные рекомендации</li>
-                    <li>• Адаптивное обучение</li>
-                </ul>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Геймификация и прогресс -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Ваш прогресс обучения
+        </h2>
+        
+        <!-- Статистика пользователя -->
+        <div class="user-stats mb-12">
+            <div class="stat-card" data-animation="scale-in" data-delay="100">
+                <div class="stat-value user-level">Уровень 1</div>
+                <div class="stat-label">Текущий уровень</div>
+            </div>
+            
+            <div class="stat-card" data-animation="scale-in" data-delay="200">
+                <div class="stat-value user-experience">0 опыта</div>
+                <div class="stat-label">Накопленный опыт</div>
+            </div>
+            
+            <div class="stat-card" data-animation="scale-in" data-delay="300">
+                <div class="stat-value user-score">0 очков</div>
+                <div class="stat-label">Общий счёт</div>
+            </div>
+        </div>
+        
+        <!-- Прогресс-бар уровня -->
+        <div class="progress-container mb-8" data-animation="fade-in" data-delay="400">
+            <div class="progress-label">
+                <span>Прогресс до следующего уровня</span>
+                <span>0 / 100</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="level-progress progress-bar" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- Прогресс по предметам -->
+        <div class="subjects-progress" data-animation="fade-in" data-delay="500">
+            <h3 class="text-2xl font-bold mb-6 text-center" style="color: #252525;">
+                Прогресс по предметам
+            </h3>
+            
+            <div class="subject-progress-item">
+                <div class="subject-progress-header">
+                    <span class="subject-name">Математика</span>
+                    <span class="subject-count">0 / 100</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="subject-progress progress-bar" data-subject="Математика" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="subject-progress-item">
+                <div class="subject-progress-header">
+                    <span class="subject-name">Русский язык</span>
+                    <span class="subject-count">0 / 100</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="subject-progress progress-bar" data-subject="Русский язык" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="subject-progress-item">
+                <div class="subject-progress-header">
+                    <span class="subject-name">Физика</span>
+                    <span class="subject-count">0 / 100</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="subject-progress progress-bar" data-subject="Физика" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ежедневные задания -->
+        <div class="daily-challenges mb-12" data-animation="fade-in" data-delay="600">
+            <h3 class="text-2xl font-bold mb-6 text-center" style="color: #252525;">
+                Ежедневные задания
+            </h3>
+            <!-- Здесь будут отображаться ежедневные задания -->
+        </div>
+        
+        <!-- Достижения -->
+        <div class="achievements-container" data-animation="fade-in" data-delay="700">
+            <!-- Здесь будут отображаться достижения -->
+        </div>
+        
+        <!-- Таблица лидеров -->
+        <div class="leaderboard" data-animation="fade-in" data-delay="800">
+            <!-- Здесь будет отображаться рейтинг пользователя -->
         </div>
     </div>
 </section>
@@ -368,6 +647,27 @@
     </div>
 </section>
 {% endif %}
+
+<!-- Подключение JavaScript для анимаций и геймификации -->
+<script src="{% static 'js/examflow-animations.js' %}"></script>
+<script src="{% static 'js/gamification.js' %}"></script>
+
+<script>
+// Инициализация анимаций и геймификации
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализация анимаций
+    if (typeof ExamFlowAnimations !== 'undefined') {
+        const animations = new ExamFlowAnimations();
+        animations.init();
+    }
+    
+    // Инициализация геймификации
+    if (typeof ExamFlowGamification !== 'undefined') {
+        const gamification = new ExamFlowGamification();
+        gamification.init();
+    }
+});
+</script>
 
 <!-- Тарифные планы -->
 <section class="section-padding" style="background: #fffef2;">
@@ -567,117 +867,5 @@
         </div>
     </div>
 </footer>
-
-<!-- JavaScript для персонализации -->
-{% if user.is_authenticated %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Загружаем данные персонализации
-    loadPersonalizationData();
-});
-
-async function loadPersonalizationData() {
-    try {
-        const contentDiv = document.getElementById('personalization-content');
-        
-        // Загружаем основные инсайты пользователя
-        const insightsResponse = await fetch('/core/api/personalization/insights/');
-        if (!insightsResponse.ok) throw new Error('Ошибка загрузки данных');
-        
-        const insights = await insightsResponse.json();
-        
-        // Отображаем данные
-        displayPersonalizationContent(insights);
-        
-    } catch (error) {
-        console.error('Ошибка загрузки персонализации:', error);
-        displayPersonalizationError();
-    }
-}
-
-function displayPersonalizationContent(insights) {
-    const contentDiv = document.getElementById('personalization-content');
-    
-    // Создаем HTML для отображения данных
-    let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
-    
-    // Прогресс пользователя
-    if (insights.progress_summary) {
-        const progress = insights.progress_summary;
-        html += `
-            <div class="bg-blue-50 rounded-xl p-6">
-                <h4 class="text-lg font-bold mb-4" style="color: #252525;">Ваш прогресс</h4>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span style="color: #666;">Решено задач:</span>
-                        <span class="font-semibold" style="color: #252525;">${progress.solved_tasks || 0}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span style="color: #666;">Процент успеха:</span>
-                        <span class="font-semibold" style="color: #252525;">${progress.success_rate || 0}%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-600 h-2 rounded-full" style="width: ${progress.completion_percentage || 0}%"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Рекомендуемые задачи
-    if (insights.recommendations && insights.recommendations.tasks) {
-        const tasks = insights.recommendations.tasks;
-        html += `
-            <div class="bg-green-50 rounded-xl p-6">
-                <h4 class="text-lg font-bold mb-4" style="color: #252525;">Рекомендуемые задачи</h4>
-                <div class="space-y-2">
-                    ${tasks.slice(0, 3).map(task => `
-                        <div class="flex items-center justify-between p-2 bg-white rounded-lg">
-                            <span class="text-sm" style="color: #666;">${task.title || 'Задача'}</span>
-                            <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                                ${task.difficulty || 3}/5
-                            </span>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="mt-3">
-                    <a href="{% url 'core:my_recommendations' %}" class="text-sm text-blue-600 hover:text-blue-700">
-                        Смотреть все →
-                    </a>
-                </div>
-            </div>
-        `;
-    }
-    
-    html += '</div>';
-    
-    // Если нет данных, показываем сообщение
-    if (!insights.progress_summary && (!insights.recommendations || !insights.recommendations.tasks)) {
-        html = `
-            <div class="text-center py-8">
-                <div class="text-6xl mb-4">🎯</div>
-                <h3 class="text-xl font-bold mb-2" style="color: #252525;">Начните решать задачи!</h3>
-                <p class="text-lg mb-4" style="color: #666;">Решите несколько задач, чтобы получить персональные рекомендации</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary">Выбрать предмет</a>
-            </div>
-        `;
-    }
-    
-    contentDiv.innerHTML = html;
-}
-
-function displayPersonalizationError() {
-    const contentDiv = document.getElementById('personalization-content');
-    contentDiv.innerHTML = `
-        <div class="text-center py-8">
-            <div class="text-6xl mb-4">⚠️</div>
-            <h3 class="text-xl font-bold mb-2" style="color: #252525;">Ошибка загрузки</h3>
-            <p class="text-lg mb-4" style="color: #666;">Не удалось загрузить ваши данные</p>
-            <button onclick="loadPersonalizationData()" class="btn-secondary">Попробовать снова</button>
-        </div>
-    `;
-}
-</script>
-{% endif %}
 
 {% endblock %}

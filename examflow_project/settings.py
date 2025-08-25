@@ -65,6 +65,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
     'csp.middleware.CSPMiddleware',  # CSP middleware
+    # 🔒 Дополнительные middleware для безопасности
+    'examflow_project.middleware.SecurityHeadersMiddleware',  # Кастомные заголовки безопасности
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
@@ -382,6 +384,79 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
+# 🔒 ДОПОЛНИТЕЛЬНЫЕ ЗАГОЛОВКИ БЕЗОПАСНОСТИ
+# Permissions-Policy - ограничение доступа к API браузера
+PERMISSIONS_POLICY = {
+    'accelerometer': [],
+    'ambient-light-sensor': [],
+    'autoplay': [],
+    'battery': [],
+    'camera': [],
+    'cross-origin-isolated': [],
+    'display-capture': [],
+    'document-domain': [],
+    'encrypted-media': [],
+    'execution-while-not-rendered': [],
+    'execution-while-out-of-viewport': [],
+    'fullscreen': [],
+    'geolocation': [],
+    'gyroscope': [],
+    'keyboard-map': [],
+    'magnetometer': [],
+    'microphone': [],
+    'midi': [],
+    'navigation-override': [],
+    'payment': [],
+    'picture-in-picture': [],
+    'publickey-credentials-get': [],
+    'screen-wake-lock': [],
+    'sync-xhr': [],
+    'usb': [],
+    'web-share': [],
+    'xr-spatial-tracking': [],
+}
+
+# Улучшенный Referrer-Policy
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Дополнительные заголовки безопасности
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'require-corp'
+
+# Защита от MIME-sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Защита от XSS
+SECURE_BROWSER_XSS_FILTER = True
+
+# Защита от clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+# Дополнительные настройки сессий
+SESSION_COOKIE_AGE = 3600  # 1 час
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = False
+
+# Настройки паролей
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+
+# MFA настройки (готовность к внедрению)
+MFA_ENABLED = os.getenv('MFA_ENABLED', 'False').lower() == 'true'
+MFA_REQUIRED_FOR_ADMIN = True
+MFA_REQUIRED_FOR_STAFF = True
+
+# Rate limiting настройки
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_ENABLE = True
+
+# Безопасность API
+API_RATE_LIMIT = '100/hour'
+API_RATE_LIMIT_BLOCK = '10/minute'
+
 # CORS настройки
 CORS_ALLOWED_ORIGINS = [
     "https://examflow.ru",
@@ -494,6 +569,27 @@ LOGGING = {
 
 # Create logs directory if it doesn't exist
 os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
+
+# 🔒 ЛОГИРОВАНИЕ БЕЗОПАСНОСТИ
+# Создаем отдельную папку для логов безопасности
+os.makedirs(os.path.join(BASE_DIR, 'logs', 'security'), exist_ok=True)
+
+# Расширенное логирование безопасности
+SECURITY_LOGGING = {
+    'failed_login': True,
+    'successful_login': True,
+    'password_change': True,
+    'user_creation': True,
+    'admin_action': True,
+    'suspicious_activity': True,
+}
+
+# Настройки для мониторинга безопасности
+SECURITY_MONITORING = {
+    'failed_login_threshold': 5,  # Количество неудачных попыток входа
+    'suspicious_ip_threshold': 10,  # Количество запросов с одного IP
+    'admin_action_logging': True,  # Логирование действий администратора
+}
 
 # ==========================================
 # НАСТРОЙКИ GOOGLE GEMINI AI

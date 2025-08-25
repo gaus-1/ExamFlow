@@ -115,11 +115,11 @@
 
         /* Класс логотипа рядом с названием */
         .brand-logo {
-            width: 40px;
-            height: 40px;
-            margin-left: 10px;
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
             border-radius: 8px;
-            object-fit: cover;
+            object-fit: contain;
             display: inline-block;
         }
         
@@ -328,8 +328,8 @@
             <div class="navbar-content">
                 <!-- Логотип и название слева -->
                 <a class="navbar-brand" href="{% url 'learning:home' %}">
-                    ExamFlow
                     <img class="brand-logo" src="{% static 'images/logo-180.png' %}" alt="ExamFlow">
+                    ExamFlow
                 </a>
                 
                 <!-- Навигация по центру -->
