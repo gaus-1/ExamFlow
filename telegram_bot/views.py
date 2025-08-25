@@ -325,26 +325,23 @@ def test_webhook(request):
 
 
 def test_bot_api(request):
-    """Тест API бота"""
+    """Тест API бота через прямой HTTP getMe (без async)"""
     try:
-        bot = get_bot()
-        bot_info = bot.get_me()
+        token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+        if not token:
+            return JsonResponse({'status': 'error', 'error': 'TELEGRAM_BOT_TOKEN не задан'}, status=500)
+        resp = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=8)
+        data = resp.json()
+        if not data.get('ok'):
+            return JsonResponse({'status': 'error', 'api': 'getMe', 'response': data}, status=500)
+        info = data.get('result', {})
         return JsonResponse({
             'status': 'ok',
-            'bot_info': {
-                'id': bot_info.id,  # type: ignore
-                'username': bot_info.username,  # type: ignore
-                'first_name': bot_info.first_name,  # type: ignore
-                'is_bot': bot_info.is_bot  # type: ignore
-            },
+            'bot_info': info,
             'timestamp': timezone.now().isoformat()
         })
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'error': str(e),
-            'timestamp': timezone.now().isoformat()
-        }, status=500)
+        return JsonResponse({'status': 'error', 'error': str(e), 'timestamp': timezone.now().isoformat()}, status=500)
 
 
 def bot_control_panel(request):
