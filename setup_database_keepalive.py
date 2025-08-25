@@ -191,7 +191,7 @@ def main():
             
             # Проверяем существующую задачу
             if check_scheduled_task():
-                logger.info("Задача уже существует. Хотите пересоздать? (y/n): ", end="")
+                logger.info("Задача уже существует. Хотите пересоздать? (y/n): ")
                 response = input().lower().strip()
                 if response == 'y':
                     delete_scheduled_task()
