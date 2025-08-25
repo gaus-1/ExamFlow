@@ -16,7 +16,7 @@ from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST  # type: ignore
 from django.contrib.auth.decorators import user_passes_test
 from telegram import Update
 from .bot_main import setup_bot_application, get_bot
@@ -46,7 +46,6 @@ def is_allowed_ip(ip):
     return False
 
 @csrf_exempt
-@require_POST
 def telegram_webhook(request):
     """
     Обрабатывает webhook от Telegram
@@ -60,6 +59,9 @@ def telegram_webhook(request):
     logger.info(f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
     
     try:
+        # Разрешаем быстрый health-check GET без 500
+        if request.method != 'POST':
+            return JsonResponse({'status': 'ok', 'mode': 'noop'})
         # 🔒 БЕЗОПАСНОСТЬ: Проверка IP
         client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
         if not is_allowed_ip(client_ip):
@@ -76,8 +78,12 @@ def telegram_webhook(request):
         logger.info(f"Headers: {dict(request.headers)}")
         logger.info(f"Body length: {len(request.body)} bytes")
         
-        # Парсим JSON данные
-        data = json.loads(request.body.decode('utf-8'))
+        # Парсим JSON данные (без 500 при пустом/битом теле)
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            logger.warning("Пустой или некорректный JSON в webhook — возвращаем OK")
+            return HttpResponse(b"OK")
         logger.info(f"Webhook data: {json.dumps(data, indent=2, ensure_ascii=False)}")
         
         # Получаем экземпляр бота
