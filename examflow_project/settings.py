@@ -373,7 +373,9 @@ else:
 CONTENT_SECURITY_POLICY = {
     'default-src': ("'self'",),
     'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+    'style-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
     'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+    'script-src-elem': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
     'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
     'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
     'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
