@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                         <span>~15 мин</span>
                     </div>
-                    <button onclick="startTask(${task.id})" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    <button data-task-id="${task.id}" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
                         Начать
                     </button>
                 </div>
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </svg>
                 <h3 class="text-lg font-medium text-gray-900 mb-2">Произошла ошибка</h3>
                 <p class="text-gray-500">${message}</p>
-                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                <button class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
                     Попробовать снова
                 </button>
             </div>

@@ -21,4 +21,5 @@ urlpatterns = [
     
     # API
     path('api/stats/', views.api_stats, name='api_stats'),
+    path('api/update-user-profile/', views.update_user_profile, name='update_user_profile'),
 ]

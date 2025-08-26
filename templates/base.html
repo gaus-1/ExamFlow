@@ -21,10 +21,10 @@
     <meta property="og:locale" content="ru_RU">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo-180.png' %}">
-    <!-- SVG логотип временно отключен -->
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/icon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/icon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/icon-180x180.png' %}">
     
     <!-- PWA мета-теги -->
     <meta name="theme-color" content="#252525">
@@ -35,20 +35,26 @@
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/static/manifest.json">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
     
     <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Tailwind CSS для правильных отступов и размеров -->
     <link rel="stylesheet" href="{% static 'css/tailwind-styles.css' %}">
-    <!-- Readdy Tailwind утилиты из предоставленного файла -->
-    <link rel="stylesheet" href="{% static 'css/readdy-tailwind.css' %}">
     
     <!-- Основные стили для ExamFlow с нашими цветами и шрифтами -->
     <link rel="stylesheet" href="{% static 'css/examflow-styles.css' %}">
     <!-- Адаптивный дизайн -->
     <link rel="stylesheet" href="{% static 'css/responsive-design.css' %}">
+    <!-- Readdy Tailwind утилиты из предоставленного файла (подключаем в конце для переопределений) -->
+    <link rel="stylesheet" href="{% static 'css/readdy-tailwind.css' %}?v={{ STATIC_VERSION|default:'1.0' }}">
+    <!-- Стили для главной страницы -->
+    <link rel="stylesheet" href="{% static 'css/home-styles.css' %}">
+    
+    <!-- JavaScript функции для core приложения -->
+    <script src="{% static 'js/core-functions.js' %}"></script>
+    
     <style>
         /* Основные цвета и переменные */
         :root {

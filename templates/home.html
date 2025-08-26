@@ -274,8 +274,7 @@
                 <!-- QR код для Telegram бота -->
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/ExamFlowBot" 
                      alt="QR код для Telegram бота" 
-                     class="w-48 h-48 mx-auto rounded-lg"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                     class="w-48 h-48 mx-auto rounded-lg">
                 <div class="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center" style="display: none;">
                     <i class="fas fa-qrcode text-6xl" style="color: #ccc;"></i>
                 </div>
@@ -651,23 +650,7 @@
 <!-- Подключение JavaScript для анимаций и геймификации -->
 <script src="{% static 'js/examflow-animations.js' %}"></script>
 <script src="{% static 'js/gamification.js' %}"></script>
-
-<script>
-// Инициализация анимаций и геймификации
-document.addEventListener('DOMContentLoaded', function() {
-    // Инициализация анимаций
-    if (typeof ExamFlowAnimations !== 'undefined') {
-        const animations = new ExamFlowAnimations();
-        animations.init();
-    }
-    
-    // Инициализация геймификации
-    if (typeof ExamFlowGamification !== 'undefined') {
-        const gamification = new ExamFlowGamification();
-        gamification.init();
-    }
-});
-</script>
+<script src="{% static 'js/home-init.js' %}"></script>
 
 <!-- Тарифные планы -->
 <section class="section-padding" style="background: #fffef2;">

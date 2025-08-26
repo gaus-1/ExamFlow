@@ -369,14 +369,16 @@ else:
     ]))
 
 # 🔒 БЕЗОПАСНОСТЬ - БЕСПЛАТНЫЕ НАСТРОЙКИ
-# Content Security Policy (CSP) - защита от XSS
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net")
-CSP_SCRIPT_SRC = ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net")
-CSP_IMG_SRC = ("'self'", "data:", "https:", "https://api.qrserver.com")
-CSP_FONT_SRC = ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net")
-CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com")
-CSP_FRAME_ANCESTORS = ("'none'",)  # Защита от clickjacking
+# Content Security Policy (CSP) - защита от XSS (django-csp 4.0+)
+CONTENT_SECURITY_POLICY = {
+    'default-src': ("'self'",),
+    'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+    'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+    'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
+    'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+    'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
+    'frame-ancestors': ("'none'",),  # Защита от clickjacking
+}
 
 # Дополнительные заголовки безопасности
 SECURE_BROWSER_XSS_FILTER = True
@@ -421,7 +423,7 @@ SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Дополнительные заголовки безопасности
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
-SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'require-corp'
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'credentialless'  # Изменено для совместимости
 
 # Защита от MIME-sniffing
 SECURE_CONTENT_TYPE_NOSNIFF = True
