@@ -999,3 +999,19 @@ p {
 /* Анимации появления */
 .animate-on-scroll{opacity:0;transform:translateY(12px)}
 .animate-in{opacity:1;transform:none;transition:all .5s cubic-bezier(0.4,0,0.2,1)}
+
+/* Перенос длинных строк */
+.break-words{overflow-wrap:anywhere;word-break:break-word}
+
+/* Адаптивные правки сеток/отступов */
+@media (max-width: 768px){
+  .section-padding{padding-top: 40px;padding-bottom: 40px}
+  .cards-grid{grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));gap:16px}
+  .subject-card,.task-item{padding:16px}
+  .navbar-aesop{position:sticky;top:0;z-index:1000}
+}
+
+@media (max-width: 480px){
+  .cards-grid{grid-template-columns: 1fr}
+  .container{padding-left: 12px;padding-right: 12px}
+}
