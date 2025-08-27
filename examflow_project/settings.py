@@ -14,6 +14,10 @@ sys.path.append(str(BASE_DIR))
 
 # ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: держите секретный ключ в секрете!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b=8q90=se^7twm97htmj$v2n-(b@8!0(%h48n=tnb=t^%ja!ta')
+# Запрет небезопасного SECRET_KEY в продакшене
+if not os.getenv('DEBUG', 'False').lower() == 'true':
+    if SECRET_KEY.startswith('django-insecure'):
+        raise RuntimeError('SECURITY: SECRET_KEY must be set via environment in production')
 
 # ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: не запускайте с debug=True в продакшене!
 # В продакшене принудительно выключаем DEBUG
@@ -465,7 +469,9 @@ API_RATE_LIMIT_BLOCK = '10/minute'
 CORS_ALLOWED_ORIGINS = [
     "https://examflow.ru",
     "https://www.examflow.ru",
-    "https://*.onrender.com",
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/[a-zA-Z0-9-]+\.onrender\.com$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
