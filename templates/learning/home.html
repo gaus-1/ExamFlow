@@ -5,308 +5,163 @@
 {% block title %}ExamFlow - ИИ помощник для подготовки к ЕГЭ и ОГЭ{% endblock %}
 
 {% block content %}
-<div class="main-content">
-    <!-- Центральная строка ввода ИИ по аналогии с Perplexity.ai -->
-    <div class="ai-chat-container">
-        <h1 class="ai-chat-title">ExamFlow</h1>
-        <p class="ai-chat-subtitle">Ваш персональный ИИ помощник для подготовки к экзаменам</p>
-        
-        <!-- Широкая строка ввода в центре экрана -->
-        <div class="ai-input-container">
-            <input type="text" class="ai-input" placeholder="Задайте вопрос по ЕГЭ или ОГЭ..." id="ai-input">
-            <button class="ai-send-btn" id="ai-send-btn">
-                <i class="fas fa-paper-plane"></i>
+<div class="container section-padding">
+  <div class="home-grid">
+    <!-- Левая колонка: пользовательские виджеты -->
+    <aside class="home-aside left">
+      <div class="widget animate-on-scroll">
+        <h3>Ваши достижения</h3>
+        <ul class="text-sm" style="margin:0;padding-left:18px;color:var(--aesop-text-light)">
+          <li>Серия: 7 дней</li>
+          <li>Текущий уровень: Эксперт</li>
+          <li>Очки: 1540</li>
+        </ul>
+      </div>
+      <div class="widget animate-on-scroll">
+        <h3>Быстрые действия</h3>
+        <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+          <a href="{% url 'learning:subjects_list' %}" class="btn-bot" style="text-align:center">Предметы</a>
+          <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot" style="text-align:center">Бот</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Центральная колонка: AI + основной контент -->
+    <main>
+      <!-- Центральная строка ввода ИИ -->
+      <section class="animate-on-scroll" style="margin-bottom:24px">
+        <div class="ai-chat-container">
+          <h1 class="ai-chat-title">ExamFlow</h1>
+          <p class="ai-chat-subtitle">Ваш персональный ИИ помощник для подготовки к экзаменам</p>
+
+          <div class="ai-input-container ai-advanced">
+            <textarea id="ai-textarea" class="ai-textarea" rows="1" placeholder="Например: Объясни тему 'Кинематика' для ОГЭ…"></textarea>
+            <button class="ai-send-btn ai-send-btn-lg" id="ai-send-btn" title="Отправить">
+              <i class="fas fa-paper-plane"></i>
             </button>
+          </div>
+
+          <div class="query-examples pills" id="query-pills" style="margin-top:12px">
+            <div class="query-example">Как решать квадратные уравнения?</div>
+            <div class="query-example">Сделай план подготовки по физике</div>
+            <div class="query-example">Поясни правило падежей</div>
+            <div class="query-example">Разбери фотосинтез</div>
+          </div>
         </div>
-        
-        <!-- Краткие примеры запросов под строкой (кликабельные) -->
-        <div class="query-examples">
-            <div class="query-example" data-query="Как решить квадратное уравнение?">Как решить квадратное уравнение?</div>
-            <div class="query-example" data-query="Объясни правило падежей в русском языке">Объясни правило падежей в русском языке</div>
-            <div class="query-example" data-query="Что такое фотосинтез?">Что такое фотосинтез?</div>
-            <div class="query-example" data-query="Как определить площадь треугольника?">Как определить площадь треугольника?</div>
-            <div class="query-example" data-query="Объясни принцип работы электрического тока">Объясни принцип работы электрического тока</div>
-            <div class="query-example" data-query="Как правильно писать эссе по обществознанию?">Как правильно писать эссе по обществознанию?</div>
-        </div>
-    </div>
-    
-    <!-- Вкладка "Задания ФИПИ" -->
-    <div class="fipi-tab">
+      </section>
+
+      <!-- Основной контент: задания ФИПИ + информблоки -->
+      <section class="fipi-tab animate-on-scroll">
         <h2 class="fipi-tab-title">Задания ФИПИ</h2>
-        <div class="subject-grid">
-            <div class="subject-card" data-subject="math">
-                <div class="subject-icon">📐</div>
-                <div class="subject-name">Математика</div>
-            </div>
-            <div class="subject-card" data-subject="russian">
-                <div class="subject-icon">📚</div>
-                <div class="subject-name">Русский язык</div>
-            </div>
-            <div class="subject-card" data-subject="physics">
-                <div class="subject-icon">⚡</div>
-                <div class="subject-name">Физика</div>
-            </div>
-            <div class="subject-card" data-subject="chemistry">
-                <div class="subject-icon">🧪</div>
-                <div class="subject-name">Химия</div>
-            </div>
-            <div class="subject-card" data-subject="biology">
-                <div class="subject-icon">🧬</div>
-                <div class="subject-name">Биология</div>
-            </div>
-            <div class="subject-card" data-subject="history">
-                <div class="subject-icon">🏛️</div>
-                <div class="subject-name">История</div>
-            </div>
-            <div class="subject-card" data-subject="social">
-                <div class="subject-icon">👥</div>
-                <div class="subject-name">Обществознание</div>
-            </div>
-            <div class="subject-card" data-subject="literature">
-                <div class="subject-icon">📖</div>
-                <div class="subject-name">Литература</div>
-            </div>
+        <div class="subject-grid cards-grid">
+          <div class="subject-card" data-subject="math">
+            <div class="subject-icon">📐</div>
+            <div class="subject-name">Математика</div>
+          </div>
+          <div class="subject-card" data-subject="russian">
+            <div class="subject-icon">📚</div>
+            <div class="subject-name">Русский язык</div>
+          </div>
+          <div class="subject-card" data-subject="physics">
+            <div class="subject-icon">⚡</div>
+            <div class="subject-name">Физика</div>
+          </div>
+          <div class="subject-card" data-subject="chemistry">
+            <div class="subject-icon">🧪</div>
+            <div class="subject-name">Химия</div>
+          </div>
+          <div class="subject-card" data-subject="biology">
+            <div class="subject-icon">🧬</div>
+            <div class="subject-name">Биология</div>
+          </div>
+          <div class="subject-card" data-subject="history">
+            <div class="subject-icon">🏛️</div>
+            <div class="subject-name">История</div>
+          </div>
         </div>
-    </div>
-    
-    <!-- Аккордеоны с информацией -->
-    <div class="accordion">
-        <div class="accordion-item">
+      </section>
+
+      <!-- Инфо-аккордеоны -->
+      <section class="animate-on-scroll" style="margin-top:24px">
+        <div class="accordion">
+          <div class="accordion-item">
             <div class="accordion-header">
-                <div class="accordion-title">Как это работает?</div>
-                <div class="accordion-icon">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
+              <div class="accordion-title">Как это работает?</div>
+              <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
             </div>
-            <div class="accordion-content">
-                <div class="accordion-body">
-                    <p>ExamFlow использует передовые технологии искусственного интеллекта для персонализированной подготовки к экзаменам. Наша система анализирует ваши ответы, выявляет слабые места и предлагает индивидуальную программу обучения.</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="accordion-item">
+            <div class="accordion-content"><div class="accordion-body">
+              <p>ExamFlow использует ИИ для персонализированной подготовки и рекомендаций.</p>
+            </div></div>
+          </div>
+          <div class="accordion-item">
             <div class="accordion-header">
-                <div class="accordion-title">Примеры заданий</div>
-                <div class="accordion-icon">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
+              <div class="accordion-title">Примеры заданий</div>
+              <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
             </div>
-            <div class="accordion-content">
-                <div class="accordion-body">
-                    <p>У нас собрана обширная база заданий ФИПИ по всем предметам ЕГЭ и ОГЭ. Каждое задание сопровождается подробным решением и объяснением, что поможет вам понять принципы решения подобных задач.</p>
-                </div>
-            </div>
+            <div class="accordion-content"><div class="accordion-body">
+              <p>Задания ФИПИ по всем предметам с решениями и объяснениями.</p>
+            </div></div>
+          </div>
         </div>
-        
-        <div class="accordion-item">
-            <div class="accordion-header">
-                <div class="accordion-title">О нас</div>
-                <div class="accordion-icon">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="accordion-content">
-                <div class="accordion-body">
-                    <p>ExamFlow - это инновационная образовательная платформа, созданная для того, чтобы сделать подготовку к экзаменам эффективной, интересной и доступной для каждого ученика. Мы верим, что современные технологии могут значительно улучшить процесс обучения.</p>
-                </div>
-            </div>
+      </section>
+    </main>
+
+    <!-- Правая колонка: геймификация и тарифы -->
+    <aside class="home-aside right">
+      <div class="widget gamification-wrapper sidebar animate-on-scroll">
+        <div class="gamification-card">
+          <h3>Прогресс</h3>
+          <div class="progress-label"><span>Общий</span><span>75%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
         </div>
-    </div>
-    
-    <!-- Геймификация -->
-    <div class="gamification">
-        <h2 class="gamification-title">Ваш прогресс</h2>
-        <div class="progress-container">
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span>Общий прогресс</span>
-                    <span>75%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 75%"></div>
-                </div>
-            </div>
-            
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span>Решено заданий</span>
-                    <span>150/200</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 75%"></div>
-                </div>
-            </div>
-            
-            <div class="progress-item">
-                <div class="progress-label">
-                    <span>Уровень</span>
-                    <span>Эксперт</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 90%"></div>
-                </div>
-            </div>
+        <div class="gamification-card">
+          <h3>Решено</h3>
+          <div class="progress-label"><span>150/200</span><span>75%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
         </div>
-    </div>
+        <div class="gamification-card">
+          <h3>Уровень</h3>
+          <div class="progress-label"><span>Эксперт</span><span>90%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+        </div>
+      </div>
+      <div class="widget animate-on-scroll">
+        <h3>Тарифы</h3>
+        <details open>
+          <summary>Сравнение</summary>
+          <ul style="margin:12px 0 0;padding-left:18px;color:var(--aesop-text-light)">
+            <li>Базовый — бесплатно</li>
+            <li>Премиум — расширенные рекомендации</li>
+            <li>Pro — максимально всё</li>
+          </ul>
+        </details>
+      </div>
+    </aside>
+  </div>
 </div>
 
 <script>
-// Обработка примеров запросов с анимациями
-document.querySelectorAll('.query-example').forEach((example, index) => {
-    // Добавляем задержку для анимации появления
-    example.style.opacity = '0';
-    example.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-        example.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-        example.style.opacity = '1';
-        example.style.transform = 'translateY(0)';
-    }, 1000 + (index * 100));
-    
-    example.addEventListener('click', () => {
-        const query = example.getAttribute('data-query');
-        document.getElementById('ai-input').value = query;
-        document.getElementById('ai-input').focus();
-        
-        // Анимация клика
-        example.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            example.style.transform = 'scale(1)';
-        }, 150);
-    });
-});
+// Авто‑рост textarea
+(function(){
+  const ta = document.getElementById('ai-textarea');
+  if(!ta) return;
+  const autoResize = ()=>{
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 220) + 'px';
+  };
+  ['input','change'].forEach(e=> ta.addEventListener(e, autoResize));
+  autoResize();
+})();
 
-// Обработка выбора предмета с анимациями
-document.querySelectorAll('.subject-card').forEach((card, index) => {
-    // Добавляем задержку для анимации появления
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    
-    setTimeout(() => {
-        card.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-    }, 1200 + (index * 150));
-    
-    card.addEventListener('click', () => {
-        const subject = card.getAttribute('data-subject');
-        console.log('Выбран предмет:', subject);
-        
-        // Анимация клика
-        card.style.transform = 'scale(0.95) translateY(-2px)';
-        setTimeout(() => {
-            card.style.transform = 'scale(1) translateY(0)';
-        }, 200);
-    });
-});
-
-// Обработка отправки сообщения с анимациями
-document.getElementById('ai-send-btn').addEventListener('click', () => {
-    const input = document.getElementById('ai-input');
-    const message = input.value.trim();
-    
-    if (message) {
-        // Анимация кнопки
-        const btn = document.getElementById('ai-send-btn');
-        btn.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-            btn.style.transform = 'scale(1)';
-        }, 150);
-        
-        console.log('Отправлено сообщение:', message);
-        input.value = '';
-        
-        // Показываем уведомление
-        showNotification('Сообщение отправлено!', 'success');
-    }
-});
-
-// Обработка Enter в поле ввода
-document.getElementById('ai-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        document.getElementById('ai-send-btn').click();
-    }
-});
-
-// Улучшенная функция показа уведомлений
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = message;
-    
-    // Стили для уведомления
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--aesop-secondary);
-        color: var(--aesop-text);
-        border: 1px solid var(--aesop-border);
-        border-radius: 8px;
-        padding: 12px 16px;
-        box-shadow: var(--aesop-shadow);
-        z-index: 10000;
-        transform: translateX(100%) scale(0.8);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        max-width: 300px;
-        font-family: 'Georgia', 'Times New Roman', serif;
-        font-size: 14px;
-        opacity: 0;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Анимация появления
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0) scale(1)';
-        notification.style.opacity = '1';
-    }, 100);
-    
-    // Автоматическое скрытие
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%) scale(0.8)';
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 400);
-    }, 3000);
-}
-
-// Анимация прогресс-баров при появлении
-function animateProgressBars() {
-    const progressBars = document.querySelectorAll('.progress-fill');
-    
-    progressBars.forEach((bar, index) => {
-        const width = bar.style.width;
-        bar.style.width = '0%';
-        
-        setTimeout(() => {
-            bar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            bar.style.width = width;
-        }, 2000 + (index * 300));
-    });
-}
-
-// Запускаем анимацию прогресс-баров
-setTimeout(animateProgressBars, 2500);
-
-// Добавляем анимации для заголовков
-document.addEventListener('DOMContentLoaded', () => {
-    const titles = document.querySelectorAll('h1, h2, h3');
-    
-    titles.forEach((title, index) => {
-        title.style.opacity = '0';
-        title.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            title.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-            title.style.opacity = '1';
-            title.style.transform = 'translateY(0)';
-        }, 500 + (index * 200));
-    });
-});
+// Клик по чипам — вставка текста в textarea
+(function(){
+  const ta = document.getElementById('ai-textarea');
+  const pills = document.querySelectorAll('#query-pills .query-example');
+  pills.forEach(p=> p.addEventListener('click', ()=>{
+    ta.value = p.textContent.trim();
+    ta.focus();
+    const evt = new Event('input'); ta.dispatchEvent(evt);
+  }));
+})();
 </script>
 {% endblock %}
