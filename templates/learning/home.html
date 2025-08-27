@@ -6,155 +6,149 @@
 
 {% block content %}
 <div class="main-content">
-    <!-- Центральная секция с ИИ - главный фокус -->
-    <section class="hero-section">
-        <div class="ai-chat-container">
-            <h1 class="ai-chat-title">ExamFlow</h1>
-            <p class="ai-chat-subtitle">Ваш персональный ИИ помощник для подготовки к экзаменам</p>
-            
-            <!-- Центральная строка ввода ИИ -->
-            <div class="ai-input-container">
-                <input type="text" class="ai-input" placeholder="Задайте вопрос по ЕГЭ или ОГЭ..." id="ai-input">
-                <button class="ai-send-btn" id="ai-send-btn">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+    <!-- Центральная строка ввода ИИ по аналогии с Perplexity.ai -->
+    <div class="ai-chat-container">
+        <h1 class="ai-chat-title">ExamFlow</h1>
+        <p class="ai-chat-subtitle">Ваш персональный ИИ помощник для подготовки к экзаменам</p>
+        
+        <!-- Широкая строка ввода в центре экрана -->
+        <div class="ai-input-container">
+            <input type="text" class="ai-input" placeholder="Задайте вопрос по ЕГЭ или ОГЭ..." id="ai-input">
+            <button class="ai-send-btn" id="ai-send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        
+        <!-- Краткие примеры запросов под строкой (кликабельные) -->
+        <div class="query-examples">
+            <div class="query-example" data-query="Как решить квадратное уравнение?">Как решить квадратное уравнение?</div>
+            <div class="query-example" data-query="Объясни правило падежей в русском языке">Объясни правило падежей в русском языке</div>
+            <div class="query-example" data-query="Что такое фотосинтез?">Что такое фотосинтез?</div>
+            <div class="query-example" data-query="Как определить площадь треугольника?">Как определить площадь треугольника?</div>
+            <div class="query-example" data-query="Объясни принцип работы электрического тока">Объясни принцип работы электрического тока</div>
+            <div class="query-example" data-query="Как правильно писать эссе по обществознанию?">Как правильно писать эссе по обществознанию?</div>
+        </div>
+    </div>
+    
+    <!-- Вкладка "Задания ФИПИ" -->
+    <div class="fipi-tab">
+        <h2 class="fipi-tab-title">Задания ФИПИ</h2>
+        <div class="subject-grid">
+            <div class="subject-card" data-subject="math">
+                <div class="subject-icon">📐</div>
+                <div class="subject-name">Математика</div>
             </div>
-            
-            <!-- Компактные примеры запросов -->
-            <div class="query-examples">
-                <div class="query-example" data-query="Как решить квадратное уравнение?">Квадратное уравнение</div>
-                <div class="query-example" data-query="Объясни правило падежей в русском языке">Падежи</div>
-                <div class="query-example" data-query="Что такое фотосинтез?">Фотосинтез</div>
-                <div class="query-example" data-query="Как определить площадь треугольника?">Площадь треугольника</div>
+            <div class="subject-card" data-subject="russian">
+                <div class="subject-icon">📚</div>
+                <div class="subject-name">Русский язык</div>
+            </div>
+            <div class="subject-card" data-subject="physics">
+                <div class="subject-icon">⚡</div>
+                <div class="subject-name">Физика</div>
+            </div>
+            <div class="subject-card" data-subject="chemistry">
+                <div class="subject-icon">🧪</div>
+                <div class="subject-name">Химия</div>
+            </div>
+            <div class="subject-card" data-subject="biology">
+                <div class="subject-icon">🧬</div>
+                <div class="subject-name">Биология</div>
+            </div>
+            <div class="subject-card" data-subject="history">
+                <div class="subject-icon">🏛️</div>
+                <div class="subject-name">История</div>
+            </div>
+            <div class="subject-card" data-subject="social">
+                <div class="subject-icon">👥</div>
+                <div class="subject-name">Обществознание</div>
+            </div>
+            <div class="subject-card" data-subject="literature">
+                <div class="subject-icon">📖</div>
+                <div class="subject-name">Литература</div>
             </div>
         </div>
-    </section>
-
-    <!-- Компактная сетка предметов -->
-    <section class="subjects-section">
-        <div class="fipi-tab">
-            <h2 class="fipi-tab-title">Предметы ЕГЭ/ОГЭ</h2>
-            <div class="subject-grid">
-                <div class="subject-card" data-subject="math">
-                    <div class="subject-icon">📐</div>
-                    <div class="subject-name">Математика</div>
-                </div>
-                <div class="subject-card" data-subject="russian">
-                    <div class="subject-icon">📚</div>
-                    <div class="subject-name">Русский язык</div>
-                </div>
-                <div class="subject-card" data-subject="physics">
-                    <div class="subject-icon">⚡</div>
-                    <div class="subject-name">Физика</div>
-                </div>
-                <div class="subject-card" data-subject="chemistry">
-                    <div class="subject-icon">🧪</div>
-                    <div class="subject-name">Химия</div>
-                </div>
-                <div class="subject-card" data-subject="biology">
-                    <div class="subject-icon">🧬</div>
-                    <div class="subject-name">Биология</div>
-                </div>
-                <div class="subject-card" data-subject="history">
-                    <div class="subject-icon">🏛️</div>
-                    <div class="subject-name">История</div>
-                </div>
-                <div class="subject-card" data-subject="social">
-                    <div class="subject-icon">👥</div>
-                    <div class="subject-name">Обществознание</div>
-                </div>
-                <div class="subject-card" data-subject="literature">
-                    <div class="subject-icon">📖</div>
-                    <div class="subject-name">Литература</div>
+    </div>
+    
+    <!-- Аккордеоны с информацией -->
+    <div class="accordion">
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div class="accordion-title">Как это работает?</div>
+                <div class="accordion-icon">
+                    <i class="fas fa-chevron-down"></i>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Компактные аккордеоны в одну колонку -->
-    <section class="info-section">
-        <div class="accordion">
-            <div class="accordion-item">
-                <div class="accordion-header">
-                    <div class="accordion-title">Как это работает?</div>
-                    <div class="accordion-icon">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="accordion-content">
-                    <div class="accordion-body">
-                        <p>ExamFlow использует передовые технологии ИИ для персонализированной подготовки к экзаменам. Система анализирует ваши ответы, выявляет слабые места и предлагает индивидуальную программу обучения.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="accordion-item">
-                <div class="accordion-header">
-                    <div class="accordion-title">Примеры заданий</div>
-                    <div class="accordion-icon">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="accordion-content">
-                    <div class="accordion-body">
-                        <p>Обширная база заданий ФИПИ по всем предметам ЕГЭ и ОГЭ с подробными решениями и объяснениями.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="accordion-item">
-                <div class="accordion-header">
-                    <div class="accordion-title">О нас</div>
-                    <div class="accordion-icon">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="accordion-content">
-                    <div class="accordion-body">
-                        <p>Инновационная образовательная платформа для эффективной, интересной и доступной подготовки к экзаменам.</p>
-                    </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <p>ExamFlow использует передовые технологии искусственного интеллекта для персонализированной подготовки к экзаменам. Наша система анализирует ваши ответы, выявляет слабые места и предлагает индивидуальную программу обучения.</p>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Компактная геймификация -->
-    <section class="progress-section">
-        <div class="gamification">
-            <h2 class="gamification-title">Ваш прогресс</h2>
-            <div class="progress-container">
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Общий прогресс</span>
-                        <span>75%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 75%"></div>
-                    </div>
+        
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div class="accordion-title">Примеры заданий</div>
+                <div class="accordion-icon">
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-                
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Решено заданий</span>
-                        <span>150/200</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 75%"></div>
-                    </div>
-                </div>
-                
-                <div class="progress-item">
-                    <div class="progress-label">
-                        <span>Уровень</span>
-                        <span>Эксперт</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 90%"></div>
-                    </div>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <p>У нас собрана обширная база заданий ФИПИ по всем предметам ЕГЭ и ОГЭ. Каждое задание сопровождается подробным решением и объяснением, что поможет вам понять принципы решения подобных задач.</p>
                 </div>
             </div>
         </div>
-    </section>
+        
+        <div class="accordion-item">
+            <div class="accordion-header">
+                <div class="accordion-title">О нас</div>
+                <div class="accordion-icon">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="accordion-content">
+                <div class="accordion-body">
+                    <p>ExamFlow - это инновационная образовательная платформа, созданная для того, чтобы сделать подготовку к экзаменам эффективной, интересной и доступной для каждого ученика. Мы верим, что современные технологии могут значительно улучшить процесс обучения.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Геймификация -->
+    <div class="gamification">
+        <h2 class="gamification-title">Ваш прогресс</h2>
+        <div class="progress-container">
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>Общий прогресс</span>
+                    <span>75%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                </div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>Решено заданий</span>
+                    <span>150/200</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                </div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>Уровень</span>
+                    <span>Эксперт</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 90%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

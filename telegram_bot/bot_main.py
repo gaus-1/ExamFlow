@@ -97,16 +97,6 @@ def setup_bot_application():
     # 🔒 БЕЗОПАСНОСТЬ: Логируем успешное создание
     logger.info("✅ Приложение бота создано с проверкой безопасности")
     
-    # Принудительно удаляем webhook перед использованием polling
-    try:
-        import asyncio
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(application.bot.delete_webhook())
-        logger.info("✅ Webhook успешно удален")
-    except Exception as e:
-        logger.warning(f"⚠️ Не удалось удалить webhook: {e}")
-    
     # Регистрируем обработчики команд
     application.add_handler(CommandHandler("start", start))  # type: ignore
     application.add_handler(CommandHandler("help", start))  # type: ignore
