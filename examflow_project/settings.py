@@ -215,20 +215,21 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# В режиме разработки используем стандартное хранилище для автоматического обновления
-if DEBUG:
-    STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'static'),
-    ]
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-else:
-    # В продакшене (Render) используем whitenoise для статических файлов
+# Настройки статических файлов для Render
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# На Render используем whitenoise для статических файлов
+if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-    
     # Настройки whitenoise для продакшена
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
     WHITENOISE_INDEX_FILE = True
+    WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+else:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media (для вложений задач)
 # Cache
