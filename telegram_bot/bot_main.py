@@ -18,13 +18,12 @@ django.setup()
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from django.conf import settings
 from .bot_handlers import (
-    start, subjects_menu, show_subject_topics, show_subject_topics,
+    start, subjects_menu, show_subject_topics,
     show_stats, handle_unknown_callback,
     main_menu, random_task, show_answer, ai_help_handler,
     ai_explain_handler, ai_personal_handler, ai_hint_general_handler,
     handle_ai_message, handle_text_message, learning_plan_menu,
     search_subject_handler, random_subject_handler, show_task_handler,
-    # 🎮 Геймификация
     gamification_menu_handler, user_stats_handler, achievements_handler,
     progress_handler, overall_progress_handler, subjects_progress_handler,
     daily_challenges_handler, leaderboard_handler, bonus_handler
@@ -44,15 +43,15 @@ def validate_bot_token():
     """
     token = settings.TELEGRAM_BOT_TOKEN
     if not token or len(token) < 40:
-        logger.error("❌ НЕДЕЙСТВИТЕЛЬНЫЙ ТОКЕН БОТА!")
+        logger.error("НЕДЕЙСТВИТЕЛЬНЫЙ ТОКЕН БОТА")
         return False
     
     # Проверяем формат токена Telegram
     if not token.count(':') == 1:
-        logger.error("❌ НЕПРАВИЛЬНЫЙ ФОРМАТ ТОКЕНА!")
+        logger.error("НЕПРАВИЛЬНЫЙ ФОРМАТ ТОКЕНА")
         return False
     
-    logger.info("✅ Токен бота валиден")
+    logger.info("Токен бота валиден")
     return True
 
 # 🔒 БЕЗОПАСНОСТЬ: Проверка webhook
@@ -95,7 +94,7 @@ def setup_bot_application():
     application = Application.builder().token(settings.TELEGRAM_BOT_TOKEN).build()
     
     # 🔒 БЕЗОПАСНОСТЬ: Логируем успешное создание
-    logger.info("✅ Приложение бота создано с проверкой безопасности")
+    logger.info("Приложение бота создано с проверкой безопасности")
     
     # Регистрируем обработчики команд
     application.add_handler(CommandHandler("start", start))  # type: ignore
@@ -156,5 +155,6 @@ if __name__ == '__main__':
     """Запуск бота в режиме polling (для разработки)"""
     application = setup_bot_application()
     
-    logger.info("Запуск бота в режиме polling...")
-    application.run_polling()
+    logger.info("Запуск бота в режиме polling")
+    # Снимаем webhook и отбрасываем накопившиеся обновления при запуске
+    application.run_polling(drop_pending_updates=True)

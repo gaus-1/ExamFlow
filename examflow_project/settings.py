@@ -14,6 +14,10 @@ sys.path.append(str(BASE_DIR))
 
 # ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: держите секретный ключ в секрете!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b=8q90=se^7twm97htmj$v2n-(b@8!0(%h48n=tnb=t^%ja!ta')
+# Запрет небезопасного SECRET_KEY в продакшене
+if not os.getenv('DEBUG', 'False').lower() == 'true':
+    if SECRET_KEY.startswith('django-insecure'):
+        raise RuntimeError('SECURITY: SECRET_KEY must be set via environment in production')
 
 # ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: не запускайте с debug=True в продакшене!
 # В продакшене принудительно выключаем DEBUG
@@ -289,53 +293,8 @@ ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID', None)  # Telegram chat ID админ�
 # Автозапуск парсинга при первом запросе (по умолчанию включен)
 AUTO_STARTUP_ENABLED = os.getenv('AUTO_STARTUP_ENABLED', 'true').lower() in ['true', '1', 'yes']
 
-# Логирование
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'examflow.log',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'core': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'bot': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-}
+# Логирование — базовая конфигурация (подробная финальная версия ниже переопределяет её)
+# Оставлено намеренно пустым для избежания дублирования
 
 if not DEBUG:
     # HSTS settings
@@ -368,19 +327,31 @@ else:
         'https://*.onrender.com',
     ]))
 
-# 🔒 БЕЗОПАСНОСТЬ - БЕСПЛАТНЫЕ НАСТРОЙКИ
-# Content Security Policy (CSP) - защита от XSS (django-csp 4.0+)
-CONTENT_SECURITY_POLICY = {
-    'default-src': ("'self'",),
-    'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-    'style-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-    'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-    'script-src-elem': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-    'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
-    'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-    'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
-    'frame-ancestors': ("'none'",),  # Защита от clickjacking
-}
+# CSP — либеральная в DEV, строгая в PROD (без unsafe)
+if DEBUG:
+    CONTENT_SECURITY_POLICY = {
+        'default-src': ("'self'",),
+        'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'style-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'script-src-elem': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
+        'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
+        'frame-ancestors': ("'none'",),
+    }
+else:
+    CONTENT_SECURITY_POLICY = {
+        'default-src': ("'self'",),
+        'style-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'style-src-elem': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'script-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'script-src-elem': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
+        'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+        'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
+        'frame-ancestors': ("'none'",),
+    }
 
 # Дополнительные заголовки безопасности
 SECURE_BROWSER_XSS_FILTER = True
@@ -465,7 +436,9 @@ API_RATE_LIMIT_BLOCK = '10/minute'
 CORS_ALLOWED_ORIGINS = [
     "https://examflow.ru",
     "https://www.examflow.ru",
-    "https://*.onrender.com",
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https:\/\/[a-zA-Z0-9-]+\.onrender\.com$",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
