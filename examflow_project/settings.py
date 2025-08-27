@@ -59,7 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # ВРЕМЕННО ОТКЛЮЧЕН для совместимости
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Включен для статических файлов на Render
     'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -214,12 +214,21 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+
 # В режиме разработки используем стандартное хранилище для автоматического обновления
-# На Render используем обычное хранилище для совместимости
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+if DEBUG:
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static'),
+    ]
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    # В продакшене (Render) используем whitenoise для статических файлов
+    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+    
+    # Настройки whitenoise для продакшена
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_AUTOREFRESH = True
+    WHITENOISE_INDEX_FILE = True
 
 # Media (для вложений задач)
 # Cache
