@@ -945,3 +945,22 @@ p {
     white-space: nowrap;
     border: 0;
 }
+
+/* Контейнер и секционные утилиты */
+.container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: clamp(12px, 4vw, 24px);
+    padding-right: clamp(12px, 4vw, 24px);
+}
+
+.section-padding {
+    padding-top: var(--space-6, 64px);
+    padding-bottom: var(--space-6, 64px);
+}
+
+.section-padding-lg {
+    padding-top: calc(var(--space-6, 64px) + 24px);
+    padding-bottom: calc(var(--space-6, 64px) + 24px);
+}
