@@ -177,6 +177,8 @@
     sourcesBox.innerHTML = '';
     followupsBox.innerHTML = '';
     section.style.display = '';
+    // Сжимаем зону ввода, как в Perplexity
+    document.querySelector('.ai-chat-container')?.classList.add('shrink');
     try{
       const res = await fetch('{% url "ai:api_chat" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({prompt})});
       const data = await res.json();

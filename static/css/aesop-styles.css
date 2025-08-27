@@ -1,3 +1,21 @@
+/* ExamFlow Aesop Styles - v2.2 - Perplexity AI Chat Interface */
+/* ==================================================== */
+/* ТЕСТ ОБНОВЛЕНИЯ - ДОЛЖЕН БЫТЬ ВИДЕН СРАЗУ */
+
+body::before {
+    content: "CSS ОБНОВЛЕН v2.2!";
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: red;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 9999;
+    font-size: 14px;
+    font-weight: bold;
+}
+
 /* 🎨 Корректные стили Aesop для ExamFlow с анимациями и темами */
 
 /* CSS переменные для светлой и темной темы */
@@ -81,28 +99,6 @@
     }
 }
 
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 /* Базовые стили */
 * {
     box-sizing: border-box;
@@ -121,6 +117,7 @@ body {
 
 /* Плавные переходы темы и цветов */
 body{transition: background-color .25s ease, color .25s ease, border-color .25s ease}
+
 /* Блокировка прокрутки при открытом мобильном меню */
 .no-scroll{overflow:hidden}
 
@@ -318,6 +315,27 @@ p {
     margin-bottom: 4rem;
     animation: var(--aesop-slide-up);
     animation-delay: 0.4s;
+    position: relative;
+    padding: 16px 0;
+    background: linear-gradient(135deg, rgba(139,115,85,.08), rgba(37,37,37,.05));
+    border-radius: 20px;
+    margin: 20px 0;
+    box-shadow: 0 0 0 3px rgba(139,115,85,0.1);
+    transition: all 0.3s ease;
+}
+
+.ai-chat-container::before {
+    content: "";
+    position: absolute;
+    inset: -24px -24px 0 -24px;
+    background: radial-gradient(1200px 400px at 20% -10%, rgba(139,115,85,.12), transparent 60%), radial-gradient(800px 300px at 80% -20%, rgba(37,37,37,.15), transparent 65%);
+    filter: saturate(120%);
+    z-index: -1;
+    border-radius: 24px;
+}
+
+.ai-chat-container:hover {
+    box-shadow: 0 0 0 3px rgba(139,115,85,0.2);
 }
 
 .ai-chat-title {
@@ -338,6 +356,23 @@ p {
     margin-left: auto;
     margin-right: auto;
     transition: var(--aesop-transition);
+}
+
+/* Сжатие инпута после появления ответа */
+.ai-chat-container.shrink .ai-textarea {
+    min-height: 44px;
+    max-height: 140px;
+    transition: all 0.3s ease;
+}
+
+.ai-chat-container.shrink .ai-chat-title {
+    font-size: clamp(20px, 2.2vw, 28px);
+    transition: all 0.3s ease;
+}
+
+.ai-chat-container.shrink .ai-chat-subtitle {
+    display: none;
+    transition: all 0.3s ease;
 }
 
 /* Строка ввода */
@@ -407,6 +442,53 @@ p {
     transform: translateY(-50%) scale(0.95);
 }
 
+/* Улучшенная AI-форма: textarea авто-рост */
+.ai-input-container.ai-advanced {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.ai-textarea {
+    flex: 1;
+    min-height: 56px;
+    max-height: 220px;
+    resize: none;
+    line-height: 1.4;
+    padding: 14px 14px;
+    border: 2px solid var(--aesop-border);
+    border-radius: 12px;
+    background: var(--aesop-card-bg);
+    color: var(--aesop-text);
+    box-shadow: var(--aesop-shadow);
+    transition: var(--aesop-transition);
+}
+
+.ai-textarea:focus {
+    outline: none;
+    border-color: var(--aesop-accent);
+    box-shadow: 0 0 0 4px rgba(139,115,85,.1);
+}
+
+.ai-send-btn-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8b7355, #6b5b3f);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(139,115,85,0.3);
+}
+
+.ai-send-btn-lg:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(139,115,85,0.4);
+}
+
 /* Примеры запросов */
 .query-examples {
     display: flex;
@@ -458,6 +540,69 @@ p {
     border-color: var(--aesop-accent);
     transform: translateY(-3px) scale(1.05);
     box-shadow: var(--aesop-shadow-hover);
+}
+
+/* Примеры запросов — компактные "пилюли" + горизонтальный скролл на мобиле */
+.query-examples.pills {
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+@media(max-width: 768px) {
+    .query-examples.pills {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 6px;
+    }
+}
+
+/* Блок ответа ИИ: акцент и читаемость */
+#ai-answer-section.widget {
+    border: 2px solid #8b7355;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #fffef2, #f8f8f8);
+    box-shadow: 0 8px 24px rgba(139,115,85,0.15);
+    margin: 20px 0;
+    padding: 20px;
+}
+
+#ai-answer {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #252525;
+}
+
+#ai-answer h1, #ai-answer h2, #ai-answer h3 {
+    margin: 12px 0 6px;
+    color: #8b7355;
+}
+
+#ai-sources {
+    border-top: 2px dashed #8b7355;
+    padding-top: 12px;
+    color: #666;
+    font-size: .95rem;
+    margin-top: 15px;
+}
+
+#ai-sources a {
+    color: #8b7355;
+    text-decoration: underline;
+}
+
+#ai-followups .btn-bot {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #8b7355;
+    color: #fff;
+    border: none;
+    margin: 5px;
+    transition: all 0.2s ease;
+}
+
+#ai-followups .btn-bot:hover {
+    background: #6b5b3f;
+    transform: translateY(-1px);
 }
 
 /* Вкладка "Задания ФИПИ" */
@@ -749,6 +894,326 @@ p {
     transform: scale(1.1) rotate(180deg);
 }
 
+/* Хедер: flex-сетка */
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 16px 0;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navbar-center {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Бургер */
+.navbar-burger {
+    display: none;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--aesop-border);
+    border-radius: 8px;
+    background: var(--aesop-card-bg);
+    cursor: pointer;
+    transition: var(--aesop-transition);
+}
+
+.navbar-burger span {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: var(--aesop-primary);
+    transition: var(--aesop-transition);
+}
+
+.navbar-burger span:nth-child(1) { top: 12px; }
+.navbar-burger span:nth-child(2) { top: 19px; }
+.navbar-burger span:nth-child(3) { top: 26px; }
+
+.navbar-burger:hover {
+    box-shadow: var(--aesop-shadow-hover);
+}
+
+/* Мобильное меню */
+.mobile-menu {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(80%, 360px);
+    background: var(--aesop-card-bg);
+    border-left: 1px solid var(--aesop-border);
+    box-shadow: var(--aesop-shadow-hover);
+    transform: translateX(100%);
+    transition: transform .3s ease, z-index 0s;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu.open {
+    transform: translateX(0);
+}
+
+.mobile-menu__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--aesop-border);
+}
+
+.mobile-menu__close {
+    background: transparent;
+    border: 0;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--aesop-primary);
+}
+
+.mobile-menu__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+.mobile-menu__actions {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Глобальная адаптивность хедера */
+@media (max-width: 1024px) {
+    .navbar-center {
+        display: none;
+    }
+    
+    .navbar-burger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Единый модуль отступов и утилиты */
+:root {
+    --spacing-unit: 8px;
+}
+
+.gap-sm { padding: calc(var(--spacing-unit) * 2); } /* 16 */
+.gap-md { padding: calc(var(--spacing-unit) * 3); } /* 24 */
+.gap-lg { padding: calc(var(--spacing-unit) * 4); } /* 32 */
+
+/* Helper: добавить gap в legacy row/col */
+.row.with-gap-24 {
+    gap: 24px;
+}
+
+/* Доступность: видимый фокус */
+:focus-visible {
+    outline: 2px solid var(--aesop-accent);
+    outline-offset: 2px;
+}
+
+/* Стаггер-эффект для списков/сеток */
+.stagger > * {
+    transition-delay: 0ms;
+}
+
+.stagger > *:nth-child(1) { transition-delay: 0ms; }
+.stagger > *:nth-child(2) { transition-delay: 60ms; }
+.stagger > *:nth-child(3) { transition-delay: 120ms; }
+.stagger > *:nth-child(4) { transition-delay: 180ms; }
+.stagger > *:nth-child(5) { transition-delay: 240ms; }
+.stagger > *:nth-child(6) { transition-delay: 300ms; }
+.stagger > *:nth-child(7) { transition-delay: 360ms; }
+.stagger > *:nth-child(8) { transition-delay: 420ms; }
+.stagger > *:nth-child(9) { transition-delay: 480ms; }
+.stagger > *:nth-child(10) { transition-delay: 540ms; }
+.stagger > *:nth-child(11) { transition-delay: 600ms; }
+.stagger > *:nth-child(12) { transition-delay: 660ms; }
+
+/* Обертка геймификации */
+.gamification-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.gamification-wrapper .gamification-card {
+    background: var(--aesop-card-bg);
+    border: 1px solid var(--aesop-border);
+    border-radius: 12px;
+    box-shadow: var(--aesop-shadow);
+    padding: 24px;
+}
+
+@media(max-width: 1024px) {
+    .gamification-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Сетка карточек */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+/* Анимации появления */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+.animate-in {
+    opacity: 1;
+    transform: none;
+    transition: all .5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Перенос длинных строк */
+.break-words {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Адаптивные правки сеток/отступов */
+@media (max-width: 768px) {
+    .section-padding {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 16px;
+    }
+    
+    .subject-card, .task-item {
+        padding: 16px;
+    }
+    
+    .navbar-aesop {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+}
+
+@media (max-width: 480px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}
+
+/* Главная: 3-колоночная сетка */
+.home-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+.home-grid .home-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+@media(max-width: 1024px) {
+    .home-grid {
+        grid-template-columns: 280px 1fr;
+    }
+    
+    .home-grid .home-aside.right {
+        grid-column: 1 / -1;
+        order: 3;
+    }
+}
+
+@media(max-width: 768px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .home-grid .home-aside {
+        order: initial;
+    }
+}
+
+/* Компактные виджеты для сайдбаров */
+.widget {
+    background: var(--aesop-card-bg);
+    border: 1px solid var(--aesop-border);
+    border-radius: 12px;
+    box-shadow: var(--aesop-shadow);
+    padding: 16px;
+}
+
+.widget h3 {
+    margin: 0 0 12px 0;
+    color: var(--aesop-primary);
+    font-size: 1.1rem;
+}
+
+.widget + .widget {
+    margin-top: 0;
+}
+
+/* Геймификация: компактные карточки в сайдбаре */
+.gamification-wrapper.sidebar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.gamification-card .progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: .9rem;
+    color: var(--aesop-text);
+}
+
+.gamification-card .progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--aesop-border);
+}
+
+.gamification-card .progress-fill {
+    height: 100%;
+    background: var(--aesop-accent);
+    transition: width 1s ease;
+    border-radius: 4px;
+}
+
 /* Адаптивность */
 @media (max-width: 1200px) {
     .navbar-container,
@@ -890,14 +1355,6 @@ p {
     animation: var(--aesop-scale-in);
 }
 
-.slide-in-left {
-    animation: var(--aesop-slide-in-left);
-}
-
-.slide-in-right {
-    animation: var(--aesop-slide-in-right);
-}
-
 /* Утилиты */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
@@ -969,113 +1426,3 @@ p {
     padding-top: calc(var(--space-6, 64px) + 24px);
     padding-bottom: calc(var(--space-6, 64px) + 24px);
 }
-
-/* Хедер: flex‑сетка */
-.navbar-container{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:16px 0}
-.navbar-left{display:flex;align-items:center;gap:12px}
-.navbar-center{display:flex;align-items:center;gap:24px}
-.navbar-right{display:flex;align-items:center;gap:16px}
-
-/* Бургер */
-.navbar-burger{display:none;position:relative;width:40px;height:40px;border:1px solid var(--aesop-border);border-radius:8px;background:var(--aesop-card-bg);cursor:pointer;transition:var(--aesop-transition)}
-.navbar-burger span{position:absolute;left:8px;right:8px;height:2px;background:var(--aesop-primary);transition:var(--aesop-transition)}
-.navbar-burger span:nth-child(1){top:12px}
-.navbar-burger span:nth-child(2){top:19px}
-.navbar-burger span:nth-child(3){top:26px}
-.navbar-burger:hover{box-shadow:var(--aesop-shadow-hover)}
-
-/* Мобильное меню */
-.mobile-menu{position:fixed;inset:0 0 0 auto;width:min(80%,360px);background:var(--aesop-card-bg);border-left:1px solid var(--aesop-border);box-shadow:var(--aesop-shadow-hover);transform:translateX(100%);transition:transform .3s ease,z-index 0s;z-index:9999;display:flex;flex-direction:column}
-.mobile-menu.open{transform:translateX(0)}
-.mobile-menu__header{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--aesop-border)}
-.mobile-menu__close{background:transparent;border:0;font-size:24px;cursor:pointer;color:var(--aesop-primary)}
-.mobile-menu__content{display:flex;flex-direction:column;gap:12px;padding:16px}
-.mobile-menu__actions{margin-top:16px;display:flex;flex-direction:column;gap:12px}
-
-/* Глобальная адаптивность хедера */
-@media (max-width: 1024px){
-  .navbar-center{display:none}
-  .navbar-burger{display:inline-flex;align-items:center;justify-content:center}
-}
-
-/* Единый модуль отступов и утилиты */
-:root{--spacing-unit:8px}
-.gap-sm{padding:calc(var(--spacing-unit)*2)} /*16*/
-.gap-md{padding:calc(var(--spacing-unit)*3)} /*24*/
-.gap-lg{padding:calc(var(--spacing-unit)*4)} /*32*/
-
-/* Helper: добавить gap в legacy row/col */
-.row.with-gap-24{gap:24px}
-
-/* Доступность: видимый фокус */
-:focus-visible{outline:2px solid var(--aesop-accent); outline-offset:2px}
-
-/* Стаггер‑эффект для списков/сеток */
-.stagger > *{transition-delay:0ms}
-.stagger > *:nth-child(1){transition-delay:0ms}
-.stagger > *:nth-child(2){transition-delay:60ms}
-.stagger > *:nth-child(3){transition-delay:120ms}
-.stagger > *:nth-child(4){transition-delay:180ms}
-.stagger > *:nth-child(5){transition-delay:240ms}
-.stagger > *:nth-child(6){transition-delay:300ms}
-.stagger > *:nth-child(7){transition-delay:360ms}
-.stagger > *:nth-child(8){transition-delay:420ms}
-.stagger > *:nth-child(9){transition-delay:480ms}
-.stagger > *:nth-child(10){transition-delay:540ms}
-.stagger > *:nth-child(11){transition-delay:600ms}
-.stagger > *:nth-child(12){transition-delay:660ms}
-
-/* Обертка геймификации */
-.gamification-wrapper{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
-.gamification-wrapper .gamification-card{background:var(--aesop-card-bg);border:1px solid var(--aesop-border);border-radius:12px;box-shadow:var(--aesop-shadow);padding:24px}
-@media(max-width:1024px){.gamification-wrapper{grid-template-columns:1fr}}
-
-/* Сетка карточек */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
-
-/* Анимации появления */
-.animate-on-scroll{opacity:0;transform:translateY(12px)}
-.animate-in{opacity:1;transform:none;transition:all .5s cubic-bezier(0.4,0,0.2,1)}
-
-/* Перенос длинных строк */
-.break-words{overflow-wrap:anywhere;word-break:break-word}
-
-/* Адаптивные правки сеток/отступов */
-@media (max-width: 768px){
-  .section-padding{padding-top: 40px;padding-bottom: 40px}
-  .cards-grid{grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));gap:16px}
-  .subject-card,.task-item{padding:16px}
-  .navbar-aesop{position:sticky;top:0;z-index:1000}
-}
-
-@media (max-width: 480px){
-  .cards-grid{grid-template-columns: 1fr}
-  .container{padding-left: 12px;padding-right: 12px}
-}
-
-/* Главная: 3‑колоночная сетка */
-.home-grid{display:grid;grid-template-columns:280px 1fr 320px;gap:24px;align-items:start}
-.home-grid .home-aside{display:flex;flex-direction:column;gap:24px}
-@media(max-width:1024px){.home-grid{grid-template-columns:280px 1fr}.home-grid .home-aside.right{grid-column:1 / -1;order:3}}
-@media(max-width:768px){.home-grid{grid-template-columns:1fr}.home-grid .home-aside{order:initial}}
-
-/* Компактные виджеты для сайдбаров */
-.widget{background:var(--aesop-card-bg);border:1px solid var(--aesop-border);border-radius:12px;box-shadow:var(--aesop-shadow);padding:16px}
-.widget h3{margin:0 0 12px 0;color:var(--aesop-primary);font-size:1.1rem}
-.widget + .widget{margin-top:0}
-
-/* Улучшенная AI-форма: textarea авто‑рост */
-.ai-input-container.ai-advanced{display:flex;gap:12px;align-items:flex-start}
-.ai-textarea{flex:1;min-height:56px;max-height:220px;resize:none;line-height:1.4;padding:14px 14px;border:2px solid var(--aesop-border);border-radius:12px;background:var(--aesop-card-bg);color:var(--aesop-text);box-shadow:var(--aesop-shadow);transition:var(--aesop-transition)}
-.ai-textarea:focus{outline:none;border-color:var(--aesop-accent);box-shadow:0 0 0 4px rgba(139,115,85,.1)}
-.ai-send-btn-lg{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center}
-
-/* Примеры запросов — компактные “пилюли” + горизонтальный скролл на мобиле */
-.query-examples.pills{gap:8px;justify-content:flex-start}
-@media(max-width:768px){.query-examples.pills{overflow-x:auto;white-space:nowrap;padding-bottom:6px}}
-
-/* Геймификация: компактные карточки в сайдбаре */
-.gamification-wrapper.sidebar{display:grid;grid-template-columns:1fr;gap:16px}
-.gamification-card .progress-label{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.9rem;color:var(--aesop-text)}
-.gamification-card .progress-bar{height:8px;border-radius:4px;overflow:hidden;background:var(--aesop-border)}
-.gamification-card .progress-fill{height:100%;background:var(--aesop-accent);transition:width 1s ease;border-radius:4px}

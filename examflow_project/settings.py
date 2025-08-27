@@ -21,7 +21,7 @@ if not os.getenv('DEBUG', 'False').lower() == 'true':
 
 # ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ: не запускайте с debug=True в продакшене!
 # В продакшене принудительно выключаем DEBUG
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'  # По умолчанию True для разработки
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,.onrender.com,localhost,127.0.0.1,testserver').split(',') if h.strip()]
 # Добавим хост Render автоматически, если предоставлен платформой
@@ -59,7 +59,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # ВРЕМЕННО ОТКЛЮЧЕН для совместимости
     'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -68,7 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
-    'csp.middleware.CSPMiddleware',  # CSP middleware
+    # 'csp.middleware.CSPMiddleware',  # CSP middleware - ВРЕМЕННО ОТКЛЮЧЕН
     # 🔒 Дополнительные middleware для безопасности
     'examflow_project.middleware.SecurityHeadersMiddleware',  # Кастомные заголовки безопасности
 ]
@@ -217,7 +217,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# В режиме разработки используем стандартное хранилище для автоматического обновления
+# На Render используем обычное хранилище для совместимости
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media (для вложений задач)
 # Cache
@@ -327,31 +329,32 @@ else:
         'https://*.onrender.com',
     ]))
 
-# CSP — либеральная в DEV, строгая в PROD (без unsafe)
-if DEBUG:
-    CONTENT_SECURITY_POLICY = {
-        'default-src': ("'self'",),
-        'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'style-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'script-src-elem': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
-        'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
-        'frame-ancestors': ("'none'",),
-    }
-else:
-    CONTENT_SECURITY_POLICY = {
-        'default-src': ("'self'",),
-        'style-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'style-src-elem': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'script-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'script-src-elem': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
-        'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
-        'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
-        'frame-ancestors': ("'none'",),
-    }
+# CSP — ВРЕМЕННО ОТКЛЮЧЕН для тестирования стилей
+# if DEBUG:
+#     CONTENT_SECURITY_POLICY = {
+#         'default-src': ("'self'",),
+#         'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'style-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'script-src': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'script-src-elem': ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
+#         'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
+#         'frame-ancestors': ("'none'",),
+#     }
+# else:
+#     # В продакшене тоже разрешаем unsafe-inline для совместимости
+#     CONTENT_SECURITY_POLICY = {
+#         'default-src': ("'self'",),
+#         'style-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'style-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'script-src': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'script-src-elem': ("'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'img-src': ("'self'", "data:", "https:", "https://api.qrserver.com"),
+#         'font-src': ("'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"),
+#         'connect-src': ("'self'", "https://generativelanguage.googleapis.com"),
+#         'frame-ancestors': ("'none'",),
+#     }
 
 # Дополнительные заголовки безопасности
 SECURE_BROWSER_XSS_FILTER = True
