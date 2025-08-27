@@ -870,7 +870,7 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 
                 await thinking_message.edit_text(  # type: ignore
                     clean_response,
-                    reply_markup=reply_markup,
+                    reply_markup=None,
                     parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
                 )
                 
@@ -974,7 +974,7 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         
         await thinking_message.edit_text(  # type: ignore
             clean_response,
-            reply_markup=reply_markup,
+            reply_markup=None,
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
         
@@ -1032,7 +1032,7 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         
         await thinking_message.edit_text(  # type: ignore
             clean_response,
-            reply_markup=reply_markup,
+            reply_markup=None,
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
         
@@ -1090,7 +1090,7 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
         
         await thinking_message.edit_text(  # type: ignore
             clean_response,
-            reply_markup=reply_markup,
+            reply_markup=None,
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
         
