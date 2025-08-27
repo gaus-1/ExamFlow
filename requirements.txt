@@ -22,7 +22,7 @@ requests==2.31.0
 # Обход Cloudflare для РешуЕГЭ
 cloudscraper==1.2.71
 # Планировщик задач для keep-alive
-schedule==1.2.0
+schedule==1.2.2
 
 # 🔒 БЕЗОПАСНОСТЬ - Rate Limiting
 django-ratelimit==4.1.0
