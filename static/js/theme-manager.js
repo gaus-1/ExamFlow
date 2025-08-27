@@ -298,6 +298,51 @@ document.addEventListener('DOMContentLoaded', () => {
     window.themeManager = new ThemeManager();
 });
 
+// Инициализация мобильного меню и анимаций скролла
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    // Бургер
+    const burger = document.getElementById('navbar-burger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileClose = document.getElementById('mobile-menu-close');
+    if(burger && mobileMenu){
+      const toggle = (open)=>{
+        if(open){
+          mobileMenu.classList.add('open');
+          burger.setAttribute('aria-expanded','true');
+          mobileMenu.setAttribute('aria-hidden','false');
+        }else{
+          mobileMenu.classList.remove('open');
+          burger.setAttribute('aria-expanded','false');
+          mobileMenu.setAttribute('aria-hidden','true');
+        }
+      };
+      burger.addEventListener('click', ()=> toggle(!mobileMenu.classList.contains('open')));
+      if(mobileClose){ mobileClose.addEventListener('click', ()=> toggle(false)); }
+      // Закрытие по клику вне
+      document.addEventListener('click', (e)=>{
+        if(!mobileMenu.contains(e.target) && !burger.contains(e.target)) toggle(false);
+      });
+      // На ресайз >1024 закрываем
+      window.addEventListener('resize', ()=>{ if(window.innerWidth>1024) toggle(false); });
+    }
+
+    // Анимации при скролле
+    const items = document.querySelectorAll('.animate-on-scroll');
+    if(items.length){
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            entry.target.classList.add('animate-in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, {threshold: 0.1, rootMargin: '0px 0px -50px 0px'});
+      items.forEach(el=> io.observe(el));
+    }
+  });
+})();
+
 // Экспорт для использования в других модулях
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ThemeManager;

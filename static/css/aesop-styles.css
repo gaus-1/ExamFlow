@@ -964,3 +964,38 @@ p {
     padding-top: calc(var(--space-6, 64px) + 24px);
     padding-bottom: calc(var(--space-6, 64px) + 24px);
 }
+
+/* Хедер: flex‑сетка */
+.navbar-container{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:16px 0}
+.navbar-left{display:flex;align-items:center;gap:12px}
+.navbar-center{display:flex;align-items:center;gap:24px}
+.navbar-right{display:flex;align-items:center;gap:16px}
+
+/* Бургер */
+.navbar-burger{display:none;position:relative;width:40px;height:40px;border:1px solid var(--aesop-border);border-radius:8px;background:var(--aesop-card-bg);cursor:pointer;transition:var(--aesop-transition)}
+.navbar-burger span{position:absolute;left:8px;right:8px;height:2px;background:var(--aesop-primary);transition:var(--aesop-transition)}
+.navbar-burger span:nth-child(1){top:12px}
+.navbar-burger span:nth-child(2){top:19px}
+.navbar-burger span:nth-child(3){top:26px}
+.navbar-burger:hover{box-shadow:var(--aesop-shadow-hover)}
+
+/* Мобильное меню */
+.mobile-menu{position:fixed;inset:0 0 0 auto;width:min(80%,360px);background:var(--aesop-card-bg);border-left:1px solid var(--aesop-border);box-shadow:var(--aesop-shadow-hover);transform:translateX(100%);transition:transform .3s ease,z-index 0s;z-index:9999;display:flex;flex-direction:column}
+.mobile-menu.open{transform:translateX(0)}
+.mobile-menu__header{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--aesop-border)}
+.mobile-menu__close{background:transparent;border:0;font-size:24px;cursor:pointer;color:var(--aesop-primary)}
+.mobile-menu__content{display:flex;flex-direction:column;gap:12px;padding:16px}
+.mobile-menu__actions{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+
+/* Глобальная адаптивность хедера */
+@media (max-width: 1024px){
+  .navbar-center{display:none}
+  .navbar-burger{display:inline-flex;align-items:center;justify-content:center}
+}
+
+/* Сетка карточек */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+
+/* Анимации появления */
+.animate-on-scroll{opacity:0;transform:translateY(12px)}
+.animate-in{opacity:1;transform:none;transition:all .5s cubic-bezier(0.4,0,0.2,1)}

@@ -53,45 +53,58 @@
     <nav class="navbar-aesop">
         <div class="navbar-container">
             <!-- Логотип слева -->
-            <a class="navbar-brand" href="{% url 'learning:home' %}">
-                <img class="brand-logo" src="{% static 'images/logo-180.png' %}" alt="ExamFlow">
-                ExamFlow
-            </a>
+            <div class="navbar-left">
+                <a class="navbar-brand" href="{% url 'learning:home' %}">
+                    <img class="brand-logo" src="{% static 'images/logo-180.png' %}" alt="ExamFlow">
+                    ExamFlow
+                </a>
+            </div>
             
-            <!-- Навигация по центру -->
-            <ul class="navbar-nav">
+            <!-- Навигация по центру (десктоп) -->
+            <ul class="navbar-nav navbar-center">
                 <li class="nav-item">
-                    <a class="nav-link-aesop active" href="{% url 'learning:home' %}">
-                        Главная
-                    </a>
+                    <a class="nav-link-aesop active" href="{% url 'learning:home' %}">Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">
-                        Задания ФИПИ
-                    </a>
+                    <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">Задания ФИПИ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link-aesop" href="{% url 'ai:chat' %}">
-                        О сервисе
-                    </a>
+                    <a class="nav-link-aesop" href="{% url 'ai:chat' %}">О сервисе</a>
                 </li>
             </ul>
             
             <!-- Пользовательские элементы справа -->
-            <div class="navbar-user">
-                <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">
-                    Перейти в бота
-                </a>
+            <div class="navbar-right navbar-user">
+                <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">Перейти в бота</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop">
-                        <i class="fas fa-user"></i> Профиль
-                    </a>
+                    <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop"><i class="fas fa-user"></i> Профиль</a>
                 {% else %}
-                    <a href="{% url 'authentication:login' %}" class="nav-link-aesop">
-                        <i class="fas fa-sign-in-alt"></i> Войти
-                    </a>
+                    <a href="{% url 'authentication:login' %}" class="nav-link-aesop"><i class="fas fa-sign-in-alt"></i> Войти</a>
                 {% endif %}
-                <!-- Кнопка переключения темы будет добавлена автоматически -->
+                <button class="navbar-burger" id="navbar-burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Мобильное меню (off-canvas) -->
+        <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+            <div class="mobile-menu__header">
+                <span>Меню</span>
+                <button class="mobile-menu__close" id="mobile-menu-close" aria-label="Закрыть меню">×</button>
+            </div>
+            <div class="mobile-menu__content">
+                <a class="nav-link-aesop" href="{% url 'learning:home' %}">Главная</a>
+                <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">Задания ФИПИ</a>
+                <a class="nav-link-aesop" href="{% url 'ai:chat' %}">О сервисе</a>
+                <div class="mobile-menu__actions">
+                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">Перейти в бота</a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop"><i class="fas fa-user"></i> Профиль</a>
+                    {% else %}
+                        <a href="{% url 'authentication:login' %}" class="nav-link-aesop"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
