@@ -119,6 +119,11 @@ body {
     transition: var(--aesop-transition-slow);
 }
 
+/* Плавные переходы темы и цветов */
+body{transition: background-color .25s ease, color .25s ease, border-color .25s ease}
+/* Блокировка прокрутки при открытом мобильном меню */
+.no-scroll{overflow:hidden}
+
 /* Типографика */
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Georgia', 'Times New Roman', serif;

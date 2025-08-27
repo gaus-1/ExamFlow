@@ -311,10 +311,12 @@ document.addEventListener('DOMContentLoaded', () => {
           mobileMenu.classList.add('open');
           burger.setAttribute('aria-expanded','true');
           mobileMenu.setAttribute('aria-hidden','false');
+          document.body.classList.add('no-scroll');
         }else{
           mobileMenu.classList.remove('open');
           burger.setAttribute('aria-expanded','false');
           mobileMenu.setAttribute('aria-hidden','true');
+          document.body.classList.remove('no-scroll');
         }
       };
       burger.addEventListener('click', ()=> toggle(!mobileMenu.classList.contains('open')));
