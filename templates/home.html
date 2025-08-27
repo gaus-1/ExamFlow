@@ -31,7 +31,7 @@
 <section class="section-padding" style="background: #fffef2;">
     <div class="container">
         <h2 class="visually-hidden">Форма общения с ИИ</h2>
-        <div class="ai-chat-input-container" data-animation="fade-in">
+        <div class="ai-chat-input-container animate-on-scroll" data-animation="fade-in">
             <div class="relative">
                 <textarea 
                     class="ai-chat-input" 
@@ -59,7 +59,7 @@
             Задания ФИПИ
         </h2>
         
-        <div class="fipi-tabs" data-animation="fade-in-delayed" data-delay="200">
+        <div class="fipi-tabs animate-on-scroll" data-animation="fade-in-delayed" data-delay="200">
             <div class="fipi-tab-header">
                 <button class="fipi-tab active">Все предметы</button>
                 <button class="fipi-tab">Математика</button>
@@ -67,7 +67,7 @@
                 <button class="fipi-tab">Физика</button>
             </div>
             
-            <div class="fipi-tab-content active">
+            <div class="fipi-tab-content active animate-on-scroll">
                 <div class="fipi-filters">
                     <div class="filter-group">
                         <select class="filter-select">
@@ -87,8 +87,8 @@
                     </div>
                 </div>
                 
-                <div class="subject-grid">
-                    <div class="subject-card" data-animation="scale-in" data-delay="100">
+                <div class="subject-grid cards-grid">
+                    <div class="subject-card animate-on-scroll" data-animation="scale-in" data-delay="100">
                         <div class="subject-icon">📐</div>
                         <h3 class="subject-title">Математика</h3>
                         <p class="subject-description">Алгебра, геометрия, тригонометрия</p>
@@ -98,7 +98,7 @@
                         </div>
                     </div>
                     
-                    <div class="subject-card" data-animation="scale-in" data-delay="200">
+                    <div class="subject-card animate-on-scroll" data-animation="scale-in" data-delay="200">
                         <div class="subject-icon">📚</div>
                         <h3 class="subject-title">Русский язык</h3>
                         <p class="subject-description">Грамматика, сочинение, тесты</p>
@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     
-                    <div class="subject-card" data-animation="scale-in" data-delay="300">
+                    <div class="subject-card animate-on-scroll" data-animation="scale-in" data-delay="300">
                         <div class="subject-icon">⚡</div>
                         <h3 class="subject-title">Физика</h3>
                         <p class="subject-description">Механика, электричество, оптика</p>
@@ -227,7 +227,7 @@
 </section>
 
 <!-- Статистика -->
-<section class="section-padding text-center" style="background: #fffef2;">
+<section class="section-padding text-center animate-on-scroll" style="background: #fffef2;">
     <div class="container">
         <h2 class="visually-hidden">Ключевая статистика ExamFlow</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
@@ -301,7 +301,7 @@
             Выберите предмет для начала подготовки
         </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-on-scroll">
             {% for subject in subjects %}
             <div class="subject-card card-hover text-reveal text-center">
                 <div class="flex justify-between items-start mb-4">
@@ -319,7 +319,7 @@
             </div>
             {% empty %}
             <!-- Демо предметы если нет в базе -->
-            <div class="subject-card card-hover text-center">
+            <div class="subject-card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Математика</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -327,7 +327,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="subject-card card-hover text-center">
+            <div class="subject-card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Русский язык</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -335,7 +335,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover text-center">
+            <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Физика</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -343,7 +343,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover text-center">
+            <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Химия</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -351,7 +351,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover text-center">
+            <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Биология</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -359,7 +359,7 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-                        <div class="card card-hover text-center">
+                        <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">История</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -368,7 +368,7 @@
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
             
-            <div class="card card-hover text-center">
+            <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">География</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -378,7 +378,7 @@
 >
             </div>
             
-            <div class="card card-hover text-center">
+            <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Литература</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -387,7 +387,7 @@
                 <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
             
-            <div class="card card-hover text-center">
+            <div class="card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold" style="color: #252525;">Информатика</h3>
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
@@ -416,7 +416,7 @@
             Технологии будущего для подготовки к экзаменам
         </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-on-scroll">
             <div class="feature-card card-hover text-reveal text-center">
                 <div class="text-4xl mb-4">📚</div>
                 <h3 class="text-xl font-bold mb-2" style="color: #252525;">На основе ФИПИ</h3>
