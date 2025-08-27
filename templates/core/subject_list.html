@@ -21,9 +21,9 @@
 <!-- Список предметов -->
 <section class="section-padding animate-on-scroll" style="background: #f8f8f8;">
     <div class="container">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 cards-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 cards-grid stagger">
             {% for subject in subjects %}
-            <div class="subject-card card-hover text-reveal animate-on-scroll" data-subject="{{ subject.name }}">
+            <div class="subject-card card-hover text-reveal animate-on-scroll gap-md break-words" data-subject="{{ subject.name }}">
                 <div class="text-center">
                     <div class="text-6xl mb-4 rotate">
                         {% if subject.name == 'Математика' %}📐

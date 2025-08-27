@@ -998,6 +998,38 @@ p {
   .navbar-burger{display:inline-flex;align-items:center;justify-content:center}
 }
 
+/* Единый модуль отступов и утилиты */
+:root{--spacing-unit:8px}
+.gap-sm{padding:calc(var(--spacing-unit)*2)} /*16*/
+.gap-md{padding:calc(var(--spacing-unit)*3)} /*24*/
+.gap-lg{padding:calc(var(--spacing-unit)*4)} /*32*/
+
+/* Helper: добавить gap в legacy row/col */
+.row.with-gap-24{gap:24px}
+
+/* Доступность: видимый фокус */
+:focus-visible{outline:2px solid var(--aesop-accent); outline-offset:2px}
+
+/* Стаггер‑эффект для списков/сеток */
+.stagger > *{transition-delay:0ms}
+.stagger > *:nth-child(1){transition-delay:0ms}
+.stagger > *:nth-child(2){transition-delay:60ms}
+.stagger > *:nth-child(3){transition-delay:120ms}
+.stagger > *:nth-child(4){transition-delay:180ms}
+.stagger > *:nth-child(5){transition-delay:240ms}
+.stagger > *:nth-child(6){transition-delay:300ms}
+.stagger > *:nth-child(7){transition-delay:360ms}
+.stagger > *:nth-child(8){transition-delay:420ms}
+.stagger > *:nth-child(9){transition-delay:480ms}
+.stagger > *:nth-child(10){transition-delay:540ms}
+.stagger > *:nth-child(11){transition-delay:600ms}
+.stagger > *:nth-child(12){transition-delay:660ms}
+
+/* Обертка геймификации */
+.gamification-wrapper{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.gamification-wrapper .gamification-card{background:var(--aesop-card-bg);border:1px solid var(--aesop-border);border-radius:12px;box-shadow:var(--aesop-shadow);padding:24px}
+@media(max-width:1024px){.gamification-wrapper{grid-template-columns:1fr}}
+
 /* Сетка карточек */
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
 

@@ -4,10 +4,10 @@
 <section class="py-5 animate-on-scroll">
   <div class="container">
     <h1 class="mb-4">{{ topic.name }}</h1>
-    <div class="row">
+    <div class="row with-gap-24 stagger">
       {% for t in page_obj %}
       <div class="col-md-6 mb-3">
-        <div class="p-3 border rounded-3 h-100">
+        <div class="p-3 gap-md border rounded-3 h-100">
           <div class="fw-semibold">{{ t.title }}</div>
           <div class="small text-muted">Сложность: {{ t.get_difficulty_display }}</div>
         </div>
