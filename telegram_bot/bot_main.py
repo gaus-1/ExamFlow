@@ -156,9 +156,5 @@ if __name__ == '__main__':
     application = setup_bot_application()
     
     logger.info("Запуск бота в режиме polling")
-    # Снятие webhook, если он активен, чтобы избежать 409 Conflict при polling
-    try:
-        application.bot.delete_webhook(drop_pending_updates=True)
-    except Exception:
-        pass
-    application.run_polling()
+    # Снимаем webhook и отбрасываем накопившиеся обновления при запуске
+    application.run_polling(drop_pending_updates=True)
