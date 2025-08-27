@@ -11,6 +11,7 @@ from django.utils import timezone
 import json
 import logging
 from django_ratelimit.decorators import ratelimit
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -120,12 +121,46 @@ def api_chat(request):
         if 'error' in result:
             return JsonResponse({'error': result['error']}, status=429)
 
+        text = result.get('response', '') or ''
+        # Источники: извлекаем URL из текста ответа (если присутствуют)
+        url_pattern = re.compile(r"https?://\S+", re.IGNORECASE)
+        found_urls = url_pattern.findall(text)
+        sources = []
+        seen = set()
+        for idx, url in enumerate(found_urls, start=1):
+            if url in seen:
+                continue
+            seen.add(url)
+            sources.append({
+                'id': idx,
+                'title': url,
+                'url': url
+            })
+
+        # Follow-ups: простые действия в экосистеме
+        followups = [
+            {
+                'label': 'Показать задания по предметам',
+                'href': '/learning/subjects/'
+            },
+            {
+                'label': 'Случайное задание',
+                'href': '/learning/random/'
+            },
+            {
+                'label': 'Задать уточняющий вопрос',
+                'action': 'refocus-input'
+            }
+        ]
+
         return JsonResponse({
-            'response': result.get('response', ''),
+            'response': text,
             'provider': result.get('provider', 'local'),
             'cached': result.get('cached', False),
             'tokens_used': result.get('tokens_used', 0),
-            'cost': 0.0
+            'cost': 0.0,
+            'sources': sources,
+            'followups': followups
         })
         
     except json.JSONDecodeError:

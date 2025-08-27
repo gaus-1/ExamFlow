@@ -50,6 +50,14 @@
         </div>
       </section>
 
+      <!-- Область ответа ИИ -->
+      <section id="ai-answer-section" class="widget animate-on-scroll" style="display:none">
+        <h3 style="margin-top:0">Ответ ИИ</h3>
+        <div id="ai-answer" class="break-words" style="white-space:pre-wrap"></div>
+        <div id="ai-sources" style="margin-top:16px"></div>
+        <div id="ai-followups" style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"></div>
+      </section>
+
       <!-- Основной контент: задания ФИПИ + информблоки -->
       <section class="fipi-tab animate-on-scroll">
         <h2 class="fipi-tab-title">Задания ФИПИ</h2>
@@ -141,27 +149,61 @@
 </div>
 
 <script>
-// Авто‑рост textarea
 (function(){
   const ta = document.getElementById('ai-textarea');
-  if(!ta) return;
-  const autoResize = ()=>{
-    ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 220) + 'px';
-  };
+  const btn = document.getElementById('ai-send-btn');
+  const answerBox = document.getElementById('ai-answer');
+  const section = document.getElementById('ai-answer-section');
+  const sourcesBox = document.getElementById('ai-sources');
+  const followupsBox = document.getElementById('ai-followups');
+
+  const autoResize = ()=>{ ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,220)+'px'; };
   ['input','change'].forEach(e=> ta.addEventListener(e, autoResize));
   autoResize();
-})();
 
-// Клик по чипам — вставка текста в textarea
-(function(){
-  const ta = document.getElementById('ai-textarea');
-  const pills = document.querySelectorAll('#query-pills .query-example');
-  pills.forEach(p=> p.addEventListener('click', ()=>{
-    ta.value = p.textContent.trim();
+  document.getElementById('query-pills').addEventListener('click',(e)=>{
+    const pill = e.target.closest('.query-example');
+    if(!pill) return;
+    ta.value = pill.textContent.trim();
     ta.focus();
-    const evt = new Event('input'); ta.dispatchEvent(evt);
-  }));
+    ta.dispatchEvent(new Event('input'));
+  });
+
+  async function ask(){
+    const prompt = (ta.value||'').trim();
+    if(!prompt) return;
+    btn.disabled = true; btn.classList.add('loading');
+    answerBox.textContent = 'Думаю…';
+    sourcesBox.innerHTML = '';
+    followupsBox.innerHTML = '';
+    section.style.display = '';
+    try{
+      const res = await fetch('{% url "ai:api_chat" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({prompt})});
+      const data = await res.json();
+      if(!res.ok){ answerBox.textContent = data.error||'Ошибка запроса'; return; }
+      answerBox.textContent = data.response||'';
+      // Sources
+      if(Array.isArray(data.sources) && data.sources.length){
+        const frag = document.createDocumentFragment();
+        const title = document.createElement('div'); title.style.marginBottom='6px'; title.textContent='Источники:'; frag.appendChild(title);
+        data.sources.forEach(s=>{ const a=document.createElement('a'); a.href=s.url; a.target='_blank'; a.rel='noopener'; a.textContent=`[${s.id}] ${s.title}`; const d=document.createElement('div'); d.appendChild(a); frag.appendChild(d); });
+        sourcesBox.innerHTML=''; sourcesBox.appendChild(frag);
+      }
+      // Follow-ups
+      if(Array.isArray(data.followups) && data.followups.length){
+        data.followups.forEach(f=>{
+          if(f.href){ const a=document.createElement('a'); a.className='btn-bot'; a.href=f.href; a.textContent=f.label; followupsBox.appendChild(a); }
+          else if(f.action==='refocus-input'){ const b=document.createElement('button'); b.className='btn-bot'; b.textContent=f.label; b.onclick=()=>ta.focus(); followupsBox.appendChild(b); }
+        });
+      }
+      window.scrollTo({top:section.offsetTop-24,behavior:'smooth'});
+    }catch(err){ answerBox.textContent = 'Ошибка сети'; }
+    finally{ btn.disabled=false; btn.classList.remove('loading'); }
+  }
+  btn.addEventListener('click', ask);
+  ta.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ask(); }});
+
+  function getCookie(name){ const m=document.cookie.match('(?:^|; )'+name+'=([^;]*)'); return m?decodeURIComponent(m[1]):''; }
 })();
 </script>
 {% endblock %}
