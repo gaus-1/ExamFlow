@@ -1,20 +1,5 @@
 /* ExamFlow Aesop Styles - v2.2 - Perplexity AI Chat Interface */
 /* ==================================================== */
-/* ТЕСТ ОБНОВЛЕНИЯ - ДОЛЖЕН БЫТЬ ВИДЕН СРАЗУ */
-
-body::before {
-    content: "CSS ОБНОВЛЕН v2.2!";
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: red;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 9999;
-    font-size: 14px;
-    font-weight: bold;
-}
 
 /* 🎨 Корректные стили Aesop для ExamFlow с анимациями и темами */
 
