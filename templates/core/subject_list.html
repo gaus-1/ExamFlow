@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Hero секция -->
-<section class="hero-section section-padding" style="background: #fffef2;">
+<section class="hero-section section-padding animate-on-scroll" style="background: #fffef2;">
     <div class="container">
         <div class="text-center">
             <h1 class="text-4xl md:text-6xl font-bold mb-6 heading-animate" style="color: #252525;">
@@ -19,11 +19,11 @@
 </section>
 
 <!-- Список предметов -->
-<section class="section-padding" style="background: #f8f8f8;">
+<section class="section-padding animate-on-scroll" style="background: #f8f8f8;">
     <div class="container">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 cards-grid">
             {% for subject in subjects %}
-            <div class="subject-card card-hover text-reveal" data-subject="{{ subject.name }}">
+            <div class="subject-card card-hover text-reveal animate-on-scroll" data-subject="{{ subject.name }}">
                 <div class="text-center">
                     <div class="text-6xl mb-4 rotate">
                         {% if subject.name == 'Математика' %}📐
@@ -68,7 +68,7 @@
 </section>
 
 <!-- Статистика -->
-<section class="section-padding" style="background: #fffef2;">
+<section class="section-padding animate-on-scroll" style="background: #fffef2;">
     <div class="container">
         <div class="text-center mb-12">
             <h2 class="text-3xl md:text-4xl font-bold mb-4 heading-animate" style="color: #252525;">

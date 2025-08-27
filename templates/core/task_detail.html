@@ -1,80 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}{{ task.title }} — ExamFlow{% endblock %}
 {% block content %}
-<section class="py-5">
+<section class="py-5 animate-on-scroll">
   <div class="container">
     <h1 class="mb-4">{{ task.title }}</h1>
     <p>{{ task.description }}</p>
     <div class="text-muted">Сложность: {{ task.difficulty }}</div>
   </div>
 </section>
-{% endblock %}
-
-{% extends 'base.html' %}
-
-{% block title %}Задание #{{ task.id }} - {{ task.subject.name }}{% endblock %}
-
-{% block content %}
-<div class="container py-4">
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{% url 'learning:home' %}">Главная</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'subjects' %}">Предметы</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'subject_detail' task.subject.id %}">{{ task.subject.name }}</a></li>
-            <li class="breadcrumb-item active">Задание #{{ task.id }}</li>
-        </ol>
-    </nav>
-
-    <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">{{ task.title }}</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">{{ task.description|linebreaksbr }}</p>
-
-                    {% if task.pdf_file %}
-                        <div class="mt-3">
-                            <a class="btn btn-outline-primary" href="{{ task.pdf_file.url }}" target="_blank">
-                                <i class="fas fa-file-pdf me-1"></i> Открыть PDF
-                            </a>
-                        </div>
-                    {% elif task.attachment_url %}
-                        <div class="mt-3">
-                            <a class="btn btn-outline-primary" href="{{ task.attachment_url }}" target="_blank">
-                                <i class="fas fa-link me-1"></i> Источник (PDF)
-                            </a>
-                        </div>
-                    {% endif %}
-
-                    {% if task.solution %}
-                    <hr/>
-                    <h6>Подсказка/решение</h6>
-                    <div class="text-muted small">{{ task.solution|linebreaksbr }}</div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            {% if similar_tasks %}
-            <div class="card shadow-sm">
-                <div class="card-header bg-white">
-                    <h6 class="mb-0">Похожие задания</h6>
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for t in similar_tasks %}
-                    <li class="list-group-item">
-                        <a href="{% url 'task_detail' t.id %}">{{ t.title|truncatechars:60 }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 
