@@ -156,5 +156,11 @@ if __name__ == '__main__':
     application = setup_bot_application()
     
     logger.info("Запуск бота в режиме polling")
-    # Снимаем webhook и отбрасываем накопившиеся обновления при запуске
+    # Явно удаляем webhook, если активен, чтобы избежать 409 Conflict
+    try:
+        import asyncio
+        asyncio.run(application.bot.delete_webhook(drop_pending_updates=True))
+    except Exception:
+        pass
+    # Стартуем polling и отбрасываем накопившиеся обновления
     application.run_polling(drop_pending_updates=True)
