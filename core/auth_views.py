@@ -43,9 +43,9 @@ def register_view(request):
                     if user:
                         login(request, user)
                         # Создаем рейтинг пользователя
-                        UserRating.objects.create(user=user)
+                        UserRating.objects.create(user=user)  # type: ignore
                         # Добавляем достижение за регистрацию
-                        Achievement.objects.create(
+                        Achievement.objects.create(  # type: ignore
                             user=user,
                             name='Добро пожаловать!',
                             description='Регистрация в ExamFlow',
@@ -76,7 +76,7 @@ def login_view(request):
             if user:
                 login(request, user)
                 # Обновляем время последней активности
-                profile, created = UserProfile.objects.get_or_create(user=user)
+                profile, created = UserProfile.objects.get_or_create(user=user)  # type: ignore
                 profile.last_activity = timezone.now()
                 profile.save()
                 
@@ -95,27 +95,27 @@ def logout_view(request):
     """Выход пользователя"""
     logout(request)
     messages.info(request, 'Вы успешно вышли из системы')
-    return redirect('home')
+    return redirect('learning:home')
 
 
 @login_required
 def dashboard_view(request):
     """Личный кабинет пользователя"""
     user = request.user
-    profile, created = UserProfile.objects.get_or_create(user=user)
-    rating, created = UserRating.objects.get_or_create(user=user)
-    achievements = Achievement.objects.filter(user=user).order_by('-created_at')
+    profile, created = UserProfile.objects.get_or_create(user=user)  # type: ignore
+    rating, created = UserRating.objects.get_or_create(user=user)  # type: ignore
+    achievements = Achievement.objects.filter(user=user).order_by('-created_at')  # type: ignore
     
     # Статистика пользователя
     from learning.models import UserProgress, Task, Subject
-    total_tasks_solved = UserProgress.objects.filter(user=user, is_correct=True).count()
-    total_subjects = Subject.objects.count()
-    user_subjects = UserProgress.objects.filter(user=user).values('task__subject').distinct().count()
+    total_tasks_solved = UserProgress.objects.filter(user=user, is_correct=True).count()  # type: ignore
+    total_subjects = Subject.objects.count()  # type: ignore
+    user_subjects = UserProgress.objects.filter(user=user).values('task__subject').distinct().count()  # type: ignore
     
     # Проверяем подписку
     active_subscription = None
     if profile.is_premium:
-        active_subscription = Subscription.objects.filter(
+        active_subscription = Subscription.objects.filter(  # type: ignore
             user=user, 
             status='active',
             expires_at__gt=timezone.now()
@@ -140,7 +140,7 @@ def dashboard_view(request):
 @login_required
 def profile_view(request):
     """Профиль пользователя"""
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)  # type: ignore
     
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, instance=profile, user=request.user)
@@ -180,7 +180,7 @@ def subscribe_view(request):
         starts_at = timezone.now()
         expires_at = starts_at + timedelta(days=30 if subscription_type == 'monthly' else 365)
         
-        subscription = Subscription.objects.create(
+        subscription = Subscription.objects.create(  # type: ignore
             user=request.user,
             subscription_type=subscription_type,
             amount=amount,
@@ -214,8 +214,8 @@ def subscribe_view(request):
 @login_required
 def achievements_view(request):
     """Страница достижений пользователя"""
-    achievements = Achievement.objects.filter(user=request.user).order_by('-created_at')
-    profile = UserProfile.objects.get(user=request.user)
+    achievements = Achievement.objects.filter(user=request.user).order_by('-created_at')  # type: ignore
+    profile = UserProfile.objects.get(user=request.user)  # type: ignore
     
     # Статистика достижений
     total_achievements = achievements.count()
@@ -244,19 +244,19 @@ def telegram_auth(request):
         
         # Ищем пользователя по Telegram ID
         try:
-            profile = UserProfile.objects.get(telegram_id=telegram_id)
+            profile = UserProfile.objects.get(telegram_id=telegram_id)  # type: ignore
             user = profile.user
-        except UserProfile.DoesNotExist:
+        except UserProfile.DoesNotExist:  # type: ignore
             # Создаем нового пользователя
             user = User.objects.create_user(
                 username=f'tg_{telegram_id}',
                 first_name=first_name
             )
-            profile = UserProfile.objects.create(
+            profile = UserProfile.objects.create(  # type: ignore
                 user=user,
                 telegram_id=telegram_id
             )
-            UserRating.objects.create(user=user)
+            UserRating.objects.create(user=user)  # type: ignore
         
         # Обновляем время активности
         profile.last_activity = timezone.now()

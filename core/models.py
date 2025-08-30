@@ -49,6 +49,7 @@ class Task(models.Model):
     source = models.CharField(max_length=100, blank=True, verbose_name="Источник")
     year = models.IntegerField(blank=True, null=True, verbose_name="Год")
     topics = models.JSONField(default=list, blank=True, verbose_name="Темы")
+    explanation = models.TextField(blank=True, verbose_name="Объяснение")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
@@ -59,12 +60,19 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.subject.name}: {self.title}"
+    
+    def check_answer(self, user_answer):
+        """Проверяет правильность ответа пользователя"""
+        if not self.answer:
+            return False
+        return str(user_answer).strip().lower() == str(self.answer).strip().lower()
 
 
 class UserProgress(models.Model):
     """Модель прогресса пользователя по задаче"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь", related_name='core_userprogress_set')
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задача")
+    user_answer = models.CharField(max_length=200, blank=True, verbose_name="Ответ пользователя")
     is_correct = models.BooleanField(default=False, verbose_name="Правильно решено")  # type: ignore
     attempts = models.IntegerField(default=1, verbose_name="Количество попыток")  # type: ignore
     time_spent = models.IntegerField(default=0, verbose_name="Время в секундах")  # type: ignore

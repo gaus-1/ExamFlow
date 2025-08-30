@@ -28,9 +28,11 @@ def register_view(request):
         form = TechRegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            # Явно указываем backend для аутентификации
+            from authentication.backends import EmailBackend
+            login(request, user, backend='authentication.backends.EmailBackend')
             messages.success(request, f'Добро пожаловать, {user.first_name}! Ваш аккаунт успешно создан.')
-            return redirect('dashboard')
+            return redirect('authentication:dashboard')
     else:
         form = TechRegisterForm()
     
@@ -55,7 +57,7 @@ def logout_view(request):
     """Выход из системы"""
     logout(request)
     messages.info(request, 'Вы успешно вышли из системы.')
-    return redirect('home')
+    return redirect('learning:home')
 
 
 @login_required
@@ -72,22 +74,22 @@ def dashboard_view(request):
     from core.models import UserProgress, Task, Subject
     
     # Получаем статистику пользователя
-    user_progress = UserProgress.objects.filter(user=request.user)
-    total_solved = user_progress.filter(is_correct=True).count()
-    total_attempts = user_progress.count()
+    user_progress = UserProgress.objects.filter(user=request.user)  # type: ignore
+    total_solved = user_progress.filter(is_correct=True).count()  # type: ignore
+    total_attempts = user_progress.count()  # type: ignore
     
     # Прогресс по предметам
     subjects_progress = {}
-    for subject in Subject.objects.all():
-        subject_progress = user_progress.filter(task__topic__subject=subject)
+    for subject in Subject.objects.all():  # type: ignore   
+        subject_progress = user_progress.filter(task__subject=subject)  # type: ignore
         subjects_progress[subject.name] = {
-            'total': subject_progress.count(),
-            'correct': subject_progress.filter(is_correct=True).count(),
+            'total': subject_progress.count(),  # type: ignore
+            'correct': subject_progress.filter(is_correct=True).count(),  # type: ignore
             'subject': subject
         }
     
     # Последние решенные задания
-    recent_tasks = user_progress.order_by('-created_at')[:5]
+    recent_tasks = user_progress.order_by('-created_at')[:5]  # type: ignore    
     
     context = {
         'total_solved': total_solved,
@@ -95,6 +97,27 @@ def dashboard_view(request):
         'accuracy': round((total_solved / total_attempts * 100) if total_attempts > 0 else 0, 1),
         'subjects_progress': subjects_progress,
         'recent_tasks': recent_tasks,
+        # Добавляем недостающие переменные для шаблона
+        'total_tasks_solved': total_solved,
+        'user_subjects': len(subjects_progress),
+        'profile': {
+            'level': 1,
+            'experience': total_solved * 10,
+            'is_premium': False,
+            'subscription_type': 'Бесплатный',
+            'streak_days': 0,
+            'last_activity': request.user.last_login or request.user.date_joined,
+            'tasks_solved_today': total_solved,
+            'daily_tasks_limit': 10,
+            'telegram_id': None
+        },
+        'rating': {
+            'accuracy': round((total_solved / total_attempts * 100) if total_attempts > 0 else 0, 1),
+            'rank': '-'
+        },
+        'achievements': [],
+        'can_solve_tasks': True,
+        'active_subscription': None
     }
     
     return render(request, 'auth/dashboard.html', context)
@@ -103,10 +126,9 @@ def dashboard_view(request):
 @login_required
 def profile_update_view(request):
     """Обновление профиля пользователя"""
-    profile = request.user.userprofile
     
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, instance=profile)
+        form = ProfileUpdateForm(request.POST)
         if form.is_valid():
             # Обновляем данные пользователя
             user = request.user
@@ -115,10 +137,8 @@ def profile_update_view(request):
             user.email = form.cleaned_data.get('email', user.email)
             user.save()
             
-            # Обновляем профиль
-            form.save()
             messages.success(request, 'Профиль успешно обновлен!')
-            return redirect('dashboard')
+            return redirect('authentication:dashboard')
     else:
         # Предзаполняем форму данными пользователя
         initial_data = {
@@ -126,6 +146,6 @@ def profile_update_view(request):
             'last_name': request.user.last_name,
             'email': request.user.email,
         }
-        form = ProfileUpdateForm(instance=profile, initial=initial_data)
+        form = ProfileUpdateForm(initial=initial_data)
     
     return render(request, 'auth/profile_update.html', {'form': form})

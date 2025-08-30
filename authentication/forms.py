@@ -10,7 +10,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import UserProfile
+# from .models import UserProfile  # UserProfile больше не существует
 
 
 class TechRegisterForm(UserCreationForm):
@@ -73,8 +73,7 @@ class TechRegisterForm(UserCreationForm):
         
         if commit:
             user.save()
-            # Создаем упрощенный профиль пользователя
-            UserProfile.objects.create(user=user)  # type: ignore
+            # UserProfile больше не создается автоматически
         return user
 
 
@@ -97,21 +96,15 @@ class TechLoginForm(AuthenticationForm):
         self.fields['password'].label = 'Пароль'
 
 
-class ProfileUpdateForm(forms.ModelForm):
+class ProfileUpdateForm(forms.Form):
     """Форма обновления профиля пользователя"""
     first_name = forms.CharField(max_length=30, required=False)
     last_name = forms.CharField(max_length=30, required=False)
     email = forms.EmailField(required=True)
     
-    class Meta:
-        model = UserProfile
-        # Используем только реально существующие поля модели UserProfile
-        fields = ['phone']
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Добавляем русские подписи для полей формы
-        self.fields['phone'].label = 'Телефон'
         self.fields['first_name'].label = 'Имя'
         self.fields['last_name'].label = 'Фамилия'
         self.fields['email'].label = 'Email'

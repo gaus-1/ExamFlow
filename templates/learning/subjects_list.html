@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Предметы - ExamFlow{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Предметы для подготовки</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for subject in subjects %}
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div class="flex items-center mb-4">
+                {% if subject.icon %}
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-2xl">{{ subject.icon }}</span>
+                </div>
+                {% endif %}
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ subject.name }}</h2>
+                    <p class="text-sm text-gray-600">{{ subject.get_exam_type_display }}</p>
+                </div>
+            </div>
+            
+            {% if subject.description %}
+            <p class="text-gray-700 mb-4">{{ subject.description }}</p>
+            {% endif %}
+            
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500">
+                    Заданий: {{ subject.task_count }}
+                </span>
+                <a href="{% url 'learning:subject_detail' subject.id %}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                    Перейти
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 text-lg">Предметы пока не добавлены</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

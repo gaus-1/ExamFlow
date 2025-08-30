@@ -118,6 +118,9 @@ class ThemesIntegrationTest(TestCase):
     
     def test_theme_switching_workflow(self):
         """Тест полного процесса переключения темы"""
+        # Авторизуемся
+        self.client.login(username='testuser', password='testpass123')
+        
         # 1. Получаем текущую тему
         response = self.client.get(reverse('themes:get_current_theme'))
         initial_theme = response.json()['theme']

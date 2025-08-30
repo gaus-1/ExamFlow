@@ -40,8 +40,25 @@ def switch_theme(request):
         # Если пользователь авторизован, сохраняем выбор в профиле
         if request.user.is_authenticated:
             try:
-                # Здесь можно добавить сохранение в профиль пользователя
-                # пока просто логируем
+                # Создаем или обновляем предпочтение пользователя
+                from .models import UserThemePreference
+                preference, created = UserThemePreference.objects.get_or_create(  # type: ignore
+                    user=request.user,
+                    defaults={'theme': theme}
+                )
+                if not created:
+                    preference.theme = theme
+                    preference.save()
+                
+                # Создаем запись об использовании темы
+                from .models import ThemeUsage
+                ThemeUsage.objects.create(  # type: ignore
+                    user=request.user,
+                    theme=theme,
+                    session_duration=0,
+                    page_views=1
+                )
+                
                 print(f"Пользователь {request.user.username} переключился на тему: {theme}")
             except Exception as e:
                 print(f"Ошибка сохранения темы в профиль: {e}")
@@ -84,11 +101,21 @@ def get_current_theme(request):
         # Если пользователь авторизован, можно получить из профиля
         if request.user.is_authenticated:
             try:
-                # Здесь можно добавить получение из профиля пользователя
-                # пока возвращаем дефолтную тему
-                pass
+                # Получаем тему из профиля пользователя
+                from .models import UserThemePreference
+                try:
+                    preference = UserThemePreference.objects.get(user=request.user)  # type: ignore
+                    theme = preference.theme
+                except UserThemePreference.DoesNotExist:  # type: ignore
+                    # Если предпочтения нет, создаем с дефолтной темой
+                    preference = UserThemePreference.objects.create(  # type: ignore
+                        user=request.user,
+                        theme='school'
+                    )
+                    theme = preference.theme
             except Exception as e:
                 print(f"Ошибка получения темы из профиля: {e}")
+                theme = 'school'
         
         return JsonResponse({
             'success': True,

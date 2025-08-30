@@ -16,7 +16,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
-from .models import Subject, Topic, Task, UserProgress
+from core.models import Subject, Task, UserProgress
 import random
 
 
@@ -86,8 +86,8 @@ def subject_detail(request, subject_id):
     - Статистику решенных заданий
     """
     subject = get_object_or_404(Subject, id=subject_id)
-    # Получаем темы для предмета
-    topics = Topic.objects.filter(subject=subject)  # type: ignore
+    # Получаем темы для предмета (временно пустой список)
+    topics = []  # Topic.objects.filter(subject=subject)
     
     # Статистика для авторизованных пользователей
     user_stats = {}
@@ -105,14 +105,8 @@ def subject_detail(request, subject_id):
             'progress_percent': round((solved_tasks / total_tasks * 100) if total_tasks > 0 else 0, 1)
         }
         
-        # Прогресс по темам
-        for topic in topics:
-            topic_solved = UserProgress.objects.filter(  # type: ignore
-                user=request.user,
-                task__topic=topic,
-                is_correct=True
-            ).count()
-            topic.user_progress = topic_solved
+        # Прогресс по темам (временно отключено)
+        pass
     
     return render(request, 'learning/subject_detail.html', {
         'subject': subject,
@@ -123,36 +117,10 @@ def subject_detail(request, subject_id):
 
 def topic_detail(request, topic_id):
     """
-    Детальная страница темы
-    
-    Показывает:
-    - Описание темы
-    - Список заданий с пагинацией
-    - Возможность решать задания
+    Детальная страница темы (временно отключено)
     """
-    topic = get_object_or_404(Topic, id=topic_id)
-    tasks_list = Task.objects.filter(topic=topic).order_by('id')  # type: ignore
-    
-    # Пагинация заданий
-    paginator = Paginator(tasks_list, 10)  # 10 заданий на страницу
-    page_number = request.GET.get('page')
-    tasks = paginator.get_page(page_number)
-    
-    # Отмечаем решенные задания для авторизованных пользователей
-    if request.user.is_authenticated:
-        solved_task_ids = UserProgress.objects.filter(  # type: ignore
-            user=request.user,
-            task__in=tasks,
-            is_correct=True
-        ).values_list('task_id', flat=True)
-        
-        for task in tasks:
-            task.is_solved = task.id in solved_task_ids
-    
-    return render(request, 'learning/topic_detail.html', {
-        'topic': topic,
-        'tasks': tasks
-    })
+    # Временно перенаправляем на список предметов
+    return redirect('learning:subjects_list')
 
 
 def task_detail(request, task_id):
@@ -206,7 +174,8 @@ def solve_task(request, task_id):
         task=task,
         defaults={
             'user_answer': user_answer,
-            'is_correct': is_correct
+            'is_correct': is_correct,
+            'attempts': 1
         }
     )
     
@@ -214,6 +183,7 @@ def solve_task(request, task_id):
         # Обновляем существующую запись
         progress.user_answer = user_answer
         progress.is_correct = is_correct
+        progress.attempts += 1
         progress.save()
     
     return JsonResponse({
@@ -235,7 +205,7 @@ def random_task(request, subject_id=None):
     
     if subject_id:
         subject = get_object_or_404(Subject, id=subject_id)
-        tasks_query = tasks_query.filter(topic__subject=subject)
+        tasks_query = tasks_query.filter(subject=subject)
     
     # Исключаем уже решенные задания для авторизованных пользователей
     if request.user.is_authenticated:

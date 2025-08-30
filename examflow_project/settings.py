@@ -97,6 +97,12 @@ WSGI_APPLICATION = 'examflow_project.wsgi.application'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 
+# Кастомные backends для аутентификации
+AUTHENTICATION_BACKENDS = [
+    'authentication.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Database
 # Настройки базы данных
 DATABASE_URL = os.getenv('DATABASE_URL')
