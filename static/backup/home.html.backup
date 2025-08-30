@@ -1,0 +1,211 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ExamFlow - ИИ помощник для подготовки к ЕГЭ и ОГЭ{% endblock %}
+
+{% block content %}
+<div class="container section-padding">
+  <div class="home-grid">
+    <!-- Левая колонка: пользовательские виджеты -->
+    <aside class="home-aside left">
+      <div class="widget animate-on-scroll">
+        <h3>Ваши достижения</h3>
+        <ul class="text-sm" style="margin:0;padding-left:18px;color:var(--aesop-text-light)">
+          <li>Серия: 7 дней</li>
+          <li>Текущий уровень: Эксперт</li>
+          <li>Очки: 1540</li>
+        </ul>
+      </div>
+      <div class="widget animate-on-scroll">
+        <h3>Быстрые действия</h3>
+        <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+          <a href="{% url 'learning:subjects_list' %}" class="btn-bot" style="text-align:center">Предметы</a>
+          <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot" style="text-align:center">Бот</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Центральная колонка: AI + основной контент -->
+    <main>
+      <!-- Центральная строка ввода ИИ -->
+      <section class="animate-on-scroll" style="margin-bottom:24px">
+        <div class="ai-chat-container">
+          <h1 class="ai-chat-title">ExamFlow</h1>
+          <p class="ai-chat-subtitle">Ваш персональный ИИ помощник для подготовки к экзаменам</p>
+
+          <div class="ai-input-container ai-advanced">
+            <textarea id="ai-textarea" class="ai-textarea" rows="1" placeholder="Например: Объясни тему 'Кинематика' для ОГЭ…"></textarea>
+            <button class="ai-send-btn ai-send-btn-lg" id="ai-send-btn" title="Отправить">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+
+          <div class="query-examples pills" id="query-pills" style="margin-top:12px">
+            <div class="query-example">Как решать квадратные уравнения?</div>
+            <div class="query-example">Сделай план подготовки по физике</div>
+            <div class="query-example">Поясни правило падежей</div>
+            <div class="query-example">Разбери фотосинтез</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Область ответа ИИ -->
+      <section id="ai-answer-section" class="widget animate-on-scroll" style="display:none">
+        <h3 style="margin-top:0">Ответ ИИ</h3>
+        <div id="ai-answer" class="break-words" style="white-space:pre-wrap"></div>
+        <div id="ai-sources" style="margin-top:16px"></div>
+        <div id="ai-followups" style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"></div>
+      </section>
+
+      <!-- Основной контент: задания ФИПИ + информблоки -->
+      <section class="fipi-tab animate-on-scroll">
+        <h2 class="fipi-tab-title">Задания ФИПИ</h2>
+        <div class="subject-grid cards-grid">
+          <div class="subject-card" data-subject="math">
+            <div class="subject-icon">📐</div>
+            <div class="subject-name">Математика</div>
+          </div>
+          <div class="subject-card" data-subject="russian">
+            <div class="subject-icon">📚</div>
+            <div class="subject-name">Русский язык</div>
+          </div>
+          <div class="subject-card" data-subject="physics">
+            <div class="subject-icon">⚡</div>
+            <div class="subject-name">Физика</div>
+          </div>
+          <div class="subject-card" data-subject="chemistry">
+            <div class="subject-icon">🧪</div>
+            <div class="subject-name">Химия</div>
+          </div>
+          <div class="subject-card" data-subject="biology">
+            <div class="subject-icon">🧬</div>
+            <div class="subject-name">Биология</div>
+          </div>
+          <div class="subject-card" data-subject="history">
+            <div class="subject-icon">🏛️</div>
+            <div class="subject-name">История</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Инфо-аккордеоны -->
+      <section class="animate-on-scroll" style="margin-top:24px">
+        <div class="accordion">
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <div class="accordion-title">Как это работает?</div>
+              <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
+            </div>
+            <div class="accordion-content"><div class="accordion-body">
+              <p>ExamFlow использует ИИ для персонализированной подготовки и рекомендаций.</p>
+            </div></div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <div class="accordion-title">Примеры заданий</div>
+              <div class="accordion-icon"><i class="fas fa-chevron-down"></i></div>
+            </div>
+            <div class="accordion-content"><div class="accordion-body">
+              <p>Задания ФИПИ по всем предметам с решениями и объяснениями.</p>
+            </div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Правая колонка: геймификация и тарифы -->
+    <aside class="home-aside right">
+      <div class="widget gamification-wrapper sidebar animate-on-scroll">
+        <div class="gamification-card">
+          <h3>Прогресс</h3>
+          <div class="progress-label"><span>Общий</span><span>75%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+        </div>
+        <div class="gamification-card">
+          <h3>Решено</h3>
+          <div class="progress-label"><span>150/200</span><span>75%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+        </div>
+        <div class="gamification-card">
+          <h3>Уровень</h3>
+          <div class="progress-label"><span>Эксперт</span><span>90%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:90%"></div></div>
+        </div>
+      </div>
+      <div class="widget animate-on-scroll">
+        <h3>Тарифы</h3>
+        <details open>
+          <summary>Сравнение</summary>
+          <ul style="margin:12px 0 0;padding-left:18px;color:var(--aesop-text-light)">
+            <li>Базовый — бесплатно</li>
+            <li>Премиум — расширенные рекомендации</li>
+            <li>Pro — максимально всё</li>
+          </ul>
+        </details>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ta = document.getElementById('ai-textarea');
+  const btn = document.getElementById('ai-send-btn');
+  const answerBox = document.getElementById('ai-answer');
+  const section = document.getElementById('ai-answer-section');
+  const sourcesBox = document.getElementById('ai-sources');
+  const followupsBox = document.getElementById('ai-followups');
+
+  const autoResize = ()=>{ ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,220)+'px'; };
+  ['input','change'].forEach(e=> ta.addEventListener(e, autoResize));
+  autoResize();
+
+  document.getElementById('query-pills').addEventListener('click',(e)=>{
+    const pill = e.target.closest('.query-example');
+    if(!pill) return;
+    ta.value = pill.textContent.trim();
+    ta.focus();
+    ta.dispatchEvent(new Event('input'));
+  });
+
+  async function ask(){
+    const prompt = (ta.value||'').trim();
+    if(!prompt) return;
+    btn.disabled = true; btn.classList.add('loading');
+    answerBox.textContent = 'Думаю…';
+    sourcesBox.innerHTML = '';
+    followupsBox.innerHTML = '';
+    section.style.display = '';
+    // Сжимаем зону ввода, как в Perplexity
+    document.querySelector('.ai-chat-container')?.classList.add('shrink');
+    try{
+      const res = await fetch('{% url "ai:api_chat" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')},body:JSON.stringify({prompt})});
+      const data = await res.json();
+      if(!res.ok){ answerBox.textContent = data.error||'Ошибка запроса'; return; }
+      answerBox.textContent = data.response||'';
+      // Sources
+      if(Array.isArray(data.sources) && data.sources.length){
+        const frag = document.createDocumentFragment();
+        const title = document.createElement('div'); title.style.marginBottom='6px'; title.textContent='Источники:'; frag.appendChild(title);
+        data.sources.forEach(s=>{ const a=document.createElement('a'); a.href=s.url; a.target='_blank'; a.rel='noopener'; a.textContent=`[${s.id}] ${s.title}`; const d=document.createElement('div'); d.appendChild(a); frag.appendChild(d); });
+        sourcesBox.innerHTML=''; sourcesBox.appendChild(frag);
+      }
+      // Follow-ups
+      if(Array.isArray(data.followups) && data.followups.length){
+        data.followups.forEach(f=>{
+          if(f.href){ const a=document.createElement('a'); a.className='btn-bot'; a.href=f.href; a.textContent=f.label; followupsBox.appendChild(a); }
+          else if(f.action==='refocus-input'){ const b=document.createElement('button'); b.className='btn-bot'; b.textContent=f.label; b.onclick=()=>ta.focus(); followupsBox.appendChild(b); }
+        });
+      }
+      window.scrollTo({top:section.offsetTop-24,behavior:'smooth'});
+    }catch(err){ answerBox.textContent = 'Ошибка сети'; }
+    finally{ btn.disabled=false; btn.classList.remove('loading'); }
+  }
+  btn.addEventListener('click', ask);
+  ta.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ask(); }});
+
+  function getCookie(name){ const m=document.cookie.match('(?:^|; )'+name+'=([^;]*)'); return m?decodeURIComponent(m[1]):''; }
+})();
+</script>
+{% endblock %}

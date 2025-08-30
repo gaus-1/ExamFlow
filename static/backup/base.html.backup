@@ -58,9 +58,10 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Старая навигация (закомментирована для отката) -->
-    <!-- <nav class="navbar-aesop">
+    <!-- Навигация -->
+    <nav class="navbar-aesop">
         <div class="navbar-container">
+            <!-- Логотип слева -->
             <div class="navbar-left">
                 <a class="navbar-brand" href="{% url 'learning:home' %}">
                     <img class="brand-logo" src="{% static 'images/logo-180.png' %}" alt="ExamFlow">
@@ -68,6 +69,7 @@
                 </a>
             </div>
             
+            <!-- Навигация по центру (десктоп) -->
             <ul class="navbar-nav navbar-center">
                 <li class="nav-item">
                     <a class="nav-link-aesop active" href="{% url 'learning:home' %}">Главная</a>
@@ -80,6 +82,7 @@
                 </li>
             </ul>
             
+            <!-- Пользовательские элементы справа -->
             <div class="navbar-right navbar-user">
                 <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">Перейти в бота</a>
                 {% if user.is_authenticated %}
@@ -93,6 +96,7 @@
             </div>
         </div>
         
+        <!-- Мобильное меню (off-canvas) -->
         <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
             <div class="mobile-menu__header">
                 <span>Меню</span>
@@ -112,21 +116,23 @@
                 </div>
             </div>
         </div>
-    </nav> -->
+    </nav>
     
     <!-- Основной контент -->
     <main>
-        {% block content %}{% endblock %}
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
     </main>
     
     <!-- Footer -->
-    <!-- <footer class="footer-modern">
+    <footer class="footer-modern">
         <div class="footer-container">
             <div class="footer-text">
                 &copy; 2024 ExamFlow. Все права защищены.
             </div>
         </div>
-    </footer> -->
+    </footer>
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

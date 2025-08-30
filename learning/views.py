@@ -45,7 +45,7 @@ def home(request):
         'subjects': subjects,
     }
     
-    return render(request, 'learning/home.html', context)
+    return render(request, 'learning/home-new-branding.html', context)
 
 
 def subjects_list(request):
