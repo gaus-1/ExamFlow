@@ -7,39 +7,42 @@
     <title>{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}</title>
     
     <!-- SEO мета-теги -->
-    <meta name="description" content="Эффективная подготовка к ЕГЭ и ОГЭ с заданиями на основе материалов ФИПИ. Умный ИИ-помощник, персонализация, Telegram бот.">
-    <meta name="keywords" content="ЕГЭ, ОГЭ, подготовка, ФИПИ, экзамены, задания, математика, русский язык, физика, химия">
+    <meta name="description" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ. Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
+    <meta name="keywords" content="ЕГЭ, ОГЭ, подготовка, искусственный интеллект, ИИ, экзамены, образование, математика, русский язык, физика, химия, биология, история">
     <meta name="author" content="ExamFlow">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="ExamFlow — Подготовка к ЕГЭ и ОГЭ">
-    <meta property="og:description" content="Эффективная подготовка с заданиями на основе материалов ФИПИ">
+    <meta property="og:title" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ">
+    <meta property="og:description" content="Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://examflow.ru">
-    <meta property="og:image" content="https://examflow.ru/static/images/og-image.png">
+    <meta property="og:image" content="{% static 'images/logo-180.png' %}">
     <meta property="og:site_name" content="ExamFlow">
     <meta property="og:locale" content="ru_RU">
     
-    <!-- Favicon full set -->
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/icon-16x16.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/icon-32x32.png' %}">
-            <!-- <link rel="icon" type="image/png" sizes="48x48" href="{% static 'icons/icon-48x48.png' %}"> -->
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/icon-180x180.png' %}">
-    <link rel="icon" sizes="192x192" href="{% static 'icons/icon-192x192.png' %}">
-    <link rel="icon" sizes="512x512" href="{% static 'icons/icon-512x512.png' %}">
-    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ">
+    <meta name="twitter:description" content="Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
+    <meta name="twitter:image" content="{% static 'images/logo-180.png' %}">
     
+    <!-- Favicon full set -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/logo-new.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo-180.png' %}">
+    
+    <!-- Modern Meta Tags -->
+    <meta name="theme-color" content="#333333">
+    <meta name="msapplication-TileColor" content="#333333">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- PWA мета-теги -->
-    <meta name="theme-color" content="#252525">
-    <meta name="msapplication-TileColor" content="#252525">
+    <meta name="theme-color" content="#333333">
+    <meta name="msapplication-TileColor" content="#333333">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="{% static 'manifest.json' %}">
     
     <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
