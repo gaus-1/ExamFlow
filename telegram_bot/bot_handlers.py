@@ -422,10 +422,9 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Добавляем кнопки навигации
         keyboard.append([
-            InlineKeyboardButton("🔍 Поиск по предмету", callback_data="search_subject"),
-            InlineKeyboardButton("🎯 Случайный предмет", callback_data="random_subject")
+            InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu"),
+            InlineKeyboardButton("🔄 Начать заново", callback_data="start")
         ])
-        keyboard.append([InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -479,7 +478,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
         await query.edit_message_text(
             f"❌ В предмете **{subject.name}** пока нет заданий",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 К предметам", callback_data="subjects")
+                InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")
             ]]),
             parse_mode='Markdown'
         )
@@ -511,10 +510,8 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
 """
 
     keyboard = [
-        [InlineKeyboardButton("🤖 Спросить ИИ", callback_data=f"ai_help_{task.id}")],
-        [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
-        [InlineKeyboardButton("🎯 Следующее задание", callback_data=f"subject_{subject_id}")],
-        [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
     ]
 
     try:
@@ -576,9 +573,8 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
     
     keyboard = [
-        [InlineKeyboardButton("🤖 Спросить AI", callback_data=f"ai_help_{task.id}")],
-        [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
-        [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
     ]
     
     try:
@@ -632,9 +628,8 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
     
     keyboard = [
-        [InlineKeyboardButton("🎯 Следующее задание", callback_data="random_task")],
-        [InlineKeyboardButton("📚 Предметы", callback_data="subjects")],
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
     ]
     
     try:
@@ -686,9 +681,8 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
     
     keyboard = [
-        [InlineKeyboardButton("🎯 Решить задание", callback_data="random_task")],
-        [InlineKeyboardButton("📚 Предметы", callback_data="subjects")],
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
     ]
     
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -774,9 +768,8 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         
         # Кнопки для навигации
         keyboard = [
-            [InlineKeyboardButton("🎯 Начать обучение", callback_data="subjects")],
-            [InlineKeyboardButton("📊 Детальная статистика", callback_data="stats")],
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")]
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -858,10 +851,8 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
                 
                 keyboard = [
-                    [InlineKeyboardButton("💡 Только подсказка", callback_data=f"ai_hint_{task.id}")],
-                    [InlineKeyboardButton("📚 Похожие задания", callback_data=f"similar_{task.id}")],
-                    [InlineKeyboardButton("🎯 Моя персонализация", callback_data="personalization_menu")],
-                    [InlineKeyboardButton("🔙 К заданию", callback_data=f"show_task_{task.id}")]
+                    [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+                    [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
                 
@@ -1260,9 +1251,8 @@ async def random_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
             f"🎓 **Тип:** {random_subject['exam_type']}\n\n"
             f"Хотите решить задание по этому предмету?",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🎯 Решить задание", callback_data=f"subject_{random_subject['id']}")],
-                [InlineKeyboardButton("🎲 Другой предмет", callback_data="random_subject")],
-                [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+                [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+                [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
             ]),
             parse_mode='Markdown'
         )
@@ -1307,9 +1297,8 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
         keyboard = [
-            [InlineKeyboardButton("🤖 Спросить ИИ", callback_data=f"ai_help_{task.id}")],
-            [InlineKeyboardButton("💡 Показать ответ", callback_data=f"answer_{task.id}")],
-            [InlineKeyboardButton("🔙 К предметам", callback_data="subjects")]
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
 
         await query.edit_message_text(
