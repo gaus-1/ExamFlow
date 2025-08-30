@@ -1,22 +1,23 @@
 /* ExamFlow Components - Адаптировано из React для Django */
 /* ==================================================== */
 
-/* Компонент Button */
+/* Компонент Button - Aesop-inspired warm palette */
 .btn-component {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   white-space: nowrap;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
   text-decoration: none;
   border: none;
   outline: none;
   user-select: none;
+  font-family: inherit;
 }
 
 .btn-component:focus-visible {
@@ -36,15 +37,19 @@
 .btn-default {
   background-color: var(--primary);
   color: var(--primary-foreground);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.2);
 }
 
 .btn-default:hover {
-  background-color: rgba(51, 51, 51, 0.9);
+  background-color: oklch(0.4 0.09 40);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(139, 115, 85, 0.3);
 }
 
 [data-theme="dark"] .btn-default:hover {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: oklch(0.7 0.11 45);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(139, 115, 85, 0.4);
 }
 
 .btn-destructive {
@@ -61,49 +66,63 @@
   border: 1px solid var(--border);
   background-color: var(--background);
   color: var(--foreground);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px -1px rgba(139, 115, 85, 0.15);
 }
 
 .btn-outline:hover {
   background-color: var(--accent);
   color: var(--accent-foreground);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(139, 115, 85, 0.25);
 }
 
 [data-theme="dark"] .btn-outline {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(139, 115, 85, 0.05);
   border-color: var(--input);
 }
 
 [data-theme="dark"] .btn-outline:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(139, 115, 85, 0.1);
+  border-color: var(--primary);
+  transform: translateY(-2px);
 }
 
 .btn-secondary {
   background-color: var(--secondary);
   color: var(--secondary-foreground);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px -1px rgba(90, 74, 58, 0.2);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(247, 247, 247, 0.8);
+  background-color: oklch(0.4 0.07 25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(90, 74, 58, 0.3);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-  background-color: rgba(38, 38, 38, 0.8);
+  background-color: oklch(0.6 0.09 30);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(90, 74, 58, 0.4);
 }
 
 .btn-ghost {
   background-color: transparent;
   color: var(--foreground);
+  transition: all 0.3s ease;
 }
 
 .btn-ghost:hover {
   background-color: var(--accent);
   color: var(--accent-foreground);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px -2px rgba(139, 115, 85, 0.2);
 }
 
 [data-theme="dark"] .btn-ghost:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(139, 115, 85, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px -2px rgba(139, 115, 85, 0.3);
 }
 
 .btn-link {
@@ -111,30 +130,38 @@
   color: var(--primary);
   text-decoration: underline;
   text-underline-offset: 4px;
+  transition: all 0.3s ease;
 }
 
 .btn-link:hover {
   text-decoration: underline;
+  color: oklch(0.4 0.09 40);
+  transform: translateY(-1px);
 }
 
-/* Размеры кнопок */
+/* Размеры кнопок - Aesop-inspired warm palette */
 .btn-sm {
   height: 2rem;
   padding: 0 0.75rem;
   font-size: 0.875rem;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
 }
 
 .btn-default-size {
-  height: 2.25rem;
+  height: 2.5rem;
   padding: 0 1rem;
   font-size: 0.875rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
 }
 
 .btn-lg {
-  height: 2.5rem;
+  height: 3rem;
   padding: 0 1.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
 }
 
 .btn-icon {
@@ -143,27 +170,30 @@
   padding: 0;
 }
 
-/* Компонент Input */
+/* Компонент Input - Aesop-inspired warm palette */
 .input-component {
   display: flex;
-  height: 2.5rem;
+  height: 2.75rem;
   width: 100%;
-  border-radius: 0.375rem;
-  border: 1px solid var(--input);
+  border-radius: 0.75rem;
+  border: 2px solid var(--input);
   background-color: var(--background);
-  padding: 0 0.75rem;
+  padding: 0 1rem;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   outline: none;
+  font-family: inherit;
 }
 
 .input-component:focus {
   border-color: var(--ring);
-  box-shadow: 0 0 0 2px rgba(180, 180, 180, 0.2);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.2);
+  transform: translateY(-1px);
 }
 
 [data-theme="dark"] .input-component:focus {
-  box-shadow: 0 0 0 2px rgba(67, 67, 67, 0.2);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.3);
+  transform: translateY(-1px);
 }
 
 .input-component:disabled {
@@ -175,19 +205,25 @@
   color: var(--muted-foreground);
 }
 
-/* Компонент Card */
+/* Компонент Card - Aesop-inspired warm palette */
 .card-component {
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background-color: var(--card);
   color: var(--card-foreground);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(139, 115, 85, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-component:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(139, 115, 85, 0.15);
 }
 
 .card-header {
   display: flex;
   flex-direction: column;
-  space-y: 1.5rem;
+  gap: 1.5rem;
   padding: 1.5rem;
 }
 
@@ -214,17 +250,23 @@
   border-top: 1px solid var(--border);
 }
 
-/* Компонент Badge */
+/* Компонент Badge - Aesop-inspired warm palette */
 .badge-component {
   display: inline-flex;
   align-items: center;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   border: 1px solid transparent;
   font-size: 0.75rem;
   font-weight: 500;
   line-height: 1;
-  padding: 0.125rem 0.5rem;
-  transition: all 0.2s ease;
+  padding: 0.25rem 0.75rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.badge-component:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px -1px rgba(139, 115, 85, 0.2);
 }
 
 .badge-default {
@@ -300,19 +342,22 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--foreground);
   background-color: var(--background);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .dropdown-trigger:hover {
   background-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px -2px rgba(139, 115, 85, 0.2);
 }
 
 .dropdown-content {
@@ -388,13 +433,13 @@
   max-width: 28rem;
   max-height: 85vh;
   transform: translate(-50%, -50%) scale(0.95);
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background-color: var(--background);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(139, 115, 85, 0.25);
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .dialog-content.show {
@@ -480,8 +525,9 @@
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  font-family: inherit;
 }
 
 .tabs-trigger:hover {
@@ -508,8 +554,14 @@
 
 .accordion-item {
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.accordion-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 4px -1px rgba(139, 115, 85, 0.1);
 }
 
 .accordion-item:first-child {
@@ -566,18 +618,21 @@
   color: var(--muted-foreground);
 }
 
-/* Компонент Progress */
+/* Компонент Progress - Aesop-inspired warm palette */
 .progress-component {
   width: 100%;
   overflow: hidden;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   background-color: var(--secondary);
+  height: 0.75rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .progress-indicator {
   height: 100%;
-  background-color: var(--primary);
-  transition: width 0.3s ease;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  transition: width 0.5s ease;
+  border-radius: 0.75rem;
 }
 
 /* Компонент Skeleton */
@@ -606,14 +661,15 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background-color: var(--background);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(139, 115, 85, 0.15);
   opacity: 0;
   visibility: hidden;
   transform: translateX(100%);
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .toast-component.show {
@@ -686,8 +742,9 @@
   right: 0;
   bottom: 0;
   background-color: var(--muted);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   border-radius: 1.5rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .switch-slider:before {
@@ -730,10 +787,10 @@
   left: 0;
   width: 1rem;
   height: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 0.25rem;
+  border: 2px solid var(--border);
+  border-radius: 0.375rem;
   background-color: var(--background);
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .checkbox-input:checked + .checkbox-mark {
