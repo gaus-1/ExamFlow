@@ -897,12 +897,8 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
             
             keyboard = [
-                [InlineKeyboardButton("📚 Объяснить тему", callback_data="ai_explain")],
-                [InlineKeyboardButton("💡 Дать подсказку", callback_data="ai_hint")],
-                [InlineKeyboardButton("🎯 Персональные советы", callback_data="ai_personal")],
-                [InlineKeyboardButton("🔍 Похожие задания", callback_data="similar_tasks")],
-                [InlineKeyboardButton("📊 Анализ прогресса", callback_data="my_analytics")],
-                [InlineKeyboardButton("⬅️ Назад", callback_data="main_menu")]
+                [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+                [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
@@ -963,9 +959,8 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
 """
         
         keyboard = [
-            [InlineKeyboardButton("💡 Подсказка к заданию", callback_data="ai_hint")],
-            [InlineKeyboardButton("🎯 Персональные советы", callback_data="ai_personal")],
-            [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")]
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1021,9 +1016,8 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 """
         
         keyboard = [
-            [InlineKeyboardButton("📚 Объяснить тему", callback_data="ai_explain")],
-            [InlineKeyboardButton("💡 Подсказка к заданию", callback_data="ai_hint")],
-            [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")]
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1079,9 +1073,8 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
 """
         
         keyboard = [
-            [InlineKeyboardButton("🎯 Персональные советы", callback_data="ai_personal")],
-            [InlineKeyboardButton("📚 Объяснить тему", callback_data="ai_explain")],
-            [InlineKeyboardButton("⬅️ Назад к ИИ", callback_data="ai_help")]
+            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
+            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1197,9 +1190,6 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
         
         keyboard = [
-            [InlineKeyboardButton("📚 Объяснить тему", callback_data="ai_explain")],
-            [InlineKeyboardButton("💡 Дать подсказку", callback_data="ai_hint")],
-            [InlineKeyboardButton("🎯 Персональные советы", callback_data="ai_personal")],
             [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
             [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]

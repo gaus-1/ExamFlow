@@ -320,22 +320,65 @@ function initializeAIInterface() {
     });
 }
 
-function handleAISearch() {
+async function handleAISearch() {
     const aiInput = document.querySelector('.ai-input-new');
     const query = aiInput ? aiInput.value.trim() : '';
     
     if (query) {
-        // Показываем toast с подтверждением
-        window.showToast(`Отправляем запрос: "${query}"`, 'info');
-        
-        // Здесь можно добавить логику отправки запроса на сервер
-        console.log('AI Query:', query);
+        try {
+            // Показываем toast с подтверждением
+            window.showToast(`Отправляем запрос: "${query}"`, 'info');
+            
+            // Получаем CSRF токен
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                             getCookie('csrftoken');
+            
+            // Отправляем запрос на AI API
+            const response = await fetch('/ai/api/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ prompt: query })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                window.showToast(`Ответ получен: ${data.response.substring(0, 50)}...`, 'success');
+                
+                // Здесь можно добавить отображение ответа
+                console.log('AI Response:', data.response);
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+        } catch (error) {
+            console.error('AI API Error:', error);
+            window.showToast('Ошибка при отправке запроса', 'error');
+        }
         
         // Очищаем поле
         if (aiInput) {
             aiInput.value = '';
         }
     }
+}
+
+// Функция для получения CSRF токена из cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 // ===== UTILITY FUNCTIONS =====
