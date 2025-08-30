@@ -6,14 +6,12 @@ services:
     startCommand: |
       echo "🔄 Применяем миграции..."
       python manage.py migrate --noinput
-      echo "🔄 Перезагружаем данные бота..."
-      python manage.py reload_bot_data --force
-      echo "🔄 Запускаем систему keep-alive..."
-      python manage.py start_keepalive --daemon --db-interval 300 --site-interval 600
       echo "🚀 Запускаем сервер..."
-      gunicorn examflow_project.wsgi:application
+      gunicorn examflow_project.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: DJANGO_SETTINGS_MODULE
         value: examflow_project.settings
+      - key: PORT
+        value: 10000
