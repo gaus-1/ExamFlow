@@ -21,4 +21,7 @@ urlpatterns = [
     path('api/personalization/study-plan/', views.api_study_plan, name='api_study_plan'),
     path('api/personalization/weak-topics/', views.api_weak_topics, name='api_weak_topics'),
     path('api/personalization/preferences/', views.api_user_preferences, name='api_user_preferences'),
+    
+    # Health check для Render
+    path('health/', views.health_check, name='health_check'),
 ]

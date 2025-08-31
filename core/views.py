@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import logging
 from django_ratelimit.decorators import ratelimit
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 from .personalization_system import (
     get_user_insights,
@@ -210,3 +212,15 @@ def api_user_preferences(request):
     except Exception as e:
         logger.error(f"Ошибка в api_user_preferences: {e}")
         return JsonResponse({'error': 'Ошибка загрузки предпочтений'}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def health_check(request):
+    """Health check endpoint для Render"""
+    return JsonResponse({
+        "status": "healthy",
+        "service": "ExamFlow 2.0",
+        "version": "2.0.0",
+        "timestamp": "2024-01-01T00:00:00Z"
+    })

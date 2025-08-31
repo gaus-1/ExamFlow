@@ -45,7 +45,7 @@ def home(request):
         'subjects': subjects,
     }
     
-    return render(request, 'learning/home-new-branding.html', context)
+    return render(request, 'learning/home-examflow-2.0.html', context)
 
 
 def subjects_list(request):
