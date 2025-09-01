@@ -47,6 +47,26 @@ def db_check_connection() -> bool:
         cursor.fetchone()
     return True
 
+# Новые функции для работы с Unified Profile
+@sync_to_async
+def db_get_or_create_unified_profile(telegram_user):
+    """Получает или создает UnifiedProfile для пользователя Telegram"""
+    return UnifiedProfileService.get_or_create_profile(
+        telegram_id=telegram_user.id,
+        telegram_username=telegram_user.username,
+        user=None  # Django User будет создан позже при необходимости
+    )
+
+@sync_to_async
+def db_update_profile_activity(profile):
+    """Обновляет время последней активности профиля"""
+    UnifiedProfileService.update_last_activity(profile) # type: ignore
+
+@sync_to_async
+def db_get_profile_progress(profile):
+    """Получает сводку прогресса пользователя"""
+    return UnifiedProfileService.get_user_progress_summary(profile) # type: ignore
+
 # ИИ сервис для асинхронного использования
 @sync_to_async
 def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
@@ -270,21 +290,31 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"Ошибка создания нижнего меню: {e}")
     
-    # Временно отключаем проверку БД для отладки
+    # Получаем или создаем UnifiedProfile
     try:
-        # user_obj, created = await db_get_or_create_user(user)
-        user_obj = None
-        created = False
+        profile = await db_get_or_create_unified_profile(user)
+        await db_update_profile_activity(profile)
+        logger.info(f"UnifiedProfile получен/создан для пользователя {user.id}")
+        
+        # Получаем прогресс пользователя для персонализации
+        progress = await db_get_profile_progress(profile)
+        
+        # Формируем персонализированное приветствие
+        level_info = f"Уровень {progress['level']}" if progress.get('level', 1) > 1 else "Новичок"
+        xp_info = f"• {progress['experience_points']} XP" if progress.get('experience_points', 0) > 0 else ""
+        solved_info = f"• Решено: {progress['total_solved']}" if progress.get('total_solved', 0) > 0 else ""
+        
+        stats_line = f"\n{level_info} {xp_info} {solved_info}".strip() if any([xp_info, solved_info]) else ""
         
         welcome_text = f"""
 🎯 **ExamFlow 2.0**
 
-Привет, {user.first_name}! 
+Привет, {profile.display_name}!{stats_line}
 
 Умная платформа подготовки к ЕГЭ с ИИ-ассистентом
 
-🤖 **Задай любой вопрос** — получи мгновенный ответ
-📚 **Практика** — тысячи заданий с проверкой
+🤖 **Задай любой вопрос** — получи персональный ответ
+📚 **Практика** — тысячи заданий с проверкой  
 🏆 **Прогресс** — отслеживай достижения
 
 Что тебя интересует?
@@ -642,34 +672,36 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    Показывает статистику пользователя
+    Показывает статистику пользователя из Unified Profile
     
-    Отображает количество решенных заданий, точность, рейтинг
+    Отображает уровень, опыт, решенные задания, серии, достижения
     """
     query = update.callback_query
     await query.answer()
     
-    user, _ = await db_get_or_create_user(update.effective_user)
-
-    # Получаем статистику безопасно
-    total_attempts = await sync_to_async(lambda: UserProgress.objects.filter(user=user).count())()  # type: ignore
-    correct_answers = await sync_to_async(lambda: UserProgress.objects.filter(user=user, is_correct=True).count())()  # type: ignore
-    accuracy = round((correct_answers / total_attempts * 100) if total_attempts > 0 else 0, 1)
+    # Получаем UnifiedProfile пользователя
+    profile = await db_get_or_create_unified_profile(update.effective_user)
+    await db_update_profile_activity(profile)
     
-    rating = await sync_to_async(lambda: UserRating.objects.get_or_create(user=user)[0])()  # type: ignore
+    # Получаем полную статистику
+    progress = await db_get_profile_progress(profile)
     
+    # Формируем красивую статистику в стиле ExamFlow 2.0
     stats_text = f"""
-📊 **Ваша статистика**
+🏆 **Твой прогресс в ExamFlow**
 
-👤 **Пользователь:** {user.first_name or user.username}
-✅ **Правильных ответов:** {correct_answers}
-📝 **Всего попыток:** {total_attempts}
-🎯 **Точность:** {accuracy}%
-⭐ **Рейтинг:** {rating.total_points} очков
+👤 **{profile.display_name}**
+🎯 **Уровень {profile.level}** • {profile.experience_points} XP
+📈 **До следующего уровня:** {profile.experience_to_next_level} XP
 
-🏆 **Достижения:** {await sync_to_async(lambda: len([ach for ach in user.achievements.all()]))()}
+📚 **Статистика решений:**
+✅ Решено задач: **{profile.total_solved}**
+🔥 Текущая серия: **{profile.current_streak} дней**
+⭐ Лучшая серия: **{profile.best_streak} дней**
 
-Продолжайте решать задания для улучшения результатов!
+🏅 **Достижения:** {len(profile.achievements) if profile.achievements else 0}  # type: ignore
+
+💡 **Продолжай решать задания для роста!**
 """
     
     keyboard = [
@@ -801,8 +833,9 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             query = None
             user = update.effective_user
         
-        # Получаем пользователя
-        user_obj, created = await db_get_or_create_user(user)
+        # Получаем UnifiedProfile пользователя  
+        profile = await db_get_or_create_unified_profile(user)
+        await db_update_profile_activity(profile)
         
         # Проверяем формат callback_data (только для callback-запросов)
         if is_callback and query.data and query.data.startswith('ai_help_') and '_' in query.data:
@@ -823,11 +856,18 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 
                 # Получаем персонализированную помощь от AI
+                # Создаем временного Django User для совместимости с AI сервисом
+                temp_user = type('User', (), {
+                    'id': profile.telegram_id,
+                    'username': profile.display_name,
+                    'first_name': profile.display_name
+                })()
+                
                 ai_response = await get_ai_response(
                     "Объясни, как решить это задание. Дай пошаговое решение с объяснением каждого шага. "
                     "Учитывай мой текущий уровень и слабые темы.",
                     task_type='task_help',
-                    user=user_obj,
+                    user=temp_user,
                     task=task
                 )
                 
@@ -856,7 +896,7 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
                 )
                 
-                logger.info(f"Пользователь {user_obj.id} получил персонализированную AI помощь для задания {task.id}")
+                logger.info(f"Пользователь {profile.telegram_id} получил персонализированную AI помощь для задания {task.id}")
                 
             except (IndexError, ValueError) as e:
                 logger.error(f"Ошибка парсинга task_id в ai_help_handler: {e}")
@@ -1142,8 +1182,9 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
         user = update.effective_user
         
-        # Получаем или создаем пользователя
-        user_obj, created = await db_get_or_create_user(user)
+        # Получаем UnifiedProfile пользователя
+        profile = await db_get_or_create_unified_profile(user)
+        await db_update_profile_activity(profile)
         
         # Показываем сообщение о том, что AI думает
         thinking_message = await context.bot.send_message(
@@ -1152,11 +1193,18 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_to_message_id=update.message.message_id
         )
         
+        # Создаем временного Django User для совместимости с AI сервисом
+        temp_user = type('User', (), {
+            'id': profile.telegram_id,
+            'username': profile.display_name,
+            'first_name': profile.display_name
+        })()
+        
         # Получаем ответ от AI
         ai_response = await get_ai_response(
             user_message,
             task_type='direct_question',
-            user=user_obj
+            user=temp_user
         )
         
         # Очищаем текст от проблемных символов Markdown
@@ -1185,7 +1233,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode=None
         )
         
-        logger.info(f"Пользователь {user_obj.id} получил прямой ответ от ИИ на вопрос: {user_message[:50]}...")
+        logger.info(f"Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {user_message[:50]}...")
         
     except Exception as e:
         logger.error(f"Ошибка в handle_ai_message: {e}")
