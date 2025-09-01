@@ -26,7 +26,8 @@ from .bot_handlers import (
     search_subject_handler, random_subject_handler, show_task_handler,
     gamification_menu_handler, user_stats_handler, achievements_handler,
     progress_handler, overall_progress_handler, subjects_progress_handler,
-    daily_challenges_handler, leaderboard_handler, bonus_handler
+    daily_challenges_handler, leaderboard_handler, bonus_handler,
+    clear_context_handler
 )
 
 # Настройка логирования
@@ -127,6 +128,7 @@ def setup_bot_application():
     application.add_handler(CallbackQueryHandler(ai_explain_handler, pattern=r"ai_explain"))
     application.add_handler(CallbackQueryHandler(ai_personal_handler, pattern=r"ai_personal"))
     application.add_handler(CallbackQueryHandler(ai_hint_general_handler, pattern=r"ai_hint"))
+    application.add_handler(CallbackQueryHandler(clear_context_handler, pattern="clear_context"))
     
     # Обработчики для заданий
     application.add_handler(CallbackQueryHandler(show_answer, pattern=r"answer_\d+"))

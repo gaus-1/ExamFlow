@@ -5,6 +5,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 
 class Subject(models.Model):
@@ -200,3 +201,61 @@ class UserChallenge(models.Model):
         if self.challenge.target_value == 0:  # type: ignore
             return 0
         return min(100, (self.current_progress / self.challenge.target_value) * 100)  # type: ignore
+
+
+class ChatSession(models.Model):
+    """Сессия чата пользователя с ботом для сохранения контекста"""
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, verbose_name="Пользователь")
+    telegram_id = models.BigIntegerField(verbose_name="Telegram ID")
+    session_id = models.CharField(max_length=100, unique=True, verbose_name="ID сессии")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создана")
+    last_activity = models.DateTimeField(auto_now=True, verbose_name="Последняя активность")
+    context_messages = models.JSONField(default=list, verbose_name="История сообщений")
+    max_context_length = models.IntegerField(default=10, verbose_name="Максимальная длина контекста")  # type: ignore   
+    
+    class Meta:
+        verbose_name = "Сессия чата"
+        verbose_name_plural = "Сессии чата"
+        indexes = [
+            models.Index(fields=['telegram_id', 'session_id']),
+            models.Index(fields=['last_activity']),
+        ]
+    
+    def __str__(self):
+        return f"Сессия {self.session_id} для {self.user.username}"  # type: ignore
+    
+    def add_message(self, role: str, content: str):
+        """Добавляет сообщение в контекст сессии"""
+        message = {
+            'role': role,  # 'user' или 'assistant'
+            'content': content,
+            'timestamp': timezone.now().isoformat()
+        }
+        self.context_messages.append(message)  # type: ignore
+        
+        # Ограничиваем длину контекста
+        if len(self.context_messages) > self.max_context_length:  # type: ignore
+            # Оставляем первые 2 сообщения (системные) и последние max_context_length-2
+            self.context_messages = (
+                self.context_messages[:2] +  # type: ignore
+                self.context_messages[-(self.max_context_length-2):]  # type: ignore
+            )
+        
+        self.save()
+    
+    def get_context_for_ai(self) -> str:
+        """Возвращает контекст в формате для ИИ"""
+        if not self.context_messages:
+            return ""
+        
+        context_parts = []
+        for msg in self.context_messages[-self.max_context_length:]:  # type: ignore
+            role = "Пользователь" if msg['role'] == 'user' else "Ассистент"  # type: ignore
+            context_parts.append(f"{role}: {msg['content']}")  # type: ignore
+        
+        return "\n".join(context_parts)
+    
+    def clear_context(self):
+        """Очищает контекст сессии"""
+        self.context_messages = []  # type: ignore  
+        self.save()

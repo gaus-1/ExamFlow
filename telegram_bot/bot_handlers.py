@@ -20,6 +20,7 @@ from learning.models import (
 from authentication.models import UserProfile, Subscription
 from core.models import UnifiedProfile
 from core.services.unified_profile import UnifiedProfileService
+from core.services.chat_session import ChatSessionService
 from django.db.models import Count, Q
 from django.utils import timezone
 from ai.services import AiService
@@ -74,6 +75,35 @@ def db_get_profile_progress(profile):
         'best_streak': profile.best_streak,
         'achievements_count': len(profile.achievements) if profile.achievements else 0
     }
+
+@sync_to_async
+def db_get_or_create_chat_session(telegram_user, django_user=None):
+    """Получает или создает сессию чата для пользователя"""
+    return ChatSessionService.get_or_create_session(
+        telegram_id=telegram_user.id,
+        user=django_user
+    )
+
+@sync_to_async
+def db_add_user_message_to_session(session, message):
+    """Добавляет сообщение пользователя в сессию"""
+    ChatSessionService.add_user_message(session, message)
+
+@sync_to_async
+def db_add_assistant_message_to_session(session, message):
+    """Добавляет ответ ассистента в сессию"""
+    ChatSessionService.add_assistant_message(session, message)
+
+@sync_to_async
+def db_create_enhanced_prompt(user_message, session):
+    """Создает расширенный промпт с контекстом"""
+    return ChatSessionService.create_enhanced_prompt(user_message, session)
+
+@sync_to_async
+def db_clear_chat_session_context(telegram_user):
+    """Очищает контекст сессии пользователя"""
+    session = ChatSessionService.get_or_create_session(telegram_id=telegram_user.id)
+    ChatSessionService.clear_session_context(session)
 
 # ИИ сервис для асинхронного использования
 @sync_to_async
@@ -1191,6 +1221,12 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         profile = await db_get_or_create_unified_profile(user)
         await db_update_profile_activity(profile)
         
+        # Получаем или создаем Django User для совместимости с AI сервисом
+        django_user, created = await db_get_or_create_user(user)
+        
+        # Получаем или создаем сессию чата
+        chat_session = await db_get_or_create_chat_session(user, django_user)
+        
         # Показываем сообщение о том, что AI думает
         thinking_message = await context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -1198,15 +1234,21 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_to_message_id=update.message.message_id
         )
         
-        # Получаем или создаем Django User для совместимости с AI сервисом
-        django_user, created = await db_get_or_create_user(user)
+        # Добавляем сообщение пользователя в контекст
+        await db_add_user_message_to_session(chat_session, user_message)
         
-        # Получаем ответ от AI
+        # Создаем расширенный промпт с контекстом
+        enhanced_prompt = await db_create_enhanced_prompt(user_message, chat_session)
+        
+        # Получаем ответ от AI с контекстом
         ai_response = await get_ai_response(
-            user_message,
+            enhanced_prompt,
             task_type='direct_question',
             user=django_user
         )
+        
+        # Добавляем ответ ассистента в контекст
+        await db_add_assistant_message_to_session(chat_session, ai_response)
         
         # Очищаем текст от проблемных символов Markdown
         clean_response = clean_markdown_text(ai_response)
@@ -1222,8 +1264,8 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
         
         keyboard = [
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+            [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")],
+            [InlineKeyboardButton("🧹 Очистить контекст", callback_data="clear_context")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -1351,6 +1393,39 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"Ошибка в show_task_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+
+async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обработчик для очистки контекста чата
+    """
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        user = update.effective_user
+        
+        # Очищаем контекст сессии
+        await db_clear_chat_session_context(user)
+        
+        await query.edit_message_text(
+            "🧹 **Контекст очищен!**\n\n"
+            "Теперь ИИ будет отвечать на ваши вопросы без учета предыдущего разговора.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🏠 Главная", callback_data="main_menu")
+            ]]),
+            parse_mode='Markdown'
+        )
+        
+        logger.info(f"Пользователь {user.id} очистил контекст чата")
+        
+    except Exception as e:
+        logger.error(f"Ошибка при очистке контекста: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка при очистке контекста. Попробуйте позже.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🏠 Главная", callback_data="main_menu")
+            ]])
+        )
 
 async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
