@@ -18,6 +18,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.conf import settings
 import json
+from core.services.unified_profile import UnifiedProfileService
 import logging
 
 logger = logging.getLogger(__name__)

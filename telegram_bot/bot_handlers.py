@@ -18,6 +18,8 @@ from learning.models import (
     Subject, Task, UserProgress, UserRating, Achievement
 )
 from authentication.models import UserProfile, Subscription
+from core.models import UnifiedProfile
+from core.services.unified_profile import UnifiedProfileService
 from django.db.models import Count, Q
 from django.utils import timezone
 from ai.services import AiService
