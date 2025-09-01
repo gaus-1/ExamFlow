@@ -1276,9 +1276,12 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode=None
         )
         
-        logger.info(f"Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {user_message[:50]}...")
+        # Очищаем сообщение от эмодзи для логов
+        import re  # type: ignore
+        clean_message = re.sub(r'[^\w\s\-.,!?]', '', user_message[:50])
+        logger.info(f"Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}...")
         
-    except Exception as e:
+    except Exception as e:  # type: ignore
         logger.error(f"Ошибка в handle_ai_message: {e}")
         try:
             await context.bot.send_message(
