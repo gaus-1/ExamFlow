@@ -60,12 +60,20 @@ def db_get_or_create_unified_profile(telegram_user):
 @sync_to_async
 def db_update_profile_activity(profile):
     """Обновляет время последней активности профиля"""
-    UnifiedProfileService.update_last_activity(profile) # type: ignore
+    profile.last_activity = timezone.now()
+    profile.save()
 
 @sync_to_async
 def db_get_profile_progress(profile):
     """Получает сводку прогресса пользователя"""
-    return UnifiedProfileService.get_user_progress_summary(profile) # type: ignore
+    return {
+        'level': profile.level,
+        'experience_points': profile.experience_points,
+        'total_solved': profile.total_solved,
+        'current_streak': profile.current_streak,
+        'best_streak': profile.best_streak,
+        'achievements_count': len(profile.achievements) if profile.achievements else 0
+    }
 
 # ИИ сервис для асинхронного использования
 @sync_to_async
@@ -686,6 +694,9 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем полную статистику
     progress = await db_get_profile_progress(profile)
     
+    # Подсчитываем количество достижений
+    achievements_count = len(profile.achievements) if profile.achievements else 0  # type: ignore
+    
     # Формируем красивую статистику в стиле ExamFlow 2.0
     stats_text = f"""
 🏆 **Твой прогресс в ExamFlow**
@@ -699,11 +710,10 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🔥 Текущая серия: **{profile.current_streak} дней**
 ⭐ Лучшая серия: **{profile.best_streak} дней**
 
-🏅 **Достижения:** {len(profile.achievements) if profile.achievements else 0}  # type: ignore
+🏅 **Достижения:** {achievements_count}
 
 💡 **Продолжай решать задания для роста!**
 """
-    
     keyboard = [
         [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
@@ -855,19 +865,14 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     parse_mode=None
                 )
                 
-                # Получаем персонализированную помощь от AI
-                # Создаем временного Django User для совместимости с AI сервисом
-                temp_user = type('User', (), {
-                    'id': profile.telegram_id,
-                    'username': profile.display_name,
-                    'first_name': profile.display_name
-                })()
+                # Получаем или создаем Django User для совместимости с AI сервисом
+                django_user, created = await db_get_or_create_user(user)
                 
                 ai_response = await get_ai_response(
                     "Объясни, как решить это задание. Дай пошаговое решение с объяснением каждого шага. "
                     "Учитывай мой текущий уровень и слабые темы.",
                     task_type='task_help',
-                    user=temp_user,
+                    user=django_user,
                     task=task
                 )
                 
@@ -1193,18 +1198,14 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_to_message_id=update.message.message_id
         )
         
-        # Создаем временного Django User для совместимости с AI сервисом
-        temp_user = type('User', (), {
-            'id': profile.telegram_id,
-            'username': profile.display_name,
-            'first_name': profile.display_name
-        })()
+        # Получаем или создаем Django User для совместимости с AI сервисом
+        django_user, created = await db_get_or_create_user(user)
         
         # Получаем ответ от AI
         ai_response = await get_ai_response(
             user_message,
             task_type='direct_question',
-            user=temp_user
+            user=django_user
         )
         
         # Очищаем текст от проблемных символов Markdown
