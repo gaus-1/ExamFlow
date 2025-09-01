@@ -31,6 +31,45 @@
         </ul>
       </nav>
       
+      <!-- Мобильное меню -->
+      <div class="mobile-menu mobile-only">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+          <div class="mobile-menu-content">
+            <div class="mobile-menu-header">
+              <div class="logo-container flex items-center gap-3">
+                <img src="{% static 'images/logo-new.png' %}" alt="ExamFlow" class="logo-image">
+                <span class="logo-text gradient-text font-bold text-xl">ExamFlow</span>
+              </div>
+              <button class="mobile-menu-close" onclick="toggleMobileMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <nav class="mobile-nav">
+              <ul class="mobile-nav-list">
+                <li><a href="#features" class="mobile-nav-link" onclick="toggleMobileMenu()">Возможности</a></li>
+                <li><a href="#subjects" class="mobile-nav-link" onclick="toggleMobileMenu()">Предметы</a></li>
+                <li><a href="#pricing" class="mobile-nav-link" onclick="toggleMobileMenu()">Тарифы</a></li>
+                <li><a href="#about" class="mobile-nav-link" onclick="toggleMobileMenu()">О нас</a></li>
+              </ul>
+            </nav>
+            
+            <div class="mobile-menu-actions">
+              <button class="btn btn-ghost w-full mb-3" onclick="focusAI(); toggleMobileMenu()">Задать вопрос</button>
+              <button class="btn btn-primary w-full">Войти</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Действия -->
       <div class="header-actions flex items-center gap-3">
         <button class="btn btn-ghost" onclick="focusAI()">Задать вопрос</button>

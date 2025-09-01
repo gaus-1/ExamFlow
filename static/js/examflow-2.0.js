@@ -979,6 +979,56 @@ window.askQuestion = function(question) {
   }
 };
 
+/**
+ * Мобильное меню
+ */
+window.toggleMobileMenu = function() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  
+  if (overlay && toggle) {
+    const isActive = overlay.classList.contains('active');
+    
+    if (isActive) {
+      // Закрываем меню
+      overlay.classList.remove('active');
+      toggle.classList.remove('active');
+      document.body.style.overflow = '';
+    } else {
+      // Открываем меню
+      overlay.classList.add('active');
+      toggle.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+};
+
+/**
+ * Закрытие мобильного меню при клике вне его
+ */
+document.addEventListener('click', function(event) {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  
+  if (overlay && toggle && overlay.classList.contains('active')) {
+    if (!overlay.contains(event.target) && !toggle.contains(event.target)) {
+      toggleMobileMenu();
+    }
+  }
+});
+
+/**
+ * Закрытие мобильного меню при нажатии Escape
+ */
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const overlay = document.getElementById('mobileMenuOverlay');
+    if (overlay && overlay.classList.contains('active')) {
+      toggleMobileMenu();
+    }
+  }
+});
+
 // ========================================
 // КОНЕЦ EXAMFLOW 2.0 JAVASCRIPT
 // ========================================
