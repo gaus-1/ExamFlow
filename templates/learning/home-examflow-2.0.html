@@ -142,9 +142,117 @@
             </div>
           </div>
           
-          <!-- Чат с AI -->
-          <div class="ai-chat-container" style="display: none;">
-            <!-- Сообщения будут добавляться динамически -->
+          <!-- AI чат контейнер -->
+          <div class="ai-chat-container" id="aiChatContainer">
+            <!-- Сообщения будут добавляться сюда -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- ГЕЙМИФИКАЦИЯ - ПРОГРЕСС И ДОСТИЖЕНИЯ -->
+      <div class="gamification-section mt-16">
+        <div class="container container-lg">
+          <div class="section-header text-center mb-12">
+            <h2 class="section-title text-3xl font-bold">Ваш прогресс</h2>
+            <p class="section-subtitle text-lg">Отслеживайте достижения и развивайтесь</p>
+          </div>
+          
+          <!-- Прогресс-трекер -->
+          <div class="progress-tracker card max-w-4xl mx-auto mb-8">
+            <div class="progress-header text-center mb-6">
+              <div class="level-info">
+                <div class="level-badge badge badge-primary text-lg">Уровень 5</div>
+                <h3 class="level-title text-xl font-semibold mt-2">Опытный ученик</h3>
+                <p class="level-subtitle text-muted">До следующего уровня: 250 XP</p>
+              </div>
+            </div>
+            
+            <!-- Прогресс-бар уровня -->
+            <div class="level-progress mb-6">
+              <div class="progress-label flex justify-between text-sm mb-2">
+                <span>Прогресс уровня</span>
+                <span>750 / 1000 XP</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" style="width: 75%"></div>
+              </div>
+            </div>
+            
+            <!-- Статистика -->
+            <div class="stats-grid grid grid-cols-3 gap-6">
+              <div class="stat-item text-center">
+                <div class="stat-number text-2xl font-bold text-primary">1,250</div>
+                <div class="stat-label text-sm text-muted">Всего XP</div>
+              </div>
+              <div class="stat-item text-center">
+                <div class="stat-number text-2xl font-bold text-success">47</div>
+                <div class="stat-label text-sm text-muted">Решенных задач</div>
+              </div>
+              <div class="stat-item text-center">
+                <div class="stat-number text-2xl font-bold text-accent">12</div>
+                <div class="stat-label text-sm text-muted">Достижений</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Достижения -->
+          <div class="achievements-wall card max-w-4xl mx-auto">
+            <div class="achievements-header text-center mb-6">
+              <h3 class="text-xl font-semibold">Достижения</h3>
+              <p class="text-muted">Зарабатывайте достижения за активность</p>
+            </div>
+            
+            <div class="achievements-grid grid grid-cols-2 md:grid-cols-4 gap-4">
+              <!-- Полученные достижения -->
+              <div class="achievement-item text-center p-4 rounded-lg bg-success/10 border border-success/20">
+                <div class="achievement-icon text-3xl mb-2">🎯</div>
+                <div class="achievement-title text-sm font-medium">Первая задача</div>
+                <div class="achievement-desc text-xs text-muted">Решите первую задачу</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
+                <div class="achievement-icon text-3xl mb-2">🔥</div>
+                <div class="achievement-title text-sm font-medium">Серия успехов</div>
+                <div class="achievement-desc text-xs text-muted">5 правильных ответов подряд</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-accent/10 border border-accent/20">
+                <div class="achievement-icon text-3xl mb-2">🧠</div>
+                <div class="achievement-title text-sm font-medium">Любознательный</div>
+                <div class="achievement-desc text-xs text-muted">Задайте 10 вопросов ИИ</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-warning/10 border border-warning/20">
+                <div class="achievement-icon text-3xl mb-2">⚡</div>
+                <div class="achievement-title text-sm font-medium">Скорость</div>
+                <div class="achievement-desc text-xs text-muted">Решите задачу за 30 секунд</div>
+              </div>
+              
+              <!-- Неполученные достижения -->
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">🏆</div>
+                <div class="achievement-title text-sm font-medium">Мастер</div>
+                <div class="achievement-desc text-xs text-muted">Решите 100 задач</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">🌟</div>
+                <div class="achievement-title text-sm font-medium">Эксперт</div>
+                <div class="achievement-desc text-xs text-muted">Достигните 10 уровня</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">📚</div>
+                <div class="achievement-title text-sm font-medium">Эрудит</div>
+                <div class="achievement-desc text-xs text-muted">Изучите все предметы</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">💎</div>
+                <div class="achievement-title text-sm font-medium">Легенда</div>
+                <div class="achievement-desc text-xs text-muted">Получите все достижения</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -680,6 +788,7 @@
 
 {% block extra_js %}
 <script src="{% static 'js/examflow-2.0.js' %}"></script>
+<script src="{% static 'js/gamification.js' %}"></script>
 <script>
 // Дополнительные функции для главной страницы
 
