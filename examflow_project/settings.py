@@ -334,10 +334,10 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     # Доп. заголовки
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
-                   CSRF_TRUSTED_ORIGINS = [
-         'https://examflow.ru',
-         'https://www.examflow.ru',
-     ]
+    CSRF_TRUSTED_ORIGINS = [
+        'https://examflow.ru',
+        'https://www.examflow.ru',
+    ]
 else:
     # При разработке тоже добавим доверенные домены, чтобы тестировать прокси/туннели
     CSRF_TRUSTED_ORIGINS = list(set([
