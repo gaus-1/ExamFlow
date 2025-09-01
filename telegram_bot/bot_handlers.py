@@ -256,8 +256,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             from telegram import ReplyKeyboardMarkup, KeyboardButton
             keyboard = [
-                [KeyboardButton("🚀 Старт"), KeyboardButton("🤖 Спросить ИИ")],
-                [KeyboardButton("📚 Предметы"), KeyboardButton("📊 Статистика")]
+                [KeyboardButton("🤖 ИИ"), KeyboardButton("📚 Практика")],
+                [KeyboardButton("🏆 Прогресс"), KeyboardButton("🎯 Главная")]
             ]
             reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
             
@@ -277,26 +277,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         created = False
         
         welcome_text = f"""
-🚀 **Добро пожаловать в ExamFlow!**
+🎯 **ExamFlow 2.0**
 
 Привет, {user.first_name}! 
 
-Я помогу тебе подготовиться к ЕГЭ и ОГЭ:
+Умная платформа подготовки к ЕГЭ с ИИ-ассистентом
 
-✅ Решать задания по всем предметам
-📊 Отслеживать прогресс
-🏆 Зарабатывать достижения
-🤖 Умный ИИ-помощник
+🤖 **Задай любой вопрос** — получи мгновенный ответ
+📚 **Практика** — тысячи заданий с проверкой
+🏆 **Прогресс** — отслеживай достижения
 
-Выбери действие:
+Что тебя интересует?
 """
         
         keyboard = [
-            [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("📊 Статистика", callback_data="stats")],
-            [InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan"), InlineKeyboardButton("🎯 Персонализация", callback_data="personalization_menu")],
-            [InlineKeyboardButton("🎮 Геймификация", callback_data=f"gamification_{update.effective_user.id}")],
-            [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+            [InlineKeyboardButton("🤖 Спросить ИИ", callback_data="ai_chat")],
+            [InlineKeyboardButton("📚 Практика", callback_data="subjects"), InlineKeyboardButton("🏆 Прогресс", callback_data="stats")],
+            [InlineKeyboardButton("🌐 Сайт", url="https://examflow.onrender.com")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -346,26 +343,23 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     welcome_text = f"""
-🚀 **ГЛАВНОЕ МЕНЮ EXAMFLOW**
+🎯 **ExamFlow 2.0**
 
 Привет, {update.effective_user.first_name}! 
 
-Я помогу тебе подготовиться к ЕГЭ и ОГЭ:
+Умная платформа подготовки к ЕГЭ с ИИ-ассистентом
 
-✅ Решать задания по всем предметам
-📊 Отслеживать прогресс
-🏆 Зарабатывать достижения
-🤖 Умный ИИ-помощник
+🤖 **Задай любой вопрос** — получи мгновенный ответ
+📚 **Практика** — тысячи заданий с проверкой
+🏆 **Прогресс** — отслеживай достижения
 
-Выбери действие:
+Что тебя интересует?
 """
     
     keyboard = [
-        [InlineKeyboardButton("📚 Предметы", callback_data="subjects"), InlineKeyboardButton("📊 Статистика", callback_data="stats")],
-        [InlineKeyboardButton("🎓 План обучения", callback_data="learning_plan"), InlineKeyboardButton("🎯 Персонализация", callback_data="personalization_menu")],
-        [InlineKeyboardButton("🎮 Геймификация", callback_data=f"gamification_{update.effective_user.id}")], 
-        [InlineKeyboardButton("🌐 Сайт", url="https://examflow.ru")],
-        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+        [InlineKeyboardButton("🤖 Спросить ИИ", callback_data="ai_chat")],
+        [InlineKeyboardButton("📚 Практика", callback_data="subjects"), InlineKeyboardButton("🏆 Прогресс", callback_data="stats")],
+        [InlineKeyboardButton("🌐 Сайт", url="https://examflow.onrender.com")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -424,17 +418,16 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Добавляем кнопки навигации
         keyboard.append([
-            InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu"),
-            InlineKeyboardButton("🔄 Начать заново", callback_data="start")
+            InlineKeyboardButton("🏠 Главная", callback_data="main_menu")
         ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         try:
             await query.edit_message_text(
-                "📚 **ВЫБЕРИТЕ ПРЕДМЕТ ДЛЯ ИЗУЧЕНИЯ**\n\n"
-                f"Доступно **{len(subjects)} предметов** с **{sum(s['tasks_count'] for s in subjects)} заданиями**\n\n"
-                "Предметы отсортированы по количеству заданий:",
+                f"📚 **Практика по предметам**\n\n"
+                f"**{len(subjects)}** предметов • **{sum(s['tasks_count'] for s in subjects)}** заданий\n\n"
+                "Выбери предмет для изучения:",
                 reply_markup=reply_markup,
                 parse_mode='Markdown'
             )
@@ -512,8 +505,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
 """
 
     keyboard = [
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
 
     try:
@@ -575,8 +567,7 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
     
     keyboard = [
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
     
     try:
@@ -630,8 +621,7 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
     
     keyboard = [
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
     
     try:
@@ -683,8 +673,7 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
     
     keyboard = [
-        [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-        [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
     
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -876,22 +865,23 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             # Общее меню ИИ с персонализацией
             ai_menu_text = """
-🤖 **ИИ-ПОМОЩНИК EXAMFLOW**
+🤖 **ИИ-ассистент ExamFlow**
 
-Я могу помочь тебе с:
+Задай любой вопрос по ЕГЭ — получи персональный ответ
 
-📚 **Объяснение тем** - с учетом твоего уровня
-💡 **Подсказки к заданиям** - персональные советы
-🎯 **Персональные рекомендации** - на основе прогресса
-🔍 **Поиск похожих заданий** - для практики
-📊 **Анализ слабых мест** - фокус на проблемных темах
+💬 **Просто напиши сообщение** с вопросом
+📚 **Объяснение тем** — с учетом твоего уровня  
+💡 **Помощь с заданиями** — пошаговые решения
+🎯 **Советы по подготовке** — персональные рекомендации
 
-**Выбери что нужно:**
+**Пример вопросов:**
+• Как решать квадратные уравнения?
+• Объясни теорию вероятности
+• Подготовка к ЕГЭ по физике
 """
             
             keyboard = [
-                [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-                [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
+                [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
@@ -1106,7 +1096,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             return
         
         # Обработка нижнего меню
-        if user_message in ["🚀 Старт", "🤖 Спросить ИИ", "📚 Предметы", "📊 Статистика"]:
+        if user_message in ["🤖 ИИ", "📚 Практика", "🏆 Прогресс", "🎯 Главная"]:
             await handle_menu_button(update, context, user_message)
             return
         
@@ -1129,13 +1119,13 @@ async def handle_menu_button(update: Update, context: ContextTypes.DEFAULT_TYPE,
     Обрабатывает нажатия кнопок нижнего меню
     """
     try:
-        if button_text == "🚀 Старт":
+        if button_text == "🎯 Главная":
             await start(update, context)
-        elif button_text == "🤖 Спросить ИИ":
+        elif button_text == "🤖 ИИ":
             await ai_help_handler(update, context)
-        elif button_text == "📚 Предметы":
+        elif button_text == "📚 Практика":
             await subjects_menu(update, context)
-        elif button_text == "📊 Статистика":
+        elif button_text == "🏆 Прогресс":
             await show_stats(update, context)
     except Exception as e:
         logger.error(f"Ошибка в handle_menu_button: {e}")

@@ -123,6 +123,7 @@ def setup_bot_application():
         # Обработчики для ИИ
     application.add_handler(CallbackQueryHandler(ai_help_handler, pattern=r"ai_help"))
     application.add_handler(CallbackQueryHandler(ai_help_handler, pattern=r"ai_help_\d+"))
+    application.add_handler(CallbackQueryHandler(ai_help_handler, pattern=r"ai_chat"))
     application.add_handler(CallbackQueryHandler(ai_explain_handler, pattern=r"ai_explain"))
     application.add_handler(CallbackQueryHandler(ai_personal_handler, pattern=r"ai_personal"))
     application.add_handler(CallbackQueryHandler(ai_hint_general_handler, pattern=r"ai_hint"))
