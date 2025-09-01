@@ -23,7 +23,7 @@ if not os.getenv('DEBUG', 'False').lower() == 'true':
 # В продакшене принудительно выключаем DEBUG
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'  # По умолчанию True для разработки
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,.onrender.com,localhost,127.0.0.1,testserver').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1,testserver').split(',') if h.strip()]
 # Добавим хост Render автоматически, если предоставлен платформой
 RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
@@ -96,6 +96,10 @@ WSGI_APPLICATION = 'examflow_project.wsgi.application'
 # URL-ы аутентификации
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+
+# Keepalive настройки
+WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://examflow.ru')
+KEEPALIVE_INTERVAL = int(os.getenv('KEEPALIVE_INTERVAL', '300'))  # 5 минут
 
 # Кастомные backends для аутентификации
 AUTHENTICATION_BACKENDS = [
@@ -330,11 +334,10 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     # Доп. заголовки
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
-    CSRF_TRUSTED_ORIGINS = [
-        'https://examflow.ru',
-        'https://www.examflow.ru',
-        'https://*.onrender.com',
-    ]
+                   CSRF_TRUSTED_ORIGINS = [
+         'https://examflow.ru',
+         'https://www.examflow.ru',
+     ]
 else:
     # При разработке тоже добавим доверенные домены, чтобы тестировать прокси/туннели
     CSRF_TRUSTED_ORIGINS = list(set([

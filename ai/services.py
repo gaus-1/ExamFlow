@@ -474,7 +474,15 @@ class AiService:
         # Добавляем логирование для отладки
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"Получен запрос к ИИ: пользователь={user}, сессия={session_id}, промпт={prompt[:50]}...")
+        
+        # Очищаем промпт от эмодзи для безопасного логирования
+        import re
+        clean_prompt = re.sub(r'[^\w\s\.,!?;:()\[\]{}"\'-]', '', prompt[:50])
+        try:
+            logger.info(f"Получен запрос к ИИ: пользователь={user}, сессия={session_id}, промпт={clean_prompt}...")
+        except UnicodeEncodeError:
+            # Fallback для проблем с кодировкой
+            logger.info(f"Получен запрос к ИИ: пользователь={user}, сессия={session_id}")
 
         # Проверяем лимиты
         limit = self._get_or_create_limits(user, session_id)
