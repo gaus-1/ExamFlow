@@ -17,8 +17,12 @@ function cn(...classes) {
  * Утилита для получения CSRF токена
  */
 function getCSRFToken() {
+  // Сначала ищем в скрытом поле
   const token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-  if (token) return token;
+  if (token) {
+    console.log('CSRF токен найден в скрытом поле');
+    return token;
+  }
   
   // Fallback - поиск в cookies
   const name = 'csrftoken';
@@ -33,6 +37,13 @@ function getCSRFToken() {
       }
     }
   }
+  
+  if (cookieValue) {
+    console.log('CSRF токен найден в cookies');
+  } else {
+    console.warn('CSRF токен не найден!');
+  }
+  
   return cookieValue;
 }
 
@@ -324,22 +335,34 @@ class AIAssistant {
   }
   
   async callAIAPI(message) {
-    const response = await fetch('/ai/api/chat/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFToken()
-      },
-      body: JSON.stringify({ prompt: message })
-    });
-    
-    console.log('AI API Response:', response.status, response.statusText);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    try {
+      console.log('Отправляем запрос к AI API:', message);
+      
+      const response = await fetch('/ai/api/chat/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({ prompt: message })
+      });
+      
+      console.log('AI API Response:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('AI API Error Response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('AI API Success Response:', data);
+      return data;
+      
+    } catch (error) {
+      console.error('AI API Call Error:', error);
+      throw error;
     }
-    
-    return await response.json();
   }
   
   addMessage(content, type, sources = null) {
@@ -936,6 +959,23 @@ window.focusAI = function() {
   const aiInput = document.querySelector('.ai-input');
   if (aiInput) {
     aiInput.focus();
+  }
+};
+
+/**
+ * Глобальная функция для быстрых вопросов
+ */
+window.askQuestion = function(question) {
+  const aiInput = document.querySelector('.ai-input');
+  if (aiInput) {
+    aiInput.value = question;
+    aiInput.focus();
+    
+    // Автоматически отправляем вопрос
+    const sendButton = document.querySelector('.ai-send-btn');
+    if (sendButton) {
+      sendButton.click();
+    }
   }
 };
 

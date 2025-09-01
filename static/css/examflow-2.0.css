@@ -870,12 +870,19 @@ a:hover {
 
 .ai-interface-container {
   margin: var(--space-3xl) 0;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
 }
 
 .ai-interface {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
 }
 
 .ai-header {
@@ -968,12 +975,16 @@ a:hover {
 }
 
 .ai-chat-container {
-  max-height: 400px;
+  flex: 1;
+  min-height: 300px;
+  max-height: none;
   overflow-y: auto;
   padding: var(--space-lg);
   background: var(--color-gray-50);
   border-radius: var(--radius-lg);
   margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
 }
 
 .ai-message {

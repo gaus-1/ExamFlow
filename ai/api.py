@@ -607,8 +607,18 @@ def ai_chat_api(request):
     
     Обрабатывает POST запросы к /ai/api/chat/
     """
-    view = AIAssistantAPI()
-    return view.post(request)
+    logger.info(f"AI Chat API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
+    logger.info(f"AI Chat API: Метод: {request.method}")
+    logger.info(f"AI Chat API: Headers: {dict(request.headers)}")
+    
+    try:
+        view = AIAssistantAPI()
+        return view.post(request)
+    except Exception as e:
+        logger.error(f"AI Chat API Error: {e}")
+        return JsonResponse({
+            'error': f'Внутренняя ошибка сервера: {str(e)}'
+        }, status=500)
 
 
 @csrf_exempt
