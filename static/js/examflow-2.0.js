@@ -333,6 +333,8 @@ class AIAssistant {
       body: JSON.stringify({ prompt: message })
     });
     
+    console.log('AI API Response:', response.status, response.statusText);
+    
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }

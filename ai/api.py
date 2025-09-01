@@ -61,8 +61,10 @@ class AIAssistantAPI(View):
         }
         """
         try:
+            logger.info(f"AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
             data = json.loads(request.body)
             prompt = data.get('prompt', '').strip()
+            logger.info(f"AI API: Промпт: {prompt[:100]}...")
             
             if not prompt:
                 return JsonResponse({

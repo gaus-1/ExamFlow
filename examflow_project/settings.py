@@ -23,7 +23,7 @@ if not os.getenv('DEBUG', 'False').lower() == 'true':
 # В продакшене принудительно выключаем DEBUG
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'  # По умолчанию True для разработки
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1,testserver').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1,testserver,examflow.onrender.com').split(',') if h.strip()]
 # Добавим хост Render автоматически, если предоставлен платформой
 RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
