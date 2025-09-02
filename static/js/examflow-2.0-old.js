@@ -1,9 +1,7 @@
 /* ========================================
    EXAMFLOW 2.0 - СОВРЕМЕННЫЙ JAVASCRIPT
-   Версия: 3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА
+   Версия: 2.9 - Исправлены ошибки дублирования
    ======================================== */
-
-console.log('🚀 Загружен examflow-2.0.js v3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА!');
 
 // ========================================
 // УТИЛИТЫ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
@@ -674,13 +672,30 @@ class ProblemSolver {
   }
   
   async updateUserProgress(subject, isCorrect) {
-    // Временно отключено - endpoint не реализован
-    console.log('📊 Обновление прогресса пользователя отключено (endpoint не реализован)');
-    console.log('Предмет:', subject, 'Правильно:', isCorrect);
-    
-    // Вместо API используем локальную геймификацию
-    if (isCorrect && window.gamification) {
-      window.gamification.addXP(20, 'Правильный ответ');
+    try {
+      const response = await fetch('/ai/api/user/profile/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({
+          action: 'solve_problem',
+          problem_id: this.currentProblem.id,
+          is_correct: isCorrect,
+          subject: subject
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.status === 'success') {
+          // Обновляем UI с новым прогрессом
+          this.updateProgressUI(result);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating progress:', error);
     }
   }
   

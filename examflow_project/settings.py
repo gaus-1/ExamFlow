@@ -239,6 +239,7 @@ if not DEBUG:
     WHITENOISE_INDEX_FILE = True
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 else:
+    # Отключаем хеширование файлов для разработки
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media (для вложений задач)

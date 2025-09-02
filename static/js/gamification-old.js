@@ -1,34 +1,25 @@
 /* ========================================
  * Геймификация ExamFlow 2.0
- * Версия: 3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА
- * Без загрузки профиля пользователя через API
+ * 
   ======================================== */
-
-console.log('🏆 Загружен gamification.js v3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА!');
-
 class ExamFlowGamification {
   constructor() {
-    console.log('🔧 Инициализируем геймификацию v3.1...');
     this.userData = this.loadUserData();
     this.init();
   }
   
   init() {
-    console.log('✅ Геймификация инициализирована успешно!');
     this.updateProgressDisplay();
     this.updateAchievementsDisplay();
     this.setupEventListeners();
   }
   
   loadUserData() {
-    console.log('📊 Загружаем данные пользователя из localStorage...');
     const saved = localStorage.getItem('examflow_user_data');
     if (saved) {
-      console.log('✅ Данные пользователя найдены в localStorage');
       return JSON.parse(saved);
     }
     
-    console.log('🆕 Создаем новые данные пользователя по умолчанию');
     // Данные по умолчанию для демонстрации
     return {
       level: 5,
@@ -50,12 +41,10 @@ class ExamFlowGamification {
   }
   
   saveUserData() {
-    console.log('💾 Сохраняем данные пользователя в localStorage...');
     localStorage.setItem('examflow_user_data', JSON.stringify(this.userData));
   }
   
   addXP(amount, reason = '') {
-    console.log(`⭐ Добавляем ${amount} XP (${reason})`);
     const oldLevel = this.userData.level;
     this.userData.xp += amount;
     this.userData.totalXp += amount;
@@ -101,7 +90,6 @@ class ExamFlowGamification {
   }
   
   updateProgressDisplay() {
-    console.log('🎨 Обновляем отображение прогресса...');
     const levelInfo = this.getLevelInfo(this.userData.level);
     const progressPercent = ((this.userData.totalXp - levelInfo.xpRequired) / (levelInfo.xpForNext - levelInfo.xpRequired)) * 100;
     
@@ -129,7 +117,6 @@ class ExamFlowGamification {
   }
   
   updateAchievementsDisplay() {
-    console.log('🏆 Обновляем отображение достижений...');
     const achievementsGrid = document.querySelector('.achievements-grid');
     if (!achievementsGrid) return;
     
@@ -260,18 +247,14 @@ class ExamFlowGamification {
   }
   
   setupEventListeners() {
-    console.log('👂 Настраиваем обработчики событий...');
-    
     // Слушаем события от AI ассистента
     document.addEventListener('aiQuestionAsked', () => {
-      console.log('🤖 Обработано событие aiQuestionAsked');
       this.addXP(5, 'Вопрос ИИ');
       this.checkAchievements();
     });
     
     // Слушаем события решения задач
     document.addEventListener('taskSolved', (event) => {
-      console.log('✅ Обработано событие taskSolved', event.detail);
       const { correct, time } = event.detail;
       if (correct) {
         this.userData.solvedTasks++;
@@ -283,19 +266,11 @@ class ExamFlowGamification {
       }
       this.checkAchievements();
     });
-    
-    console.log('✅ Обработчики событий настроены успешно');
   }
 }
 
 // Инициализация геймификации
 let gamification;
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 DOM загружен, инициализируем геймификацию...');
-  try {
-    gamification = new ExamFlowGamification();
-    console.log('✅ Геймификация успешно инициализирована!');
-  } catch (error) {
-    console.error('❌ Ошибка при инициализации геймификации:', error);
-  }
+  gamification = new ExamFlowGamification();
 });
