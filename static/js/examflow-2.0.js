@@ -1,9 +1,9 @@
 /* ========================================
    EXAMFLOW 2.0 - СОВРЕМЕННЫЙ JAVASCRIPT
-   Версия: 3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА
+   Версия: 3.3 - ОПТИМИЗИРОВАННАЯ ДЛЯ СКОРОСТИ
    ======================================== */
 
-console.log('🚀 Загружен examflow-2.0.js v3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА!');
+console.log('🚀 Загружен examflow-2.0.js v3.3 - ОПТИМИЗИРОВАННАЯ ДЛЯ СКОРОСТИ!');
 
 // ========================================
 // УТИЛИТЫ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
@@ -446,6 +446,22 @@ class AIAssistant {
     this.isLoading = true;
     this.sendButton.disabled = true;
     this.sendButton.innerHTML = '<div class="spinner"></div>';
+    
+    // Показываем индикатор "ИИ думает..."
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'ai-message ai-message-loading fade-in';
+    loadingMessage.innerHTML = `
+      <div class="ai-message-content">
+        <div class="ai-message-text">
+          <div class="flex items-center gap-2">
+            <div class="spinner-small"></div>
+            <span>ИИ думает...</span>
+          </div>
+        </div>
+      </div>
+    `;
+    this.chatContainer.appendChild(loadingMessage);
+    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
   
   hideLoading() {
@@ -456,6 +472,12 @@ class AIAssistant {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
       </svg>
     `;
+    
+    // Удаляем индикатор "ИИ думает..."
+    const loadingMessage = this.chatContainer.querySelector('.ai-message-loading');
+    if (loadingMessage) {
+      loadingMessage.remove();
+    }
   }
   
   suggestPractice(practiceData) {

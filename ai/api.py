@@ -20,15 +20,26 @@ from django.conf import settings
 import json
 from core.services.unified_profile import UnifiedProfileService
 import logging
+import hashlib
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
 # Настройка Gemini API
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyCvi8Mm5paqqV-bakd2N897MgUEvJyWw44')
-# Инициализация модели
+# Инициализация модели с оптимизацией для скорости
 try:
     genai.configure(api_key=GEMINI_API_KEY)  # type: ignore
-    model = genai.GenerativeModel('gemini-1.5-flash')  # type: ignore
+    # Используем более быструю модель с настройками для скорости
+    model = genai.GenerativeModel(
+        'gemini-1.5-flash',
+        generation_config=genai.types.GenerationConfig(
+            max_output_tokens=1000,  # Ограничиваем длину ответа
+            temperature=0.7,  # Баланс между креативностью и скоростью
+            top_p=0.8,
+            top_k=40
+        )
+    )  # type: ignore
 except Exception as e:
     logger.error(f"Ошибка инициализации Gemini API: {e}")
     model = None
@@ -94,23 +105,31 @@ class AIAssistantAPI(View):
     
     def generate_ai_response(self, prompt):
         """
-        Генерирует ответ ИИ на основе запроса через Gemini API
+        Генерирует ответ ИИ на основе запроса через Gemini API с кэшированием
         """
         try:
-            # Формируем контекст для ЕГЭ
-            context = f"""
-            Ты - эксперт по подготовке к ЕГЭ в России. Отвечай на вопросы учеников по любому предмету ЕГЭ.
+            # Создаем хеш для кэширования
+            prompt_hash = hashlib.md5(prompt.lower().strip().encode()).hexdigest()
+            cache_key = f"ai_response_{prompt_hash}"
             
-            Вопрос ученика: {prompt}
+            # Проверяем кэш
+            cached_response = cache.get(cache_key)
+            if cached_response:
+                logger.info(f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
+                return cached_response
             
-            Твой ответ должен быть:
-            1. Структурированным и понятным
-            2. Содержать практические примеры
-            3. Соответствовать требованиям ЕГЭ
-            4. Включать ссылки на официальные источники ФИПИ
-            
-            Формат ответа: используй Markdown для форматирования
-            """
+            # Оптимизированный контекст для скорости
+            context = f"""Эксперт ЕГЭ. Отвечай кратко и по делу.
+
+Вопрос: {prompt}
+
+Ответ должен быть:
+- Кратким и понятным
+- С практическими примерами
+- Соответствовать ЕГЭ
+- Использовать Markdown
+
+Отвечай быстро и структурированно."""
             
             # Получаем ответ от Gemini
             response = model.generate_content(context)
@@ -120,7 +139,7 @@ class AIAssistantAPI(View):
             practice_topic = self.detect_subject(prompt)
             
             # Формируем структурированный ответ
-            return {
+            response_data = {
                 'answer': answer,
                 'sources': self.get_sources_for_subject(practice_topic),
                 'practice': {
@@ -128,6 +147,12 @@ class AIAssistantAPI(View):
                     'description': f'Практикуйтесь в решении задач по теме "{practice_topic}"'
                 }
             }
+            
+            # Сохраняем в кэш на 1 час
+            cache.set(cache_key, response_data, 3600)
+            logger.info(f"AI API: Сохранили ответ в кэш для: {prompt[:50]}...")
+            
+            return response_data
             
         except Exception as e:
             logger.error(f"Gemini API Error: {e}")
