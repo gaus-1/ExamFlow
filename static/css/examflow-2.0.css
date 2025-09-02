@@ -903,7 +903,7 @@ a:hover {
   }
   
   .hero-section {
-    padding: var(--space-2xl) 0;
+    padding: var(--space-lg) 0; /* Уменьшили отступы для мобильных */
   }
   
   .hero-title {
@@ -991,11 +991,11 @@ a:hover {
 /* Ландшафтная ориентация на мобильных */
 @media (max-width: 768px) and (orientation: landscape) {
   .hero-section {
-    padding: var(--space-xl) 0;
+    padding: var(--space-md) 0; /* Уменьшили отступы для планшетов */
   }
   
   .ai-interface-container {
-    margin: var(--space-xl) 0;
+    margin: var(--space-md) 0; /* Уменьшили отступы для планшетов */
   }
 }
 
@@ -1106,8 +1106,8 @@ a:hover {
    ======================================== */
 
 .ai-interface-container {
-  margin: var(--space-3xl) 0;
-  min-height: 700px;
+  margin: var(--space-lg) 0; /* Уменьшили с 3xl на lg */
+  min-height: 600px; /* Уменьшили с 700px на 600px */
   display: flex;
   flex-direction: column;
 }
@@ -1322,7 +1322,7 @@ a:hover {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: var(--space-lg) 0;
+  padding: var(--space-md) 0; /* Уменьшили padding с lg на md */
 }
 
 .logo-container {
@@ -1332,8 +1332,8 @@ a:hover {
 }
 
 .logo-image {
-  width: 40px;
-  height: 40px;
+  width: 32px; /* Уменьшили с 40px на 32px */
+  height: 32px; /* Уменьшили с 40px на 32px */
   object-fit: contain;
 }
 
@@ -1348,16 +1348,16 @@ a:hover {
 }
 
 .hero-section {
-  padding: var(--space-3xl) 0 var(--space-2xl);
+  padding: var(--space-xl) 0 var(--space-lg); /* Уменьшили отступы */
   background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-white) 100%);
 }
 
 .hero-title {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md); /* Уменьшили с lg на md */
 }
 
 .hero-subtitle {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg); /* Уменьшили с 2xl на lg */
 }
 
 .hero-stats {
