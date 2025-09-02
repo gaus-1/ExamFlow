@@ -96,6 +96,9 @@
         От теории до практики — все в одном месте.
       </p>
       
+      <!-- CSRF токен для AJAX запросов -->
+      {% csrf_token %}
+      
       <!-- AI интерфейс в стиле Perplexity.ai -->
       <div class="ai-interface-container">
         <div class="ai-interface card glass max-w-4xl mx-auto">
@@ -787,8 +790,8 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/examflow-2.0.js' %}"></script>
-<script src="{% static 'js/gamification.js' %}"></script>
+<script src="{% static 'js/examflow-2.0.js' %}?v=2.5&t={{ timestamp }}"></script>
+<script src="{% static 'js/gamification.js' %}?v=2.5&t={{ timestamp }}"></script>
 <script>
 // Дополнительные функции для главной страницы
 
@@ -840,6 +843,16 @@ function closePracticeModal() {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 Главная страница ExamFlow 2.0 загружена!');
+  console.log('📅 Timestamp:', '{{ timestamp }}');
+  
+  // Принудительная очистка кэша для отладки
+  if (window.location.search.includes('nocache')) {
+    console.log('🧹 Принудительная очистка кэша...');
+    // Очищаем localStorage
+    localStorage.clear();
+    // Очищаем sessionStorage
+    sessionStorage.clear();
+  }
   
   // Добавляем анимацию появления элементов
   const observerOptions = {

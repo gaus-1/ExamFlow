@@ -1080,8 +1080,8 @@ a:hover {
    ======================================== */
 
 .ai-interface-container {
-  margin: var(--space-2xl) 0;
-  min-height: 600px;
+  margin: var(--space-3xl) 0;
+  min-height: 700px;
   display: flex;
   flex-direction: column;
 }
@@ -1093,7 +1093,12 @@ a:hover {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 500px;
+  min-height: 600px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-2xl);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-xl);
 }
 
 .ai-header {
@@ -1101,23 +1106,25 @@ a:hover {
 }
 
 .ai-icon-container {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   background: var(--gradient-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto var(--space-lg);
+  margin: 0 auto var(--space-xl);
 }
 
 .ai-icon {
-  font-size: 2.5rem;
+  font-size: 3rem;
 }
 
 .ai-title {
   color: var(--color-gray-900);
   margin-bottom: var(--space-sm);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
 }
 
 .ai-subtitle {
@@ -1187,13 +1194,13 @@ a:hover {
 
 .ai-chat-container {
   flex: 1;
-  min-height: 300px;
+  min-height: 400px;
   max-height: none;
   overflow-y: auto;
-  padding: var(--space-lg);
+  padding: var(--space-xl);
   background: var(--color-gray-50);
   border-radius: var(--radius-lg);
-  margin-top: var(--space-lg);
+  margin-top: var(--space-xl);
   display: flex;
   flex-direction: column;
 }

@@ -18,6 +18,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from core.models import Subject, Task, UserProgress
 import random
+import time
 
 
 def home(request):
@@ -43,6 +44,7 @@ def home(request):
         'subjects_count': subjects_count,
         'tasks_count': tasks_count,
         'subjects': subjects,
+        'timestamp': int(time.time()),
     }
     
     return render(request, 'learning/home-examflow-2.0.html', context)

@@ -71,6 +71,12 @@ class AIAssistantAPI(View):
                     'error': 'Пустой запрос'
                 }, status=400)
             
+            # Проверяем, что модель инициализирована
+            if model is None:
+                return JsonResponse({
+                    'error': 'AI модель не инициализирована'
+                }, status=500)
+            
             # Получаем реальный ответ от Gemini API
             response = self.generate_ai_response(prompt)
             
@@ -83,7 +89,7 @@ class AIAssistantAPI(View):
         except Exception as e:
             logger.error(f"AI API Error: {e}")
             return JsonResponse({
-                'error': 'Внутренняя ошибка сервера'
+                'error': f'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
     
     def generate_ai_response(self, prompt):
@@ -127,7 +133,7 @@ class AIAssistantAPI(View):
             logger.error(f"Gemini API Error: {e}")
             # Fallback на базовый ответ
             return {
-                'answer': f"Извините, произошла ошибка при обработке вашего вопроса. Попробуйте переформулировать.\n\nВаш вопрос: {prompt}",
+                'answer': f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. Попробуйте переформулировать или обратитесь к официальным источникам.\n\nВаш вопрос: {prompt}",
                 'sources': [
                     {'title': 'ФИПИ - ЕГЭ', 'url': 'https://fipi.ru/ege'},
                     {'title': 'ExamFlow - Главная', 'url': 'https://examflow.ru/'}
