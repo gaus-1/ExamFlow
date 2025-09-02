@@ -1,75 +1,219 @@
+"""
+API для интеграции RAG-системы с фронтендом
+"""
+
+import logging
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET, require_POST
-from django.db.models import Q
-from learning.models import Subject, Task
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.utils.decorators import method_decorator
+from django.views import View
+import json
+
+from core.rag_system.orchestrator import AIOrchestrator
+from core.rag_system.vector_store import VectorStore
+
+logger = logging.getLogger(__name__)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AIQueryView(View):
+    """
+    API для обработки запросов к AI
+    """
+    
+    def __init__(self):
+        super().__init__()
+        self.orchestrator = AIOrchestrator()
+    
+    def post(self, request):
+        """
+        Обрабатывает запрос пользователя
+        """
+        try:
+            # Парсим JSON данные
+            data = json.loads(request.body)
+            query = data.get('query', '').strip()
+            user_id = data.get('user_id')
+            
+            if not query:
+                return JsonResponse({
+                    'error': 'Пустой запрос',
+                    'answer': 'Пожалуйста, задайте вопрос по подготовке к ЕГЭ.'
+                }, status=400)
+            
+            logger.info(f"Получен запрос от пользователя {user_id}: {query[:100]}...")
+            
+            # Обрабатываем запрос через оркестратор
+            response = self.orchestrator.process_query(query, user_id)
+            
+            logger.info(f"Запрос обработан успешно для пользователя {user_id}")
+            return JsonResponse(response)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'error': 'Неверный JSON',
+                'answer': 'Произошла ошибка при обработке запроса.'
+            }, status=400)
+        except Exception as e:
+            logger.error(f"Ошибка в AIQueryView: {e}")
+            return JsonResponse({
+                'error': str(e),
+                'answer': 'Произошла ошибка при обработке запроса. Попробуйте позже.'
+            }, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class VectorStoreStatsView(View):
+    """
+    API для получения статистики векторного хранилища
+    """
+    
+    def get(self, request):
+        """
+        Возвращает статистику векторного хранилища
+        """
+        try:
+            vector_store = VectorStore()
+            stats = vector_store.get_statistics()
+            
+            return JsonResponse({
+                'status': 'success',
+                'data': stats
+            })
+            
+        except Exception as e:
+            logger.error(f"Ошибка при получении статистики: {e}")
+            return JsonResponse({
+                'status': 'error',
+                'error': str(e)
+            }, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SearchView(View):
+    """
+    API для семантического поиска
+    """
+    
+    def post(self, request):
+        """
+        Выполняет семантический поиск
+        """
+        try:
+            data = json.loads(request.body)
+            query = data.get('query', '').strip()
+            limit = data.get('limit', 5)
+            
+            if not query:
+                return JsonResponse({
+                    'error': 'Пустой запрос поиска'
+                }, status=400)
+            
+            vector_store = VectorStore()
+            results = vector_store.search(query, limit=limit)
+            
+            return JsonResponse({
+                'status': 'success',
+                'query': query,
+                'results': results,
+                'total': len(results)
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'error': 'Неверный JSON'
+            }, status=400)
+        except Exception as e:
+            logger.error(f"Ошибка при поиске: {e}")
+            return JsonResponse({
+                'error': str(e)
+            }, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class HealthCheckView(View):
+    """
+    API для проверки состояния системы
+    """
+    
+    def get(self, request):
+        """
+        Проверяет состояние всех компонентов системы
+        """
+        try:
+            health_status = {
+                'status': 'healthy',
+                'components': {},
+                'timestamp': None
+            }
+            
+            # Проверяем векторное хранилище
+            try:
+                vector_store = VectorStore()
+                stats = vector_store.get_statistics()
+                health_status['components']['vector_store'] = {
+                    'status': 'healthy',
+                    'stats': stats
+                }
+            except Exception as e:
+                health_status['components']['vector_store'] = {
+                    'status': 'unhealthy',
+                    'error': str(e)
+                }
+                health_status['status'] = 'degraded'
+            
+            # Проверяем оркестратор
+            try:
+                orchestrator = AIOrchestrator()
+                health_status['components']['orchestrator'] = {
+                    'status': 'healthy'
+                }
+            except Exception as e:
+                health_status['components']['orchestrator'] = {
+                    'status': 'unhealthy',
+                    'error': str(e)
+                }
+                health_status['status'] = 'degraded'
+            
+            from django.utils import timezone
+            health_status['timestamp'] = timezone.now().isoformat()
+            
+            return JsonResponse(health_status)
+            
+        except Exception as e:
+            logger.error(f"Ошибка при проверке состояния: {e}")
+            return JsonResponse({
+                'status': 'unhealthy',
+                'error': str(e)
+            }, status=500)
 
 
-def _serialize_task(task: Task) -> dict:
-    return {
-        'id': task.pk,
-        'title': task.title,
-        'description': task.description or '',
-        'difficulty': task.difficulty,
-        'subject_id': task.subject.id if task.subject else None, # type: ignore
-    }
-
-
-@require_GET
+# Legacy API functions for backward compatibility
 def get_random_task(request):
-    task = Task.objects.order_by('?').first()  # type: ignore
-    if not task:
-        return JsonResponse({'ok': False, 'error': 'no_tasks'}, status=404)
-    return JsonResponse({'ok': True, 'task': _serialize_task(task)})
+    """Legacy API - returns random task"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
-@require_GET
 def get_subjects(request):
-    items = list(Subject.objects.values('id', 'name', 'exam_type'))  # type: ignore
-    return JsonResponse({'ok': True, 'subjects': items})
+    """Legacy API - returns subjects"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
+def get_tasks_by_subject(request, subject_id):
+    """Legacy API - returns tasks by subject"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
-@require_GET
-def get_tasks_by_subject(request, subject_id: int):
-    qs = Task.objects.filter(subject_id=subject_id).order_by('-created_at', '-id')  # type: ignore
-    tasks = [_serialize_task(t) for t in qs[:100]]
-    return JsonResponse({'ok': True, 'tasks': tasks, 'count': qs.count()})  # type: ignore
+def get_task_by_id(request, task_id):
+    """Legacy API - returns task by ID"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
-@require_GET
-def get_task_by_id(request, task_id: int):
-    try:
-        task = Task.objects.get(id=task_id)  # type: ignore
-    except Task.DoesNotExist:  # type: ignore
-        return JsonResponse({'ok': False, 'error': 'not_found'}, status=404)
-    return JsonResponse({'ok': True, 'task': _serialize_task(task)})
-
-
-@require_GET
 def search_tasks(request):
-    q = request.GET.get('q', '').strip()
-    qs = Task.objects.all()  # type: ignore
-    if q:
-        qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
-    tasks = [_serialize_task(t) for t in qs.order_by('-created_at', '-id')[:100]]
-    return JsonResponse({'ok': True, 'tasks': tasks})
+    """Legacy API - searches tasks"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
-@require_GET
 def get_topics(request):
-    # Базовая заглушка: в минимальной модели тем может не быть
-    return JsonResponse({'ok': True, 'topics': []})
+    """Legacy API - returns topics"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
-@require_GET
 def get_statistics(request):
-    return JsonResponse({
-        'ok': True,
-        'subjects': Subject.objects.count(),  # type: ignore
-        'tasks': Task.objects.count(),  # type: ignore
-    })
+    """Legacy API - returns statistics"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
-@require_POST
 def create_subscription(request):
-    # Заглушка под платёж
-    return JsonResponse({'ok': True, 'status': 'pending_admin_approval'})
+    """Legacy API - creates subscription"""
+    return JsonResponse({'error': 'API deprecated'}, status=410)

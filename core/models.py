@@ -259,3 +259,70 @@ class ChatSession(models.Model):
         """Очищает контекст сессии"""
         self.context_messages = []  # type: ignore  
         self.save()
+
+
+class FIPIData(models.Model):
+    """Модель для хранения данных с ФИПИ"""
+    
+    DATA_TYPES = [
+        ('demo_variant', 'Демонстрационный вариант'),
+        ('open_bank_task', 'Задание из открытого банка'),
+        ('specification', 'Спецификация'),
+        ('codifier', 'Кодификатор'),
+    ]
+    
+    title = models.CharField(max_length=500, verbose_name="Название")
+    url = models.URLField(verbose_name="URL")
+    data_type = models.CharField(max_length=50, choices=DATA_TYPES, verbose_name="Тип данных")
+    subject = models.CharField(max_length=100, blank=True, null=True, verbose_name="Предмет")
+    content_hash = models.CharField(max_length=64, unique=True, verbose_name="Хеш содержимого")
+    content = models.TextField(blank=True, verbose_name="Содержимое")
+    collected_at = models.DateTimeField(verbose_name="Дата сбора")
+    processed_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата обработки")
+    is_processed = models.BooleanField(default=False, verbose_name="Обработано")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    
+    class Meta:
+        verbose_name = "Данные ФИПИ"
+        verbose_name_plural = "Данные ФИПИ"
+        ordering = ['-collected_at']
+        indexes = [
+            models.Index(fields=['data_type']),
+            models.Index(fields=['subject']),
+            models.Index(fields=['is_processed']),
+            models.Index(fields=['collected_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_data_type_display()})"  # type: ignore
+    
+    def mark_as_processed(self):
+        """Отмечает запись как обработанную"""
+        self.is_processed = True
+        self.processed_at = timezone.now()
+        self.save()
+
+
+class DataChunk(models.Model):
+    """Модель для хранения чанков текста с векторными представлениями"""
+    
+    source_data = models.ForeignKey(FIPIData, on_delete=models.CASCADE, verbose_name="Исходные данные")
+    chunk_text = models.TextField(verbose_name="Текст чанка")
+    chunk_index = models.IntegerField(verbose_name="Индекс чанка")
+    embedding = models.JSONField(verbose_name="Векторное представление")
+    metadata = models.JSONField(default=dict, blank=True, verbose_name="Метаданные")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    
+    class Meta:
+        verbose_name = "Чанк данных"
+        verbose_name_plural = "Чанки данных"
+        ordering = ['source_data', 'chunk_index']
+        unique_together = ['source_data', 'chunk_index']
+        indexes = [
+            models.Index(fields=['source_data']),
+            models.Index(fields=['chunk_index']),
+        ]
+    
+    def __str__(self):
+        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..."

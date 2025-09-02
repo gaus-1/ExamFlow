@@ -105,7 +105,7 @@ class AIAssistantAPI(View):
     
     def generate_ai_response(self, prompt):
         """
-        Генерирует ответ ИИ на основе запроса через Gemini API с кэшированием
+        Генерирует ответ ИИ на основе запроса через RAG-систему с кэшированием
         """
         try:
             # Создаем хеш для кэширования
@@ -118,8 +118,17 @@ class AIAssistantAPI(View):
                 logger.info(f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
                 return cached_response
             
-            # Оптимизированный контекст для скорости
-            context = f"""Эксперт ЕГЭ. Отвечай кратко и по делу.
+            # Пытаемся использовать RAG-систему
+            try:
+                from core.rag_system.orchestrator import AIOrchestrator
+                orchestrator = AIOrchestrator()
+                response_data = orchestrator.process_query(prompt)
+                logger.info(f"AI API: Использована RAG-система для: {prompt[:50]}...")
+            except Exception as rag_error:
+                logger.warning(f"RAG-система недоступна: {rag_error}, используем fallback")
+                
+                # Fallback на базовый Gemini API
+                context = f"""Эксперт ЕГЭ. Отвечай кратко и по делу.
 
 Вопрос: {prompt}
 
@@ -130,23 +139,23 @@ class AIAssistantAPI(View):
 - Использовать Markdown
 
 Отвечай быстро и структурированно."""
-            
-            # Получаем ответ от Gemini
-            response = model.generate_content(context)
-            answer = response.text
-            
-            # Определяем тему для практики
-            practice_topic = self.detect_subject(prompt)
-            
-            # Формируем структурированный ответ
-            response_data = {
-                'answer': answer,
-                'sources': self.get_sources_for_subject(practice_topic),
-                'practice': {
-                    'topic': practice_topic,
-                    'description': f'Практикуйтесь в решении задач по теме "{practice_topic}"'
+                
+                # Получаем ответ от Gemini
+                response = model.generate_content(context)
+                answer = response.text
+                
+                # Определяем тему для практики
+                practice_topic = self.detect_subject(prompt)
+                
+                # Формируем структурированный ответ
+                response_data = {
+                    'answer': answer,
+                    'sources': self.get_sources_for_subject(practice_topic),
+                    'practice': {
+                        'topic': practice_topic,
+                        'description': f'Практикуйтесь в решении задач по теме "{practice_topic}"'
+                    }
                 }
-            }
             
             # Сохраняем в кэш на 1 час
             cache.set(cache_key, response_data, 3600)
@@ -155,7 +164,7 @@ class AIAssistantAPI(View):
             return response_data
             
         except Exception as e:
-            logger.error(f"Gemini API Error: {e}")
+            logger.error(f"AI API Error: {e}")
             # Fallback на базовый ответ
             return {
                 'answer': f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. Попробуйте переформулировать или обратитесь к официальным источникам.\n\nВаш вопрос: {prompt}",
