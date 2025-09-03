@@ -275,11 +275,16 @@ class FIPIData(models.Model):
     url = models.URLField(verbose_name="URL")
     data_type = models.CharField(max_length=50, choices=DATA_TYPES, verbose_name="Тип данных")
     subject = models.CharField(max_length=100, blank=True, null=True, verbose_name="Предмет")
+    exam_type = models.CharField(max_length=20, choices=[
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
+        ('vpr', 'ВПР'),
+    ], default='ege', verbose_name="Тип экзамена")
     content_hash = models.CharField(max_length=64, unique=True, verbose_name="Хеш содержимого")
     content = models.TextField(blank=True, verbose_name="Содержимое")
     collected_at = models.DateTimeField(verbose_name="Дата сбора")
     processed_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата обработки")
-    is_processed = models.BooleanField(default=False, verbose_name="Обработано")
+    is_processed = models.BooleanField(default=False, verbose_name="Обработано")  # type: ignore
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     
@@ -325,4 +330,135 @@ class DataChunk(models.Model):
         ]
     
     def __str__(self):
-        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..."
+        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..." # type: ignore
+
+
+class FIPISourceMap(models.Model):
+    """Модель для хранения карты источников данных fipi.ru"""
+    
+    DATA_TYPES = [
+        ('demo_variant', 'Демонстрационный вариант'),
+        ('specification', 'Спецификация КИМ'),
+        ('codefier', 'Кодификатор'),
+        ('open_bank_task', 'Задание из открытого банка'),
+        ('methodical_material', 'Методический материал'),
+        ('news', 'Новости и анонсы'),
+        ('document', 'Официальные документы'),
+    ]
+    
+    EXAM_TYPES = [
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
+        ('gve_11', 'ГВЭ-11'),
+        ('gve_9', 'ГВЭ-9'),
+        ('essay', 'Итоговое сочинение'),
+        ('interview', 'Итоговое собеседование'),
+    ]
+    
+    PRIORITIES = [
+        (1, 'Критически важные'),
+        (2, 'Высокий приоритет'),
+        (3, 'Средний приоритет'),
+        (4, 'Низкий приоритет'),
+    ]
+    
+    UPDATE_FREQUENCIES = [
+        ('annually', 'Ежегодно'),
+        ('monthly', 'Ежемесячно'),
+        ('weekly', 'Еженедельно'),
+        ('daily', 'Ежедневно'),
+        ('on_demand', 'По требованию'),
+    ]
+    
+    FILE_FORMATS = [
+        ('HTML', 'HTML'),
+        ('PDF', 'PDF'),
+        ('DOC', 'DOC'),
+        ('XLS', 'XLS'),
+        ('XLSX', 'XLSX'),
+    ]
+    
+    # Основные поля
+    source_id = models.CharField(max_length=100, unique=True, verbose_name="ID источника")
+    name = models.CharField(max_length=500, verbose_name="Название")
+    url = models.URLField(verbose_name="URL")
+    data_type = models.CharField(max_length=50, choices=DATA_TYPES, verbose_name="Тип данных")
+    exam_type = models.CharField(max_length=20, choices=EXAM_TYPES, verbose_name="Тип экзамена")
+    subject = models.CharField(max_length=100, blank=True, null=True, verbose_name="Предмет")
+    
+    # Приоритет и частота обновления
+    priority = models.IntegerField(choices=PRIORITIES, default=3, verbose_name="Приоритет") # type: ignore
+    update_frequency = models.CharField(max_length=20, choices=UPDATE_FREQUENCIES, default='annually', verbose_name="Частота обновления")
+    
+    # Технические характеристики
+    file_format = models.CharField(max_length=10, choices=FILE_FORMATS, default='HTML', verbose_name="Формат файла")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    
+    # Статус и мониторинг
+    is_active = models.BooleanField(default=True, verbose_name="Активен") # type: ignore
+    last_checked = models.DateTimeField(null=True, blank=True, verbose_name="Последняя проверка")
+    content_hash = models.CharField(max_length=64, blank=True, null=True, verbose_name="Хеш содержимого")
+    last_updated = models.DateTimeField(null=True, blank=True, verbose_name="Последнее обновление")
+    
+    # Временные метки
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    
+    class Meta:
+        verbose_name = "Источник данных ФИПИ"
+        verbose_name_plural = "Источники данных ФИПИ"
+        ordering = ['priority', 'data_type', 'subject']
+        indexes = [
+            models.Index(fields=['priority']),
+            models.Index(fields=['data_type']),
+            models.Index(fields=['exam_type']),
+            models.Index(fields=['subject']),
+            models.Index(fields=['is_active']),
+            models.Index(fields=['last_checked']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} ({self.get_data_type_display()})" # type: ignore
+    
+    @property
+    def is_critical(self) -> bool:
+        """Проверяет, является ли источник критически важным"""
+        return self.priority == 1
+    
+    @property
+    def is_high_priority(self) -> bool:
+        """Проверяет, является ли источник высокоприоритетным"""
+        return self.priority <= 2
+    
+    def mark_as_checked(self, content_hash: str = None): # type: ignore
+        """Отмечает источник как проверенный"""
+        from django.utils import timezone
+        self.last_checked = timezone.now()
+        if content_hash:
+            self.content_hash = content_hash
+        self.save()
+    
+    def mark_as_updated(self):
+        """Отмечает источник как обновленный"""
+        from django.utils import timezone
+        self.last_updated = timezone.now()
+        self.save()
+    
+    def needs_update(self) -> bool:
+        """Проверяет, нуждается ли источник в обновлении"""
+        if not self.last_checked:
+            return True
+        
+        from django.utils import timezone
+        now = timezone.now()
+        last_checked = self.last_checked  # type: ignore
+        if self.update_frequency == 'daily':
+            return (now - last_checked).days >= 1  # type: ignore
+        elif self.update_frequency == 'weekly':
+            return (now - last_checked).days >= 7  # type: ignore
+        elif self.update_frequency == 'monthly':
+            return (now - last_checked).days >= 30  # type: ignore
+        elif self.update_frequency == 'annually':
+            return (now - last_checked).days >= 365  # type: ignore
+        
+        return False

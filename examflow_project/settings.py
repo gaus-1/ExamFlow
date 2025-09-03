@@ -285,6 +285,24 @@ else:
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 BILLING_SECRET = os.getenv('BILLING_SECRET', 'change-me')
 
+# Настройки системы мониторинга
+MONITORING_EMAIL_RECIPIENTS = [
+    email.strip() for email in os.getenv('MONITORING_EMAIL_RECIPIENTS', '').split(',')
+    if email.strip()
+]
+MONITORING_WEBHOOK_URL = os.getenv('MONITORING_WEBHOOK_URL')
+
+# Настройки движка сбора данных
+INGESTION_ENGINE_MAX_WORKERS = int(os.getenv('INGESTION_ENGINE_MAX_WORKERS', '5'))
+INGESTION_ENGINE_CHECK_INTERVAL = int(os.getenv('INGESTION_ENGINE_CHECK_INTERVAL', '300'))  # 5 минут
+
+# Настройки Change Data Capture
+CHANGE_WEBHOOK_URL = os.getenv('CHANGE_WEBHOOK_URL')
+CHANGE_NOTIFICATION_EMAILS = [
+    email.strip() for email in os.getenv('CHANGE_NOTIFICATION_EMAILS', '').split(',')
+    if email.strip()
+]
+
 # Redis settings for Celery
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 

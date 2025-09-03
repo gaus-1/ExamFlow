@@ -69,6 +69,7 @@ class AIOrchestrator:
         try:
             # Пытаемся найти профиль по user_id (Django User) или telegram_id
             user_profile = UnifiedProfile.objects.filter( # type: ignore
+            
                 models.Q(user_id=user_id) | models.Q(telegram_id=user_id)
             ).first()
             
@@ -274,3 +275,13 @@ class AIOrchestrator:
             'generated_at': timezone.now().isoformat(),
             'error': error
         }
+
+# Глобальный синглтон оркестратора
+_ai_orchestrator: Optional[AIOrchestrator] = None
+
+def get_ai_orchestrator() -> AIOrchestrator:
+    """Возвращает глобальный экземпляр AIOrchestrator."""
+    global _ai_orchestrator
+    if _ai_orchestrator is None:
+        _ai_orchestrator = AIOrchestrator()
+    return _ai_orchestrator
