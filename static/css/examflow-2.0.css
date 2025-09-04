@@ -1,3 +1,46 @@
+/* Brand subtitle under logo */
+.brand-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+  color: #6C757D;
+  letter-spacing: 0.05em;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: brand-subtitle-in 1.2s ease forwards 0.2s;
+}
+
+.brand-subtitle__item {
+  font-size: clamp(14px, 2.2vw, 1.6rem);
+  font-weight: 300;
+}
+
+.brand-subtitle__sep {
+  opacity: 0.6;
+}
+
+.brand-subtitle__item--accent {
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .brand-subtitle__item { font-size: clamp(16px, 1.4vw, 1.25rem); }
+}
+
+@keyframes brand-subtitle-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .brand-subtitle {
+    flex-direction: column;
+    gap: 0.2em;
+  }
+  .brand-subtitle__sep { display: none; }
+}
 /* ========================================
    EXAMFLOW 2.0 - СОВРЕМЕННАЯ ДИЗАЙН-СИСТЕМА
    ======================================== */
