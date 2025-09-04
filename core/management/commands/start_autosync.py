@@ -19,7 +19,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from core.models import FIPISourceMap, FIPIData
 from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
 from core.data_ingestion.ingestion_engine import IngestionEngine, TaskPriority
-from core.data_ingestion.pdf_processor import get_pdf_processor
+# Импорт PDF-процессора переносим внутрь функции, чтобы не падать на окружениях без cffi/cryptography
 
 logger = logging.getLogger(__name__)
 
@@ -116,6 +116,13 @@ class Command(BaseCommand):
         # 3) Периодическая обработка PDF
         def process_pdfs():
             try:
+                # Флаг для явного разрешения PDF-пайплайна (по умолчанию выключен для совместимости с Windows локально)
+                if os.getenv('USE_PDF_PIPELINE', '0') != '1':
+                    logger.info("Автосинхро: PDF-пайплайн отключен (USE_PDF_PIPELINE!=1)")
+                    return
+
+                # Ленивая загрузка, чтобы не импортировать при старте команды
+                from core.data_ingestion.pdf_processor import get_pdf_processor  # type: ignore
                 processor = get_pdf_processor()
                 pdf_qs = FIPIData.objects.filter(  # type: ignore
                     is_processed=False,
