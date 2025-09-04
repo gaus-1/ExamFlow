@@ -26,7 +26,7 @@ def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
                 current_usage=0,
                 reset_date=timezone.now() + timedelta(days=1)
             )
-            
+
             # Создаем месячный лимит
             AiLimit.objects.create(  # type: ignore[attr-defined]
                 user=instance,
@@ -35,11 +35,12 @@ def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
                 current_usage=0,
                 reset_date=timezone.now() + timedelta(days=30)
             )
-            
+
             logger.info(f"Созданы лимиты ИИ для пользователя {instance.username}")
-            
+
         except Exception as e:
-            logger.error(f"Ошибка при создании лимитов ИИ для пользователя {instance.username}: {e}")
+            logger.error(
+                f"Ошибка при создании лимитов ИИ для пользователя {instance.username}: {e}")
 
 
 # ========================================
@@ -65,16 +66,17 @@ def check_and_reset_limits(sender, instance, **kwargs):
         if instance.reset_date <= timezone.now():
             # Сбрасываем лимит
             instance.current_usage = 0
-            
+
             # Устанавливаем новую дату сброса
             if instance.limit_type == 'daily':
                 instance.reset_date = timezone.now() + timedelta(days=1)
             elif instance.limit_type == 'monthly':
                 instance.reset_date = timezone.now() + timedelta(days=30)
-            
+
             instance.save()
-            logger.info(f"Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}")
-            
+            logger.info(
+                f"Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}")
+
     except Exception as e:
         logger.error(f"Ошибка при сбросе лимита: {e}")
 
@@ -109,7 +111,7 @@ def clear_ai_cache_on_provider_update(sender, instance, **kwargs):
         # Здесь можно добавить логику очистки кэша
         # Например, очистка Redis кэша или файлового кэша
         logger.info(f"Кэш ИИ очищен после обновления провайдера {instance.name}")
-        
+
     except Exception as e:
         logger.error(f"Ошибка при очистке кэша ИИ: {e}")
 
@@ -127,13 +129,13 @@ def check_rate_limiting(sender, instance, **kwargs):
                 user=instance.user,
                 limit_type='daily'
             ).first()
-            
+
             if daily_limit and daily_limit.is_exceeded():
                 logger.warning(
                     f"Пользователь {instance.user.username} превысил дневной лимит ИИ "
                     f"({daily_limit.current_usage}/{daily_limit.max_limit})"
                 )
-                
+
         except Exception as e:
             logger.error(f"Ошибка при проверке лимитов: {e}")
 
@@ -150,6 +152,6 @@ def auto_reactivate_provider(sender, instance, **kwargs):
             instance.is_active = True
             instance.save()
             logger.info(f"Провайдер {instance.name} автоматически реактивирован")
-            
+
     except Exception as e:
         logger.error(f"Ошибка при автоматической реактивации провайдера: {e}")

@@ -1,3 +1,4 @@
+from .models import AiLimit  # для получения лимитов
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 # Сервис ИИ: провайдеры, кэш и лимиты
 ai_service = None
 
+
 def get_ai_service():
     """Получает или создает экземпляр AiService"""
     global ai_service
@@ -26,8 +28,6 @@ def get_ai_service():
             logger.error(f"Ошибка создания AiService: {e}")
             return None
     return ai_service
-
-from .models import AiLimit  # для получения лимитов
 
 
 # ========================================
@@ -113,7 +113,10 @@ def api_chat(request):
         if ai_service_instance is None:
             return JsonResponse({'error': 'ИИ временно недоступен'}, status=503)
 
-        result = ai_service_instance.ask(prompt=prompt, user=request.user if request.user.is_authenticated else None, session_id=session_id)
+        result = ai_service_instance.ask(
+            prompt=prompt,
+            user=request.user if request.user.is_authenticated else None,
+            session_id=session_id)
         if 'error' in result:
             return JsonResponse({'error': result['error']}, status=429)
 
@@ -158,7 +161,7 @@ def api_chat(request):
             'sources': sources,
             'followups': followups
         })
-        
+
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Неверный JSON'}, status=400)
     except Exception as e:
@@ -174,19 +177,19 @@ def api_explain(request):
     try:
         data = json.loads(request.body)
         topic = data.get('topic', '')
-        
+
         if not topic:
             return JsonResponse({'error': 'Не указана тема'}, status=400)
-        
+
         # TODO: Реализовать логику объяснения
         explanation = f"Объяснение темы '{topic}' находится в разработке. Скоро здесь будет подробное объяснение с примерами."
-        
+
         return JsonResponse({
             'explanation': explanation,
             'tokens_used': len(topic.split()),
             'cost': 0.0
         })
-        
+
     except Exception as e:
         logger.error(f"Ошибка в API объяснения: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
@@ -200,10 +203,10 @@ def api_search(request):
     try:
         data = json.loads(request.body)
         query = data.get('query', '')
-        
+
         if not query:
             return JsonResponse({'error': 'Пустой поисковый запрос'}, status=400)
-        
+
         # TODO: Реализовать логику поиска
         results = [
             {
@@ -214,14 +217,14 @@ def api_search(request):
                 'difficulty': 'Средний'
             }
         ]
-        
+
         return JsonResponse({
             'results': results,
             'total': len(results),
             'tokens_used': len(query.split()),
             'cost': 0.0
         })
-        
+
     except Exception as e:
         logger.error(f"Ошибка в API поиска: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
@@ -236,24 +239,23 @@ def api_generate(request):
         data = json.loads(request.body)
         topic = data.get('topic', '')
         difficulty = data.get('difficulty', 'medium')
-        
+
         if not topic:
             return JsonResponse({'error': 'Не указана тема'}, status=400)
-        
+
         # TODO: Реализовать логику генерации
         generated_task = {
             'title': f'Сгенерированное задание по теме "{topic}"',
             'content': f'Содержание задания по теме "{topic}" с уровнем сложности "{difficulty}" находится в разработке.',
             'answer': 'Ответ будет доступен после реализации функционала',
-            'explanation': 'Подробное объяснение решения будет добавлено позже'
-        }
-        
+            'explanation': 'Подробное объяснение решения будет добавлено позже'}
+
         return JsonResponse({
             'task': generated_task,
             'tokens_used': len(topic.split()),
             'cost': 0.0
         })
-        
+
     except Exception as e:
         logger.error(f"Ошибка в API генерации: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
@@ -285,14 +287,14 @@ def api_limits(request):
         session_id = None if is_auth else request.session.session_key
 
         max_daily = 30 if is_auth else 10
-        limit, _ = AiLimit.objects.get_or_create( # type: ignore
+        limit, _ = AiLimit.objects.get_or_create(  # type: ignore
             user=request.user if is_auth else None,
             session_id=session_id,
             limit_type='daily',
             defaults={
                 'current_usage': 0,
                 'max_limit': max_daily,
-                'reset_date': timezone.now().date(), # type: ignore
+                'reset_date': timezone.now().date(),  # type: ignore
             }
         )
         # Синхронизируем максимальный лимит на случай смены статуса
@@ -308,7 +310,7 @@ def api_limits(request):
                 'remaining': remaining
             }
         })
-        
+
     except Exception as e:
         logger.error(f"Ошибка в API лимитов: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
@@ -335,18 +337,18 @@ def api_voice(request):
         data = json.loads(request.body)
         audio_data = data.get('audio', '')
         command = data.get('command', '')
-        
+
         if not audio_data and not command:
-            return JsonResponse({'error': 'Не переданы аудио данные или команда'}, status=400)
-        
+            return JsonResponse(
+                {'error': 'Не переданы аудио данные или команда'}, status=400)
+
         # TODO: Реализовать логику голосового помощника
         response = {
             'text': f'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
-            'audio_url': None
-        }
-        
+            'audio_url': None}
+
         return JsonResponse(response)
-        
+
     except Exception as e:
         logger.error(f"Ошибка в API голосового помощника: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)

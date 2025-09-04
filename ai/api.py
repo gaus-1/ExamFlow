@@ -44,23 +44,24 @@ except Exception as e:
     logger.error(f"Ошибка инициализации Gemini API: {e}")
     model = None
 
+
 class AIAssistantAPI(View):
     """
     API для ИИ-ассистента с реальным Gemini API
-    
+
     Обрабатывает запросы пользователей и возвращает структурированные ответы
     с предложениями практики
     """
-    
+
     def post(self, request):
         """
         Обрабатывает POST запросы к ИИ-ассистенту
-        
+
         Ожидает JSON:
         {
             "prompt": "Вопрос пользователя"
         }
-        
+
         Возвращает JSON:
         {
             "answer": "Ответ ИИ",
@@ -73,42 +74,42 @@ class AIAssistantAPI(View):
         """
         try:
             logger.info(f"AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
-            
+
             # Валидация размера запроса
             if len(request.body) > 10000:  # 10KB лимит
                 return JsonResponse({
                     'error': 'Слишком большой запрос'
                 }, status=413)
-            
+
             data = json.loads(request.body)
             prompt = data.get('prompt', '').strip()
-            
+
             # Валидация промпта
             if not prompt:
                 return JsonResponse({
                     'error': 'Пустой запрос'
                 }, status=400)
-            
+
             if len(prompt) > 2000:  # Ограничение длины
                 return JsonResponse({
                     'error': 'Промпт слишком длинный (максимум 2000 символов)'
                 }, status=400)
-            
+
             # Базовая санитизация
             prompt = prompt.replace('<', '&lt;').replace('>', '&gt;')
             logger.info(f"AI API: Промпт: {prompt[:100]}...")
-            
+
             # Проверяем, что модель инициализирована
             if model is None:
                 return JsonResponse({
                     'error': 'AI модель не инициализирована'
                 }, status=500)
-            
+
             # Получаем реальный ответ от Gemini API
             response = self.generate_ai_response(prompt)
-            
+
             return JsonResponse(response)
-            
+
         except json.JSONDecodeError:
             return JsonResponse({
                 'error': 'Неверный JSON'
@@ -118,7 +119,7 @@ class AIAssistantAPI(View):
             return JsonResponse({
                 'error': f'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
-    
+
     def generate_ai_response(self, prompt):
         """
         Генерирует ответ ИИ на основе запроса через RAG-систему с кэшированием
@@ -127,13 +128,14 @@ class AIAssistantAPI(View):
             # Создаем хеш для кэширования (используем SHA-256 для безопасности)
             prompt_hash = hashlib.sha256(prompt.lower().strip().encode()).hexdigest()
             cache_key = f"ai_response_{prompt_hash}"
-            
+
             # Проверяем кэш
             cached_response = cache.get(cache_key)
             if cached_response:
-                logger.info(f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
+                logger.info(
+                    f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
                 return cached_response
-            
+
             # Пытаемся использовать RAG-систему
             try:
                 from core.rag_system.orchestrator import AIOrchestrator
@@ -141,8 +143,9 @@ class AIAssistantAPI(View):
                 response_data = orchestrator.process_query(prompt)
                 logger.info(f"AI API: Использована RAG-система для: {prompt[:50]}...")
             except Exception as rag_error:
-                logger.warning(f"RAG-система недоступна: {rag_error}, используем fallback")
-                
+                logger.warning(
+                    f"RAG-система недоступна: {rag_error}, используем fallback")
+
                 # Fallback на базовый Gemini API
                 context = f"""Эксперт ЕГЭ. Отвечай кратко и по делу.
 
@@ -155,38 +158,35 @@ class AIAssistantAPI(View):
 - Использовать Markdown
 
 Отвечай быстро и структурированно."""
-                
+
                 # Получаем ответ от Gemini
                 response = model.generate_content(context)
                 answer = response.text
-                
+
                 # Определяем тему для практики
                 practice_topic = self.detect_subject(prompt)
-                
+
                 # Формируем структурированный ответ
                 response_data = {
                     'answer': answer,
                     'sources': self.get_sources_for_subject(practice_topic),
                     'practice': {
                         'topic': practice_topic,
-                        'description': f'Практикуйтесь в решении задач по теме "{practice_topic}"'
-                    }
-                }
-            
+                        'description': f'Практикуйтесь в решении задач по теме "{practice_topic}"'}}
+
             # Сохраняем в кэш на 1 час
             cache.set(cache_key, response_data, 3600)
             logger.info(f"AI API: Сохранили ответ в кэш для: {prompt[:50]}...")
-            
+
             return response_data
-            
+
         except Exception as e:
             logger.error(f"AI API Error: {e}")
             # Fallback на базовый ответ
             error_msg = (
                 f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. "
                 f"Попробуйте переформулировать или обратитесь к официальным источникам.\n\n"
-                f"Ваш вопрос: {prompt}"
-            )
+                f"Ваш вопрос: {prompt}")
             return {
                 'answer': error_msg,
                 'sources': [
@@ -198,30 +198,30 @@ class AIAssistantAPI(View):
                     'description': 'Выберите предмет для начала практики'
                 }
             }
-    
+
     def detect_subject(self, prompt):
         """
         Определяет предмет по запросу пользователя
         """
         prompt_lower = prompt.lower()
-        
+
         subjects = {
-            'mathematics': ['математик', 'алгебр', 'геометр', 'уравнен', 'функц', 'производн', 'интеграл'],
-            'russian': ['русск', 'сочинен', 'грамматик', 'орфограф', 'пунктуац'],
-            'physics': ['физик', 'механик', 'электричеств', 'оптик', 'термодинамик'],
-            'chemistry': ['хими', 'органическ', 'неорганическ', 'молекул'],
-            'biology': ['биолог', 'клетк', 'генетик', 'эволюц'],
-            'history': ['истори', 'дата', 'событи', 'войн'],
-            'social_studies': ['обществознан', 'полит', 'экономик', 'социолог'],
-            'english': ['английск', 'english', 'грамматик', 'vocabulary']
-        }
-        
+            'mathematics': [
+                'математик', 'алгебр', 'геометр', 'уравнен', 'функц', 'производн', 'интеграл'], 'russian': [
+                'русск', 'сочинен', 'грамматик', 'орфограф', 'пунктуац'], 'physics': [
+                'физик', 'механик', 'электричеств', 'оптик', 'термодинамик'], 'chemistry': [
+                    'хими', 'органическ', 'неорганическ', 'молекул'], 'biology': [
+                        'биолог', 'клетк', 'генетик', 'эволюц'], 'history': [
+                            'истори', 'дата', 'событи', 'войн'], 'social_studies': [
+                                'обществознан', 'полит', 'экономик', 'социолог'], 'english': [
+                                    'английск', 'english', 'грамматик', 'vocabulary']}
+
         for subject, keywords in subjects.items():
             if any(keyword in prompt_lower for keyword in keywords):
                 return subject
-        
+
         return 'general'
-    
+
     def get_sources_for_subject(self, subject):
         """
         Возвращает источники для конкретного предмета
@@ -260,7 +260,7 @@ class AIAssistantAPI(View):
                 {'title': 'Английский для ЕГЭ', 'url': 'https://english-ege.ru/'}
             ]
         }
-        
+
         return sources_map.get(subject, [
             {'title': 'ФИПИ - ЕГЭ', 'url': 'https://fipi.ru/ege'},
             {'title': 'ExamFlow - Главная', 'url': 'https://examflow.ru/'}
@@ -270,43 +270,43 @@ class AIAssistantAPI(View):
 class ProblemsAPI(View):
     """
     API для работы с задачами
-    
+
     Обеспечивает:
     - Получение задач по темам
     - Проверку ответов
     - Отслеживание прогресса
     """
-    
+
     def get(self, request):
         """
         GET запрос для получения задач по теме
-        
+
         Параметры:
         - topic: тема предмета
         - limit: количество задач (по умолчанию 5)
         """
         topic = request.GET.get('topic', '')
         limit = int(request.GET.get('limit', 5))
-        
+
         if not topic:
             return JsonResponse({
                 'error': 'Не указана тема'
             }, status=400)
-        
+
         # Здесь будет получение реальных задач из базы данных
         # Пока возвращаем заглушку
         problems = self.get_problems_by_topic(topic, limit)
-        
+
         return JsonResponse({
             'topic': topic,
             'problems': problems,
             'total': len(problems)
         })
-    
+
     def post(self, request):
         """
         POST запрос для проверки ответа
-        
+
         Ожидает JSON:
         {
             "problem_id": "ID задачи",
@@ -317,33 +317,33 @@ class ProblemsAPI(View):
             data = json.loads(request.body)
             problem_id = data.get('problem_id')
             answer = data.get('answer')
-            
+
             if not problem_id or answer is None:
                 return JsonResponse({
                     'error': 'Не указан ID задачи или ответ'
                 }, status=400)
-            
+
             # Здесь будет проверка ответа
             is_correct = self.check_answer(problem_id, answer)
-            
+
             return JsonResponse({
                 'problem_id': problem_id,
                 'is_correct': is_correct,
                 'feedback': self.get_feedback(is_correct)
             })
-            
+
         except json.JSONDecodeError:
             return JsonResponse({
                 'error': 'Неверный JSON'
             }, status=400)
-    
+
     def get_problems_by_topic(self, topic, limit):
         """
         Получает задачи по теме из реальной базы данных
         """
         try:
             from core.models import Task, Subject  # type: ignore
-            
+
             # Получаем предмет по теме
             subject_mapping = {
                 'mathematics': 'Математика',
@@ -355,14 +355,14 @@ class ProblemsAPI(View):
                 'social_studies': 'Обществознание',
                 'english': 'Английский язык'
             }
-            
+
             subject_name = subject_mapping.get(topic, topic)
-            
+
             # Получаем реальные задачи из базы данных
             tasks = Task.objects.filter(  # type: ignore
                 subject__name__icontains=subject_name
             ).order_by('?')[:limit]  # Случайный порядок
-            
+
             problems = []
             for task in tasks:
                 problems.append({
@@ -373,79 +373,71 @@ class ProblemsAPI(View):
                     'hint': task.hint or 'Попробуйте внимательно прочитать условие задачи',
                     'explanation': task.explanation or 'Объяснение будет доступно после ответа'
                 })
-            
+
             return problems
-            
+
         except ImportError:
             # Fallback если модели не доступны
             return self.get_fallback_problems(topic, limit)
         except Exception as e:
             logger.error(f"Error getting problems: {e}")
             return self.get_fallback_problems(topic, limit)
-    
+
     def get_fallback_problems(self, topic, limit):
         """
         Fallback задачи если база данных недоступна
         """
-        fallback_problems = {
-            'mathematics': [
-                {
-                    'id': 1,
-                    'text': 'Решите квадратное уравнение: x² - 5x + 6 = 0',
-                    'options': ['x₁ = 2, x₂ = 3', 'x₁ = -2, x₂ = -3', 'x₁ = 1, x₂ = 6', 'x₁ = -1, x₂ = -6'],
-                    'correct_answer': 0,
-                    'hint': 'Используйте формулу дискриминанта: D = b² - 4ac'
-                },
-                {
-                    'id': 2,
-                    'text': 'Найдите площадь круга с радиусом 5 см',
-                    'options': ['25π см²', '50π см²', '100π см²', '125π см²'],
-                    'correct_answer': 0,
-                    'hint': 'Площадь круга: S = πr²'
-                }
-            ],
-            'russian': [
-                {
-                    'id': 3,
-                    'text': 'В каком предложении есть грамматическая ошибка?',
-                    'options': [
-                        'Он пришел домой поздно.',
-                        'Мы с ним договорились о встрече.',
-                        'По приезду в город мы сразу отправились в музей.',
-                        'Дети играли во дворе.'
-                    ],
-                    'correct_answer': 2,
-                    'hint': 'Правильно: "По приезде в город"'
-                }
-            ]
-        }
-        
+        fallback_problems = {'mathematics': [{'id': 1,
+                                              'text': 'Решите квадратное уравнение: x² - 5x + 6 = 0',
+                                              'options': ['x₁ = 2, x₂ = 3',
+                                                          'x₁ = -2, x₂ = -3',
+                                                          'x₁ = 1, x₂ = 6',
+                                                          'x₁ = -1, x₂ = -6'],
+                                              'correct_answer': 0,
+                                              'hint': 'Используйте формулу дискриминанта: D = b² - 4ac'},
+                                             {'id': 2,
+                                              'text': 'Найдите площадь круга с радиусом 5 см',
+                                              'options': ['25π см²',
+                                                          '50π см²',
+                                                          '100π см²',
+                                                          '125π см²'],
+                                              'correct_answer': 0,
+                                              'hint': 'Площадь круга: S = πr²'}],
+                             'russian': [{'id': 3,
+                                          'text': 'В каком предложении есть грамматическая ошибка?',
+                                          'options': ['Он пришел домой поздно.',
+                                                      'Мы с ним договорились о встрече.',
+                                                      'По приезду в город мы сразу отправились в музей.',
+                                                      'Дети играли во дворе.'],
+                                          'correct_answer': 2,
+                                          'hint': 'Правильно: "По приезде в город"'}]}
+
         return fallback_problems.get(topic, [])[:limit]
-    
+
     def check_answer(self, problem_id, answer):
         """
         Проверяет правильность ответа по реальной базе данных
         """
         try:
             from core.models import Task  # type: ignore
-            
+
             # Получаем задачу из базы данных
             task = Task.objects.get(id=problem_id)  # type: ignore
-            
+
             # Проверяем ответ
             if hasattr(task, 'correct_answer'):
                 return answer == task.correct_answer
             else:
                 # Fallback проверка
                 return answer == 0
-                
+
         except Task.DoesNotExist:  # type: ignore
             logger.error(f"Task {problem_id} not found")
             return False
         except Exception as e:
             logger.error(f"Error checking answer: {e}")
             return False
-    
+
     def get_feedback(self, is_correct):
         """
         Возвращает обратную связь в зависимости от правильности ответа
@@ -459,24 +451,24 @@ class ProblemsAPI(View):
 class UserProfileAPI(View):
     """
     API для пользовательского профиля
-    
+
     Обеспечивает:
     - Получение профиля пользователя
     - Обновление прогресса
     - Получение достижений
     """
-    
+
     @method_decorator(login_required)
     def get(self, request):
         """
         GET запрос для получения профиля пользователя
         """
         user = request.user
-        
+
         try:
             # Получаем реальные данные из базы
             from core.models import UserProfile, UserProgress  # type: ignore
-            
+
             # Пытаемся получить профиль пользователя
             try:
                 user_profile = UserProfile.objects.get(user=user)  # type: ignore
@@ -484,7 +476,8 @@ class UserProfileAPI(View):
                 xp = user_profile.xp
                 total_problems_solved = user_profile.total_problems_solved
                 streak = user_profile.streak
-                achievements = user_profile.achievements.all() if hasattr(user_profile, 'achievements') else []
+                achievements = user_profile.achievements.all() if hasattr(
+                    user_profile, 'achievements') else []
             except UserProfile.DoesNotExist:  # type: ignore
                 # Создаем базовый профиль если не существует
                 level = 1
@@ -492,11 +485,12 @@ class UserProfileAPI(View):
                 total_problems_solved = 0
                 streak = 0
                 achievements = []
-            
+
             # Получаем прогресс по предметам
             subjects_progress = {}
             try:
-                progress_entries = UserProgress.objects.filter(user=user)  # type: ignore
+                progress_entries = UserProgress.objects.filter(  # type: ignore
+                    user=user)  # type: ignore
                 for entry in progress_entries:
                     subjects_progress[entry.subject.name] = {
                         'problems_solved': entry.problems_solved,
@@ -505,7 +499,7 @@ class UserProfileAPI(View):
                     }
             except Exception:
                 subjects_progress = {}
-            
+
             profile = {
                 'id': user.id,
                 'username': user.username,
@@ -513,12 +507,14 @@ class UserProfileAPI(View):
                 'xp': xp,
                 'total_problems_solved': total_problems_solved,
                 'streak': streak,
-                'achievements': [{'name': a.name, 'description': a.description} for a in achievements] if achievements else [],
-                'subjects_progress': subjects_progress
-            }
-            
+                'achievements': [
+                    {
+                        'name': a.name,
+                        'description': a.description} for a in achievements] if achievements else [],
+                'subjects_progress': subjects_progress}
+
             return JsonResponse(profile)
-            
+
         except Exception as e:
             logger.error(f"Error getting user profile: {e}")
             # Fallback профиль
@@ -533,7 +529,7 @@ class UserProfileAPI(View):
                 'subjects_progress': {}
             }
             return JsonResponse(profile)
-    
+
     @method_decorator(login_required)
     def post(self, request):
         """
@@ -542,37 +538,38 @@ class UserProfileAPI(View):
         try:
             data = json.loads(request.body)
             action = data.get('action')
-            
+
             if action == 'solve_problem':
                 # Обновляем прогресс решения задачи
                 problem_id = data.get('problem_id')
                 is_correct = data.get('is_correct', False)
                 subject = data.get('subject', 'general')
-                
-                return self.update_problem_progress(request.user, problem_id, is_correct, subject)
-                
+
+                return self.update_problem_progress(
+                    request.user, problem_id, is_correct, subject)
+
             elif action == 'complete_challenge':
                 # Обновляем прогресс челленджа
                 challenge_id = data.get('challenge_id')
                 return self.update_challenge_progress(request.user, challenge_id)
-                
+
             else:
                 return JsonResponse({
                     'error': 'Неизвестное действие'
                 }, status=400)
-                
+
         except json.JSONDecodeError:
             return JsonResponse({
                 'error': 'Неверный JSON'
             }, status=400)
-    
+
     def update_problem_progress(self, user, problem_id, is_correct, subject):
         """
         Обновляет прогресс решения задачи
         """
         try:
             from core.models import UserProfile, UserProgress  # type: ignore
-            
+
             # Получаем или создаем профиль пользователя
             profile, created = UserProfile.objects.get_or_create(  # type: ignore
                 user=user,
@@ -583,20 +580,20 @@ class UserProfileAPI(View):
                     'streak': 0
                 }
             )
-            
+
             # Обновляем статистику
             if is_correct:
                 profile.xp += 10
                 profile.total_problems_solved += 1
                 profile.streak += 1
-                
+
                 # Проверяем повышение уровня
                 if profile.xp >= profile.level * 100:
                     profile.level += 1
                     profile.xp = 0
-            
+
             profile.save()
-            
+
             # Обновляем прогресс по предмету
             progress, created = UserProgress.objects.get_or_create(  # type: ignore
                 user=user,
@@ -607,14 +604,15 @@ class UserProfileAPI(View):
                     'accuracy': 0.0
                 }
             )
-            
+
             progress.problems_solved += 1
             if is_correct:
                 progress.correct_answers += 1
-            
-            progress.accuracy = (progress.correct_answers / progress.problems_solved) * 100
+
+            progress.accuracy = (progress.correct_answers /
+                                 progress.problems_solved) * 100
             progress.save()
-            
+
             return JsonResponse({
                 'status': 'success',
                 'new_level': profile.level,
@@ -622,18 +620,18 @@ class UserProfileAPI(View):
                 'total_solved': profile.total_problems_solved,
                 'streak': profile.streak
             })
-            
+
         except Exception as e:
             logger.error(f"Error updating problem progress: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-    
+
     def update_challenge_progress(self, user, challenge_id):
         """
         Обновляет прогресс челленджа
         """
         try:
             from core.models import UserProfile  # type: ignore
-            
+
             profile, created = UserProfile.objects.get_or_create(  # type: ignore
                 user=user,
                 defaults={
@@ -643,17 +641,17 @@ class UserProfileAPI(View):
                     'streak': 0
                 }
             )
-            
+
             # Бонус за выполнение челленджа
             profile.xp += 50
             profile.save()
-            
+
             return JsonResponse({
                 'status': 'success',
                 'challenge_completed': True,
                 'xp_gained': 50
             })
-            
+
         except Exception as e:
             logger.error(f"Error updating challenge progress: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
@@ -665,13 +663,13 @@ class UserProfileAPI(View):
 def ai_chat_api(request):
     """
     API endpoint для чата с ИИ
-    
+
     Обрабатывает POST запросы к /ai/api/chat/
     """
     logger.info(f"AI Chat API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
     logger.info(f"AI Chat API: Метод: {request.method}")
     logger.info(f"AI Chat API: Headers: {dict(request.headers)}")
-    
+
     try:
         view = AIAssistantAPI()
         return view.post(request)
@@ -687,7 +685,7 @@ def ai_chat_api(request):
 def problems_api(request):
     """
     API endpoint для работы с задачами
-    
+
     Обрабатывает GET и POST запросы к /api/problems/
     """
     view = ProblemsAPI()
@@ -701,7 +699,7 @@ def problems_api(request):
 def user_profile_api(request):
     """
     API endpoint для пользовательского профиля
-    
+
     Обрабатывает GET и POST запросы к /api/user/profile/
     """
     view = UserProfileAPI()
