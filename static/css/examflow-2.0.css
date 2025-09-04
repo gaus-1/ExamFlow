@@ -3,13 +3,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6em;
+  margin-top: 0.25rem;
   margin-bottom: 0.75rem;
   font-weight: 400;
-  color: #6C757D;
+  color: #252525;
   letter-spacing: 0.05em;
-  opacity: 0;
-  transform: translateY(6px);
-  animation: brand-subtitle-in 1.2s ease forwards 0.2s;
+  opacity: 1; /* была 0 — из-за анимации подпись могла не появляться */
 }
 
 .brand-subtitle__item {
