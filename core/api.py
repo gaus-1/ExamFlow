@@ -5,7 +5,6 @@ API для интеграции RAG-системы с фронтендом
 import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views import View
 import json
@@ -15,16 +14,17 @@ from core.rag_system.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AIQueryView(View):
     """
     API для обработки запросов к AI
     """
-    
+
     def __init__(self):
         super().__init__()
         self.orchestrator = AIOrchestrator()
-    
+
     def post(self, request):
         """
         Обрабатывает запрос пользователя
@@ -34,21 +34,21 @@ class AIQueryView(View):
             data = json.loads(request.body)
             query = data.get('query', '').strip()
             user_id = data.get('user_id')
-            
+
             if not query:
                 return JsonResponse({
                     'error': 'Пустой запрос',
                     'answer': 'Пожалуйста, задайте вопрос по подготовке к ЕГЭ.'
                 }, status=400)
-            
+
             logger.info(f"Получен запрос от пользователя {user_id}: {query[:100]}...")
-            
+
             # Обрабатываем запрос через оркестратор
             response = self.orchestrator.process_query(query, user_id)
-            
+
             logger.info(f"Запрос обработан успешно для пользователя {user_id}")
             return JsonResponse(response)
-            
+
         except json.JSONDecodeError:
             return JsonResponse({
                 'error': 'Неверный JSON',
@@ -61,12 +61,13 @@ class AIQueryView(View):
                 'answer': 'Произошла ошибка при обработке запроса. Попробуйте позже.'
             }, status=500)
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class VectorStoreStatsView(View):
     """
     API для получения статистики векторного хранилища
     """
-    
+
     def get(self, request):
         """
         Возвращает статистику векторного хранилища
@@ -74,12 +75,12 @@ class VectorStoreStatsView(View):
         try:
             vector_store = VectorStore()
             stats = vector_store.get_statistics()
-            
+
             return JsonResponse({
                 'status': 'success',
                 'data': stats
             })
-            
+
         except Exception as e:
             logger.error(f"Ошибка при получении статистики: {e}")
             return JsonResponse({
@@ -87,12 +88,13 @@ class VectorStoreStatsView(View):
                 'error': str(e)
             }, status=500)
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class SearchView(View):
     """
     API для семантического поиска
     """
-    
+
     def post(self, request):
         """
         Выполняет семантический поиск
@@ -101,22 +103,22 @@ class SearchView(View):
             data = json.loads(request.body)
             query = data.get('query', '').strip()
             limit = data.get('limit', 5)
-            
+
             if not query:
                 return JsonResponse({
                     'error': 'Пустой запрос поиска'
                 }, status=400)
-            
+
             vector_store = VectorStore()
             results = vector_store.search(query, limit=limit)
-            
+
             return JsonResponse({
                 'status': 'success',
                 'query': query,
                 'results': results,
                 'total': len(results)
             })
-            
+
         except json.JSONDecodeError:
             return JsonResponse({
                 'error': 'Неверный JSON'
@@ -127,12 +129,13 @@ class SearchView(View):
                 'error': str(e)
             }, status=500)
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class HealthCheckView(View):
     """
     API для проверки состояния системы
     """
-    
+
     def get(self, request):
         """
         Проверяет состояние всех компонентов системы
@@ -143,7 +146,7 @@ class HealthCheckView(View):
                 'components': {},
                 'timestamp': None
             }
-            
+
             # Проверяем векторное хранилище
             try:
                 vector_store = VectorStore()
@@ -158,10 +161,10 @@ class HealthCheckView(View):
                     'error': str(e)
                 }
                 health_status['status'] = 'degraded'
-            
+
             # Проверяем оркестратор
             try:
-                orchestrator = AIOrchestrator()
+                AIOrchestrator()
                 health_status['components']['orchestrator'] = {
                     'status': 'healthy'
                 }
@@ -171,12 +174,12 @@ class HealthCheckView(View):
                     'error': str(e)
                 }
                 health_status['status'] = 'degraded'
-            
+
             from django.utils import timezone
             health_status['timestamp'] = timezone.now().isoformat()
-            
+
             return JsonResponse(health_status)
-            
+
         except Exception as e:
             logger.error(f"Ошибка при проверке состояния: {e}")
             return JsonResponse({
@@ -190,29 +193,36 @@ def get_random_task(request):
     """Legacy API - returns random task"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
+
 def get_subjects(request):
     """Legacy API - returns subjects"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
+
 
 def get_tasks_by_subject(request, subject_id):
     """Legacy API - returns tasks by subject"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
+
 def get_task_by_id(request, task_id):
     """Legacy API - returns task by ID"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
+
 
 def search_tasks(request):
     """Legacy API - searches tasks"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
+
 def get_topics(request):
     """Legacy API - returns topics"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
+
 def get_statistics(request):
     """Legacy API - returns statistics"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
+
 
 def create_subscription(request):
     """Legacy API - creates subscription"""

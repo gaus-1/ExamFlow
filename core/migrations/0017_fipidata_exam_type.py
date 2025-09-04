@@ -13,6 +13,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='fipidata',
             name='exam_type',
-            field=models.CharField(choices=[('ege', 'ЕГЭ'), ('oge', 'ОГЭ'), ('vpr', 'ВПР')], default='ege', max_length=20, verbose_name='Тип экзамена'),
+            field=models.CharField(
+                choices=[
+                    ('ege',
+                     'ЕГЭ'),
+                    ('oge',
+                     'ОГЭ'),
+                    ('vpr',
+                     'ВПР')],
+                default='ege',
+                max_length=20,
+                verbose_name='Тип экзамена'),
         ),
     ]

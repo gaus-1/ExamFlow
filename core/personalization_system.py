@@ -19,7 +19,9 @@ class UserBehaviorAnalyzer:
 
     def __init__(self, user_id: int):
         self.user_id = user_id
-        self.user = UserProfile.objects.get(user_id=user_id) if UserProfile.objects.filter(user_id=user_id).exists() else None  # type: ignore
+        self.user = UserProfile.objects.get(
+            user_id=user_id) if UserProfile.objects.filter(
+            user_id=user_id).exists() else None  # type: ignore
 
     def get_user_preferences(self) -> Dict:
         """Получает предпочтения пользователя на основе его активности"""
@@ -63,7 +65,8 @@ class UserBehaviorAnalyzer:
                     reverse=True
                 )
 
-                preferences['favorite_subjects'] = [subject[0] for subject in sorted_subjects[:3]]
+                preferences['favorite_subjects'] = [subject[0]
+                                                    for subject in sorted_subjects[:3]]
 
                 # Анализируем предпочтения по сложности
                 difficulty_stats = user_progress.values('task__difficulty').annotate(
@@ -76,12 +79,14 @@ class UserBehaviorAnalyzer:
                         stat['task__difficulty'] * stat['count']
                         for stat in difficulty_stats
                     )
-                    preferences['difficulty_preference'] = round(weighted_difficulty / total_attempts, 1)
+                    preferences['difficulty_preference'] = round(
+                        weighted_difficulty / total_attempts, 1)
 
             return preferences
 
         except Exception as e:
-            logger.error(f"Ошибка при анализе предпочтений пользователя {self.user_id}: {e}")
+            logger.error(
+                f"Ошибка при анализе предпочтений пользователя {self.user_id}: {e}")
             return {
                 'favorite_subjects': [],
                 'difficulty_preference': 3,
@@ -162,7 +167,8 @@ class UserBehaviorAnalyzer:
             return patterns
 
         except Exception as e:
-            logger.error(f"Ошибка при анализе паттернов обучения пользователя {self.user_id}: {e}")
+            logger.error(
+                f"Ошибка при анализе паттернов обучения пользователя {self.user_id}: {e}")
             return {
                 'study_frequency': 'regular',
                 'preferred_days': [],
@@ -193,7 +199,8 @@ class PersonalizedRecommendations:
                 )
 
             # Фильтруем по предпочтительной сложности
-            difficulty_range = self._get_difficulty_range(preferences['difficulty_preference'])
+            difficulty_range = self._get_difficulty_range(
+                preferences['difficulty_preference'])
             recommended_tasks = recommended_tasks.filter(
                 difficulty__range=difficulty_range
             )
@@ -215,7 +222,8 @@ class PersonalizedRecommendations:
             return list(recommended_tasks)
 
         except Exception as e:
-            logger.error(f"Ошибка при получении рекомендаций для пользователя {self.user_id}: {e}")
+            logger.error(
+                f"Ошибка при получении рекомендаций для пользователя {self.user_id}: {e}")
             return []
 
     def get_study_plan(self) -> Dict:
@@ -274,7 +282,8 @@ class PersonalizedRecommendations:
             return plan
 
         except Exception as e:
-            logger.error(f"Ошибка при создании плана обучения для пользователя {self.user_id}: {e}")
+            logger.error(
+                f"Ошибка при создании плана обучения для пользователя {self.user_id}: {e}")
             return {
                 'daily_goals': [],
                 'weekly_focus': [],
@@ -346,7 +355,8 @@ class PersonalizedRecommendations:
             ]
 
         except Exception as e:
-            logger.error(f"Ошибка при определении слабых тем пользователя {self.user_id}: {e}")
+            logger.error(
+                f"Ошибка при определении слабых тем пользователя {self.user_id}: {e}")
             return []
 
 
@@ -393,12 +403,18 @@ def _get_progress_summary(user_id: int) -> Dict:
             'total_tasks': total_tasks,
             'solved_tasks': solved_tasks,
             'total_attempts': total_attempts,
-            'success_rate': round(success_rate, 1),
-            'completion_percentage': round(solved_tasks / total_tasks * 100, 1) if total_tasks > 0 else 0
-        }
+            'success_rate': round(
+                success_rate,
+                1),
+            'completion_percentage': round(
+                solved_tasks /
+                total_tasks *
+                100,
+                1) if total_tasks > 0 else 0}
 
     except Exception as e:
-        logger.error(f"Ошибка при получении сводки прогресса для пользователя {user_id}: {e}")
+        logger.error(
+            f"Ошибка при получении сводки прогресса для пользователя {user_id}: {e}")
         return {
             'total_tasks': 0,
             'solved_tasks': 0,

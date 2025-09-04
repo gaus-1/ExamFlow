@@ -9,33 +9,35 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('🔧 ПРИНУДИТЕЛЬНОЕ ИСПРАВЛЕНИЕ БАЗЫ ДАННЫХ EXAMFLOW')
         self.stdout.write('=' * 60)
-        
+
         try:
             # Шаг 1: Проверяем базу данных
             self.stdout.write('📊 Проверяем базу данных...')
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
-            self.stdout.write(self.style.SUCCESS('✅ База данных доступна'))  # type: ignore
-            
+            self.stdout.write(self.style.SUCCESS(
+                '✅ База данных доступна'))  # type: ignore
+
             # Шаг 2: Принудительно создаем недостающие поля
             self.stdout.write('🔄 Создаем недостающие поля...')
             self.create_missing_fields()
-            
+
             # Шаг 3: Применяем миграции
             self.stdout.write('📦 Применяем миграции...')
             call_command('migrate', '--fake-initial')
-            
+
             # Шаг 4: Проверяем статус
             self.stdout.write('✅ Проверяем статус миграций...')
             call_command('showmigrations')
-            
+
             # Шаг 5: Загружаем данные
             self.stdout.write('📚 Загружаем образцы данных...')
             call_command('load_sample_data')
-            
+
             self.stdout.write('=' * 60)
-            self.stdout.write(self.style.SUCCESS('🎉 БАЗА ДАННЫХ ИСПРАВЛЕНА!'))  # type: ignore
-            
+            self.stdout.write(self.style.SUCCESS(
+                '🎉 БАЗА ДАННЫХ ИСПРАВЛЕНА!'))  # type: ignore
+
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'❌ Ошибка: {e}'))  # type: ignore
 
@@ -45,23 +47,23 @@ class Command(BaseCommand):
             # Создаем поле exam_type в learning_subject
             try:
                 cursor.execute("""
-                    ALTER TABLE learning_subject 
+                    ALTER TABLE learning_subject
                     ADD COLUMN IF NOT EXISTS exam_type VARCHAR(3) DEFAULT 'ЕГЭ';
                 """)
                 self.stdout.write('✅ Поле exam_type добавлено в learning_subject')
             except Exception as e:
                 self.stdout.write(f'⚠️ exam_type: {e}')
-            
+
             # Создаем поле code в learning_topic
             try:
                 cursor.execute("""
-                    ALTER TABLE learning_topic 
+                    ALTER TABLE learning_topic
                     ADD COLUMN IF NOT EXISTS code VARCHAR(20) DEFAULT '';
                 """)
                 self.stdout.write('✅ Поле code добавлено в learning_topic')
             except Exception as e:
                 self.stdout.write(f'⚠️ code: {e}')
-            
+
             # Проверяем и создаем таблицы если их нет
             try:
                 cursor.execute("""
@@ -74,7 +76,7 @@ class Command(BaseCommand):
                 self.stdout.write('✅ Таблица learning_subject проверена/создана')
             except Exception as e:
                 self.stdout.write(f'⚠️ learning_subject: {e}')
-            
+
             try:
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS learning_task (

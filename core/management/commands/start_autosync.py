@@ -6,20 +6,19 @@
 import os
 import time
 import logging
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import timedelta
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
 from core.models import FIPISourceMap, FIPIData
 from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
 from core.data_ingestion.ingestion_engine import IngestionEngine, TaskPriority
-# Импорт PDF-процессора переносим внутрь функции, чтобы не падать на окружениях без cffi/cryptography
+# Импорт PDF-процессора переносим внутрь функции, чтобы не падать на
+# окружениях без cffi/cryptography
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +65,8 @@ class Command(BaseCommand):
         detect_interval_min: int = options['detect_interval_min']
         pdf_batch: int = options['pdf_batch']
 
-        self.stdout.write(self.style.SUCCESS('🚀 Старт автосинхронизации'))  # type: ignore
+        self.stdout.write(self.style.SUCCESS(
+            '🚀 Старт автосинхронизации'))  # type: ignore
 
         scheduler = BackgroundScheduler(timezone=str(timezone.get_current_timezone()))
 
@@ -95,9 +95,14 @@ class Command(BaseCommand):
             except Exception as e:
                 logger.error(f"Ошибка add_ingestion_tasks: {e}")
 
-        scheduler.add_job(add_ingestion_tasks,
-                          trigger=IntervalTrigger(minutes=ingest_interval_min),
-                          id='add_ingestion_tasks', max_instances=1, coalesce=True, replace_existing=True)
+        scheduler.add_job(
+            add_ingestion_tasks,
+            trigger=IntervalTrigger(
+                minutes=ingest_interval_min),
+            id='add_ingestion_tasks',
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True)
 
         # 2) Периодический проход скрейпера по индекс-страницам c сохранением в БД
         def run_scraper_cycle():
@@ -109,16 +114,23 @@ class Command(BaseCommand):
             except Exception as e:
                 logger.error(f"Ошибка run_scraper_cycle: {e}")
 
-        scheduler.add_job(run_scraper_cycle,
-                          trigger=IntervalTrigger(minutes=scrape_interval_min),
-                          id='run_scraper_cycle', max_instances=1, coalesce=True, replace_existing=True)
+        scheduler.add_job(
+            run_scraper_cycle,
+            trigger=IntervalTrigger(
+                minutes=scrape_interval_min),
+            id='run_scraper_cycle',
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True)
 
         # 3) Периодическая обработка PDF
         def process_pdfs():
             try:
-                # Флаг для явного разрешения PDF-пайплайна (по умолчанию выключен для совместимости с Windows локально)
+                # Флаг для явного разрешения PDF-пайплайна (по умолчанию выключен для
+                # совместимости с Windows локально)
                 if os.getenv('USE_PDF_PIPELINE', '0') != '1':
-                    logger.info("Автосинхро: PDF-пайплайн отключен (USE_PDF_PIPELINE!=1)")
+                    logger.info(
+                        "Автосинхро: PDF-пайплайн отключен (USE_PDF_PIPELINE!=1)")
                     return
 
                 # Ленивая загрузка, чтобы не импортировать при старте команды
@@ -138,16 +150,22 @@ class Command(BaseCommand):
             except Exception as e:
                 logger.error(f"Ошибка process_pdfs: {e}")
 
-        scheduler.add_job(process_pdfs,
-                          trigger=IntervalTrigger(minutes=pdf_interval_min),
-                          id='process_pdfs', max_instances=1, coalesce=True, replace_existing=True)
+        scheduler.add_job(
+            process_pdfs,
+            trigger=IntervalTrigger(
+                minutes=pdf_interval_min),
+            id='process_pdfs',
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True)
 
         # 4) Периодическая проверка изменений источников и уведомление в бот
         def detect_changes_and_notify():
             try:
                 # Простейшая эвристика: сообщаем о новых записях за последние 6 часов
                 since = timezone.now() - timedelta(hours=6)
-                new_count = FIPIData.objects.filter(created_at__gte=since).count()  # type: ignore
+                new_count = FIPIData.objects.filter(
+                    created_at__gte=since).count()  # type: ignore
                 if new_count > 0:
                     _send_telegram_broadcast(
                         f"📥 Обновление контента: добавлено {new_count} материалов за последние 6 часов"
@@ -156,19 +174,24 @@ class Command(BaseCommand):
             except Exception as e:
                 logger.error(f"Ошибка detect_changes_and_notify: {e}")
 
-        scheduler.add_job(detect_changes_and_notify,
-                          trigger=IntervalTrigger(minutes=detect_interval_min),
-                          id='detect_changes_and_notify', max_instances=1, coalesce=True, replace_existing=True)
+        scheduler.add_job(
+            detect_changes_and_notify,
+            trigger=IntervalTrigger(
+                minutes=detect_interval_min),
+            id='detect_changes_and_notify',
+            max_instances=1,
+            coalesce=True,
+            replace_existing=True)
 
         scheduler.start()
-        self.stdout.write(self.style.SUCCESS('✅ Планировщик запущен (Ctrl+C для остановки)'))  # type: ignore
+        self.stdout.write(self.style.SUCCESS(
+            '✅ Планировщик запущен (Ctrl+C для остановки)'))  # type: ignore
 
         try:
             while True:
                 time.sleep(5)
         except KeyboardInterrupt:
-            self.stdout.write(self.style.WARNING('Остановка планировщика...'))  # type: ignore
+            self.stdout.write(self.style.WARNING(
+                'Остановка планировщика...'))  # type: ignore
             scheduler.shutdown(wait=False)
             self.stdout.write(self.style.SUCCESS('Готово'))  # type: ignore
-
-

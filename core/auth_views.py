@@ -29,7 +29,7 @@ def register_view(request):
     """Регистрация нового пользователя"""
     if request.user.is_authenticated:
         return redirect('dashboard')
-    
+
     if request.method == 'POST':
         form = TechRegisterForm(request.POST)
         if form.is_valid():
@@ -52,13 +52,14 @@ def register_view(request):
                             icon='fas fa-user-plus',
                             color='#00ff88'
                         )
-                        messages.success(request, 'Регистрация успешна! Добро пожаловать в ExamFlow!')
+                        messages.success(
+                            request, 'Регистрация успешна! Добро пожаловать в ExamFlow!')
                         return redirect('dashboard')
             except Exception as e:
                 messages.error(request, f'Ошибка при регистрации: {str(e)}')
     else:
         form = TechRegisterForm()
-    
+
     return render(request, 'auth/register.html', {'form': form})
 
 
@@ -66,7 +67,7 @@ def login_view(request):
     """Вход пользователя"""
     if request.user.is_authenticated:
         return redirect('dashboard')
-    
+
     if request.method == 'POST':
         form = TechLoginForm(request, data=request.POST)
         if form.is_valid():
@@ -76,18 +77,20 @@ def login_view(request):
             if user:
                 login(request, user)
                 # Обновляем время последней активности
-                profile, created = UserProfile.objects.get_or_create(user=user)  # type: ignore
+                profile, created = UserProfile.objects.get_or_create(
+                    user=user)  # type: ignore
                 profile.last_activity = timezone.now()
                 profile.save()
-                
-                messages.success(request, f'Добро пожаловать, {user.first_name or user.username}!')
+
+                messages.success(
+                    request, f'Добро пожаловать, {user.first_name or user.username}!')
                 next_url = request.GET.get('next', 'dashboard')
                 return redirect(next_url)
             else:
                 messages.error(request, 'Неверные данные для входа')
     else:
         form = TechLoginForm()
-    
+
     return render(request, 'auth/login.html', {'form': form})
 
 
@@ -104,23 +107,26 @@ def dashboard_view(request):
     user = request.user
     profile, created = UserProfile.objects.get_or_create(user=user)  # type: ignore
     rating, created = UserRating.objects.get_or_create(user=user)  # type: ignore
-    achievements = Achievement.objects.filter(user=user).order_by('-created_at')  # type: ignore
-    
+    achievements = Achievement.objects.filter(
+        user=user).order_by('-created_at')  # type: ignore
+
     # Статистика пользователя
-    from learning.models import UserProgress, Task, Subject
-    total_tasks_solved = UserProgress.objects.filter(user=user, is_correct=True).count()  # type: ignore
+    from learning.models import UserProgress, Subject
+    total_tasks_solved = UserProgress.objects.filter(
+        user=user, is_correct=True).count()  # type: ignore
     total_subjects = Subject.objects.count()  # type: ignore
-    user_subjects = UserProgress.objects.filter(user=user).values('task__subject').distinct().count()  # type: ignore
-    
+    user_subjects = UserProgress.objects.filter(user=user).values(
+        'task__subject').distinct().count()  # type: ignore
+
     # Проверяем подписку
     active_subscription = None
     if profile.is_premium:
         active_subscription = Subscription.objects.filter(  # type: ignore
-            user=user, 
+            user=user,
             status='active',
             expires_at__gt=timezone.now()
         ).first()
-    
+
     context = {
         'user': user,
         'profile': profile,
@@ -133,15 +139,16 @@ def dashboard_view(request):
         'can_solve_tasks': profile.can_solve_tasks,
         'tasks_left_today': profile.daily_tasks_limit - profile.tasks_solved_today if not profile.is_premium else 'Безлимитно'
     }
-    
+
     return render(request, 'auth/dashboard.html', context)
 
 
 @login_required
 def profile_view(request):
     """Профиль пользователя"""
-    profile, created = UserProfile.objects.get_or_create(user=request.user)  # type: ignore
-    
+    profile, created = UserProfile.objects.get_or_create(
+        user=request.user)  # type: ignore
+
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, instance=profile, user=request.user)
         if form.is_valid():
@@ -150,7 +157,7 @@ def profile_view(request):
             return redirect('profile')
     else:
         form = ProfileUpdateForm(instance=profile, user=request.user)
-    
+
     return render(request, 'auth/profile.html', {'form': form, 'profile': profile})
 
 
@@ -162,24 +169,25 @@ def subscribe_view(request):
         data = json.loads(request.body)
         subscription_type = data.get('type')  # 'monthly' или 'yearly'
         payment_method = data.get('payment_method')  # 'card' или 'btc'
-        
+
         if subscription_type not in ['monthly', 'yearly']:
             return JsonResponse({'success': False, 'error': 'Неверный тип подписки'})
-        
+
         if payment_method not in ['card', 'btc']:
             return JsonResponse({'success': False, 'error': 'Неверный способ оплаты'})
-        
+
         # Определяем стоимость
         amounts = {
             'monthly': 990.00,
             'yearly': 9900.00
         }
         amount = amounts[subscription_type]
-        
+
         # Создаем подписку в статусе ожидания
         starts_at = timezone.now()
-        expires_at = starts_at + timedelta(days=30 if subscription_type == 'monthly' else 365)
-        
+        expires_at = starts_at + \
+            timedelta(days=30 if subscription_type == 'monthly' else 365)
+
         subscription = Subscription.objects.create(  # type: ignore
             user=request.user,
             subscription_type=subscription_type,
@@ -190,7 +198,7 @@ def subscribe_view(request):
             starts_at=starts_at,
             expires_at=expires_at
         )
-        
+
         # Здесь должна быть интеграция с платежной системой
         # Пока имитируем успешную оплату
         if payment_method == 'card':
@@ -199,14 +207,14 @@ def subscribe_view(request):
         else:
             # Интеграция с Bitcoin
             payment_url = f"/payment/btc/{subscription.id}/"
-        
+
         return JsonResponse({
             'success': True,
             'payment_url': payment_url,
             'subscription_id': subscription.id,
             'amount': float(amount)
         })
-        
+
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
@@ -214,18 +222,19 @@ def subscribe_view(request):
 @login_required
 def achievements_view(request):
     """Страница достижений пользователя"""
-    achievements = Achievement.objects.filter(user=request.user).order_by('-created_at')  # type: ignore
+    achievements = Achievement.objects.filter(
+        user=request.user).order_by('-created_at')  # type: ignore
     profile = UserProfile.objects.get(user=request.user)  # type: ignore
-    
+
     # Статистика достижений
     total_achievements = achievements.count()
-    
+
     context = {
         'achievements': achievements,
         'total_achievements': total_achievements,
         'profile': profile
     }
-    
+
     return render(request, 'auth/achievements.html', context)
 
 
@@ -236,12 +245,12 @@ def telegram_auth(request):
     try:
         data = json.loads(request.body)
         telegram_id = data.get('telegram_id')
-        username = data.get('username')
+        data.get('username')
         first_name = data.get('first_name', '')
-        
+
         if not telegram_id:
             return JsonResponse({'success': False, 'error': 'Telegram ID обязателен'})
-        
+
         # Ищем пользователя по Telegram ID
         try:
             profile = UserProfile.objects.get(telegram_id=telegram_id)  # type: ignore
@@ -257,11 +266,11 @@ def telegram_auth(request):
                 telegram_id=telegram_id
             )
             UserRating.objects.create(user=user)  # type: ignore
-        
+
         # Обновляем время активности
         profile.last_activity = timezone.now()
         profile.save()
-        
+
         return JsonResponse({
             'success': True,
             'user_id': user.id,
@@ -269,6 +278,6 @@ def telegram_auth(request):
             'is_premium': profile.is_premium,
             'can_solve_tasks': profile.can_solve_tasks
         })
-        
+
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})

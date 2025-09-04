@@ -16,9 +16,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.conf import settings
 import json
-from core.services.unified_profile import UnifiedProfileService
 import logging
 import hashlib
 from django.core.cache import cache
@@ -26,7 +24,9 @@ from django.core.cache import cache
 logger = logging.getLogger(__name__)
 
 # Настройка Gemini API
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyCvi8Mm5paqqV-bakd2N897MgUEvJyWw44')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+if not GEMINI_API_KEY:
+    raise RuntimeError('SECURITY: GEMINI_API_KEY must be set in environment variables')
 # Инициализация модели с оптимизацией для скорости
 try:
     genai.configure(api_key=GEMINI_API_KEY)  # type: ignore
@@ -73,14 +73,30 @@ class AIAssistantAPI(View):
         """
         try:
             logger.info(f"AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
+            
+            # Валидация размера запроса
+            if len(request.body) > 10000:  # 10KB лимит
+                return JsonResponse({
+                    'error': 'Слишком большой запрос'
+                }, status=413)
+            
             data = json.loads(request.body)
             prompt = data.get('prompt', '').strip()
-            logger.info(f"AI API: Промпт: {prompt[:100]}...")
             
+            # Валидация промпта
             if not prompt:
                 return JsonResponse({
                     'error': 'Пустой запрос'
                 }, status=400)
+            
+            if len(prompt) > 2000:  # Ограничение длины
+                return JsonResponse({
+                    'error': 'Промпт слишком длинный (максимум 2000 символов)'
+                }, status=400)
+            
+            # Базовая санитизация
+            prompt = prompt.replace('<', '&lt;').replace('>', '&gt;')
+            logger.info(f"AI API: Промпт: {prompt[:100]}...")
             
             # Проверяем, что модель инициализирована
             if model is None:
@@ -108,8 +124,8 @@ class AIAssistantAPI(View):
         Генерирует ответ ИИ на основе запроса через RAG-систему с кэшированием
         """
         try:
-            # Создаем хеш для кэширования
-            prompt_hash = hashlib.md5(prompt.lower().strip().encode()).hexdigest()
+            # Создаем хеш для кэширования (используем SHA-256 для безопасности)
+            prompt_hash = hashlib.sha256(prompt.lower().strip().encode()).hexdigest()
             cache_key = f"ai_response_{prompt_hash}"
             
             # Проверяем кэш
@@ -166,8 +182,13 @@ class AIAssistantAPI(View):
         except Exception as e:
             logger.error(f"AI API Error: {e}")
             # Fallback на базовый ответ
+            error_msg = (
+                f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. "
+                f"Попробуйте переформулировать или обратитесь к официальным источникам.\n\n"
+                f"Ваш вопрос: {prompt}"
+            )
             return {
-                'answer': f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. Попробуйте переформулировать или обратитесь к официальным источникам.\n\nВаш вопрос: {prompt}",
+                'answer': error_msg,
                 'sources': [
                     {'title': 'ФИПИ - ЕГЭ', 'url': 'https://fipi.ru/ege'},
                     {'title': 'ExamFlow - Главная', 'url': 'https://examflow.ru/'}

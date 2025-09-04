@@ -19,18 +19,18 @@ app_name = 'learning'
 urlpatterns = [
     # Главная страница
     path('', views.home, name='home'),
-    
+
     # Предметы
     path('subjects/', views.subjects_list, name='subjects_list'),
     path('subject/<int:subject_id>/', views.subject_detail, name='subject_detail'),
-    
+
     # Темы
     path('topic/<int:topic_id>/', views.topic_detail, name='topic_detail'),
-    
+
     # Задания
     path('task/<int:task_id>/', views.task_detail, name='task_detail'),
     path('task/<int:task_id>/solve/', views.solve_task, name='solve_task'),
-    
+
     # Случайные задания
     path('random/', views.random_task, name='random_task'),
     path('random/<int:subject_id>/', views.random_task, name='random_task_subject'),

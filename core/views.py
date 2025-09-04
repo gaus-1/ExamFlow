@@ -10,7 +10,6 @@ from django.views.decorators.http import require_http_methods
 import logging
 from django_ratelimit.decorators import ratelimit
 from django.views.decorators.csrf import csrf_exempt
-import json
 
 from .personalization_system import (
     get_user_insights,

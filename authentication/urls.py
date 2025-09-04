@@ -19,7 +19,7 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('login/', views.TechLoginView.as_view(), name='login'),
     path('logout/', views.logout_view, name='logout'),
-    
+
     # Личный кабинет
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('profile/update/', views.profile_update_view, name='profile_update'),

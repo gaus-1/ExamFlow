@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-import json
 
 
 class AiRequest(models.Model):
@@ -185,7 +184,7 @@ class AiPromptTemplate(models.Model):
         """Форматирует промпт с подстановкой переменных"""
         try:
             return self.prompt_template.format(**kwargs)
-        except KeyError as e:
+        except KeyError:
             # Если не хватает переменных, возвращаем исходный шаблон
             return self.prompt_template
 

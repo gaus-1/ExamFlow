@@ -20,7 +20,7 @@ from .forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
 def register_view(request):
     """
     Регистрация нового пользователя
-    
+
     Использует упрощенную форму: имя, email, пароль (2 раза)
     Автоматически генерирует username из email
     """
@@ -29,13 +29,14 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             # Явно указываем backend для аутентификации
-            from authentication.backends import EmailBackend
             login(request, user, backend='authentication.backends.EmailBackend')
-            messages.success(request, f'Добро пожаловать, {user.first_name}! Ваш аккаунт успешно создан.')
+            messages.success(
+                request,
+                f'Добро пожаловать, {user.first_name}! Ваш аккаунт успешно создан.')
             return redirect('authentication:dashboard')
     else:
         form = TechRegisterForm()
-    
+
     return render(request, 'auth/register.html', {'form': form})
 
 
@@ -44,10 +45,10 @@ class TechLoginView(LoginView):
     form_class = TechLoginForm
     template_name = 'auth/login.html'
     redirect_authenticated_user = True
-    
+
     def get_success_url(self):
         return '/dashboard/'
-    
+
     def form_valid(self, form):
         messages.success(self.request, f'С возвращением, {form.get_user().first_name}!')
         return super().form_valid(form)
@@ -64,33 +65,33 @@ def logout_view(request):
 def dashboard_view(request):
     """
     Личный кабинет пользователя
-    
+
     Показывает:
     - Статистику обучения
     - Последние решенные задания
     - Прогресс по предметам
     - Достижения
     """
-    from core.models import UserProgress, Task, Subject
-    
+    from core.models import UserProgress, Subject
+
     # Получаем статистику пользователя
     user_progress = UserProgress.objects.filter(user=request.user)  # type: ignore
     total_solved = user_progress.filter(is_correct=True).count()  # type: ignore
     total_attempts = user_progress.count()  # type: ignore
-    
+
     # Прогресс по предметам
     subjects_progress = {}
-    for subject in Subject.objects.all():  # type: ignore   
+    for subject in Subject.objects.all():  # type: ignore
         subject_progress = user_progress.filter(task__subject=subject)  # type: ignore
         subjects_progress[subject.name] = {
             'total': subject_progress.count(),  # type: ignore
             'correct': subject_progress.filter(is_correct=True).count(),  # type: ignore
             'subject': subject
         }
-    
+
     # Последние решенные задания
-    recent_tasks = user_progress.order_by('-created_at')[:5]  # type: ignore    
-    
+    recent_tasks = user_progress.order_by('-created_at')[:5]  # type: ignore
+
     context = {
         'total_solved': total_solved,
         'total_attempts': total_attempts,
@@ -119,14 +120,14 @@ def dashboard_view(request):
         'can_solve_tasks': True,
         'active_subscription': None
     }
-    
+
     return render(request, 'auth/dashboard.html', context)
 
 
 @login_required
 def profile_update_view(request):
     """Обновление профиля пользователя"""
-    
+
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST)
         if form.is_valid():
@@ -136,7 +137,7 @@ def profile_update_view(request):
             user.last_name = form.cleaned_data.get('last_name', user.last_name)
             user.email = form.cleaned_data.get('email', user.email)
             user.save()
-            
+
             messages.success(request, 'Профиль успешно обновлен!')
             return redirect('authentication:dashboard')
     else:
@@ -147,5 +148,5 @@ def profile_update_view(request):
             'email': request.user.email,
         }
         form = ProfileUpdateForm(initial=initial_data)
-    
+
     return render(request, 'auth/profile_update.html', {'form': form})

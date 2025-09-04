@@ -4,7 +4,7 @@ from django.apps import AppConfig
 class LearningConfig(AppConfig):
     """
     Конфигурация модуля обучения
-    
+
     Этот модуль отвечает за:
     - Управление предметами и темами
     - Работу с заданиями и их решение

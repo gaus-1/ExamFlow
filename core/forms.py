@@ -5,8 +5,6 @@
 Этот файл содержит только legacy формы для обратной совместимости.
 """
 
-from django import forms
-from authentication.models import UserProfile
 
 # Импортируем формы из нового модуля для обратной совместимости
 try:
@@ -16,11 +14,11 @@ except ImportError:
     # Если модуль authentication недоступен, создаем заглушки
     class TechRegisterForm:
         pass
-    
+
     class TechLoginForm:
         pass
-    
+
     class ProfileUpdateForm:
         pass
-    
+
     __all__ = []

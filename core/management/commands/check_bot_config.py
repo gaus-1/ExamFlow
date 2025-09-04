@@ -9,13 +9,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     help = 'Проверяет конфигурацию Telegram бота'
-    
+
     def handle(self, *args, **options):
         self.stdout.write('🔍 Проверка конфигурации Telegram бота')
         self.stdout.write('=' * 50)
-        
+
         # Проверяем токен
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
         if token:
@@ -26,7 +27,7 @@ class Command(BaseCommand):
             self.stdout.write('   Добавьте TELEGRAM_BOT_TOKEN в Environment Variables')
             logger.error('TELEGRAM_BOT_TOKEN не настроен')
             return
-        
+
         # Проверяем SITE_URL
         site_url = getattr(settings, 'SITE_URL', None)
         if site_url:
@@ -36,7 +37,7 @@ class Command(BaseCommand):
             self.stdout.write('   Добавьте SITE_URL в Environment Variables')
             logger.error('SITE_URL не настроен')
             return
-        
+
         # Проверяем базу данных
         try:
             from django.db import connection
@@ -49,7 +50,7 @@ class Command(BaseCommand):
             self.stdout.write(f'❌ Ошибка базы данных: {e}')
             logger.error(f'Ошибка базы данных: {e}')
             return
-        
+
         # Проверяем доступность бота
         try:
             from telegram_bot.bot_main import get_bot
@@ -63,7 +64,7 @@ class Command(BaseCommand):
             self.stdout.write(f'❌ Ошибка бота: {e}')
             logger.error(f'Ошибка бота: {e}')
             return
-        
+
         self.stdout.write('=' * 50)
         self.stdout.write('🎉 Конфигурация бота корректна!')
         logger.info('Конфигурация бота проверена успешно')

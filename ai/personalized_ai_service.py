@@ -3,9 +3,9 @@
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from django.contrib.auth.models import User
-from core.personalization_system import get_user_insights, PersonalizedRecommendations
+from core.personalization_system import get_user_insights
 from ai.services import AiService
 
 logger = logging.getLogger(__name__)

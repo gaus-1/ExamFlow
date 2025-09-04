@@ -52,7 +52,6 @@ def update_provider_statistics(sender, instance, **kwargs):
     # Временно отключаем обновление статистики провайдера
     # так как у AiRequest нет поля provider
     # TODO: Добавить поле provider в модель или переработать логику
-    pass
 
 
 # ========================================

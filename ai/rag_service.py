@@ -13,7 +13,7 @@ from typing import List, Dict, Any, Optional
 from django.db.models import Q
 from django.contrib.auth.models import User
 
-from learning.models import Task, Subject, Topic, UserProgress
+from learning.models import Task, Subject, UserProgress
 from authentication.models import UserProfile
 
 
