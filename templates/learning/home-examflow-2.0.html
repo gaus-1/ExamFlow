@@ -16,9 +16,18 @@
   <div class="container container-xl">
     <div class="header-content flex items-center justify-between">
       <!-- Логотип -->
-      <div class="logo-container flex items-center gap-3">
-        <img src="{% static 'images/logo-new.png' %}" alt="ExamFlow" class="logo-image">
-        <span class="logo-text gradient-text font-bold text-xl">ExamFlow</span>
+      <div class="logo-container flex items-center gap-3" style="flex-direction: column; align-items: center;">
+        <div class="flex items-center gap-3">
+          <img src="{% static 'images/logo-new.png' %}" alt="ExamFlow" class="logo-image">
+          <span class="logo-text gradient-text font-bold text-xl">ExamFlow</span>
+        </div>
+        <div class="brand-subtitle" aria-label="Get ready. Check. Stay informed.">
+          <span class="brand-subtitle__item">Get ready</span>
+          <span class="brand-subtitle__sep">•</span>
+          <span class="brand-subtitle__item">Check</span>
+          <span class="brand-subtitle__sep">•</span>
+          <span class="brand-subtitle__item brand-subtitle__item--accent">Stay informed</span>
+        </div>
       </div>
       
       <!-- Навигация -->
