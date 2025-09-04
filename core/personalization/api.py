@@ -100,7 +100,7 @@ class PersonalizationAPI(View):
             
             # Получаем профиль пользователя
             user_profile = UnifiedProfile.objects.filter( # type: ignore
-                models.Q(user_id=user_id) | models.Q(telegram_id=user_id)
+                models.Q(user_id=user_id) | models.Q(telegram_id=user_id) # type: ignore
             ).first()
             
             if not user_profile:
@@ -176,7 +176,7 @@ class PersonalizationAPI(View):
             from core.models import UnifiedProfile # type: ignore
             
             user_profile = UnifiedProfile.objects.filter( # type: ignore
-                models.Q(user_id=user_id) | models.Q(telegram_id=user_id)
+                models.Q(user_id=user_id) | models.Q(telegram_id=user_id) # type: ignore
             ).first()
             
             if user_profile:

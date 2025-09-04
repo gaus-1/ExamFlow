@@ -27,18 +27,18 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(
-            self.style.SUCCESS('🧠 Тестирование RAG-системы ExamFlow 2.0')
+            self.style.SUCCESS('Тестирование RAG-системы ExamFlow 2.0') # type: ignore      
         )
         
         # Получаем оркестратор
         try:
             orchestrator = get_ai_orchestrator()
             self.stdout.write(
-                self.style.SUCCESS('✅ RAG-система инициализирована')
+                self.style.SUCCESS('RAG-система инициализирована') # type: ignore
             )
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка инициализации RAG-системы: {e}')
+                self.style.ERROR(f'Ошибка инициализации RAG-системы: {e}') # type: ignore
             )
             return
 
@@ -65,19 +65,19 @@ class Command(BaseCommand):
                 response = orchestrator.process_query(query, user_id)
                 
                 # Выводим результат
-                self.stdout.write(f'✅ Ответ получен')
-                self.stdout.write(f'📄 Ответ: {response["answer"][:200]}...')
-                self.stdout.write(f'📚 Источники: {len(response["sources"])}')
-                self.stdout.write(f'🎯 Практика: {response["practice"]["topic"]}')
+                self.stdout.write(f'Ответ получен') # type: ignore
+                self.stdout.write(f'Ответ: {response["answer"][:200]}...')
+                self.stdout.write(f'Источники: {len(response["sources"])}')
+                self.stdout.write(f'Практика: {response["practice"]["topic"]}')
                 
                 if response.get('error'):
-                    self.stdout.write(f'⚠️ Ошибка: {response["error"]}')
+                    self.stdout.write(f'Ошибка: {response["error"]}') # type: ignore
                 
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Ошибка при обработке запроса: {e}')
+                    self.style.ERROR(f'Ошибка при обработке запроса: {e}') # type: ignore
                 )
 
         self.stdout.write(
-            self.style.SUCCESS('\n🎉 Тестирование RAG-системы завершено!')
+            self.style.SUCCESS('\nТестирование RAG-системы завершено!') # type: ignore
         )
