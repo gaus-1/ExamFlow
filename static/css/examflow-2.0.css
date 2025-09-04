@@ -1,28 +1,90 @@
 
 /* ========================================
-   ЛОГОТИП - ОРИГИНАЛЬНЫЕ СТИЛИ
+   ЛОГОТИП С ПОДПИСЬЮ - ВАРИАНТ A
    ======================================== */
+
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 
 .logo-container {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  margin-bottom: 4px; /* 4px отступ между логотипом и подписью */
+  width: fit-content; /* Ширина по содержимому */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .logo-image {
-  width: 40px;
-  height: 40px;
+  width: 46px; /* Увеличено на 15% (40px * 1.15) */
+  height: 46px;
   object-fit: contain;
 }
 
 .logo-text {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: 1.4375rem; /* Увеличено на 15% (20px * 1.15 = 23px) */
   font-weight: var(--font-bold);
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.logo-subtitle {
+  font-family: var(--font-primary);
+  font-size: 0.67rem; /* Уменьшено в 1.5 раза (16px / 1.5 = 10.67px) */
+  font-weight: 500; /* medium (500) */
+  color: #555555; /* нейтрально-серый */
+  line-height: var(--leading-tight);
+  letter-spacing: 0.2px; /* Уменьшен межбуквенный интервал */
+  max-width: 100%; /* Не выходит за границы логотипа */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  margin-top: 0; /* Убираем отступ, так как он уже в logo-container */
+  width: 100%; /* Занимает всю ширину контейнера */
+  box-sizing: border-box;
+}
+
+/* Адаптивность для Варианта A */
+@media (max-width: 1024px) {
+  .logo-image {
+    width: 46px; /* Сохраняем увеличенный размер на десктопе */
+    height: 46px;
+  }
+  
+  .logo-text {
+    font-size: 1.4375rem; /* 23px на десктопе */
+  }
+  
+  .logo-subtitle {
+    font-size: 0.67rem; /* Уменьшено в 1.5 раза (10.67px) */
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .logo-image {
+    width: 40px; /* Уменьшаем на мобильных для читаемости */
+    height: 40px;
+  }
+  
+  .logo-text {
+    font-size: 1.25rem; /* 20px на мобильных */
+  }
+  
+  .logo-subtitle {
+    font-size: 0.6rem; /* Уменьшено в 1.5 раза (8.67px) */
+    white-space: normal; /* Разрешаем перенос на мобильных */
+    text-align: center;
+  }
 }
 /* ========================================
    EXAMFLOW 2.0 - СОВРЕМЕННАЯ ДИЗАЙН-СИСТЕМА
