@@ -51,6 +51,9 @@ urlpatterns = [
     # Модуль core (персонализация и RAG-система)
     path('core/', include('core.urls')),
     
+    # Модуль персонализации
+    path('personalization/', include('core.personalization.urls')),
+    
     # ==========================================
     # LEGACY МАРШРУТЫ (для обратной совместимости)
     # ==========================================

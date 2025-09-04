@@ -17,8 +17,8 @@ class VectorStore:
     """
     
     def __init__(self):
-        self.embedding_dim = 768  # Размерность эмбеддингов Gemini
-        self.similarity_threshold = 0.7  # Порог схожести
+        self.embedding_dim = 768  # Размерность эмбеддингов text-embedding-004
+        self.similarity_threshold = 0.6  # Порог схожести (снижен для лучшего поиска)
     
     def create_embedding(self, text: str) -> List[float]:
         """
@@ -32,7 +32,7 @@ class VectorStore:
             
             # Создаем эмбеддинг
             result = genai.embed_content(
-                model="models/embedding-001",
+                model="models/text-embedding-004",
                 content=text,
                 task_type="retrieval_document"
             )
@@ -56,7 +56,7 @@ class VectorStore:
             
             # Создаем эмбеддинг для запроса
             result = genai.embed_content(
-                model="models/embedding-001",
+                model="models/text-embedding-004",
                 content=query,
                 task_type="retrieval_query"
             )

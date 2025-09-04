@@ -69,7 +69,6 @@ class AIOrchestrator:
         try:
             # Пытаемся найти профиль по user_id (Django User) или telegram_id
             user_profile = UnifiedProfile.objects.filter( # type: ignore
-            
                 models.Q(user_id=user_id) | models.Q(telegram_id=user_id)
             ).first()
             
