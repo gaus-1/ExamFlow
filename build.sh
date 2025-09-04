@@ -4,6 +4,8 @@ echo "🚀 Начинаем сборку ExamFlow..."
 
 # Устанавливаем зависимости
 echo "📦 Устанавливаем Python зависимости..."
+set -e
+python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements-prod.txt
 
 # Собираем статические файлы

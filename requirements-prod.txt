@@ -25,8 +25,8 @@ django-ratelimit==4.1.0
 django-csp==3.7
 
 # ---- Доп. зависимости для RAG/обработки PDF и OCR (как в prod) ----
-numpy==2.2.6
-scipy==1.16.1
+numpy==1.26.4
+scipy==1.11.4
 opencv-python==4.12.0.88
 pdfplumber==0.11.7
 PyMuPDF==1.26.4
