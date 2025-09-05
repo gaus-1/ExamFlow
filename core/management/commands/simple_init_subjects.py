@@ -62,7 +62,7 @@ class Command(BaseCommand):
         created_count = 0
         
         for subject_data in subjects_data:
-            subject, created = Subject.objects.get_or_create(
+            subject, created = Subject.objects.get_or_create( # type: ignore
                 name=subject_data['name'],
                 defaults=subject_data
             )
@@ -82,7 +82,7 @@ class Command(BaseCommand):
         
         archived_count = 0
         for subject_name in unused_subjects:
-            updated = Subject.objects.filter(name=subject_name).update(is_archived=True)
+            updated = Subject.objects.filter(name=subject_name).update(is_archived=True) # type: ignore
             if updated:
                 archived_count += 1
         
@@ -90,9 +90,9 @@ class Command(BaseCommand):
         self.stdout.write(f'  ✓ Создано предметов: {created_count}')
         
         # Показываем статистику
-        total_subjects = Subject.objects.count()
-        primary_subjects = Subject.objects.filter(is_primary=True).count()
-        archived_subjects = Subject.objects.filter(is_archived=True).count()
+        total_subjects = Subject.objects.count() # type: ignore
+        primary_subjects = Subject.objects.filter(is_primary=True).count() # type: ignore
+        archived_subjects = Subject.objects.filter(is_archived=True).count() # type: ignore
         
         self.stdout.write(f'\nСтатистика:')
         self.stdout.write(f'  Всего предметов: {total_subjects}')
@@ -100,5 +100,5 @@ class Command(BaseCommand):
         self.stdout.write(f'  Архивированных предметов: {archived_subjects}')
         
         self.stdout.write(
-            self.style.SUCCESS('\nПредметы успешно инициализированы!')
+            self.style.SUCCESS('\nПредметы успешно инициализированы!') # type: ignore
         )
