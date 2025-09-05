@@ -3,45 +3,6 @@
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):
-
-    dependencies = [
-        ('learning', '0001_initial'),
-    ]
-
-    operations = [
-        # Добавляем поля для архивации и приоритета
-        migrations.AddField(
-            model_name='subject',
-            name='is_archived',
-            field=models.BooleanField(default=False, verbose_name='Архивирован'),
-        ),
-        migrations.AddField(
-            model_name='subject',
-            name='is_primary',
-            field=models.BooleanField(default=False, verbose_name='Основной предмет'),
-        ),
-        
-        # Архивируем ненужные предметы
-        migrations.RunPython(
-            code=archive_unused_subjects,
-            reverse_code=restore_unused_subjects,
-        ),
-        
-        # Создаем варианты математики
-        migrations.RunPython(
-            code=create_math_variants,
-            reverse_code=remove_math_variants,
-        ),
-        
-        # Создаем варианты русского языка
-        migrations.RunPython(
-            code=create_russian_variants,
-            reverse_code=remove_russian_variants,
-        ),
-    ]
-
-
 def archive_unused_subjects(apps, schema_editor):
     """Архивирует ненужные предметы"""
     Subject = apps.get_model('learning', 'Subject')
@@ -72,7 +33,7 @@ def create_math_variants(apps, schema_editor):
         {
             'name': 'Математика (профильная)',
             'code': 'math_prof',
-            'exam_type': 'ege',
+            'exam_type': 'ЕГЭ',
             'description': 'Профильная математика ЕГЭ - задания 1-19',
             'icon': '📐',
             'is_primary': True
@@ -80,7 +41,7 @@ def create_math_variants(apps, schema_editor):
         {
             'name': 'Математика (непрофильная)',
             'code': 'math_base',
-            'exam_type': 'ege',
+            'exam_type': 'ЕГЭ',
             'description': 'Базовая математика ЕГЭ - задания 1-20',
             'icon': '📊',
             'is_primary': True
@@ -88,7 +49,7 @@ def create_math_variants(apps, schema_editor):
         {
             'name': 'Математика (ОГЭ)',
             'code': 'math_oge',
-            'exam_type': 'oge',
+            'exam_type': 'ОГЭ',
             'description': 'Математика ОГЭ - задания 1-26',
             'icon': '🔢',
             'is_primary': True
@@ -125,7 +86,7 @@ def create_russian_variants(apps, schema_editor):
         {
             'name': 'Русский язык (ЕГЭ)',
             'code': 'russian_ege',
-            'exam_type': 'ege',
+            'exam_type': 'ЕГЭ',
             'description': 'Русский язык ЕГЭ - сочинение, тесты, грамматика',
             'icon': '📝',
             'is_primary': True
@@ -133,7 +94,7 @@ def create_russian_variants(apps, schema_editor):
         {
             'name': 'Русский язык (ОГЭ)',
             'code': 'russian_oge',
-            'exam_type': 'oge',
+            'exam_type': 'ОГЭ',
             'description': 'Русский язык ОГЭ - изложение, сочинение, тесты',
             'icon': '📖',
             'is_primary': True
@@ -160,3 +121,67 @@ def remove_russian_variants(apps, schema_editor):
     Subject = apps.get_model('learning', 'Subject')
     russian_codes = ['russian_ege', 'russian_oge']
     Subject.objects.filter(code__in=russian_codes).delete()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('learning', '0003_alter_userprogress_user'),
+    ]
+
+    operations = [
+        # Добавляем поля для архивации и приоритета
+        migrations.AddField(
+            model_name='subject',
+            name='code',
+            field=models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name='Код предмета'),
+        ),
+        migrations.AddField(
+            model_name='subject',
+            name='description',
+            field=models.TextField(blank=True, verbose_name='Описание'),
+        ),
+        migrations.AddField(
+            model_name='subject',
+            name='icon',
+            field=models.CharField(max_length=50, blank=True, verbose_name='Иконка'),
+        ),
+        migrations.AddField(
+            model_name='subject',
+            name='is_archived',
+            field=models.BooleanField(default=False, verbose_name='Архивирован'),
+        ),
+        migrations.AddField(
+            model_name='subject',
+            name='is_primary',
+            field=models.BooleanField(default=False, verbose_name='Основной предмет'),
+        ),
+        migrations.AddField(
+            model_name='subject',
+            name='created_at',
+            field=models.DateTimeField(auto_now_add=True, verbose_name='Дата создания'),
+        ),
+        migrations.AddField(
+            model_name='subject',
+            name='updated_at',
+            field=models.DateTimeField(auto_now=True, verbose_name='Дата обновления'),
+        ),
+        
+        # Архивируем ненужные предметы
+        migrations.RunPython(
+            code=archive_unused_subjects,
+            reverse_code=restore_unused_subjects,
+        ),
+        
+        # Создаем варианты математики
+        migrations.RunPython(
+            code=create_math_variants,
+            reverse_code=remove_math_variants,
+        ),
+        
+        # Создаем варианты русского языка
+        migrations.RunPython(
+            code=create_russian_variants,
+            reverse_code=remove_russian_variants,
+        ),
+    ]
