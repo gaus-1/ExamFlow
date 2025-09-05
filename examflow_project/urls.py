@@ -89,6 +89,11 @@ urlpatterns = [
     # Демонстрация стилей
     path('style-showcase/', lambda request: render(request, 'style-showcase.html'), name='style_showcase'),
     path('aesop-showcase/', lambda request: render(request, 'aesop-showcase.html'), name='aesop_showcase'),
+    
+    # Новые страницы
+    path('features/', lambda request: render(request, 'features.html'), name='features'),
+    path('pricing/', lambda request: render(request, 'pricing.html'), name='pricing'),
+    path('subscribe/', lambda request: render(request, 'subscribe.html'), name='subscribe'),
 ]
 
 if settings.DEBUG:

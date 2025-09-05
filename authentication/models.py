@@ -72,6 +72,7 @@ class Subscription(TimeStampedModel):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name='legacy_subscription',
         verbose_name="Пользователь")
     subscription_type = models.CharField(
         max_length=20,

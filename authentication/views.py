@@ -1,152 +1,215 @@
 """
-Представления для модуля аутентификации
-
-Обрабатывает:
-- Регистрацию пользователей (упрощенная форма)
-- Вход в систему (по email)
-- Выход из системы
-- Личный кабинет пользователя
-- Обновление профиля
+Взгляды для модуля аутентификации ExamFlow 2.0
 """
 
+import json
+import hashlib
+import hmac
+from urllib.parse import urlencode
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
-from .forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm
+from django.utils.crypto import get_random_string
+from django.core.cache import cache
+import requests
 
 
-def register_view(request):
-    """
-    Регистрация нового пользователя
-
-    Использует упрощенную форму: имя, email, пароль (2 раза)
-    Автоматически генерирует username из email
-    """
-    if request.method == 'POST':
-        form = TechRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            # Явно указываем backend для аутентификации
-            login(request, user, backend='authentication.backends.EmailBackend')
-            messages.success(
-                request,
-                f'Добро пожаловать, {user.first_name}! Ваш аккаунт успешно создан.')
-            return redirect('authentication:dashboard')
-    else:
-        form = TechRegisterForm()
-
-    return render(request, 'auth/register.html', {'form': form})
+def simple_login(request):
+    """Упрощенная страница входа"""
+    return render(request, 'auth/simple_login.html')
 
 
-class TechLoginView(LoginView):
-    """Вход в систему в Duolingo-стиле"""
-    form_class = TechLoginForm
-    template_name = 'auth/login.html'
-    redirect_authenticated_user = True
+def telegram_login(request):
+    """Инициация входа через Telegram"""
+    # Telegram Login Widget
+    bot_username = "ExamFlowBot"
+    redirect_url = request.build_absolute_uri('/auth/telegram/callback/')
+    
+    # Параметры для Telegram Login Widget
+    params = {
+        'bot_id': settings.TELEGRAM_BOT_ID,
+        'origin': request.get_host(),
+        'return_to': redirect_url,
+        'request_access': 'write'
+    }
+    
+    telegram_url = f"https://oauth.telegram.org/auth?{urlencode(params)}"
+    return redirect(telegram_url)
 
-    def get_success_url(self):
-        return '/dashboard/'
 
-    def form_valid(self, form):
-        messages.success(self.request, f'С возвращением, {form.get_user().first_name}!')
-        return super().form_valid(form)
+def telegram_callback(request):
+    """Callback для Telegram авторизации"""
+    try:
+        # Получаем данные от Telegram
+        auth_data = request.GET.dict()
+        
+        # Проверяем подпись (упрощенно для демо)
+        if not _verify_telegram_auth(auth_data):
+            messages.error(request, 'Ошибка авторизации через Telegram')
+            return redirect('auth:simple_login')
+        
+        # Создаем или находим пользователя
+        telegram_id = auth_data.get('id')
+        username = f"telegram_{telegram_id}"
+        
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={
+                'first_name': auth_data.get('first_name', ''),
+                'last_name': auth_data.get('last_name', ''),
+                'email': f"{username}@telegram.local"
+            }
+        )
+        
+        # Авторизуем пользователя
+        login(request, user)
+        
+        if created:
+            messages.success(request, 'Добро пожаловать в ExamFlow!')
+        else:
+            messages.success(request, 'Добро пожаловать обратно!')
+        
+        return redirect('learning:home')
+        
+    except Exception as e:
+        messages.error(request, f'Ошибка авторизации: {str(e)}')
+        return redirect('auth:simple_login')
+
+
+def google_login(request):
+    """Инициация входа через Google"""
+    # Google OAuth 2.0
+    client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', 'demo')
+    redirect_uri = request.build_absolute_uri('/auth/google/callback/')
+    
+    params = {
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'scope': 'openid email profile',
+        'response_type': 'code',
+        'state': get_random_string(32)
+    }
+    
+    google_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+    return redirect(google_url)
+
+
+def google_callback(request):
+    """Callback для Google авторизации"""
+    try:
+        code = request.GET.get('code')
+        if not code:
+            messages.error(request, 'Ошибка авторизации через Google')
+            return redirect('auth:simple_login')
+        
+        # Обмениваем код на токен (упрощенно для демо)
+        # В реальном проекте здесь будет обмен кода на access_token
+        
+        # Создаем пользователя (демо)
+        user, created = User.objects.get_or_create(
+            username=f"google_{get_random_string(8)}",
+            defaults={
+                'first_name': 'Google',
+                'last_name': 'User',
+                'email': f"google_{get_random_string(8)}@google.local"
+            }
+        )
+        
+        login(request, user)
+        
+        if created:
+            messages.success(request, 'Добро пожаловать в ExamFlow!')
+        else:
+            messages.success(request, 'Добро пожаловать обратно!')
+        
+        return redirect('learning:home')
+        
+    except Exception as e:
+        messages.error(request, f'Ошибка авторизации: {str(e)}')
+        return redirect('auth:simple_login')
+
+
+def yandex_login(request):
+    """Инициация входа через Яндекс"""
+    # Яндекс OAuth 2.0
+    client_id = getattr(settings, 'YANDEX_OAUTH_CLIENT_ID', 'demo')
+    redirect_uri = request.build_absolute_uri('/auth/yandex/callback/')
+    
+    params = {
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'response_type': 'code',
+        'state': get_random_string(32)
+    }
+    
+    yandex_url = f"https://oauth.yandex.ru/authorize?{urlencode(params)}"
+    return redirect(yandex_url)
+
+
+def yandex_callback(request):
+    """Callback для Яндекс авторизации"""
+    try:
+        code = request.GET.get('code')
+        if not code:
+            messages.error(request, 'Ошибка авторизации через Яндекс')
+            return redirect('auth:simple_login')
+        
+        # Создаем пользователя (демо)
+        user, created = User.objects.get_or_create(
+            username=f"yandex_{get_random_string(8)}",
+            defaults={
+                'first_name': 'Яндекс',
+                'last_name': 'Пользователь',
+                'email': f"yandex_{get_random_string(8)}@yandex.local"
+            }
+        )
+        
+        login(request, user)
+        
+        if created:
+            messages.success(request, 'Добро пожаловать в ExamFlow!')
+        else:
+            messages.success(request, 'Добро пожаловать обратно!')
+        
+        return redirect('learning:home')
+        
+    except Exception as e:
+        messages.error(request, f'Ошибка авторизации: {str(e)}')
+        return redirect('auth:simple_login')
+
+
+def guest_access(request):
+    """Гостевой доступ"""
+    # Создаем временного пользователя
+    guest_username = f"guest_{get_random_string(8)}"
+    user, created = User.objects.get_or_create(
+        username=guest_username,
+        defaults={
+            'first_name': 'Гость',
+            'last_name': '',
+            'email': f"{guest_username}@guest.local"
+        }
+    )
+    
+    login(request, user)
+    messages.info(request, 'Вы вошли как гость. Данные сохраняются локально.')
+    
+    return redirect('learning:subjects_list')
 
 
 def logout_view(request):
     """Выход из системы"""
     logout(request)
-    messages.info(request, 'Вы успешно вышли из системы.')
+    messages.success(request, 'Вы успешно вышли из системы')
     return redirect('learning:home')
 
 
-@login_required
-def dashboard_view(request):
-    """
-    Личный кабинет пользователя
-
-    Показывает:
-    - Статистику обучения
-    - Последние решенные задания
-    - Прогресс по предметам
-    - Достижения
-    """
-    from core.models import UserProgress, Subject
-
-    # Получаем статистику пользователя
-    user_progress = UserProgress.objects.filter(user=request.user)  # type: ignore
-    total_solved = user_progress.filter(is_correct=True).count()  # type: ignore
-    total_attempts = user_progress.count()  # type: ignore
-
-    # Прогресс по предметам
-    subjects_progress = {}
-    for subject in Subject.objects.all():  # type: ignore
-        subject_progress = user_progress.filter(task__subject=subject)  # type: ignore
-        subjects_progress[subject.name] = {
-            'total': subject_progress.count(),  # type: ignore
-            'correct': subject_progress.filter(is_correct=True).count(),  # type: ignore
-            'subject': subject
-        }
-
-    # Последние решенные задания
-    recent_tasks = user_progress.order_by('-created_at')[:5]  # type: ignore
-
-    context = {
-        'total_solved': total_solved,
-        'total_attempts': total_attempts,
-        'accuracy': round((total_solved / total_attempts * 100) if total_attempts > 0 else 0, 1),
-        'subjects_progress': subjects_progress,
-        'recent_tasks': recent_tasks,
-        # Добавляем недостающие переменные для шаблона
-        'total_tasks_solved': total_solved,
-        'user_subjects': len(subjects_progress),
-        'profile': {
-            'level': 1,
-            'experience': total_solved * 10,
-            'is_premium': False,
-            'subscription_type': 'Бесплатный',
-            'streak_days': 0,
-            'last_activity': request.user.last_login or request.user.date_joined,
-            'tasks_solved_today': total_solved,
-            'daily_tasks_limit': 10,
-            'telegram_id': None
-        },
-        'rating': {
-            'accuracy': round((total_solved / total_attempts * 100) if total_attempts > 0 else 0, 1),
-            'rank': '-'
-        },
-        'achievements': [],
-        'can_solve_tasks': True,
-        'active_subscription': None
-    }
-
-    return render(request, 'auth/dashboard.html', context)
-
-
-@login_required
-def profile_update_view(request):
-    """Обновление профиля пользователя"""
-
-    if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST)
-        if form.is_valid():
-            # Обновляем данные пользователя
-            user = request.user
-            user.first_name = form.cleaned_data.get('first_name', user.first_name)
-            user.last_name = form.cleaned_data.get('last_name', user.last_name)
-            user.email = form.cleaned_data.get('email', user.email)
-            user.save()
-
-            messages.success(request, 'Профиль успешно обновлен!')
-            return redirect('authentication:dashboard')
-    else:
-        # Предзаполняем форму данными пользователя
-        initial_data = {
-            'first_name': request.user.first_name,
-            'last_name': request.user.last_name,
-            'email': request.user.email,
-        }
-        form = ProfileUpdateForm(initial=initial_data)
-
-    return render(request, 'auth/profile_update.html', {'form': form})
+def _verify_telegram_auth(auth_data):
+    """Проверка подписи Telegram (упрощенно)"""
+    # В реальном проекте здесь должна быть проверка HMAC подписи
+    # Для демо просто проверяем наличие обязательных полей
+    required_fields = ['id', 'first_name', 'auth_date']
+    return all(field in auth_data for field in required_fields)

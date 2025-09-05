@@ -88,19 +88,22 @@
                     <a class="nav-link-aesop active" href="{% url 'learning:home' %}">Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">Задания ФИПИ</a>
+                    <a class="nav-link-aesop" href="{% url 'features' %}">Возможности</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link-aesop" href="{% url 'ai:chat' %}">О сервисе</a>
+                    <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">Предметы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-aesop" href="{% url 'pricing' %}">Тарифы</a>
                 </li>
             </ul>
             
             <div class="navbar-right navbar-user">
                 <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">Перейти в бота</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop"><i class="fas fa-user"></i> Профиль</a>
+                    <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop"><i class="fas fa-user"></i> <span class="hidden md:inline">Профиль</span></a>
                 {% else %}
-                    <a href="{% url 'authentication:login' %}" class="nav-link-aesop"><i class="fas fa-sign-in-alt"></i> Войти</a>
+                    <a href="{% url 'auth:simple_login' %}" class="nav-link-aesop"><i class="fas fa-sign-in-alt"></i> <span class="hidden md:inline">Войти</span></a>
                 {% endif %}
                 <button class="navbar-burger" id="navbar-burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
                     <span></span><span></span><span></span>
@@ -153,6 +156,9 @@
     <!-- <script src="{% static 'js/ai-learning.js' %}"></script> -->
     
     <!-- Новые скрипты брендинга -->
+    
+    <!-- Гостевой доступ -->
+    <script src="{% static 'js/guest-access.js' %}"></script>
     
     <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}

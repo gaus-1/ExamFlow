@@ -13,6 +13,7 @@ except Exception:  # pragma: no cover
 
 from .models import AiRequest, AiResponse, AiProvider, AiLimit
 from .rag_service import rag_service
+from core.freemium.decorators import check_ai_limits
 
 
 @dataclass

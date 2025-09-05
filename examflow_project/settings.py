@@ -71,6 +71,8 @@ MIDDLEWARE = [
     # 'csp.middleware.CSPMiddleware',  # CSP middleware - ВРЕМЕННО ОТКЛЮЧЕН
     # 🔒 Дополнительные middleware для безопасности
     'examflow_project.middleware.SecurityHeadersMiddleware',  # Кастомные заголовки безопасности
+    # FREEMIUM middleware
+    'core.freemium.middleware.FreemiumMiddleware',
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
@@ -371,6 +373,9 @@ else:
         'https://*.onrender.com',
     ]))
 
+# Обработка ошибок
+handler404 = 'examflow_project.views.handler404'
+
 # CSP — ВРЕМЕННО ОТКЛЮЧЕН для тестирования стилей
 # if DEBUG:
 #     CONTENT_SECURITY_POLICY = {
@@ -619,6 +624,13 @@ SECURITY_MONITORING = {
 
 # 🤖 GEMINI AI - НАСТРОЙКИ
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+
+# OAuth настройки
+GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID', 'demo')
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', 'demo')
+YANDEX_OAUTH_CLIENT_ID = os.getenv('YANDEX_OAUTH_CLIENT_ID', 'demo')
+YANDEX_OAUTH_CLIENT_SECRET = os.getenv('YANDEX_OAUTH_CLIENT_SECRET', 'demo')
+TELEGRAM_BOT_ID = os.getenv('TELEGRAM_BOT_ID', '8314335876')
 GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 GEMINI_TIMEOUT = 30
 

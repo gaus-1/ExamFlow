@@ -21,6 +21,7 @@ import json
 import logging
 import hashlib
 from django.core.cache import cache
+from core.freemium.decorators import check_ai_limits
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ except Exception as e:
     model = None
 
 
+@method_decorator([login_required, check_ai_limits], name='dispatch')
 class AIAssistantAPI(View):
     """
     API для ИИ-ассистента с реальным Gemini API

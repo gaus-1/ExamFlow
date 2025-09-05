@@ -24,8 +24,8 @@
         </p>
         
         <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12 text-reveal">
-            <a href="{% url 'register' %}" class="btn-primary text-lg px-8 py-4 btn-animate">
-                Начать подготовку
+            <a href="{% url 'auth:simple_login' %}" class="btn-primary text-lg px-8 py-4 btn-animate">
+                Продолжить через
             </a>
             <a href="{% url 'learning:subjects_list' %}" class="btn-secondary text-lg px-8 py-4 btn-animate">
                 Выбрать предмет
@@ -672,48 +672,38 @@
             Выберите подходящий план для эффективной подготовки
         </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div class="pricing-card text-reveal">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Бесплатный</h3>
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Бесплатно</h3>
                 <div class="text-4xl font-bold mb-6" style="color: #252525;">0 ₽</div>
+                <p class="text-lg mb-6" style="color: #666;">Бесплатный доступ с ограничением запросов</p>
                 <ul class="text-gray-600 space-y-3 mb-8">
-                    <li>• 5 заданий в день</li>
-                    <li>• Базовая статистика</li>
-                    <li>• Доступ к боту</li>
-                    <li>• Умный ИИ-помощник</li>
-                    <li>• Персонализация</li>
+                    <li>• Полный функционал платформы</li>
+                    <li>• 10 запросов к ИИ в день</li>
+                    <li>• Все задания ФИПИ</li>
+                    <li>• Telegram бот</li>
+                    <li>• Базовая аналитика</li>
+                    <li>• Геймификация</li>
                 </ul>
-                <a href="{% url 'register' %}" class="btn btn-primary w-full btn-animate">Начать бесплатно</a>
+                <a href="{% url 'auth:simple_login' %}" class="btn btn-primary w-full btn-animate">Начать бесплатно</a>
             </div>
             
             <div class="pricing-card popular text-reveal">
                 <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    ПОПУЛЯРНЫЙ
+                    РЕКОМЕНДУЕМ
                 </div>
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Месячный</h3>
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Подписка</h3>
                 <div class="text-4xl font-bold mb-6" style="color: #252525;">990 ₽<span class="text-lg">/мес</span></div>
+                <p class="text-lg mb-6" style="color: #666;">Безлимитный доступ</p>
                 <ul class="text-gray-600 space-y-3 mb-8">
-                    <li>• Неограниченные задания</li>
-                    <li>• Полная статистика</li>
-                    <li>• Умный ИИ-помощник</li>
-                    <li>• ИИ персонализация</li>
+                    <li>• Все возможности бесплатного</li>
+                    <li>• Безлимитные запросы к ИИ</li>
                     <li>• Приоритетная поддержка</li>
-                </ul>
-                <a href="#" class="btn btn-primary w-full btn-animate">Оформить подписку</a>
-            </div>
-            
-            <div class="pricing-card text-reveal">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Годовой</h3>
-                <div class="text-4xl font-bold mb-6" style="color: #252525;">9900 ₽<span class="text-lg">/год</span></div>
-                <div class="text-sm text-green-600 mb-4 font-semibold">Экономия 17%</div>
-                <ul class="text-gray-600 space-y-3 mb-8">
-                    <li>• Все возможности месячного</li>
-                    <li>• Скидка 17%</li>
-                    <li>• Эксклюзивный контент</li>
+                    <li>• Расширенная аналитика</li>
+                    <li>• Эксклюзивные задания</li>
                     <li>• Персональный куратор</li>
-                    <li>• Сертификат о прохождении</li>
                 </ul>
-                <a href="#" class="btn btn-primary w-full btn-animate">Купить со скидкой</a>
+                <a href="{% url 'subscribe' %}" class="btn btn-primary w-full btn-animate">Оформить подписку</a>
             </div>
         </div>
     </div>
