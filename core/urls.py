@@ -4,7 +4,7 @@ URL-маршруты для core приложения
 
 from django.urls import path
 from . import api
-from .simple_health import simple_health_check, basic_health_check
+from .minimal_health import minimal_health_check, ultra_simple_health
 
 urlpatterns = [
     # API для RAG-системы
@@ -13,7 +13,7 @@ urlpatterns = [
     path('api/ai/stats/', api.VectorStoreStatsView.as_view(), name='vector_stats'),
     path('api/health/', api.HealthCheckView.as_view(), name='health_check'),
     
-    # Health check endpoints (упрощенные для Render)
-    path('health/', basic_health_check, name='health_check_basic'),
-    path('health/simple/', simple_health_check, name='health_check_simple'),
+    # Health check endpoints (минимальные для Render)
+    path('health/', ultra_simple_health, name='health_check_basic'),
+    path('health/simple/', minimal_health_check, name='health_check_simple'),
 ]
