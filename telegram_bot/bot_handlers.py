@@ -46,6 +46,30 @@ def clean_markdown_text(text: str) -> str:
                     '__',
         '')
 
+
+def create_standard_button(text: str, callback_data: str) -> InlineKeyboardButton:
+    """
+    Создает стандартную кнопку бота в стиле 2025
+    """
+    return InlineKeyboardButton(
+        text=text.upper(),  # Заглавные буквы для единообразия
+        callback_data=callback_data
+    )
+
+
+def create_main_message(text: str) -> str:
+    """
+    Создает основное сообщение бота в стиле 2025
+    """
+    return f"**{text}**"
+
+
+def create_warning_message(text: str) -> str:
+    """
+    Создает предупреждающее сообщение бота в стиле 2025
+    """
+    return f"⚠️ {text}"
+
 # Синхронные функции БД, обёрнутые для безопасного вызова в async-контексте
 
 
@@ -146,8 +170,7 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
 
         response = result['response']
 
-        # Добавляем информацию о провайдере
-        response += f"\n\n🤖 Ответ подготовлен с помощью ИИ"
+        # Убираем фразу о провайдере ИИ
 
         # Добавляем персональные рекомендации
         personalization_data = result.get('personalization_data', {})
@@ -411,13 +434,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [
             [
+                create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
+                create_standard_button("📚 ПРАКТИКА", "subjects"), 
+                create_standard_button("🏆 ПРОГРЕСС", "stats")], [
                 InlineKeyboardButton(
-                    "🤖 Спросить ИИ", callback_data="ai_chat")], [
-                InlineKeyboardButton(
-                    "📚 Практика", callback_data="subjects"), InlineKeyboardButton(
-                        "🏆 Прогресс", callback_data="stats")], [
-                            InlineKeyboardButton(
-                                "🌐 Сайт", url="https://examflow.onrender.com")]]
+                    "🌐 САЙТ", url="https://examflow.onrender.com")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if is_callback:
@@ -475,13 +496,11 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = [
         [
+            create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
+            create_standard_button("📚 ПРАКТИКА", "subjects"), 
+            create_standard_button("🏆 ПРОГРЕСС", "stats")], [
             InlineKeyboardButton(
-                "🤖 Спросить ИИ", callback_data="ai_chat")], [
-            InlineKeyboardButton(
-                "📚 Практика", callback_data="subjects"), InlineKeyboardButton(
-                "🏆 Прогресс", callback_data="stats")], [
-            InlineKeyboardButton(
-                "🌐 Сайт", url="https://examflow.onrender.com")]]
+                "🌐 САЙТ", url="https://examflow.onrender.com")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     try:
@@ -1136,7 +1155,7 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         # Формируем ответ с кнопками
         response_text = f"""
-🎯 **ПЕРСОНАЛЬНЫЕ СОВЕТЫ ОТ ИИ**
+**ПЕРСОНАЛЬНЫЕ СОВЕТЫ ОТ ИИ**
 
 {ai_response}
 
@@ -1333,7 +1352,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Формируем ответ с кнопками
         response_text = f"""
-🤖 **ОТВЕТ ИИ**
+**ОТВЕТ ИИ**
 
 {clean_response}
 
