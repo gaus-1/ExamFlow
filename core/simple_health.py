@@ -4,9 +4,7 @@
 
 import time
 import logging
-from typing import Dict, Any
 from django.http import JsonResponse
-from django.db import connection
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
@@ -17,7 +15,7 @@ def simple_health_check(request):
     try:
         start_time = time.time()
         response_time = time.time() - start_time
-        
+
         return JsonResponse({
             'status': 'healthy',
             'timestamp': timezone.now().isoformat(),
@@ -26,7 +24,7 @@ def simple_health_check(request):
             'version': '2.0.0',
             'message': 'Service is running'
         })
-            
+
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return JsonResponse({

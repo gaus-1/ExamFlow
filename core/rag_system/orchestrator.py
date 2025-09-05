@@ -4,7 +4,7 @@
 
 import logging
 import google.generativeai as genai
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional
 from django.conf import settings
 from django.utils import timezone
 from django.db import models

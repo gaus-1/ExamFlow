@@ -9,7 +9,6 @@ API для AI ассистента ExamFlow 2.0
 """
 
 import os
-from typing import Dict, List, Optional, Union, Any, Tuple
 import google.generativeai as genai
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt

@@ -15,18 +15,18 @@ def focused_subjects_list(request):
         is_archived=False,
         is_primary=True
     ).order_by('name')
-    
+
     # Группируем по типам
     math_subjects = subjects.filter(name__icontains='математика')
     russian_subjects = subjects.filter(name__icontains='русский')
-    
+
     context = {
         'math_subjects': math_subjects,
         'russian_subjects': russian_subjects,
         'total_subjects': subjects.count(),
         'focus_message': 'Специализируемся на математике и русском языке'
     }
-    
+
     return render(request, 'learning/focused_subjects.html', context)
 
 
@@ -34,14 +34,14 @@ def math_subject_detail(request, subject_id):
     """Детальная страница предмета математики"""
     try:
         subject = Subject.objects.get(id=subject_id, name__icontains='математика')
-        
+
         # Получаем темы по математике
         topics = Topic.objects.filter(subject=subject).order_by('name')
-        
+
         # Статистика
         total_tasks = Task.objects.filter(subject=subject).count()
         completed_tasks = 0  # TODO: реализовать подсчет выполненных задач
-        
+
         context = {
             'subject': subject,
             'topics': topics,
@@ -49,9 +49,9 @@ def math_subject_detail(request, subject_id):
             'completed_tasks': completed_tasks,
             'subject_type': 'math'
         }
-        
+
         return render(request, 'learning/math_subject_detail.html', context)
-        
+
     except Subject.DoesNotExist:
         return render(request, 'learning/subject_not_found.html', {
             'message': 'Предмет математики не найден'
@@ -62,14 +62,14 @@ def russian_subject_detail(request, subject_id):
     """Детальная страница предмета русского языка"""
     try:
         subject = Subject.objects.get(id=subject_id, name__icontains='русский')
-        
+
         # Получаем темы по русскому языку
         topics = Topic.objects.filter(subject=subject).order_by('name')
-        
+
         # Статистика
         total_tasks = Task.objects.filter(subject=subject).count()
         completed_tasks = 0  # TODO: реализовать подсчет выполненных задач
-        
+
         context = {
             'subject': subject,
             'topics': topics,
@@ -77,9 +77,9 @@ def russian_subject_detail(request, subject_id):
             'completed_tasks': completed_tasks,
             'subject_type': 'russian'
         }
-        
+
         return render(request, 'learning/russian_subject_detail.html', context)
-        
+
     except Subject.DoesNotExist:
         return render(request, 'learning/subject_not_found.html', {
             'message': 'Предмет русского языка не найден'
@@ -89,10 +89,10 @@ def russian_subject_detail(request, subject_id):
 def focused_search(request):
     """Поиск с фокусом на математике и русском языке"""
     query = request.GET.get('q', '')
-    
+
     if not query:
         return JsonResponse({'results': [], 'message': 'Введите поисковый запрос'})
-    
+
     # Поиск только по основным предметам
     math_tasks = Task.objects.filter(
         subject__name__icontains='математика',
@@ -101,7 +101,7 @@ def focused_search(request):
     ).filter(
         Q(title__icontains=query) | Q(description__icontains=query)
     )[:10]
-    
+
     russian_tasks = Task.objects.filter(
         subject__name__icontains='русский',
         subject__is_archived=False,
@@ -109,9 +109,9 @@ def focused_search(request):
     ).filter(
         Q(title__icontains=query) | Q(description__icontains=query)
     )[:10]
-    
+
     results = []
-    
+
     # Добавляем результаты по математике
     for task in math_tasks:
         results.append({
@@ -121,7 +121,7 @@ def focused_search(request):
             'type': 'math',
             'url': f'/task/{task.id}/'
         })
-    
+
     # Добавляем результаты по русскому языку
     for task in russian_tasks:
         results.append({
@@ -131,7 +131,7 @@ def focused_search(request):
             'type': 'russian',
             'url': f'/task/{task.id}/'
         })
-    
+
     return JsonResponse({
         'results': results,
         'total': len(results),
@@ -146,13 +146,13 @@ def get_subject_statistics(request):
         is_archived=False,
         is_primary=True
     )
-    
+
     russian_subjects = Subject.objects.filter(
         name__icontains='русский',
         is_archived=False,
         is_primary=True
     )
-    
+
     stats = {
         'math': {
             'subjects_count': math_subjects.count(),
@@ -179,5 +179,5 @@ def get_subject_statistics(request):
             ]
         }
     }
-    
+
     return JsonResponse(stats)

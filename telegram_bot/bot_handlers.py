@@ -435,7 +435,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
             [
                 create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
-                create_standard_button("📚 ПРАКТИКА", "subjects"), 
+                create_standard_button("📚 ПРАКТИКА", "subjects"),
                 create_standard_button("🏆 ПРОГРЕСС", "stats")], [
                 InlineKeyboardButton(
                     "🌐 САЙТ", url="https://examflow.onrender.com")]]
@@ -497,7 +497,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [
             create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
-            create_standard_button("📚 ПРАКТИКА", "subjects"), 
+            create_standard_button("📚 ПРАКТИКА", "subjects"),
             create_standard_button("🏆 ПРОГРЕСС", "stats")], [
             InlineKeyboardButton(
                 "🌐 САЙТ", url="https://examflow.onrender.com")]]

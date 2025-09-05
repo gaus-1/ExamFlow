@@ -3,7 +3,7 @@
 """
 
 from django.core.management.base import BaseCommand
-from learning.models import Subject, Topic
+from learning.models import Subject
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write('Создаем предметы математики и русского языка...')
-        
+
         # Создаем предметы
         subjects_data = [
             {
@@ -58,47 +58,51 @@ class Command(BaseCommand):
                 'is_primary': True
             },
         ]
-        
+
         created_count = 0
-        
+
         for subject_data in subjects_data:
-            subject, created = Subject.objects.get_or_create( # type: ignore
+            subject, created = Subject.objects.get_or_create(  # type: ignore
                 name=subject_data['name'],
                 defaults=subject_data
             )
-            
+
             if created:
                 created_count += 1
                 self.stdout.write(f'  ✓ Создан предмет: {subject.name}')
             else:
                 self.stdout.write(f'  - Предмет уже существует: {subject.name}')
-        
+
         # Архивируем ненужные предметы
         unused_subjects = [
             'Физика', 'Химия', 'Биология', 'История', 'География',
             'Литература', 'Информатика', 'Обществознание',
             'Английский язык', 'Немецкий язык', 'Французский язык', 'Испанский язык'
         ]
-        
+
         archived_count = 0
         for subject_name in unused_subjects:
-            updated = Subject.objects.filter(name=subject_name).update(is_archived=True) # type: ignore
+            updated = Subject.objects.filter(
+                name=subject_name).update(
+                is_archived=True)  # type: ignore
             if updated:
                 archived_count += 1
-        
+
         self.stdout.write(f'  ✓ Архивировано предметов: {archived_count}')
         self.stdout.write(f'  ✓ Создано предметов: {created_count}')
-        
+
         # Показываем статистику
-        total_subjects = Subject.objects.count() # type: ignore
-        primary_subjects = Subject.objects.filter(is_primary=True).count() # type: ignore
-        archived_subjects = Subject.objects.filter(is_archived=True).count() # type: ignore
-        
+        total_subjects = Subject.objects.count()  # type: ignore
+        primary_subjects = Subject.objects.filter(
+            is_primary=True).count()  # type: ignore
+        archived_subjects = Subject.objects.filter(
+            is_archived=True).count()  # type: ignore
+
         self.stdout.write(f'\nСтатистика:')
         self.stdout.write(f'  Всего предметов: {total_subjects}')
         self.stdout.write(f'  Основных предметов: {primary_subjects}')
         self.stdout.write(f'  Архивированных предметов: {archived_subjects}')
-        
+
         self.stdout.write(
-            self.style.SUCCESS('\nПредметы успешно инициализированы!') # type: ignore
+            self.style.SUCCESS('\nПредметы успешно инициализированы!')  # type: ignore
         )

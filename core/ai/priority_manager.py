@@ -3,8 +3,7 @@
 Фокусируется на математике и русском языке
 """
 
-from typing import Dict, Any, Optional
-from django.conf import settings
+from typing import Dict, Any
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 class AIPriorityManager:
     """Менеджер приоритетов для ИИ-помощника"""
-    
+
     def __init__(self):
         self.priority_subjects = {
             'математика': {
                 'prof_ege': 'Математика (профильная)',
-                'base_ege': 'Математика (непрофильная)', 
+                'base_ege': 'Математика (непрофильная)',
                 'oge': 'Математика (ОГЭ)'
             },
             'русский': {
@@ -25,17 +24,17 @@ class AIPriorityManager:
                 'oge': 'Русский язык (ОГЭ)'
             }
         }
-        
+
         self.secondary_subjects = [
             'физика', 'химия', 'биология', 'история', 'география',
             'литература', 'информатика', 'обществознание',
             'английский', 'немецкий', 'французский', 'испанский'
         ]
-        
+
         self.prompts = {
             'math_prof': """
-            Ты эксперт по профильной математике ЕГЭ. 
-            
+            Ты эксперт по профильной математике ЕГЭ.
+
             ОБЯЗАТЕЛЬНО:
             - Предоставляй подробные решения с пошаговыми объяснениями
             - Включай альтернативные методы решения
@@ -43,7 +42,7 @@ class AIPriorityManager:
             - Показывай типичные ошибки и как их избежать
             - Используй математические формулы и графики
             - Давай примеры аналогичных задач
-            
+
             СТРУКТУРА ОТВЕТА:
             1. Краткое объяснение сути задачи
             2. Пошаговое решение с комментариями
@@ -51,51 +50,51 @@ class AIPriorityManager:
             4. Типичные ошибки и советы
             5. Похожие задачи для закрепления
             """,
-            
+
             'math_base': """
             Ты эксперт по базовой математике ЕГЭ.
-            
+
             ОБЯЗАТЕЛЬНО:
             - Объясняй простым языком с примерами
             - Показывай типичные ошибки и как их избежать
             - Используй наглядные схемы и рисунки
             - Давай практические советы
             - Ссылайся на базовые понятия
-            
+
             СТРУКТУРА ОТВЕТА:
             1. Простое объяснение
             2. Пошаговое решение
             3. Практические советы
             4. Примеры для закрепления
             """,
-            
+
             'math_oge': """
             Ты эксперт по математике ОГЭ (9 класс).
-            
+
             ОБЯЗАТЕЛЬНО:
             - Адаптируй объяснения для 9 класса
             - Используй наглядные примеры и схемы
             - Показывай простые способы решения
             - Давай советы по подготовке
             - Ссылайся на школьную программу
-            
+
             СТРУКТУРА ОТВЕТА:
             1. Объяснение для 9 класса
             2. Простое решение
             3. Советы по подготовке
             4. Похожие задачи
             """,
-            
+
             'russian_ege': """
             Ты эксперт по русскому языку ЕГЭ.
-            
+
             ОБЯЗАТЕЛЬНО:
             - Помогай с сочинениями, грамматическими нормами
             - Показывай примеры из классической литературы
             - Объясняй критерии оценивания
             - Давай шаблоны и структуры
             - Показывай типичные ошибки
-            
+
             СТРУКТУРА ОТВЕТА:
             1. Теоретическая часть
             2. Практические примеры
@@ -103,17 +102,17 @@ class AIPriorityManager:
             4. Советы по написанию
             5. Примеры работ
             """,
-            
+
             'russian_oge': """
             Ты эксперт по русскому языку ОГЭ (9 класс).
-            
+
             ОБЯЗАТЕЛЬНО:
             - Помогай с изложением, сочинением, тестовыми заданиями
             - Адаптируй для 9 класса
             - Давай простые алгоритмы
             - Показывай примеры работ
             - Объясняй критерии оценивания
-            
+
             СТРУКТУРА ОТВЕТА:
             1. Объяснение для 9 класса
             2. Алгоритм выполнения
@@ -121,21 +120,25 @@ class AIPriorityManager:
             4. Критерии оценивания
             """
         }
-    
-    def analyze_question(self, question: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+
+    def analyze_question(self,
+                         question: str,
+                         context: Dict[str,
+                                       Any] = None) -> Dict[str,
+                                                            Any]:
         """Анализирует вопрос и определяет приоритет ответа"""
-        
+
         question_lower = question.lower()
-        
+
         # Определяем предмет по ключевым словам
         subject = self._detect_subject(question_lower)
-        
+
         # Определяем тип экзамена
         exam_type = self._detect_exam_type(question_lower)
-        
+
         # Определяем приоритет
         priority = self._get_priority(subject, exam_type)
-        
+
         return {
             'subject': subject,
             'exam_type': exam_type,
@@ -143,54 +146,54 @@ class AIPriorityManager:
             'prompt': self._get_prompt(subject, exam_type),
             'response_config': self._get_response_config(priority)
         }
-    
+
     def _detect_subject(self, question: str) -> str:
         """Определяет предмет по ключевым словам"""
-        
+
         math_keywords = [
             'математика', 'матем', 'уравнение', 'функция', 'график',
             'производная', 'интеграл', 'геометрия', 'алгебра', 'тригонометрия',
             'логарифм', 'степень', 'корень', 'дробь', 'процент',
             'вероятность', 'статистика', 'вектор', 'координаты'
         ]
-        
+
         russian_keywords = [
             'русский', 'язык', 'сочинение', 'изложение', 'орфография',
             'пунктуация', 'грамматика', 'лексика', 'стилистика',
             'морфология', 'синтаксис', 'фонетика', 'словообразование',
             'литература', 'текст', 'автор', 'проблема', 'аргумент'
         ]
-        
+
         if any(keyword in question for keyword in math_keywords):
             return 'математика'
         elif any(keyword in question for keyword in russian_keywords):
             return 'русский'
         else:
             return 'unknown'
-    
+
     def _detect_exam_type(self, question: str) -> str:
         """Определяет тип экзамена"""
-        
+
         if any(word in question for word in ['егэ', 'еге', '11 класс', 'одиннадцатый']):
             return 'ege'
         elif any(word in question for word in ['огэ', 'oge', '9 класс', 'девятый']):
             return 'oge'
         else:
             return 'unknown'
-    
+
     def _get_priority(self, subject: str, exam_type: str) -> str:
         """Определяет приоритет ответа"""
-        
+
         if subject in self.priority_subjects:
             return 'high'
         elif subject in self.secondary_subjects:
             return 'low'
         else:
             return 'medium'
-    
+
     def _get_prompt(self, subject: str, exam_type: str) -> str:
         """Возвращает специализированный промпт"""
-        
+
         if subject == 'математика':
             if exam_type == 'ege':
                 # Определяем профильная или базовая
@@ -199,7 +202,7 @@ class AIPriorityManager:
                 return self.prompts['math_oge']
             else:
                 return self.prompts['math_prof']
-        
+
         elif subject == 'русский':
             if exam_type == 'ege':
                 return self.prompts['russian_ege']
@@ -207,30 +210,30 @@ class AIPriorityManager:
                 return self.prompts['russian_oge']
             else:
                 return self.prompts['russian_ege']
-        
+
         else:
             return self._get_redirect_prompt()
-    
+
     def _get_redirect_prompt(self) -> str:
         """Промпт для перенаправления на профильные предметы"""
         return """
         Ты помощник ExamFlow, специализирующийся на математике и русском языке.
-        
+
         ОТВЕТ:
-        Сейчас я специализируюсь на математике и русском языке для подготовки к ОГЭ и ЕГЭ. 
-        
+        Сейчас я специализируюсь на математике и русском языке для подготовки к ОГЭ и ЕГЭ.
+
         По этим предметам я могу предоставить:
         - Подробные разборы заданий
         - Пошаговые решения
         - Советы по подготовке
         - Примеры из ФИПИ
-        
+
         Хотите перейти к одному из этих предметов? Или у вас есть вопрос по математике или русскому языку?
         """
-    
+
     def _get_response_config(self, priority: str) -> Dict[str, Any]:
         """Возвращает конфигурацию ответа"""
-        
+
         if priority == 'high':
             return {
                 'max_length': 2000,
@@ -262,10 +265,10 @@ class AIPriorityManager:
                 'use_diagrams': False,
                 'redirect': True
             }
-    
+
     def get_redirect_message(self, original_subject: str) -> str:
         """Возвращает сообщение для перенаправления"""
-        
+
         messages = {
             'физика': 'Сейчас я специализируюсь на математике и русском языке. Математика поможет с физикой! Хотите перейти к математике?',
             'химия': 'Сейчас я специализируюсь на математике и русском языке. Математика поможет с химией! Хотите перейти к математике?',
@@ -277,15 +280,16 @@ class AIPriorityManager:
             'обществознание': 'Сейчас я специализируюсь на математике и русском языке. Русский язык поможет с обществознанием! Хотите перейти к русскому языку?',
             'английский': 'Сейчас я специализируюсь на математике и русском языке. Русский язык поможет с английским! Хотите перейти к русскому языку?',
         }
-        
-        return messages.get(original_subject.lower(), 
-                          'Сейчас я специализируюсь на математике и русском языке. Хотите перейти к одному из этих предметов?')
-    
+
+        return messages.get(
+            original_subject.lower(),
+            'Сейчас я специализируюсь на математике и русском языке. Хотите перейти к одному из этих предметов?')
+
     def log_question_analysis(self, question: str, analysis: Dict[str, Any]):
         """Логирует анализ вопроса для мониторинга"""
-        
+
         logger.info(f"Question analysis: {analysis}")
-        
+
         # Можно добавить отправку в аналитику
         # analytics.track('ai_question_analyzed', {
         #     'subject': analysis['subject'],

@@ -30,37 +30,38 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['clear']:
             self.clear_existing_data()
-        
+
         self.create_focused_subjects()
-        
+
         if options['load_data']:
             self.load_fipi_data()
-        
+
         self.stdout.write(
-            self.style.SUCCESS('Фокусированные предметы успешно инициализированы!') # type: ignore
+            self.style.SUCCESS( # type: ignore
+                'Фокусированные предметы успешно инициализированы!')  # type: ignore
         )
 
     def clear_existing_data(self):
         """Очищает существующие данные"""
         self.stdout.write('Очищаем существующие данные...')
-        
-        with transaction.atomic(): # type: ignore
+
+        with transaction.atomic():  # type: ignore
             # Удаляем все предметы
-            Subject.objects.all().delete() # type: ignore
+            Subject.objects.all().delete()  # type: ignore
             self.stdout.write('  - Удалены все предметы')
-            
+
             # Удаляем все темы
-            Topic.objects.all().delete() # type: ignore
+            Topic.objects.all().delete()  # type: ignore
             self.stdout.write('  - Удалены все темы')
-            
+
             # Удаляем все задания
-            Task.objects.all().delete() # type: ignore
+            Task.objects.all().delete()  # type: ignore
             self.stdout.write('  - Удалены все задания')
 
     def create_focused_subjects(self):
         """Создает фокусированные предметы"""
         self.stdout.write('Создаем фокусированные предметы...')
-        
+
         subjects_data = [
             # Математика
             {
@@ -159,12 +160,12 @@ class Command(BaseCommand):
                 ]
             }
         ]
-        
+
         created_subjects = []
-        
-        with transaction.atomic(): # type: ignore
+
+        with transaction.atomic():  # type: ignore
             for subject_data in subjects_data:
-                subject, created = Subject.objects.get_or_create( # type: ignore
+                subject, created = Subject.objects.get_or_create(  # type: ignore
                     name=subject_data['name'],
                     defaults={
                         'code': subject_data['code'],
@@ -174,17 +175,17 @@ class Command(BaseCommand):
                         'is_primary': subject_data['is_primary']
                     }
                 )
-                
+
                 if created:
                     self.stdout.write(f'  ✓ Создан предмет: {subject.name}')
                 else:
                     self.stdout.write(f'  - Предмет уже существует: {subject.name}')
-                
+
                 # Создаем темы для предмета
                 self.create_topics_for_subject(subject, subject_data['topics'])
-                
+
                 created_subjects.append(subject)
-        
+
         return created_subjects
 
     def create_topics_for_subject(self, subject, topics_data):
@@ -192,44 +193,45 @@ class Command(BaseCommand):
         for i, topic_name in enumerate(topics_data):
             # Создаем короткий код для темы
             topic_code = f"topic_{i+1:02d}"
-            
-            topic, created = Topic.objects.get_or_create( # type: ignore
+
+            topic, created = Topic.objects.get_or_create(  # type: ignore
                 name=topic_name,
                 subject=subject,
                 defaults={
                     'code': topic_code
                 }
             )
-            
+
             if created:
                 self.stdout.write(f'    ✓ Создана тема: {topic_name}')
 
     def load_fipi_data(self):
         """Загружает данные с ФИПИ"""
         self.stdout.write('Загружаем данные с ФИПИ...')
-        
+
         try:
             parser = FipiParser()
-            
+
             # Получаем предметы
-            subjects = Subject.objects.filter(is_primary=True) # type: ignore
-            
+            subjects = Subject.objects.filter(is_primary=True)  # type: ignore
+
             for subject in subjects:
                 self.stdout.write(f'  Загружаем данные для {subject.name}...')
-                
+
                 # Определяем тип экзамена для парсера
                 exam_type = 'ЕГЭ' if subject.exam_type == 'ЕГЭ' else 'ОГЭ'
-                
+
                 # Парсим задания
                 tasks_data = parser.parse_tasks_for_subject(
                     subject.name.split('(')[0].strip(),
                     exam_type
                 )
-                
+
                 # Создаем задания
                 created_tasks = 0
-                for task_data in tasks_data[:50]:  # Ограничиваем количество для тестирования
-                    task, created = Task.objects.get_or_create( # type: ignore
+                # Ограничиваем количество для тестирования
+                for task_data in tasks_data[:50]:
+                    task, created = Task.objects.get_or_create(  # type: ignore
                         title=task_data.get('title', 'Задание'),
                         subject=subject,
                         defaults={
@@ -239,14 +241,15 @@ class Command(BaseCommand):
                             'answer': task_data.get('answer', '')
                         }
                     )
-                    
+
                     if created:
                         created_tasks += 1
-                
+
                 self.stdout.write(f'    ✓ Создано заданий: {created_tasks}')
-        
+
         except Exception as e:
             self.stdout.write(
+                # type: ignore
                 self.style.ERROR(f'Ошибка при загрузке данных с ФИПИ: {e}') # type: ignore
             )
             logger.error(f'Ошибка при загрузке данных с ФИПИ: {e}')
@@ -254,18 +257,19 @@ class Command(BaseCommand):
     def show_statistics(self):
         """Показывает статистику созданных данных"""
         self.stdout.write('\nСтатистика:')
-        
-        subjects = Subject.objects.filter(is_primary=True) # type: ignore
+
+        subjects = Subject.objects.filter(is_primary=True)  # type: ignore
         self.stdout.write(f'  Предметов: {subjects.count()}')
-        
-        topics = Topic.objects.filter(subject__in=subjects) # type: ignore
+
+        topics = Topic.objects.filter(subject__in=subjects)  # type: ignore
         self.stdout.write(f'  Тем: {topics.count()}')
-        
-        tasks = Task.objects.filter(subject__in=subjects) # type: ignore
+
+        tasks = Task.objects.filter(subject__in=subjects)  # type: ignore
         self.stdout.write(f'  Заданий: {tasks.count()}')
-        
+
         # Статистика по предметам
         for subject in subjects:
-            subject_topics = topics.filter(subject=subject).count() # type: ignore
-            subject_tasks = tasks.filter(subject=subject).count() # type: ignore
-            self.stdout.write(f'    {subject.name}: {subject_topics} тем, {subject_tasks} заданий')
+            subject_topics = topics.filter(subject=subject).count()  # type: ignore
+            subject_tasks = tasks.filter(subject=subject).count()  # type: ignore
+            self.stdout.write(
+                f'    {subject.name}: {subject_topics} тем, {subject_tasks} заданий')

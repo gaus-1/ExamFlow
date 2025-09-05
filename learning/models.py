@@ -36,7 +36,12 @@ class Subject(models.Model):
     ]
 
     name = models.CharField(max_length=100, verbose_name="Название предмета")
-    code = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name="Код предмета")
+    code = models.CharField(
+        max_length=20,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name="Код предмета")
     exam_type = models.CharField(
         max_length=3,
         choices=EXAM_TYPES,
@@ -56,7 +61,7 @@ class Subject(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
-    
+
     @property
     def task_count(self):
         """Количество задач по предмету"""

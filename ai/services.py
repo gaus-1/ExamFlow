@@ -1,5 +1,5 @@
 import hashlib
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any
 from django.contrib.auth.models import User
 from dataclasses import dataclass
 
@@ -13,7 +13,6 @@ except Exception:  # pragma: no cover
 
 from .models import AiRequest, AiResponse, AiProvider, AiLimit
 from .rag_service import rag_service
-from core.freemium.decorators import check_ai_limits
 
 
 @dataclass
