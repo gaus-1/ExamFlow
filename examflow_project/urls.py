@@ -51,6 +51,9 @@ urlpatterns = [
     # Модуль core (персонализация и RAG-система)
     path('core/', include('core.urls')),
     
+    # Health check endpoints (для Render и мониторинга)
+    path('health/', include('core.urls')),
+    
     # Модуль персонализации
     path('personalization/', include('core.personalization.urls')),
     
