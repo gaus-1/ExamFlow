@@ -52,7 +52,7 @@ urlpatterns = [
     path('core/', include('core.urls')),
     
     # Health check endpoints (для Render и мониторинга)
-    path('health/', include('core.urls')),
+    path('', include('core.urls')),
     
     # Модуль персонализации
     path('personalization/', include('core.personalization.urls')),
