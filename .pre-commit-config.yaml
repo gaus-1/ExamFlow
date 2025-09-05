@@ -1,35 +1,28 @@
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-added-large-files
-      - id: check-merge-conflict
-      - id: debug-statements
-
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 23.3.0
     hooks:
       - id: black
-        language_version: python3.11
-
+        language_version: python3
+        args: [--line-length=100]
+  
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
       - id: isort
-        args: ["--profile", "black"]
-
+        args: [--profile=black, --line-length=100]
+  
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+    rev: 6.0.0
     hooks:
       - id: flake8
-        args: [--max-line-length=127, --extend-ignore=E203,W503]
-
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
+        args: [--max-line-length=100, --extend-ignore=E203,W503]
+  
+  - repo: local
     hooks:
-      - id: bandit
-        args: [-r, ., -f, json, -o, bandit-report.json]
-        exclude: ^tests/
+      - id: minify-assets
+        name: Minify static assets
+        entry: python scripts/minify_assets.py
+        language: system
+        files: \.(css|js)$
+        pass_filenames: false

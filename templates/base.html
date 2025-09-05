@@ -56,11 +56,19 @@
     <!-- Старые стили (закомментированы для отката) -->
     <!-- <link rel="stylesheet" href="{% static 'css/aesop-styles.css' %}" type="text/css"> -->
     
-    <!-- Новые стили ExamFlow 2.0 -->
-    <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}" type="text/css">
+    <!-- Новые стили ExamFlow 2.0 (минифицированные для продакшена) -->
+    {% if debug %}
+        <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}" type="text/css">
+    {% else %}
+        <link rel="stylesheet" href="{% static 'css/examflow-2.0.min.css' %}" type="text/css">
+    {% endif %}
     
-    <!-- JavaScript функции для core приложения -->
-    <script src="{% static 'js/core-functions.js' %}"></script>
+    <!-- JavaScript функции для core приложения (минифицированные для продакшена) -->
+    {% if debug %}
+        <script src="{% static 'js/core-functions.js' %}"></script>
+    {% else %}
+        <script src="{% static 'js/core-functions.min.js' %}"></script>
+    {% endif %}
     
     {% block extra_css %}{% endblock %}
 </head>

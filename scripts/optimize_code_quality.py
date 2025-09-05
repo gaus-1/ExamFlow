@@ -184,16 +184,14 @@ def create_black_config():
     """Создает конфигурацию Black"""
     print("🎨 Создаем конфигурацию Black...")
     
-    pyproject_toml = '''[tool.black]
+    pyproject_toml = """[tool.black]
 line-length = 100
 target-version = ['py311']
 include = '\\.pyi?$'
 extend-exclude = '''
-    # A regex preceded with ^/ will apply only to files and directories
-    # in the root of the project.
-    ^/(foo|bar)/  # exclude the foo and bar directories
+    ^/(foo|bar)/
 '''
-'''
+"""
     
     with open('pyproject.toml', 'w', encoding='utf-8') as f:
         f.write(pyproject_toml)

@@ -16,6 +16,9 @@ class VectorStore:
     """
 
     def __init__(self):
+        """
+        __init__ метод
+        """
         self.embedding_dim = 768  # Размерность эмбеддингов text-embedding-004
         self.similarity_threshold = 0.6  # Порог схожести (снижен для лучшего поиска)
 

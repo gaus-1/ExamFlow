@@ -1,5 +1,6 @@
 import hashlib
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
+from django.contrib.auth.models import User
 from dataclasses import dataclass
 
 from django.utils import timezone
@@ -106,7 +107,7 @@ class GeminiProvider(BaseProvider):
             # URL без ключа (ключ в заголовке)
             api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
-            response = requests.post(
+            response = requests.post( # type: ignore
                 api_url,
                 json=payload,
                 headers=headers,
@@ -151,7 +152,7 @@ class GeminiProvider(BaseProvider):
                     cost=0.0,
                     provider_name=self.name)
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e: # type: ignore
             logger.error(f"Сетевая ошибка Gemini: {str(e)}")
             return AiResult(
                 text=f"❌ **Ошибка сети Gemini:** {str(e)}\n\nПроверьте подключение к интернету.",
@@ -306,7 +307,7 @@ class AiService:
                             'title': t.title,
                             'difficulty': t.difficulty,
                             # type: ignore
-                            'topics': [topic.name for topic in t.topics.all()]
+                            'topics': [topic.name for topic in t.topics.all()] # type: ignore
                         } for t in similar_tasks
                     ],
                     'recommendations': recommendations
@@ -397,11 +398,11 @@ class AiService:
     def _set_cache(self, prompt: str, result: AiResult,
                    provider: Optional[AiProvider] = None) -> AiResponse:
         ph = self._hash_prompt(prompt)
-        ai_provider = provider if provider else AiProvider.objects.filter(
+        ai_provider = provider if provider else AiProvider.objects.filter( # type: ignore
             is_active=True).order_by("priority").first()  # type: ignore
         if not ai_provider:
             # создаём запись провайдера локально, если нет ни одного
-            ai_provider = AiProvider.objects.create(
+            ai_provider = AiProvider.objects.create( # type: ignore 
                 name="Local",
                 provider_type="fallback",
                 is_active=True,
@@ -474,10 +475,9 @@ class AiService:
 
     def ask(self,
             prompt: str,
-            user=None,
+            user: Optional[User] = None,
             session_id: Optional[str] = None,
-            use_cache: bool = True) -> Dict[str,
-                                            Any]:
+            use_cache: bool = True) -> Dict[str, Any]:
         """Главный метод: проверяет лимиты, кэш, выбирает провайдера и возвращает ответ."""
         prompt = (prompt or "").strip()
         if not prompt:

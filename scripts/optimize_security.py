@@ -154,7 +154,7 @@ def validate_prompt(prompt: str) -> str:
     dangerous_patterns = [
         r'<script[^>]*>.*?</script>',
         r'javascript:',
-        r'on\w+\s*=',
+        r'on\\w+\\s*=',
         r'<iframe[^>]*>',
         r'<object[^>]*>',
         r'<embed[^>]*>'

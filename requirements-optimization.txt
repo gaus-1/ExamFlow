@@ -1,7 +1,7 @@
 # Инструменты оптимизации для ExamFlow 2.0
 
 # Безопасность
-safety==2.3.5
+safety==3.0.1
 bandit==1.7.5
 pip-audit==2.6.1
 django-csp==3.7

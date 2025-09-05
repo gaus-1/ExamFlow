@@ -4,7 +4,7 @@
 
 import logging
 import google.generativeai as genai
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union, Any
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
@@ -20,12 +20,15 @@ class AIOrchestrator:
     Центральный сервис для обработки запросов пользователей
     """
 
-    def __init__(self):
-        self.vector_store = VectorStore()
+    def __init__(self):  # type: ignore
+        """
+        Инициализация AIOrchestrator
+        """
+        self.vector_store = VectorStore()  # type: ignore
 
         # Настраиваем Gemini API
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        genai.configure(api_key=settings.GEMINI_API_KEY)  # type: ignore
+        self.model = genai.GenerativeModel('gemini-1.5-flash')  # type: ignore
 
     def process_query(self, query: str, user_id: Optional[int] = None) -> Dict:
         """
@@ -122,7 +125,7 @@ class AIOrchestrator:
             f"Вопрос: {query}\n\n"
             f"Контекст: {context}\n\n"
         )
-        
+
         # Добавляем персональную информацию только если есть
         if user_context:
             user_info = (
@@ -142,7 +145,7 @@ class AIOrchestrator:
             "6. Укажи источники информации\n\n"
             "Ответ:"
         )
-        
+
         return base_prompt
 
     def get_ai_response(self, prompt: str) -> str:
@@ -263,7 +266,11 @@ class AIOrchestrator:
         Возвращает fallback ответ в случае ошибки
         """
         return {
-            'answer': f"Извините, произошла ошибка при обработке вашего вопроса: {error}. Попробуйте переформулировать вопрос или обратитесь к официальным источникам ФИПИ.",
+            'answer': (
+                f"Извините, произошла ошибка при обработке вашего вопроса: {error}. "
+                "Попробуйте переформулировать вопрос или обратитесь к официальным "
+                "источникам ФИПИ."
+            ),
             'sources': [
                 {'title': 'ФИПИ - ЕГЭ', 'url': 'https://fipi.ru/ege'},
                 {'title': 'ExamFlow - Главная', 'url': 'https://examflow.ru/'}

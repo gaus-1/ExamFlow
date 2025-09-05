@@ -9,8 +9,9 @@ API для AI ассистента ExamFlow 2.0
 """
 
 import os
+from typing import Dict, List, Optional, Union, Any, Tuple
 import google.generativeai as genai
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
@@ -53,7 +54,7 @@ class AIAssistantAPI(View):
     с предложениями практики
     """
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> JsonResponse:
         """
         Обрабатывает POST запросы к ИИ-ассистенту
 
@@ -277,7 +278,7 @@ class ProblemsAPI(View):
     - Отслеживание прогресса
     """
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         """
         GET запрос для получения задач по теме
 
@@ -303,7 +304,7 @@ class ProblemsAPI(View):
             'total': len(problems)
         })
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> JsonResponse:
         """
         POST запрос для проверки ответа
 
@@ -459,7 +460,7 @@ class UserProfileAPI(View):
     """
 
     @method_decorator(login_required)
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         """
         GET запрос для получения профиля пользователя
         """
@@ -531,7 +532,7 @@ class UserProfileAPI(View):
             return JsonResponse(profile)
 
     @method_decorator(login_required)
-    def post(self, request):
+    def post(self, request: HttpRequest) -> JsonResponse:
         """
         POST запрос для обновления прогресса пользователя
         """
