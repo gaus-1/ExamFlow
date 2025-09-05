@@ -36,18 +36,31 @@ class Subject(models.Model):
     ]
 
     name = models.CharField(max_length=100, verbose_name="Название предмета")
+    code = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name="Код предмета")
     exam_type = models.CharField(
         max_length=3,
         choices=EXAM_TYPES,
         default='ЕГЭ',
         verbose_name="Тип экзамена")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
+    is_archived = models.BooleanField(default=False, verbose_name="Архивирован")
+    is_primary = models.BooleanField(default=False, verbose_name="Основной предмет")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
     class Meta:
         verbose_name = "Предмет"
         verbose_name_plural = "Предметы"
+        ordering = ['is_primary', 'name']
 
     def __str__(self):
         return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
+    
+    @property
+    def task_count(self):
+        """Количество задач по предмету"""
+        return self.task_set.count()  # type: ignore
 
 
 class Topic(models.Model):

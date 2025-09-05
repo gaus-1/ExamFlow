@@ -13,6 +13,7 @@ URL-маршруты для модуля обучения
 
 from django.urls import path
 from . import views
+from . import focused_views
 
 app_name = 'learning'
 
@@ -20,9 +21,13 @@ urlpatterns = [
     # Главная страница
     path('', views.home, name='home'),
 
-    # Предметы
-    path('subjects/', views.subjects_list, name='subjects_list'),
+    # Предметы (фокусированные на математике и русском)
+    path('subjects/', focused_views.focused_subjects_list, name='subjects_list'),
     path('subject/<int:subject_id>/', views.subject_detail, name='subject_detail'),
+    
+    # Специализированные страницы предметов
+    path('math/<int:subject_id>/', focused_views.math_subject_detail, name='math_subject_detail'),
+    path('russian/<int:subject_id>/', focused_views.russian_subject_detail, name='russian_subject_detail'),
 
     # Темы
     path('topic/<int:topic_id>/', views.topic_detail, name='topic_detail'),
@@ -34,4 +39,8 @@ urlpatterns = [
     # Случайные задания
     path('random/', views.random_task, name='random_task'),
     path('random/<int:subject_id>/', views.random_task, name='random_task_subject'),
+    
+    # Фокусированный поиск
+    path('search/', focused_views.focused_search, name='focused_search'),
+    path('api/subject-stats/', focused_views.get_subject_statistics, name='subject_statistics'),
 ]

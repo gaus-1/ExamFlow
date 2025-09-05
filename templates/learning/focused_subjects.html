@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Предметы - ExamFlow{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <!-- Заголовок -->
+  <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold mb-4" style="color: #252525;">Наши предметы</h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+      Специализируемся на математике и русском языке для качественной подготовки к ОГЭ и ЕГЭ
+    </p>
+  </div>
+
+  <!-- Математика -->
+  <div class="mb-16">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+        <span class="text-3xl">📐</span>
+      </div>
+      <h2 class="text-3xl font-bold mb-2" style="color: #252525;">Математика</h2>
+      <p class="text-gray-600">Профильная и непрофильная математика для ЕГЭ и ОГЭ</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for subject in math_subjects %}
+      <div class="subject-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mr-4">
+            <span class="text-2xl">{{ subject.icon|default:"📐" }}</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold" style="color: #252525;">{{ subject.name }}</h3>
+            <p class="text-sm text-gray-500">{{ subject.get_exam_type_display }}</p>
+          </div>
+        </div>
+        
+        {% if subject.description %}
+        <p class="text-gray-600 mb-4">{{ subject.description }}</p>
+        {% endif %}
+        
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center text-sm text-gray-500">
+            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+            {{ subject.task_count }} заданий
+          </div>
+          <div class="text-sm text-gray-500">
+            Актуально
+          </div>
+        </div>
+        
+        <a href="{% url 'learning:math_subject_detail' subject.id %}" 
+           class="btn btn-primary w-full text-center block py-3 rounded-lg font-medium transition-colors">
+          Начать изучение
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Русский язык -->
+  <div class="mb-16">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+        <span class="text-3xl">📝</span>
+      </div>
+      <h2 class="text-3xl font-bold mb-2" style="color: #252525;">Русский язык</h2>
+      <p class="text-gray-600">Сочинения, грамматика и тестовые задания для ЕГЭ и ОГЭ</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for subject in russian_subjects %}
+      <div class="subject-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mr-4">
+            <span class="text-2xl">{{ subject.icon|default:"📝" }}</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold" style="color: #252525;">{{ subject.name }}</h3>
+            <p class="text-sm text-gray-500">{{ subject.get_exam_type_display }}</p>
+          </div>
+        </div>
+        
+        {% if subject.description %}
+        <p class="text-gray-600 mb-4">{{ subject.description }}</p>
+        {% endif %}
+        
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center text-sm text-gray-500">
+            <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+            {{ subject.task_count }} заданий
+          </div>
+          <div class="text-sm text-gray-500">
+            Актуально
+          </div>
+        </div>
+        
+        <a href="{% url 'learning:russian_subject_detail' subject.id %}" 
+           class="btn btn-primary w-full text-center block py-3 rounded-lg font-medium transition-colors">
+          Начать изучение
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Преимущества фокусировки -->
+  <div class="bg-gray-50 rounded-2xl p-8 mb-12">
+    <h3 class="text-2xl font-bold text-center mb-6" style="color: #252525;">
+      Почему мы фокусируемся на математике и русском языке?
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center">
+        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">🎯</span>
+        </div>
+        <h4 class="font-semibold mb-2">Глубокое погружение</h4>
+        <p class="text-sm text-gray-600">Максимально подробные разборы и объяснения</p>
+      </div>
+      
+      <div class="text-center">
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">⚡</span>
+        </div>
+        <h4 class="font-semibold mb-2">Актуальные данные</h4>
+        <p class="text-sm text-gray-600">Автоматическое обновление с ФИПИ</p>
+      </div>
+      
+      <div class="text-center">
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">🤖</span>
+        </div>
+        <h4 class="font-semibold mb-2">ИИ-помощник</h4>
+        <p class="text-sm text-gray-600">Специализированные ответы по профильным предметам</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA секция -->
+  <div class="text-center bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-8">
+    <h3 class="text-2xl font-bold mb-4" style="color: #252525;">
+      Готовы начать подготовку?
+    </h3>
+    <p class="text-gray-600 mb-6">
+      Выберите предмет и начните изучение с нашими экспертами
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="#math" class="btn btn-primary px-8 py-3">
+        Изучить математику
+      </a>
+      <a href="#russian" class="btn btn-outline px-8 py-3">
+        Изучить русский язык
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+.subject-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.subject-card:hover {
+  transform: translateY(-2px);
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #357ABD 0%, #2E6BA8 100%);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #4A90E2;
+  border: 2px solid #4A90E2;
+}
+
+.btn-outline:hover {
+  background: #4A90E2;
+  color: white;
+}
+</style>
+{% endblock %}
