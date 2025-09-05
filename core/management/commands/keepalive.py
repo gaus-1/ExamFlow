@@ -1,126 +1,200 @@
 """
-Команда Django для управления системой keep-alive
+Команда для поддержания активности всех компонентов ExamFlow 2.0
 """
 
-from django.core.management.base import BaseCommand
-from core.keepalive import start_keepalive, stop_keepalive, keepalive_service
-import signal
-import sys
+import requests
 import time
+import logging
+from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.db import connection
+# Убираем импорт application - он не нужен для keepalive
+# from telegram_bot.bot_main import application
+# import asyncio
+# import threading
+
+logger = logging.getLogger(__name__)
+
+
+class KeepaliveService:
+    """Сервис для поддержания активности всех компонентов"""
+
+    def __init__(self):
+        self.website_url = getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.onrender.com')
+        self.health_url = f"{self.website_url}/health/"
+        self.bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+        self.telegram_api_url = f"https://api.telegram.org/bot{self.bot_token}/getMe"
+
+    def check_website(self):
+        """Проверяет доступность сайта"""
+        try:
+            response = requests.get(self.health_url, timeout=10)
+            if response.status_code == 200:
+                logger.info("✅ Сайт активен")
+                return True
+            else:
+                logger.warning(f"⚠️ Сайт отвечает с кодом {response.status_code}")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Ошибка проверки сайта: {e}")
+            return False
+
+    def check_database(self):
+        """Проверяет подключение к базе данных"""
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+                result = cursor.fetchone()
+                if result and result[0] == 1:
+                    logger.info("✅ База данных активна")
+                    return True
+                else:
+                    logger.warning("⚠️ База данных не отвечает корректно")
+                    return False
+        except Exception as e:
+            logger.error(f"❌ Ошибка проверки базы данных: {e}")
+            return False
+
+    def check_bot(self):
+        """Проверяет доступность Telegram бота"""
+        try:
+            response = requests.get(self.telegram_api_url, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok'):
+                    logger.info("✅ Telegram бот активен")
+                    return True
+                else:
+                    logger.warning(
+                        f"⚠️ Telegram бот не отвечает: {data.get('description')}")
+                    return False
+            else:
+                logger.warning(
+                    f"⚠️ Telegram API отвечает с кодом {response.status_code}")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Ошибка проверки Telegram бота: {e}")
+            return False
+
+    def wake_up_website(self):
+        """Будит сайт, делая запрос к главной странице"""
+        try:
+            response = requests.get(self.website_url, timeout=30)
+            if response.status_code == 200:
+                logger.info("✅ Сайт разбужен успешно")
+                return True
+            else:
+                logger.warning(f"⚠️ Сайт отвечает с кодом {response.status_code}")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Ошибка пробуждения сайта: {e}")
+            return False
+
+    def wake_up_database(self):
+        """Будит базу данных, выполняя простой запрос"""
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COUNT(*) FROM core_unifiedprofile")
+                result = cursor.fetchone()
+                logger.info(
+                    f"✅ База данных разбужена, профилей: {result[0] if result else 0}")
+                return True
+        except Exception as e:
+            logger.error(f"❌ Ошибка пробуждения базы данных: {e}")
+            return False
+
+    def run_keepalive_cycle(self, interval=300):  # 5 минут
+        """Запускает цикл keepalive"""
+        logger.info(f"🚀 Запуск keepalive цикла с интервалом {interval} секунд")
+
+        while True:
+            try:
+                logger.info("🔄 Начинаем проверку компонентов...")
+
+                # Проверяем компоненты
+                website_ok = self.check_website()
+                database_ok = self.check_database()
+                bot_ok = self.check_bot()
+
+                # Если что-то не работает, пробуем разбудить
+                if not website_ok:
+                    logger.info("🌐 Пробуем разбудить сайт...")
+                    self.wake_up_website()
+
+                if not database_ok:
+                    logger.info("🗄️ Пробуем разбудить базу данных...")
+                    self.wake_up_database()
+
+                # Логируем статус
+                status = "✅" if all([website_ok, database_ok, bot_ok]) else "⚠️"
+                logger.info(
+                    f"{status} Статус компонентов: Сайт={website_ok}, БД={database_ok}, Бот={bot_ok}")
+
+                # Ждем до следующей проверки
+                time.sleep(interval)
+
+            except KeyboardInterrupt:
+                logger.info("🛑 Keepalive цикл остановлен пользователем")
+                break
+            except Exception as e:
+                logger.error(f"❌ Ошибка в keepalive цикле: {e}")
+                time.sleep(60)  # Ждем минуту перед повторной попыткой
 
 
 class Command(BaseCommand):
-    help = 'Управление системой поддержания активности сайта'
+    help = 'Поддерживает активность всех компонентов ExamFlow 2.0'
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'action',
-            choices=['start', 'stop', 'status'],
-            help='Действие: start, stop или status',
+            '--interval',
+            type=int,
+            default=300,
+            help='Интервал проверки в секундах (по умолчанию 300)'
         )
         parser.add_argument(
-            '--daemon',
+            '--once',
             action='store_true',
-            help='Запустить в фоновом режиме',
+            help='Выполнить проверку один раз и завершить'
+        )
+        parser.add_argument(
+            '--component',
+            choices=['website', 'database', 'bot', 'all'],
+            default='all',
+            help='Проверить только указанный компонент'
         )
 
     def handle(self, *args, **options):
-        action = options['action']
-        
-        if action == 'start':
-            self.start_service(options.get('daemon', False))
-        elif action == 'stop':
-            self.stop_service()
-        elif action == 'status':
-            self.show_status()
+        keepalive = KeepaliveService()
 
-    def start_service(self, daemon=False):
-        """Запускает keep-alive службу"""
-        self.stdout.write(
-            self.style.SUCCESS('🚀 Запуск системы поддержания активности...')
-        )
-        
-        # Настраиваем обработчик сигналов для корректного завершения
-        def signal_handler(signum, frame):
-            self.stdout.write(
-                self.style.WARNING('\n⚠️  Получен сигнал завершения. Останавливаем службу...')
-            )
-            stop_keepalive()
-            sys.exit(0)
-        
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-        
-        try:
-            start_keepalive()
-            
-            self.stdout.write(
-                self.style.SUCCESS('✅ Keep-alive служба запущена успешно!')
-            )
-            self.stdout.write(
-                self.style.SUCCESS('🔄 Сайт будет пинговаться каждые 10 минут')
-            )
-            self.stdout.write(
-                self.style.WARNING('📝 Нажмите Ctrl+C для остановки')
-            )
-            
-            if daemon:
-                # В демон-режиме просто держим процесс
-                while keepalive_service.is_running:
-                    time.sleep(60)
-            else:
-                # В интерактивном режиме показываем статус
-                self.run_interactive_mode()
-                
-        except KeyboardInterrupt:
-            self.stdout.write(
-                self.style.WARNING('\n⚠️  Остановка по запросу пользователя...')
-            )
-            stop_keepalive()
-        except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка запуска: {str(e)}')
-            )
+        if options['once']:
+            # Однократная проверка
+            self.stdout.write("🔍 Выполняем однократную проверку компонентов...")
 
-    def stop_service(self):
-        """Останавливает keep-alive службу"""
-        self.stdout.write('🛑 Остановка keep-alive службы...')
-        stop_keepalive()
-        self.stdout.write(
-            self.style.SUCCESS('✅ Служба остановлена')
-        )
+            if options['component'] == 'website' or options['component'] == 'all':
+                website_ok = keepalive.check_website()
+                self.stdout.write(f"Сайт: {'✅' if website_ok else '❌'}")
 
-    def show_status(self):
-        """Показывает статус службы"""
-        if keepalive_service.is_running:
-            self.stdout.write(
-                self.style.SUCCESS('🟢 Keep-alive служба активна')
-            )
-            self.stdout.write(f'🌐 URL: {keepalive_service.site_url}')
-            self.stdout.write(f'⏰ Интервал: {keepalive_service.ping_interval} минут')
+            if options['component'] == 'database' or options['component'] == 'all':
+                database_ok = keepalive.check_database()
+                self.stdout.write(f"База данных: {'✅' if database_ok else '❌'}")
+
+            if options['component'] == 'bot' or options['component'] == 'all':
+                bot_ok = keepalive.check_bot()
+                self.stdout.write(f"Telegram бот: {'✅' if bot_ok else '❌'}")
+
+            self.stdout.write(self.style.SUCCESS("Проверка завершена"))  # type: ignore
+
         else:
+            # Непрерывный цикл
             self.stdout.write(
-                self.style.WARNING('🔴 Keep-alive служба остановлена')
-            )
+                f"🚀 Запуск keepalive сервиса с интервалом {options['interval']} секунд")
+            self.stdout.write("Нажмите Ctrl+C для остановки")
 
-    def run_interactive_mode(self):
-        """Запускает интерактивный режим с отображением статуса"""
-        try:
-            while keepalive_service.is_running:
-                # Очищаем экран (для Unix-систем)
-                # print('\033[2J\033[H', end='')
-                
-                self.stdout.write('\n' + '='*50)
-                self.stdout.write('🤖 ExamFlow Keep-Alive Service')
-                self.stdout.write('='*50)
-                self.stdout.write(f'🌐 URL: {keepalive_service.site_url}')
-                self.stdout.write(f'⏰ Интервал: {keepalive_service.ping_interval} минут')
-                self.stdout.write(f'🟢 Статус: Активен')
-                self.stdout.write('📝 Нажмите Ctrl+C для остановки')
-                self.stdout.write('='*50)
-                
-                # Ждем 30 секунд перед следующим обновлением
-                time.sleep(30)
-                
-        except KeyboardInterrupt:
-            pass
+            try:
+                keepalive.run_keepalive_cycle(options['interval'])
+            except KeyboardInterrupt:
+                self.stdout.write(self.style.WARNING(
+                    "Keepalive сервис остановлен"))  # type: ignore

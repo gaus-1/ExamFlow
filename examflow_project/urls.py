@@ -48,8 +48,14 @@ urlpatterns = [
     # Модуль ИИ-ассистента
     path('ai/', include('ai.urls')),
     
-    # Модуль core (персонализация)
+    # Модуль core (персонализация и RAG-система)
     path('core/', include('core.urls')),
+    
+    # Health check endpoints (для Render и мониторинга)
+    path('', include('core.urls')),
+    
+    # Модуль персонализации
+    path('personalization/', include('core.personalization.urls')),
     
     # ==========================================
     # LEGACY МАРШРУТЫ (для обратной совместимости)
@@ -86,6 +92,11 @@ urlpatterns = [
     # Демонстрация стилей
     path('style-showcase/', lambda request: render(request, 'style-showcase.html'), name='style_showcase'),
     path('aesop-showcase/', lambda request: render(request, 'aesop-showcase.html'), name='aesop_showcase'),
+    
+    # Новые страницы
+    path('features/', lambda request: render(request, 'features.html'), name='features'),
+    path('pricing/', lambda request: render(request, 'pricing.html'), name='pricing'),
+    path('subscribe/', lambda request: render(request, 'subscribe.html'), name='subscribe'),
 ]
 
 if settings.DEBUG:

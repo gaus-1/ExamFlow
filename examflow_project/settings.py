@@ -23,7 +23,7 @@ if not os.getenv('DEBUG', 'False').lower() == 'true':
 # В продакшене принудительно выключаем DEBUG
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'  # По умолчанию True для разработки
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,.onrender.com,localhost,127.0.0.1,testserver').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1,testserver,examflow.onrender.com').split(',') if h.strip()]
 # Добавим хост Render автоматически, если предоставлен платформой
 RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
@@ -71,6 +71,8 @@ MIDDLEWARE = [
     # 'csp.middleware.CSPMiddleware',  # CSP middleware - ВРЕМЕННО ОТКЛЮЧЕН
     # 🔒 Дополнительные middleware для безопасности
     'examflow_project.middleware.SecurityHeadersMiddleware',  # Кастомные заголовки безопасности
+    # FREEMIUM middleware
+    'core.freemium.middleware.FreemiumMiddleware',
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
@@ -96,6 +98,10 @@ WSGI_APPLICATION = 'examflow_project.wsgi.application'
 # URL-ы аутентификации
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
+
+# Keepalive настройки
+WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://examflow.ru')
+KEEPALIVE_INTERVAL = int(os.getenv('KEEPALIVE_INTERVAL', '300'))  # 5 минут
 
 # Кастомные backends для аутентификации
 AUTHENTICATION_BACKENDS = [
@@ -235,6 +241,7 @@ if not DEBUG:
     WHITENOISE_INDEX_FILE = True
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 else:
+    # Отключаем хеширование файлов для разработки
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media (для вложений задач)
@@ -244,8 +251,12 @@ if os.getenv('USE_REDIS_CACHE', '0') == '1':
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {
+                    'max_connections': 50,
+                    'retry_on_timeout': True,
+                }
             }
         }
     }
@@ -279,6 +290,24 @@ else:
 # Telegram Bot settings
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 BILLING_SECRET = os.getenv('BILLING_SECRET', 'change-me')
+
+# Настройки системы мониторинга
+MONITORING_EMAIL_RECIPIENTS = [
+    email.strip() for email in os.getenv('MONITORING_EMAIL_RECIPIENTS', '').split(',')
+    if email.strip()
+]
+MONITORING_WEBHOOK_URL = os.getenv('MONITORING_WEBHOOK_URL')
+
+# Настройки движка сбора данных
+INGESTION_ENGINE_MAX_WORKERS = int(os.getenv('INGESTION_ENGINE_MAX_WORKERS', '5'))
+INGESTION_ENGINE_CHECK_INTERVAL = int(os.getenv('INGESTION_ENGINE_CHECK_INTERVAL', '300'))  # 5 минут
+
+# Настройки Change Data Capture
+CHANGE_WEBHOOK_URL = os.getenv('CHANGE_WEBHOOK_URL')
+CHANGE_NOTIFICATION_EMAILS = [
+    email.strip() for email in os.getenv('CHANGE_NOTIFICATION_EMAILS', '').split(',')
+    if email.strip()
+]
 
 # Redis settings for Celery
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
@@ -333,7 +362,6 @@ if not DEBUG:
     CSRF_TRUSTED_ORIGINS = [
         'https://examflow.ru',
         'https://www.examflow.ru',
-        'https://*.onrender.com',
     ]
 else:
     # При разработке тоже добавим доверенные домены, чтобы тестировать прокси/туннели
@@ -344,6 +372,9 @@ else:
         'https://www.examflow.ru',
         'https://*.onrender.com',
     ]))
+
+# Обработка ошибок
+handler404 = 'examflow_project.views.handler404'
 
 # CSP — ВРЕМЕННО ОТКЛЮЧЕН для тестирования стилей
 # if DEBUG:
@@ -593,6 +624,13 @@ SECURITY_MONITORING = {
 
 # 🤖 GEMINI AI - НАСТРОЙКИ
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+
+# OAuth настройки
+GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID', 'demo')
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', 'demo')
+YANDEX_OAUTH_CLIENT_ID = os.getenv('YANDEX_OAUTH_CLIENT_ID', 'demo')
+YANDEX_OAUTH_CLIENT_SECRET = os.getenv('YANDEX_OAUTH_CLIENT_SECRET', 'demo')
+TELEGRAM_BOT_ID = os.getenv('TELEGRAM_BOT_ID', '8314335876')
 GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 GEMINI_TIMEOUT = 30
 

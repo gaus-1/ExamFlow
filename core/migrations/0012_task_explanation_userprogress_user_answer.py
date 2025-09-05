@@ -13,11 +13,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='explanation',
-            field=models.TextField(blank=True, verbose_name='Объяснение'),
+            field=models.TextField(
+                blank=True,
+                verbose_name='Объяснение'),
         ),
         migrations.AddField(
             model_name='userprogress',
             name='user_answer',
-            field=models.CharField(blank=True, max_length=200, verbose_name='Ответ пользователя'),
+            field=models.CharField(
+                blank=True,
+                max_length=200,
+                verbose_name='Ответ пользователя'),
         ),
     ]

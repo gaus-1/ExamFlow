@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Оформление подписки ExamFlow{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="section-padding-lg text-center" style="background: #fffef2;">
+    <div class="container">
+        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-2 heading-animate" style="color: #252525;">
+            Оформление подписки
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed text-reveal" style="color: #666;">
+            Получите безлимитный доступ ко всем возможностям ExamFlow
+        </p>
+    </div>
+</section>
+
+<!-- План подписки -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <div class="max-w-2xl mx-auto">
+            <div class="pricing-card text-center">
+                <div class="pricing-header mb-8">
+                    <h3 class="text-3xl font-bold mb-4" style="color: #252525;">Подписка ExamFlow</h3>
+                    <div class="text-5xl font-bold mb-2" style="color: #252525;">990 ₽<span class="text-lg">/мес</span></div>
+                    <p class="text-lg" style="color: #666;">Безлимитный доступ</p>
+                </div>
+                
+                <div class="pricing-features mb-8">
+                    <ul class="space-y-4 text-left">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Безлимитные запросы к ИИ-помощнику</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Все задания ФИПИ</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Приоритетная поддержка</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Расширенная аналитика прогресса</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Эксклюзивные задания</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Персональный куратор</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Способы оплаты -->
+<section class="section-padding" style="background: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Способы оплаты
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <!-- Банковская карта -->
+            <div class="payment-method text-center">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-credit-card text-3xl" style="color: #4A90E2;"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">Банковская карта</h3>
+                <p class="text-gray-600 mb-6">Visa, Mastercard, МИР</p>
+                <button class="btn-primary w-full" onclick="initiatePayment('card')">
+                    Оплатить картой
+                </button>
+            </div>
+
+            <!-- ЮKassa -->
+            <div class="payment-method text-center">
+                <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-wallet text-3xl" style="color: #f59e0b;"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">ЮKassa</h3>
+                <p class="text-gray-600 mb-6">СБП, электронные кошельки</p>
+                <button class="btn-primary w-full" onclick="initiatePayment('yookassa')">
+                    Оплатить через ЮKassa
+                </button>
+            </div>
+
+            <!-- Telegram Payments -->
+            <div class="payment-method text-center">
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fab fa-telegram text-3xl" style="color: #0088cc;"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4" style="color: #252525;">Telegram</h3>
+                <p class="text-gray-600 mb-6">Оплата через Telegram</p>
+                <button class="btn-primary w-full" onclick="initiatePayment('telegram')">
+                    Оплатить в Telegram
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Пробный период -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <div class="max-w-3xl mx-auto text-center">
+            <div class="bg-green-50 border border-green-200 rounded-2xl p-8">
+                <div class="text-6xl mb-4">🎉</div>
+                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">7 дней бесплатно</h3>
+                <p class="text-lg mb-6" style="color: #666;">
+                    Первые 7 дней подписки абсолютно бесплатны. Вы можете протестировать все возможности без оплаты.
+                </p>
+                <p class="text-sm" style="color: #666;">
+                    Оплата будет списана только через 7 дней. Вы можете отменить подписку в любое время.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Безопасность -->
+<section class="section-padding" style="background: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Безопасность платежей
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div class="security-item text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-2xl" style="color: #10b981;"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #252525;">SSL шифрование</h3>
+                <p class="text-sm" style="color: #666;">Все данные защищены</p>
+            </div>
+            
+            <div class="security-item text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-2xl" style="color: #4A90E2;"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #252525;">PCI DSS</h3>
+                <p class="text-sm" style="color: #666;">Стандарт безопасности</p>
+            </div>
+            
+            <div class="security-item text-center">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-shield text-2xl" style="color: #8b5cf6;"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #252525;">Конфиденциальность</h3>
+                <p class="text-sm" style="color: #666;">Данные не передаются третьим лицам</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function initiatePayment(method) {
+    // Здесь будет интеграция с платежными системами
+    alert(`Инициируется оплата через ${method}. Интеграция с платежными системами будет добавлена позже.`);
+}
+</script>
+{% endblock %}

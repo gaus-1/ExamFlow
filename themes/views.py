@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 import json
 
 
@@ -11,12 +10,12 @@ import json
 def switch_theme(request):
     """
     API для переключения дизайна пользователя
-    
+
     Принимает POST запрос с JSON:
     {
         "theme": "school" или "adult"
     }
-    
+
     Возвращает:
     {
         "success": true/false,
@@ -28,7 +27,7 @@ def switch_theme(request):
         # Парсим JSON из запроса
         data = json.loads(request.body)
         theme = data.get('theme')
-        
+
         # Проверяем валидность темы
         valid_themes = ['school', 'adult']
         if theme not in valid_themes:
@@ -36,7 +35,7 @@ def switch_theme(request):
                 'success': False,
                 'message': f'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
             }, status=400)
-        
+
         # Если пользователь авторизован, сохраняем выбор в профиле
         if request.user.is_authenticated:
             try:
@@ -49,7 +48,7 @@ def switch_theme(request):
                 if not created:
                     preference.theme = theme
                     preference.save()
-                
+
                 # Создаем запись об использовании темы
                 from .models import ThemeUsage
                 ThemeUsage.objects.create(  # type: ignore
@@ -58,18 +57,19 @@ def switch_theme(request):
                     session_duration=0,
                     page_views=1
                 )
-                
-                print(f"Пользователь {request.user.username} переключился на тему: {theme}")
+
+                print(
+                    f"Пользователь {request.user.username} переключился на тему: {theme}")
             except Exception as e:
                 print(f"Ошибка сохранения темы в профиль: {e}")
-        
+
         # Возвращаем успешный ответ
         return JsonResponse({
             'success': True,
             'theme': theme,
             'message': f'Дизайн успешно переключен на "{theme}"'
         })
-        
+
     except json.JSONDecodeError:
         return JsonResponse({
             'success': False,
@@ -86,7 +86,7 @@ def switch_theme(request):
 def get_current_theme(request):
     """
     API для получения текущей темы пользователя
-    
+
     Возвращает:
     {
         "success": true,
@@ -97,14 +97,15 @@ def get_current_theme(request):
     try:
         # По умолчанию тема "school"
         theme = 'school'
-        
+
         # Если пользователь авторизован, можно получить из профиля
         if request.user.is_authenticated:
             try:
                 # Получаем тему из профиля пользователя
                 from .models import UserThemePreference
                 try:
-                    preference = UserThemePreference.objects.get(user=request.user)  # type: ignore
+                    preference = UserThemePreference.objects.get(
+                        user=request.user)  # type: ignore
                     theme = preference.theme
                 except UserThemePreference.DoesNotExist:  # type: ignore
                     # Если предпочтения нет, создаем с дефолтной темой
@@ -116,13 +117,13 @@ def get_current_theme(request):
             except Exception as e:
                 print(f"Ошибка получения темы из профиля: {e}")
                 theme = 'school'
-        
+
         return JsonResponse({
             'success': True,
             'theme': theme,
             'user_authenticated': request.user.is_authenticated
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'success': False,
@@ -134,9 +135,9 @@ def get_current_theme(request):
 def preview_theme(request, theme):
     """
     API для предварительного просмотра темы
-    
+
     Принимает theme в URL: /themes/api/preview/school/ или /themes/api/preview/adult/
-    
+
     Возвращает:
     {
         "success": true,
@@ -155,7 +156,7 @@ def preview_theme(request, theme):
                 'success': False,
                 'message': f'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
             }, status=400)
-        
+
         # Данные для предварительного просмотра
         preview_data = {
             'school': {
@@ -185,13 +186,13 @@ def preview_theme(request, theme):
                 'style': 'Сдержанный профессиональный дизайн для взрослых'
             }
         }
-        
+
         return JsonResponse({
             'success': True,
             'theme': theme,
             'preview_data': preview_data.get(theme, {})
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'success': False,
@@ -202,7 +203,7 @@ def preview_theme(request, theme):
 def test_themes(request):
     """
     Тестовая страница для проверки переключателя дизайнов
-    
+
     Показывает демонстрацию всех элементов дизайна
     и позволяет протестировать переключение между темами
     """

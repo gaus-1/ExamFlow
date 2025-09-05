@@ -11,13 +11,14 @@ import json
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     help = 'Полная диагностика Telegram бота'
-    
+
     def handle(self, *args, **options):
         self.stdout.write('🔍 ПОЛНАЯ ДИАГНОСТИКА TELEGRAM БОТА')
         self.stdout.write('=' * 60)
-        
+
         # 1. Проверяем переменные окружения
         self.stdout.write('\n📋 1. ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ:')
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
@@ -26,14 +27,14 @@ class Command(BaseCommand):
         else:
             self.stdout.write('   ❌ TELEGRAM_BOT_TOKEN: НЕ НАЙДЕН')
             return
-        
+
         site_url = getattr(settings, 'SITE_URL', None)
         if site_url:
             self.stdout.write(f'   ✅ SITE_URL: {site_url}')
         else:
             self.stdout.write('   ❌ SITE_URL: НЕ НАЙДЕН')
             return
-        
+
         # 2. Проверяем базу данных
         self.stdout.write('\n🗄️ 2. БАЗА ДАННЫХ:')
         try:
@@ -45,7 +46,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(f'   ❌ Ошибка базы данных: {e}')
             return
-        
+
         # 3. Проверяем создание бота
         self.stdout.write('\n🤖 3. СОЗДАНИЕ БОТА:')
         try:
@@ -59,27 +60,29 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(f'   ❌ Ошибка создания бота: {e}')
             return
-        
+
         # 4. Проверяем API бота
         self.stdout.write('\n🌐 4. API БОТА:')
         try:
             import asyncio
             bot_info = asyncio.run(bot.get_me())
-            self.stdout.write(f'   ✅ Бот доступен: @{bot_info.username} (ID: {bot_info.id})')
+            self.stdout.write(
+                f'   ✅ Бот доступен: @{bot_info.username} (ID: {bot_info.id})')
         except Exception as e:
             self.stdout.write(f'   ❌ Ошибка API бота: {e}')
             return
-        
+
         # 5. Проверяем webhook
         self.stdout.write('\n🔗 5. WEBHOOK:')
         webhook_url = f"{site_url}/bot/webhook/"
         self.stdout.write(f'   Webhook URL: {webhook_url}')
-        
+
         try:
             # Проверяем текущий webhook
-            response = requests.get(f"https://api.telegram.org/bot{token}/getWebhookInfo")
+            response = requests.get(
+                f"https://api.telegram.org/bot{token}/getWebhookInfo")
             webhook_info = response.json()
-            
+
             if webhook_info.get('ok'):
                 current_url = webhook_info.get('result', {}).get('url', '')
                 if current_url:
@@ -92,32 +95,35 @@ class Command(BaseCommand):
                     self.stdout.write('   ❌ Webhook не настроен')
             else:
                 self.stdout.write(f'   ❌ Ошибка получения webhook: {webhook_info}')
-                
+
         except Exception as e:
             self.stdout.write(f'   ❌ Ошибка проверки webhook: {e}')
-        
+
         # 6. Проверяем доступность webhook endpoint
         self.stdout.write('\n🌐 6. ДОСТУПНОСТЬ WEBHOOK ENDPOINT:')
         try:
             # Тестируем webhook endpoint
             test_url = f"{site_url}/bot/test/"
             response = requests.get(test_url, timeout=10)
-            
+
             if response.status_code == 200:
-                self.stdout.write(f'   ✅ Webhook endpoint доступен: HTTP {response.status_code}')
+                self.stdout.write(
+                    f'   ✅ Webhook endpoint доступен: HTTP {response.status_code}')
                 try:
                     data = response.json()
-                    self.stdout.write(f'   📊 Ответ: {json.dumps(data, indent=2, ensure_ascii=False)}')
-                except:
+                    self.stdout.write(
+                        f'   📊 Ответ: {json.dumps(data, indent=2, ensure_ascii=False)}')
+                except BaseException:
                     self.stdout.write(f'   📊 Ответ: {response.text[:200]}')
             else:
-                self.stdout.write(f'   ❌ Webhook endpoint недоступен: HTTP {response.status_code}')
-                
+                self.stdout.write(
+                    f'   ❌ Webhook endpoint недоступен: HTTP {response.status_code}')
+
         except requests.exceptions.ConnectionError:
             self.stdout.write('   ❌ Ошибка соединения с webhook endpoint')
         except Exception as e:
             self.stdout.write(f'   ❌ Ошибка проверки webhook endpoint: {e}')
-        
+
         # 7. Тестируем отправку сообщения
         self.stdout.write('\n📤 7. ТЕСТ ОТПРАВКИ СООБЩЕНИЯ:')
         try:
@@ -130,7 +136,7 @@ class Command(BaseCommand):
                     'text': test_message
                 }
             )
-            
+
             if response.status_code == 200:
                 result = response.json()
                 if result.get('ok'):
@@ -138,23 +144,26 @@ class Command(BaseCommand):
                 else:
                     error_code = result.get('error_code', 'unknown')
                     if error_code == 400:  # Bad Request - нормально для несуществующего chat_id
-                        self.stdout.write('   ✅ API отправки сообщений работает (ошибка 400 ожидаема)')
+                        self.stdout.write(
+                            '   ✅ API отправки сообщений работает (ошибка 400 ожидаема)')
                     else:
                         self.stdout.write(f'   ⚠️  API работает, но ошибка: {result}')
             else:
                 self.stdout.write(f'   ❌ Ошибка API: HTTP {response.status_code}')
-                
+
         except Exception as e:
             self.stdout.write(f'   ❌ Ошибка тестирования API: {e}')
-        
+
         self.stdout.write('\n' + '=' * 60)
         self.stdout.write('🏁 ДИАГНОСТИКА ЗАВЕРШЕНА')
-        
+
         # Рекомендации
         self.stdout.write('\n💡 РЕКОМЕНДАЦИИ:')
         if site_url and not site_url.startswith('https://'):
-            self.stdout.write('   ⚠️  SITE_URL должен начинаться с https:// для webhook')
+            self.stdout.write(
+                '   ⚠️  SITE_URL должен начинаться с https:// для webhook')
         if not token:
-            self.stdout.write('   ❌ Установите TELEGRAM_BOT_TOKEN в Environment Variables')
+            self.stdout.write(
+                '   ❌ Установите TELEGRAM_BOT_TOKEN в Environment Variables')
         else:
             self.stdout.write('   ✅ TELEGRAM_BOT_TOKEN настроен')

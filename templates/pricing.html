@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Тарифы ExamFlow - Бесплатный доступ и подписка{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="section-padding-lg text-center" style="background: #fffef2;">
+    <div class="container">
+        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-2 heading-animate" style="color: #252525;">
+            Простые тарифы
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed text-reveal" style="color: #666;">
+            Выберите подходящий вариант для эффективной подготовки
+        </p>
+    </div>
+</section>
+
+<!-- Тарифные планы -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <!-- Бесплатный тариф -->
+            <div class="pricing-card text-center">
+                <div class="pricing-header mb-8">
+                    <h3 class="text-3xl font-bold mb-4" style="color: #252525;">Бесплатно</h3>
+                    <div class="text-5xl font-bold mb-2" style="color: #252525;">0 ₽</div>
+                    <p class="text-lg" style="color: #666;">Бесплатный доступ с ограничением запросов</p>
+                </div>
+                
+                <div class="pricing-features mb-8">
+                    <ul class="space-y-4 text-left">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Полный функционал платформы</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>10 запросов к ИИ в день</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Все задания ФИПИ</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Telegram бот</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Базовая аналитика</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Геймификация</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <a href="{% url 'register' %}" class="btn-primary w-full text-lg py-4">
+                    Начать бесплатно
+                </a>
+            </div>
+
+            <!-- Подписка -->
+            <div class="pricing-card popular text-center">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-6 py-2 rounded-full text-sm font-semibold">
+                    РЕКОМЕНДУЕМ
+                </div>
+                
+                <div class="pricing-header mb-8">
+                    <h3 class="text-3xl font-bold mb-4" style="color: #252525;">Подписка</h3>
+                    <div class="text-5xl font-bold mb-2" style="color: #252525;">990 ₽<span class="text-lg">/мес</span></div>
+                    <p class="text-lg" style="color: #666;">Безлимитный доступ</p>
+                </div>
+                
+                <div class="pricing-features mb-8">
+                    <ul class="space-y-4 text-left">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Все возможности бесплатного</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Безлимитные запросы к ИИ</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Приоритетная поддержка</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Расширенная аналитика</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Эксклюзивные задания</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span>Персональный куратор</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <a href="{% url 'subscribe' %}" class="btn-primary w-full text-lg py-4">
+                    Оформить подписку
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-padding" style="background: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Частые вопросы
+        </h2>
+        
+        <div class="max-w-3xl mx-auto space-y-6">
+            <div class="faq-item">
+                <h3 class="text-xl font-bold mb-3" style="color: #252525;">Можно ли использовать бесплатный тариф неограниченно?</h3>
+                <p class="text-gray-600">Да, бесплатный тариф доступен навсегда. Единственное ограничение - 10 запросов к ИИ в день.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="text-xl font-bold mb-3" style="color: #252525;">Что входит в подписку?</h3>
+                <p class="text-gray-600">Подписка снимает ограничение на запросы к ИИ и добавляет приоритетную поддержку, расширенную аналитику и эксклюзивные задания.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="text-xl font-bold mb-3" style="color: #252525;">Можно ли отменить подписку?</h3>
+                <p class="text-gray-600">Да, подписку можно отменить в любое время. После отмены вы сохраните доступ к бесплатному тарифу.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h3 class="text-xl font-bold mb-3" style="color: #252525;">Есть ли пробный период?</h3>
+                <p class="text-gray-600">Да, первые 7 дней подписки бесплатны. Вы можете протестировать все возможности без оплаты.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section-padding text-center" style="background: #252525; color: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6" style="color: #fffef2;">
+            Готовы начать подготовку?
+        </h2>
+        <p class="text-xl text-center mb-8 max-w-2xl mx-auto" style="color: #666;">
+            Начните с бесплатного тарифа и переходите на подписку, когда будете готовы
+        </p>
+        <a href="{% url 'register' %}" class="btn-primary text-lg px-8 py-4">
+            Начать бесплатно
+        </a>
+    </div>
+</section>
+{% endblock %}

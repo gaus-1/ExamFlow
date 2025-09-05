@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Вход в ExamFlow - Быстрая авторизация{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="section-padding-lg text-center" style="background: #fffef2;">
+    <div class="container">
+        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-2 heading-animate" style="color: #252525;">
+            Продолжить через
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed text-reveal" style="color: #666;">
+            Быстрый вход без регистрации
+        </p>
+    </div>
+</section>
+
+<!-- Способы входа -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <div class="max-w-2xl mx-auto">
+            <div class="auth-methods space-y-6">
+                <!-- Telegram -->
+                <div class="auth-method">
+                    <a href="{% url 'auth:telegram_login' %}" class="auth-button telegram">
+                        <div class="auth-icon">
+                            <i class="fab fa-telegram text-2xl"></i>
+                        </div>
+                        <div class="auth-content">
+                            <h3 class="auth-title">Telegram</h3>
+                            <p class="auth-description">Войти через Telegram бот</p>
+                        </div>
+                        <div class="auth-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Google -->
+                <div class="auth-method">
+                    <a href="{% url 'auth:google_login' %}" class="auth-button google">
+                        <div class="auth-icon">
+                            <i class="fab fa-google text-2xl"></i>
+                        </div>
+                        <div class="auth-content">
+                            <h3 class="auth-title">Google</h3>
+                            <p class="auth-description">Войти через Google Account</p>
+                        </div>
+                        <div class="auth-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Яндекс -->
+                <div class="auth-method">
+                    <a href="{% url 'auth:yandex_login' %}" class="auth-button yandex">
+                        <div class="auth-icon">
+                            <i class="fab fa-yandex text-2xl"></i>
+                        </div>
+                        <div class="auth-content">
+                            <h3 class="auth-title">Яндекс</h3>
+                            <p class="auth-description">Войти через Яндекс ID</p>
+                        </div>
+                        <div class="auth-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Гостевой доступ -->
+            <div class="guest-access mt-12 text-center">
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="text-4xl mb-4">👤</div>
+                    <h3 class="text-xl font-bold mb-4" style="color: #252525;">Гостевой доступ</h3>
+                    <p class="text-gray-600 mb-6">
+                        Начните использовать ExamFlow без регистрации. Ваши данные сохранятся локально.
+                    </p>
+                    <a href="{% url 'learning:subjects_list' %}" class="btn-secondary">
+                        Продолжить как гость
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Преимущества -->
+<section class="section-padding" style="background: #fffef2;">
+    <div class="container">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Почему ExamFlow?
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div class="benefit-item text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-bolt text-2xl" style="color: #4A90E2;"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #252525;">Быстрый старт</h3>
+                <p class="text-sm" style="color: #666;">Начните обучение за 30 секунд</p>
+            </div>
+            
+            <div class="benefit-item text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-2xl" style="color: #10b981;"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #252525;">Безопасно</h3>
+                <p class="text-sm" style="color: #666;">Ваши данные защищены</p>
+            </div>
+            
+            <div class="benefit-item text-center">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-mobile-alt text-2xl" style="color: #8b5cf6;"></i>
+                </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #252525;">Синхронизация</h3>
+                <p class="text-sm" style="color: #666;">Прогресс сохраняется везде</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.auth-methods {
+    margin-bottom: 2rem;
+}
+
+.auth-method {
+    margin-bottom: 1rem;
+}
+
+.auth-button {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.auth-button:hover {
+    border-color: #4A90E2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.auth-icon {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    border-radius: 0.5rem;
+}
+
+.telegram .auth-icon {
+    background: #0088cc;
+    color: white;
+}
+
+.google .auth-icon {
+    background: #db4437;
+    color: white;
+}
+
+.yandex .auth-icon {
+    background: #ff0000;
+    color: white;
+}
+
+.auth-content {
+    flex: 1;
+    text-align: left;
+}
+
+.auth-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #252525;
+    margin: 0 0 0.25rem 0;
+}
+
+.auth-description {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+}
+
+.auth-arrow {
+    color: #9ca3af;
+    font-size: 1.25rem;
+}
+
+.benefit-item {
+    padding: 1rem;
+}
+</style>
+{% endblock %}
