@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.sitemaps import views as sitemap_views
 from django.contrib.sitemaps import Sitemap
+from django.shortcuts import render
 from learning.models import Subject  # type: ignore
 
 
@@ -36,6 +37,32 @@ def robots_txt(_request):
     return HttpResponse("\n".join(lines), content_type="text/plain")  # type: ignore
 
 
+def faq_view(request):
+    qa = {
+        'Как подготовиться к ЕГЭ по математике (профильная)?': 'Решайте типовые задания 1–19, ведите список ошибок, изучайте критерии ФИПИ, тренируйтесь по времени. На сайте доступны разборы и видео.',
+        'Как готовиться к ЕГЭ по русскому языку?': 'Отработайте структуру сочинения, аргументацию, повторите орфографию и пунктуацию. Используйте наши чек‑листы и примеры сочинений.',
+        'Чем отличается ОГЭ от ЕГЭ по математике?': 'ОГЭ — базовый экзамен 9 класса с иным набором заданий и критериев. У нас есть отдельные страницы с разборами для ОГЭ.',
+        'Где посмотреть типичные ошибки?': 'На страницах заданий мы выделяем частые ошибки и даём рекомендации, как их избегать.',
+        'Есть ли видеоразборы?': 'Да, для сложных тем — видеоразборы с пошаговыми объяснениями.',
+    }
+    from . import seo as core_seo
+    context = {
+        'page_title': 'FAQ — ответы по подготовке к ЕГЭ/ОГЭ — ExamFlow',
+        'page_description': 'Частые вопросы о подготовке к ЕГЭ/ОГЭ по математике и русскому: ошибки, критерии ФИПИ, видеоразборы.',
+        'canonical_url': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/faq/',
+        'og_title': 'FAQ — ExamFlow',
+        'og_description': 'Ответы на частые вопросы по ЕГЭ/ОГЭ (математика и русский).',
+        'og_image': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/static/images/logo-512.png',
+        'og_url': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/faq/',
+        'twitter_title': 'FAQ — ExamFlow',
+        'twitter_description': 'Частые вопросы по подготовке к ЕГЭ/ОГЭ.',
+        'twitter_image': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/static/images/logo-512.png',
+        'jsonld': core_seo.jsonld_faq(qa),
+        'qa': qa,
+    }
+    return render(request, 'faq.html', context)
+
+
 from . import api
 from .ultra_simple_health import ultra_simple_health, minimal_health_check
 
@@ -51,4 +78,5 @@ urlpatterns = [
     path('health/simple/', minimal_health_check, name='health_check_simple'),
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap}}, name='sitemap'),
+    path('faq/', faq_view, name='faq'),
 ]

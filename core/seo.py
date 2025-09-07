@@ -108,3 +108,37 @@ def _jsonld_course(subject_name: str, url: str) -> str:
     return json.dumps(data, ensure_ascii=False)
 
 
+def jsonld_faq(qa: Dict[str, str]) -> str:
+    """Build FAQPage JSON-LD from dict of question->answer."""
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+            {
+                '@type': 'Question',
+                'name': q,
+                'acceptedAnswer': {'@type': 'Answer', 'text': a},
+            }
+            for q, a in qa.items()
+        ],
+    }
+    import json
+    return json.dumps(data, ensure_ascii=False)
+
+
+def jsonld_video(title: str, page_url: str, thumb_url: str, content_url: str) -> str:
+    data = {
+        '@context': 'https://schema.org',
+        '@type': 'VideoObject',
+        'name': title,
+        'thumbnailUrl': [thumb_url],
+        'contentUrl': content_url,
+        'embedUrl': content_url,
+        'uploadDate': '2025-01-01',
+        'description': title,
+        'url': page_url,
+    }
+    import json
+    return json.dumps(data, ensure_ascii=False)
+
+
