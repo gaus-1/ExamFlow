@@ -57,19 +57,10 @@ class AdvancedFIPIScraper:
             ]
         }
 
-        # Предметы для ЕГЭ и ОГЭ
+        # Предметы для фокуса: только русский и математика
         self.subjects = {
             'russian': ['русский', 'русск'],
-            'mathematics': ['математик', 'матем'],
-            'physics': ['физик', 'физ'],
-            'chemistry': ['хими', 'хим'],
-            'biology': ['биолог', 'биол'],
-            'history': ['истори', 'истор'],
-            'geography': ['географ', 'геогр'],
-            'social_studies': ['обществознан', 'обществ'],
-            'literature': ['литератур', 'литер'],
-            'foreign_language': ['иностранн', 'английск', 'немецк', 'франц', 'испанск'],
-            'informatics': ['информатик', 'информ']
+            'mathematics': ['математик', 'матем']
         }
 
     def get_page_content(self, url: str) -> Optional[str]:
@@ -160,16 +151,8 @@ class AdvancedFIPIScraper:
             return 'ege'
         elif '/oge/' in url:
             return 'oge'
-        elif '/gve-11/' in url:
-            return 'gve_11'
-        elif '/gve-9/' in url:
-            return 'gve_9'
-        elif '/essay/' in url:
-            return 'essay'
-        elif '/interview/' in url:
-            return 'interview'
         else:
-            return 'ege'  # По умолчанию ЕГЭ
+            return 'unknown'
 
     def get_content_hash(self, content: str) -> str:
         """Создает хеш содержимого"""
@@ -216,8 +199,12 @@ class AdvancedFIPIScraper:
                         detected_subject = self.detect_subject(link_url, link_title)
                         exam_type = self.detect_exam_type(link_url)
 
-                        # Пропускаем нерелевантные
+                        # Пропускаем нерелевантные типы/предметы/экзамены
                         if detected_type == 'unknown':
+                            continue
+                        if detected_subject not in ('russian', 'mathematics'):
+                            continue
+                        if exam_type not in ('ege', 'oge'):
                             continue
 
                         # Загружаем содержимое ссылки (ограниченно)
@@ -259,7 +246,7 @@ class AdvancedFIPIScraper:
 
                                 for pdf_url, pdf_title in pdf_links:
                                     pdf_hash = self.get_content_hash(pdf_url)
-                                    if FIPIData.objects.filter(
+                                    if FIPIData.objects.filter( # type: ignore
                                             content_hash=pdf_hash).exists():  # type: ignore
                                         continue
                                     FIPIData.objects.create(  # type: ignore
@@ -282,7 +269,7 @@ class AdvancedFIPIScraper:
                             # Обычная запись: HTML или прямая PDF
                             content_hash = self.get_content_hash(
                                 (link_content or '')[:5000] + link_url)
-                            if FIPIData.objects.filter(
+                            if FIPIData.objects.filter( # type: ignore
                                     content_hash=content_hash).exists():  # type: ignore
                                 continue
                             FIPIData.objects.create(  # type: ignore
@@ -306,7 +293,7 @@ class AdvancedFIPIScraper:
 
                 # Если это не индекс-страница, сохраняем саму страницу
                 content_hash = self.get_content_hash(page_content)
-                if not FIPIData.objects.filter(
+                if not FIPIData.objects.filter( # type: ignore
                         content_hash=content_hash).exists():  # type: ignore
                     FIPIData.objects.create(  # type: ignore
                         title=source.name,
@@ -345,7 +332,7 @@ class AdvancedFIPIScraper:
                     ).hexdigest()
 
                     # Проверяем, есть ли уже такая запись
-                    if FIPIData.objects.filter(
+                    if FIPIData.objects.filter( # type: ignore
                             content_hash=content_hash).exists():  # type: ignore
                         total_skipped += 1
                         continue
@@ -374,10 +361,10 @@ class AdvancedFIPIScraper:
         stats = {
             'total_sources': FIPISourceMap.objects.count(),  # type: ignore
             # type: ignore
-            'active_sources': FIPISourceMap.objects.filter(is_active=True).count(),
+            'active_sources': FIPISourceMap.objects.filter(is_active=True).count(), # type: ignore
             'total_data': FIPIData.objects.count(),  # type: ignore
             # type: ignore
-            'processed_data': FIPIData.objects.filter(is_processed=True).count(),
+            'processed_data': FIPIData.objects.filter(is_processed=True).count(), # type: ignore
             'by_type': {},
             'by_priority': {}
         }
@@ -390,7 +377,7 @@ class AdvancedFIPIScraper:
 
         # Статистика по приоритетам источников
         for priority in [1, 2, 3, 4]:
-            count = FIPISourceMap.objects.filter(
+            count = FIPISourceMap.objects.filter( # type: ignore
                 priority=priority).count()  # type: ignore
             if count > 0:
                 stats['by_priority'][priority] = count

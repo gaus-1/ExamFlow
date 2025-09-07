@@ -26,27 +26,17 @@ class FIPIScraper:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
 
-        # Ключевые разделы ФИПИ для сбора данных
+        # Ключевые разделы ФИПИ для сбора данных (ограничено ЕГЭ/ОГЭ)
         self.target_sections = {
-            'demo_variants': '/ege/demoversii-specifikacii-kodifikatory',
-            'open_bank': '/ege/otkrytyy-bank-zadaniy-ege',
-            'specifications': '/ege/specifikacii-kodifikatory',
-            'codifiers': '/ege/kodifikatory'
+            'ege_demo': '/ege/demoversii-specifikacii-kodifikatory',
+            'oge_demo': '/oge/demoversii-specifikacii-kodifikatory',
+            'open_bank': '/ege/otkrytyy-bank-zadaniy-ege'
         }
 
-        # Предметы ЕГЭ
+        # Предметы фокуса
         self.subjects = {
             'mathematics': 'Математика',
-            'russian': 'Русский язык',
-            'physics': 'Физика',
-            'chemistry': 'Химия',
-            'biology': 'Биология',
-            'history': 'История',
-            'social_studies': 'Обществознание',
-            'english': 'Английский язык',
-            'informatics': 'Информатика и ИКТ',
-            'geography': 'География',
-            'literature': 'Литература'
+            'russian': 'Русский язык'
         }
 
     def get_page_content(self, url: str) -> Optional[BeautifulSoup]:
@@ -68,7 +58,7 @@ class FIPIScraper:
         logger.info("Начинаем сбор демонстрационных вариантов...")
         variants = []
 
-        url = urljoin(self.base_url, self.target_sections['demo_variants'])
+        url = urljoin(self.base_url, self.target_sections['ege_demo'])
         soup = self.get_page_content(url)
 
         if not soup:
@@ -120,7 +110,7 @@ class FIPIScraper:
             href = link.get('href')
             text = link.get_text(strip=True)
 
-            # Проверяем, является ли ссылка предметом
+            # Проверяем, является ли ссылка предметом фокуса
             if any(subject in text for subject in self.subjects.values()):
                 subject_url = urljoin(self.base_url, href)
                 subject_tasks = self._extract_subject_tasks(subject_url, text)
