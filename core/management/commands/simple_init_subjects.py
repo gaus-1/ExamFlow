@@ -98,7 +98,7 @@ class Command(BaseCommand):
         archived_subjects = Subject.objects.filter(
             is_archived=True).count()  # type: ignore
 
-        self.stdout.write(f'\nСтатистика:')
+        self.stdout.write('\nСтатистика:')
         self.stdout.write(f'  Всего предметов: {total_subjects}')
         self.stdout.write(f'  Основных предметов: {primary_subjects}')
         self.stdout.write(f'  Архивированных предметов: {archived_subjects}')
