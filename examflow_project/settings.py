@@ -671,3 +671,7 @@ GEMINI_TASK_CONFIGS = {
 # Все настройки перенесены в GEMINI_TASK_CONFIGS
 
 STATIC_VERSION = os.getenv('STATIC_VERSION', 'v' + os.getenv('RENDER_GIT_COMMIT', '')[:7] if os.getenv('RENDER_GIT_COMMIT') else '1')
+
+# IDs аналитики (через env)
+GA4_ID = os.getenv('GA4_ID', '')
+YM_ID = os.getenv('YM_ID', '')

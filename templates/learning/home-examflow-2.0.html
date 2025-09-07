@@ -3,6 +3,10 @@
 
 {% block title %}ExamFlow 2.0 - Умный помощник для подготовки к ЕГЭ{% endblock %}
 
+{% block extra_head %}
+  {% include 'partials/seo_meta.html' %}
+{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
