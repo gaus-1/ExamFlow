@@ -130,7 +130,7 @@ else:
     if DATABASE_URL:
         try:
             # Psycopg v3 (psycopg) дружит с django через стандартную строку ENGINE ниже
-DATABASES = {
+            DATABASES = {
                 'default': dj_database_url.parse(
                     DATABASE_URL,
                     conn_max_age=600,
