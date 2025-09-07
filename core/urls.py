@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.sitemaps import views as sitemap_views
 from django.contrib.sitemaps import Sitemap
 from django.shortcuts import render
+from django.shortcuts import redirect
 from learning.models import Subject  # type: ignore
 
 
@@ -89,4 +90,9 @@ urlpatterns = [
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
     path('faq/', faq_view, name='faq'),
+    # SEO-friendly ЧПУ (301) для ЕГЭ/ОГЭ: ведём на список предметов (без ломки текущих маршрутов)
+    path('ege/matematika/', lambda r: redirect('/subjects/?utm=seo_ege_math', permanent=True)),
+    path('ege/russkiy/', lambda r: redirect('/subjects/?utm=seo_ege_rus', permanent=True)),
+    path('oge/matematika/', lambda r: redirect('/subjects/?utm=seo_oge_math', permanent=True)),
+    path('oge/russkiy/', lambda r: redirect('/subjects/?utm=seo_oge_rus', permanent=True)),
 ]
