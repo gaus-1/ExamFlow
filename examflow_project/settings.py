@@ -88,6 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'examflow_project.context_processors.inject_static_version',
             ],
         },
     },
@@ -668,3 +669,5 @@ GEMINI_TASK_CONFIGS = {
 
 # OpenAI провайдер удален - используем только Gemini
 # Все настройки перенесены в GEMINI_TASK_CONFIGS
+
+STATIC_VERSION = os.getenv('STATIC_VERSION', 'v' + os.getenv('RENDER_GIT_COMMIT', '')[:7] if os.getenv('RENDER_GIT_COMMIT') else '1')
