@@ -16,7 +16,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from learning.models import Subject, Task  # type: ignore
 from core.models import UserProgress  # type: ignore
-from core import seo as seo_utils
+import core.seo as seo_utils
 import random
 import time
 
