@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
     <title>{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}</title>
     
-    <!-- Восстановлен набор иконок -->
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/icon-16x16.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/icon-32x32.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/icon-180x180.png' %}">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo-180.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/logo-512.png' %}">
     
     <!-- SEO мета-теги -->
     <meta name="description" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ. Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам по математике и русскому языку.">
@@ -49,11 +49,7 @@
     <meta name="twitter:description" content="Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
     <meta name="twitter:image" content="{% static 'images/logo-180.png' %}">
     
-    <!-- Favicon full set -->
-    <link rel="icon" type="image/x-icon" href="{% static 'images/logo-new.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'images/logo-180.png' %}">
+    <!-- end favicon -->
     
     <!-- Modern Meta Tags -->
     <meta name="theme-color" content="#333333">
@@ -74,12 +70,8 @@
     <!-- Старые стили (закомментированы для отката) -->
     <!-- <link rel="stylesheet" href="{% static 'css/aesop-styles.css' %}" type="text/css"> -->
     
-    <!-- Новые стили ExamFlow 2.0 (минифицированные для продакшена) -->
-    {% if debug %}
-        <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}" type="text/css">
-    {% else %}
-        <link rel="stylesheet" href="{% static 'css/examflow-2.0.min.css' %}" type="text/css">
-    {% endif %}
+    <!-- Стили ExamFlow 2.0: временно всегда неминифицированные, чтобы гарантировать применение последних правок -->
+    <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}" type="text/css">
     
     <!-- JavaScript функции для core приложения (минифицированные для продакшена) -->
     {% if debug %}
