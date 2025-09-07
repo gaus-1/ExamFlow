@@ -105,7 +105,7 @@ def main():
                 if fix_pep8_file(file_path):
                     fixed_count += 1
     
-    print(f"\n📊 Результат:")
+    print("\n📊 Результат:")
     print(f"  Всего файлов: {total_count}")
     print(f"  Исправлено: {fixed_count}")
     print(f"  Без изменений: {total_count - fixed_count}")

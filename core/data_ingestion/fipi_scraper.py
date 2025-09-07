@@ -222,7 +222,7 @@ class FIPIScraper:
             # Собираем спецификации
             all_data['specifications'] = self.extract_specifications()
 
-            logger.info(f"Сбор данных завершен. Найдено:")
+            logger.info("Сбор данных завершен. Найдено:")
             logger.info(
                 f"- Демонстрационных вариантов: {len(all_data['demo_variants'])}")
             logger.info(

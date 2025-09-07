@@ -242,20 +242,20 @@ class SystemTester:
         print(f"   Процент успеха: {summary['success_rate']:.1f}%")
         print(f"   Время тестирования: {summary['test_duration']:.1f}s")
         
-        print(f"\n✅ Работающие компоненты ({len(report['healthy_components'])}):")
+        print("\n✅ Работающие компоненты (" + str(len(report['healthy_components'])) + "):")
         for component in report['healthy_components']:
-            print(f"   - {component}")
+            print("   - " + str(component))
         
         if report['unhealthy_components']:
-            print(f"\n❌ Проблемные компоненты ({len(report['unhealthy_components'])}):")
+            print("\n❌ Проблемные компоненты (" + str(len(report['unhealthy_components'])) + "):")
             for component in report['unhealthy_components']:
-                print(f"   - {component}")
+                print("   - " + str(component))
         
-        print(f"\n💡 Рекомендации:")
+        print("\n💡 Рекомендации:")
         for recommendation in report['recommendations']:
-            print(f"   {recommendation}")
+            print("   " + str(recommendation))
         
-        print(f"\n🕐 Время тестирования: {report['timestamp']}")
+        print("\n🕐 Время тестирования: " + str(report['timestamp']))
         print("=" * 60)
 
 
@@ -280,7 +280,7 @@ def main():
     with open('system_test_report.json', 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
     
-    print(f"\n📄 Подробный отчет сохранен в: system_test_report.json")
+    print("\n📄 Подробный отчет сохранен в: system_test_report.json")
     
     # Возвращаем код выхода
     if report['test_summary']['success_rate'] >= 95:
