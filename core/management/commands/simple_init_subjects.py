@@ -82,7 +82,7 @@ class Command(BaseCommand):
 
         archived_count = 0
         for subject_name in unused_subjects:
-            updated = Subject.objects.filter(
+            updated = Subject.objects.filter( # type: ignore
                 name=subject_name).update(
                 is_archived=True)  # type: ignore
             if updated:
@@ -93,9 +93,9 @@ class Command(BaseCommand):
 
         # Показываем статистику
         total_subjects = Subject.objects.count()  # type: ignore
-        primary_subjects = Subject.objects.filter(
+        primary_subjects = Subject.objects.filter( # type: ignore
             is_primary=True).count()  # type: ignore
-        archived_subjects = Subject.objects.filter(
+        archived_subjects = Subject.objects.filter( # type: ignore
             is_archived=True).count()  # type: ignore
 
         self.stdout.write('\nСтатистика:')
