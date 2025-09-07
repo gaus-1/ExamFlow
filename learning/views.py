@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from learning.models import Subject, Task  # type: ignore
 from core.models import UserProgress  # type: ignore
+from core import seo as seo_utils
 import random
 import time
 
@@ -32,21 +33,23 @@ def home(request):
     - Тарифные планы
     - Блок персонализации (для авторизованных)
     """
-    # Получаем статистику
-    subjects_count = Subject.objects.filter(is_archived=False, is_primary=True).count()  # type: ignore
+    # Получаем статистику (без падения, если столбцы ещё не в БД)
+    try:
+        base_qs = Subject.objects.filter(is_archived=False, is_primary=True)  # type: ignore
+        subjects_count = base_qs.count()  # type: ignore
+    except Exception:
+        base_qs = Subject.objects.all()  # type: ignore
+        subjects_count = base_qs.count()  # type: ignore
+
     tasks_count = Task.objects.count()  # type: ignore
 
-    # Фокус: только математика и русский, активные и основные
-    subjects = (
-        Subject.objects.filter(is_archived=False, is_primary=True)
-        .filter(name__icontains='математ')  # математика
-        .union(
-            Subject.objects.filter(is_archived=False, is_primary=True).filter(
-                name__icontains='русск'
-            )
-        )
-        .order_by('name')
-    )  # type: ignore
+    # Фокус: только математика и русский; безопасный запасной вариант
+    try:
+        math_qs = base_qs.filter(name__icontains='математ')  # type: ignore
+        rus_qs = base_qs.filter(name__icontains='русск')  # type: ignore
+        subjects = math_qs.union(rus_qs).order_by('name')  # type: ignore
+    except Exception:
+        subjects = base_qs.order_by('name')  # type: ignore
 
     context = {
         'subjects_count': subjects_count,
@@ -55,6 +58,8 @@ def home(request):
         'timestamp': int(time.time()),
     }
 
+    # SEO
+    context.update(seo_utils.seo_for_home())
     return render(request, 'learning/home-examflow-2.0.html', context)
 
 
@@ -67,8 +72,11 @@ def subjects_list(request):
     - Количество тем и заданий
     - Прогресс пользователя (если авторизован)
     """
-    # Получаем все предметы (без сложных запросов)
-    subjects = Subject.objects.all()  # type: ignore
+    # Получаем предметы c фокусом; безопасный fallback
+    try:
+        subjects = Subject.objects.filter(is_archived=False, is_primary=True).order_by('name')  # type: ignore
+    except Exception:
+        subjects = Subject.objects.all().order_by('name')  # type: ignore
 
     # Добавляем прогресс для авторизованных пользователей
     if request.user.is_authenticated:
@@ -81,9 +89,10 @@ def subjects_list(request):
             ).count()
             subject.user_progress = solved_tasks
 
-    return render(request, 'learning/subjects_list.html', {
-        'subjects': subjects
-    })
+    ctx = {'subjects': subjects}
+    # SEO для списка (фокусные предметы)
+    ctx.update(seo_utils.seo_for_subject('математика и русский', '/subjects/'))
+    return render(request, 'learning/subjects_list.html', ctx)
 
 
 def subject_detail(request, subject_id):
@@ -118,11 +127,13 @@ def subject_detail(request, subject_id):
 
         # Прогресс по темам (временно отключено)
 
-    return render(request, 'learning/subject_detail.html', {
+    ctx = {
         'subject': subject,
         'topics': topics,
-        'user_stats': user_stats
-    })
+        'user_stats': user_stats,
+    }
+    ctx.update(seo_utils.seo_for_subject(subject.name, request.path))
+    return render(request, 'learning/subject_detail.html', ctx)
 
 
 def topic_detail(request, topic_id):
