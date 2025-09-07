@@ -24,6 +24,16 @@ class SubjectSitemap(Sitemap):
     def location(self, obj):  # type: ignore
         return f"/subject/{obj.id}/"
 
+class StaticSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.6
+
+    def items(self):
+        return ["/", "/subjects/", "/faq/"]
+
+    def location(self, item):
+        return item
+
 
 def robots_txt(_request):
     lines = [
@@ -77,6 +87,6 @@ urlpatterns = [
     path('health/', ultra_simple_health, name='health_check_basic'),
     path('health/simple/', minimal_health_check, name='health_check_simple'),
     path('robots.txt', robots_txt, name='robots_txt'),
-    path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap}}, name='sitemap'),
+    path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
     path('faq/', faq_view, name='faq'),
 ]

@@ -198,5 +198,18 @@
     
     <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}
+    <script>
+    // Простой трекинг кликов по data-analytics
+    window.trackEvent = function(name, params){
+      try { if (window.gtag) gtag('event', name, params || {}); } catch(e){}
+      try { if (window.ym && '{{ YM_ID }}') ym('{{ YM_ID }}', 'reachGoal', name); } catch(e){}
+    };
+    document.addEventListener('click', function(e){
+      var el = e.target.closest('[data-analytics]');
+      if (!el) return;
+      var name = el.getAttribute('data-analytics');
+      if (name) trackEvent(name, {href: el.href || '', text: (el.textContent||'').trim()});
+    });
+    </script>
 </body>
 </html>
