@@ -14,7 +14,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
-from core.models import Subject, Task, UserProgress
+from learning.models import Subject, Task  # type: ignore
+from core.models import UserProgress  # type: ignore
 import random
 import time
 
@@ -32,11 +33,20 @@ def home(request):
     - Блок персонализации (для авторизованных)
     """
     # Получаем статистику
-    subjects_count = Subject.objects.count()  # type: ignore
+    subjects_count = Subject.objects.filter(is_archived=False, is_primary=True).count()  # type: ignore
     tasks_count = Task.objects.count()  # type: ignore
 
-    # Получаем предметы для отображения (без сложных запросов)
-    subjects = Subject.objects.all()[:8]  # type: ignore
+    # Фокус: только математика и русский, активные и основные
+    subjects = (
+        Subject.objects.filter(is_archived=False, is_primary=True)
+        .filter(name__icontains='математ')  # математика
+        .union(
+            Subject.objects.filter(is_archived=False, is_primary=True).filter(
+                name__icontains='русск'
+            )
+        )
+        .order_by('name')
+    )  # type: ignore
 
     context = {
         'subjects_count': subjects_count,
