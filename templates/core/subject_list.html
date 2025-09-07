@@ -28,13 +28,8 @@
                     <div class="text-6xl mb-4 rotate">
                         {% if subject.name == 'Математика' %}📐
                         {% elif subject.name == 'Русский язык' %}📝
-                        {% elif subject.name == 'Физика' %}⚡
-                        {% elif subject.name == 'Химия' %}🧪
-                        {% elif subject.name == 'Биология' %}🧬
-                        {% elif subject.name == 'История' %}📚
-                        {% elif subject.name == 'География' %}🌍
-                        {% elif subject.name == 'Литература' %}📖
-                        {% elif subject.name == 'Информатика' %}💻
+                        {% elif subject.name|lower|startswith:'математ' %}📐
+                        {% elif subject.name|lower|startswith:'рус' %}📝
                         {% elif subject.name == 'Обществознание' %}🏛️
                         {% elif 'язык' in subject.name %}🌐
                         {% else %}📚
