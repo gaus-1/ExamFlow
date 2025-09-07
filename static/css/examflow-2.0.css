@@ -52,7 +52,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: center;
-  margin-top: 0; /* Убираем отступ, так как он уже в logo-container */
+  margin-top: calc(var(--space-sm) * 1.5); /* Увеличили отступ ~на 50% */
   width: 100%; /* Занимает всю ширину контейнера */
   box-sizing: border-box;
   /* Ограничиваем ширину подзаголовка шириной контейнера логотипа */
@@ -102,8 +102,9 @@
   .logo-subtitle {
     font-size: 0.6rem; /* Уменьшено в 1.5 раза (8.67px) */
     white-space: normal; /* Разрешаем перенос на мобильных */
-    max-width: calc(40px + var(--space-sm) + 8ch); /* Адаптируем ширину для мобильных */
+    max-width: calc(40px + var(--space-sm) + 10ch); /* Чуть шире на мобильных */
     text-align: center;
+    margin-top: var(--space-sm);
   }
 }
 
