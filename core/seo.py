@@ -40,7 +40,7 @@ def seo_for_subject(subject_name: str, path: str) -> Dict[str, str]:
     title = f'Подготовка к {subject_name} ЕГЭ/ОГЭ — задания и разборы — ExamFlow'
     description = f'{subject_name}: задания, критерии ФИПИ, видеоразборы, тренажёры и типичные ошибки.'
     url = build_canonical(path)
-    return {
+    data = {
         'page_title': title,
         'page_description': description,
         'canonical_url': url,
@@ -51,8 +51,10 @@ def seo_for_subject(subject_name: str, path: str) -> Dict[str, str]:
         'twitter_title': title,
         'twitter_description': description,
         'twitter_image': DEFAULT_IMAGE,
-        'jsonld': _jsonld_course(subject_name, url),
     }
+    # Добавим Course JSON-LD
+    data['jsonld'] = _jsonld_course(subject_name, url)
+    return data
 
 
 def seo_for_task(subject_name: str, exam: str, task_label: str, path: str) -> Dict[str, str]:
