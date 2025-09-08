@@ -721,5 +721,16 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = {
 if os.getenv('CSP_REPORT_URI'):
     CONTENT_SECURITY_POLICY_REPORT_ONLY['DIRECTIVES']['report-uri'] = (os.getenv('CSP_REPORT_URI'),)
 
+# Совместимость с django-csp 3.x (в текущем окружении установлена 3.7)
+# Дублируем политики в старом формате, чтобы браузер видел нужные источники
+CSP_REPORT_ONLY = True
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru', 'https://cdn.jsdelivr.net')
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net')
+CSP_IMG_SRC = ("'self'", 'data:', 'https:')
+CSP_CONNECT_SRC = ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com')
+CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net')
+CSP_FRAME_ANCESTORS = ("'none'",)
+
 # Telegram webhook secret
 TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')
