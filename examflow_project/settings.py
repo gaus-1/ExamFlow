@@ -676,7 +676,7 @@ GEMINI_TASK_CONFIGS = {
 # OpenAI провайдер удален - используем только Gemini
 # Все настройки перенесены в GEMINI_TASK_CONFIGS
 
-STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250908-1')
+STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250908-2')
 
 # IDs аналитики (через env)
 GA4_ID = os.getenv('GA4_ID', '')

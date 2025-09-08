@@ -71,7 +71,7 @@
     <!-- <link rel="stylesheet" href="{% static 'css/aesop-styles.css' %}" type="text/css"> -->
     
     <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша -->
-    <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" type="text/css">
     
     <!-- JavaScript функции для core приложения (минифицированные для продакшена) -->
     {% if debug %}
