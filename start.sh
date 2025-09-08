@@ -16,4 +16,10 @@ python manage.py fix_subjects
 
 # Запускаем сервер
 echo "🚀 Запускаем сервер..."
-gunicorn examflow_project.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+# Увеличиваем таймаут и включаем логи для устойчивого старта на Render
+gunicorn examflow_project.wsgi:application \
+  --bind 0.0.0.0:$PORT \
+  --workers 2 \
+  --timeout 300 \
+  --access-logfile - \
+  --error-logfile -
