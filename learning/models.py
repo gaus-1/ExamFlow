@@ -37,20 +37,19 @@ class Subject(models.Model):
 
     name = models.CharField(max_length=100, verbose_name="Название предмета")
     code = models.CharField(
-        max_length=20,
-        unique=True,
+        max_length=50,
         blank=True,
-        null=True,
+        default='',
         verbose_name="Код предмета")
     exam_type = models.CharField(
         max_length=3,
         choices=EXAM_TYPES,
         default='ЕГЭ',
         verbose_name="Тип экзамена")
-    description = models.TextField(blank=True, verbose_name="Описание")
-    icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
-    is_archived = models.BooleanField(default=False, verbose_name="Архивирован")
-    is_primary = models.BooleanField(default=False, verbose_name="Основной предмет")
+    description = models.TextField(blank=True, default='', verbose_name="Описание")
+    icon = models.CharField(max_length=100, blank=True, default='', verbose_name="Иконка")
+    is_archived = models.BooleanField(default=False, verbose_name="Архивирован")  # type: ignore
+    is_primary = models.BooleanField(default=False, verbose_name="Основной предмет")  # type: ignore
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
@@ -120,7 +119,7 @@ class UserProgress(models.Model):
         verbose_name="Пользователь",
         related_name='learning_userprogress_set')
     task = models.ForeignKey(Task, on_delete=models.CASCADE, verbose_name="Задание")
-    is_correct = models.BooleanField(default=False,
+    is_correct = models.BooleanField(default=False,  # type: ignore
                                      verbose_name="Правильно решено")  # type: ignore
     user_answer = models.TextField(blank=True, verbose_name="Ответ пользователя")
     attempts = models.IntegerField(default=0, verbose_name="Попыток")  # type: ignore
@@ -139,7 +138,7 @@ class UserRating(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        verbose_name="Пользователь")
+        verbose_name="Пользователь")  # type: ignore
     total_points = models.IntegerField(
         default=0, verbose_name="Общее количество очков")  # type: ignore
     correct_answers = models.IntegerField(
@@ -153,7 +152,7 @@ class UserRating(models.Model):
 
     def __str__(self):
         # type: ignore
-        return f"Рейтинг {self.user.username}: {self.total_points} очков"
+        return f"Рейтинг {self.user.username}: {self.total_points} очков"  # type: ignore
 
     class Meta:
         verbose_name = "Рейтинг пользователя"
