@@ -704,17 +704,17 @@ PERMISSIONS_POLICY = {
     'camera': [],
 }
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
-SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'require-corp'
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'credentialless'
 
 # CSP (django-csp 4.x): report-only на первом этапе
 CONTENT_SECURITY_POLICY_REPORT_ONLY = {
     'DIRECTIVES': {
         'default-src': ("'self'",),
         'script-src': ("'self'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru'),
-        'style-src': ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'),
+        'style-src': ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'),
         'img-src': ("'self'", 'data:', 'https:'),
         'connect-src': ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com'),
-        'font-src': ("'self'", 'https://fonts.gstatic.com'),
+        'font-src': ("'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'),
         'frame-ancestors': ("'none'",),
     }
 }
