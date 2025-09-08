@@ -87,6 +87,7 @@ urlpatterns = [
     # Health check endpoints (ультра-простые для Render)
     path('health/', ultra_simple_health, name='health_check_basic'),
     path('health/simple/', minimal_health_check, name='health_check_simple'),
+    path('health/minimal/', minimal_health_check, name='health_check_minimal'),
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
     path('faq/', faq_view, name='faq'),
