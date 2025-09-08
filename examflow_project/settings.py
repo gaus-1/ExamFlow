@@ -241,7 +241,7 @@ STATICFILES_DIRS = [
 
 # На Render используем whitenoise для статических файлов
 if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     # Настройки whitenoise для продакшена
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
