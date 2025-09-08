@@ -676,7 +676,7 @@ GEMINI_TASK_CONFIGS = {
 # OpenAI провайдер удален - используем только Gemini
 # Все настройки перенесены в GEMINI_TASK_CONFIGS
 
-STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250907')
+STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250908-1')
 
 # IDs аналитики (через env)
 GA4_ID = os.getenv('GA4_ID', '')
@@ -706,16 +706,20 @@ PERMISSIONS_POLICY = {
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'require-corp'
 
-# CSP (report-only на первом этапе; безопасные источники)
-CSP_REPORT_ONLY = True
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru')
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com')
-CSP_IMG_SRC = ("'self'", 'data:', 'https:')
-CSP_CONNECT_SRC = ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com')
-CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com')
-CSP_FRAME_ANCESTORS = ("'none'",)
-CSP_REPORT_URI = (os.getenv('CSP_REPORT_URI', ''),) if os.getenv('CSP_REPORT_URI') else None
+# CSP (django-csp 4.x): report-only на первом этапе
+CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': ("'self'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru'),
+        'style-src': ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'),
+        'img-src': ("'self'", 'data:', 'https:'),
+        'connect-src': ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com'),
+        'font-src': ("'self'", 'https://fonts.gstatic.com'),
+        'frame-ancestors': ("'none'",),
+    }
+}
+if os.getenv('CSP_REPORT_URI'):
+    CONTENT_SECURITY_POLICY_REPORT_ONLY['DIRECTIVES']['report-uri'] = (os.getenv('CSP_REPORT_URI'),)
 
 # Telegram webhook secret
 TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')
