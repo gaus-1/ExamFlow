@@ -68,9 +68,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
-    # 'csp.middleware.CSPMiddleware',  # CSP middleware - ВРЕМЕННО ОТКЛЮЧЕН
+    'csp.middleware.CSPMiddleware',  # CSP (report-only)
     # 🔒 Дополнительные middleware для безопасности
     'examflow_project.middleware.SecurityHeadersMiddleware',  # Кастомные заголовки безопасности
+    'core.middleware.input_validation.InputValidationMiddleware',  # Базовая валидация входа
+    'core.middleware.telegram_signature.TelegramWebhookSignatureMiddleware',  # Проверка подписи Telegram webhook
     # FREEMIUM middleware
     'core.freemium.middleware.FreemiumMiddleware',
 ]
@@ -145,27 +147,31 @@ else:
             # а Supabase/PG-хост может сначала резолвиться в AAAA.
             # Если DB_FORCE_IPV4=1 (по умолчанию в продакшене), подставим hostaddr IPv4.
             force_ipv4 = os.getenv('DB_FORCE_IPV4', '1' if not DEBUG else '0') == '1'
-            if force_ipv4:
+            if force_ipv4 and isinstance(DATABASES.get('default'), dict):
                 try:
                     import socket
-                    host = DATABASES['default'].get('HOST') or ''
-                    port = int(DATABASES['default'].get('PORT') or 5432)
+                    default_db = DATABASES['default']
+                    host = str(default_db.get('HOST') or '')
+                    port = int(default_db.get('PORT') or 5432)
                     if not host:
                         # Попробуем достать hostname из DATABASE_URL
                         from urllib.parse import urlparse
-                        parsed = urlparse(DATABASE_URL)
+                        parsed = urlparse(DATABASE_URL)  # type: ignore[arg-type]
                         host = parsed.hostname or ''
 
                     if host:
                         infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                         if infos:
                             ipv4_addr = infos[0][4][0]
-                            opts = DATABASES['default'].setdefault('OPTIONS', {})
-                            opts['hostaddr'] = ipv4_addr
+                            options = default_db.get('OPTIONS')
+                            if not isinstance(options, dict):
+                                options = {}
+                                default_db['OPTIONS'] = options
+                            options['hostaddr'] = str(ipv4_addr)
                             # Гарантируем TLS
-                            opts.setdefault('sslmode', 'require')
+                            options.setdefault('sslmode', 'require')
                             # Прямо подключимся по IPv4, чтобы libpq не выбирал AAAA
-                            DATABASES['default']['HOST'] = ipv4_addr
+                            default_db['HOST'] = str(ipv4_addr)
                 except Exception:
                     # Тихо продолжаем, если не удалось резолвить IPv4
                     pass
@@ -675,3 +681,41 @@ STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250907')
 # IDs аналитики (через env)
 GA4_ID = os.getenv('GA4_ID', '')
 YM_ID = os.getenv('YM_ID', '')
+
+# ----------------- Безопасность (cookies, SSL, HSTS) -----------------
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 60 * 60 * 24  # 24 часа
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# HSTS и перенаправление на HTTPS (защита только в продакшене)
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', '1' if not DEBUG else '0') == '1'
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Политики безопасности
+PERMISSIONS_POLICY = {
+    'geolocation': [],
+    'microphone': [],
+    'camera': [],
+}
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = 'require-corp'
+
+# CSP (report-only на первом этапе; безопасные источники)
+CSP_REPORT_ONLY = True
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru')
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com')
+CSP_IMG_SRC = ("'self'", 'data:', 'https:')
+CSP_CONNECT_SRC = ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com')
+CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com')
+CSP_FRAME_ANCESTORS = ("'none'",)
+CSP_REPORT_URI = (os.getenv('CSP_REPORT_URI', ''),) if os.getenv('CSP_REPORT_URI') else None
+
+# Telegram webhook secret
+TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')

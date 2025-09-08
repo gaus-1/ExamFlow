@@ -111,15 +111,7 @@
                         </div>
                     </div>
                     
-                    <div class="subject-card animate-on-scroll" data-animation="scale-in" data-delay="300">
-                        <div class="subject-icon">⚡</div>
-                        <h3 class="subject-title">Физика</h3>
-                        <p class="subject-description">Механика, электричество, оптика</p>
-                        <div class="subject-stats">
-                            <span>320 заданий</span>
-                            <span>ЕГЭ/ОГЭ</span>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
             
@@ -196,35 +188,7 @@
                 </div>
             </div>
             
-            <div class="fipi-tab-content">
-                <div class="accordion">
-                    <div class="accordion-item">
-                        <div class="accordion-header">
-                            <h3 class="accordion-title">Механика</h3>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p>Кинематика, динамика, статика</p>
-                            <div class="mt-4">
-                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <div class="accordion-header">
-                            <h3 class="accordion-title">Электричество</h3>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p>Электростатика, ток, магнетизм</p>
-                            <div class="mt-4">
-                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </section>
@@ -236,10 +200,10 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
             <div class="text-center text-reveal">
                 <div class="text-6xl md:text-7xl font-bold mb-2 stat-counter" style="color: #252525;">
-                    8<span class="text-4xl">+</span>
+                    2
                 </div>
                 <div class="text-lg font-semibold" style="color: #666;">
-                    предметов ЕГЭ/ОГЭ
+                    предмета ЕГЭ/ОГЭ
                 </div>
             </div>
             
@@ -339,68 +303,8 @@
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
                 <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Физика</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Химия</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Биология</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-                        <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">История</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">География</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
->
-            </div>
-            
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Литература</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Информатика</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
         {% endfor %}
-    </div>
+        </div>
         
         <div class="text-center mt-12">
             <a href="{% url 'learning:subjects_list' %}" class="btn-secondary">
@@ -740,8 +644,8 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
                     <div class="text-reveal">
-                        <div class="text-4xl font-bold mb-2 stat-counter" style="color: #252525;">12+</div>
-                        <div class="text-lg" style="color: #666;">предметов ЕГЭ/ОГЭ</div>
+                        <div class="text-4xl font-bold mb-2 stat-counter" style="color: #252525;">2</div>
+                        <div class="text-lg" style="color: #666;">предмета ЕГЭ/ОГЭ</div>
                     </div>
                     
                     <div class="text-reveal">
