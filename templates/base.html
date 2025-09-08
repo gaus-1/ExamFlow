@@ -64,7 +64,8 @@
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
     
     <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    {# Локальная копия иконок вместо CDN (для CSP и стабильности) #}
+    <link href="{% static 'vendor/fontawesome/css/all.min.css' %}" rel="stylesheet">
     
     <!-- Основные стили -->
     <!-- Старые стили (закомментированы для отката) -->
@@ -183,7 +184,7 @@
     </footer>
     
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
     
     <!-- Менеджер тем и анимаций -->
     <!-- <script src="{% static 'js/theme-manager.js' %}"></script> -->
