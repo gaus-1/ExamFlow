@@ -76,6 +76,7 @@ def faq_view(request):
 
 from . import api  # noqa: E402
 from .ultra_simple_health import ultra_simple_health, minimal_health_check  # noqa: E402
+from core.rag_system.search_api import fipi_semantic_search  # noqa: E402
 
 urlpatterns = [
     # API для RAG-системы
@@ -91,6 +92,7 @@ urlpatterns = [
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
     path('faq/', faq_view, name='faq'),
+    path('api/fipi/search/', fipi_semantic_search, name='fipi_semantic_search'),
     # SEO-friendly ЧПУ (301) для ЕГЭ/ОГЭ: ведём на список предметов (без ломки текущих маршрутов)
     path('ege/matematika/', lambda r: redirect('/subjects/?utm=seo_ege_math', permanent=True)),
     path('ege/russkiy/', lambda r: redirect('/subjects/?utm=seo_ege_rus', permanent=True)),

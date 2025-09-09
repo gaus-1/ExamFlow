@@ -1,3 +1,93 @@
+from django.core.management.base import BaseCommand
+from django.db import transaction
+
+
+class Command(BaseCommand):  # type: ignore
+    help = "Инициализирует карту источников FIPI для математики и русского"
+
+    def handle(self, *args, **options):
+        try:
+            from core.models import FIPISourceMap  # type: ignore
+        except Exception:
+            self.stdout.write(self.style.ERROR("Модель FIPISourceMap недоступна"))  # type: ignore
+            return
+
+        seeds = [
+            {
+                "name": "ЕГЭ Математика — Демоверсия",
+                "url": "https://fipi.ru/ege/demoversii/po-matematike",
+                "type": "PDF",
+                "category": "demo",
+                "subject": "Математика",
+                "exam_type": "ЕГЭ",
+                "update_frequency": "yearly",
+                "priority": 100,
+            },
+            {
+                "name": "ЕГЭ Математика — Спецификация",
+                "url": "https://fipi.ru/ege/specifikacii/po-matematike",
+                "type": "PDF",
+                "category": "spec",
+                "subject": "Математика",
+                "exam_type": "ЕГЭ",
+                "update_frequency": "yearly",
+                "priority": 100,
+            },
+            {
+                "name": "ЕГЭ Математика — Кодификатор",
+                "url": "https://fipi.ru/ege/kodifikatory/po-matematike",
+                "type": "PDF",
+                "category": "codifier",
+                "subject": "Математика",
+                "exam_type": "ЕГЭ",
+                "update_frequency": "yearly",
+                "priority": 90,
+            },
+            {
+                "name": "ЕГЭ Русский — Демоверсия",
+                "url": "https://fipi.ru/ege/demoversii/po-russkomu-yazyku",
+                "type": "PDF",
+                "category": "demo",
+                "subject": "Русский язык",
+                "exam_type": "ЕГЭ",
+                "update_frequency": "yearly",
+                "priority": 100,
+            },
+            {
+                "name": "ЕГЭ Русский — Спецификация",
+                "url": "https://fipi.ru/ege/specifikacii/po-russkomu-yazyku",
+                "type": "PDF",
+                "category": "spec",
+                "subject": "Русский язык",
+                "exam_type": "ЕГЭ",
+                "update_frequency": "yearly",
+                "priority": 100,
+            },
+            {
+                "name": "ЕГЭ Русский — Кодификатор",
+                "url": "https://fipi.ru/ege/kodifikatory/po-russkomu-yazyku",
+                "type": "PDF",
+                "category": "codifier",
+                "subject": "Русский язык",
+                "exam_type": "ЕГЭ",
+                "update_frequency": "yearly",
+                "priority": 90,
+            },
+        ]
+
+        created = 0
+        with transaction.atomic():  # type: ignore
+            for s in seeds:
+                obj, was_created = FIPISourceMap.objects.get_or_create(  # type: ignore
+                    url=s["url"], defaults=s
+                )
+                if was_created:
+                    created += 1
+
+        self.stdout.write(
+            self.style.SUCCESS(f"Готово: добавлено {created} источников (или уже были).")  # type: ignore
+        )
+
 """
 Команда для инициализации карты источников данных fipi.ru
 """
@@ -11,7 +101,7 @@ from core.models import FIPISourceMap
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # type: ignore 
     help = 'Инициализирует карту источников данных fipi.ru в базе данных'
 
     def add_arguments(self, parser):
@@ -34,7 +124,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(
-            self.style.SUCCESS(
+            self.style.SUCCESS(  # type: ignore
                 '🗺️ Инициализация карты источников данных fipi.ru')  # type: ignore
         )
         self.stdout.write('=' * 60)
@@ -47,7 +137,7 @@ class Command(BaseCommand):
         if options['priority']:
             sources = [s for s in sources if s.priority.value == options['priority']]
             self.stdout.write(
-                self.style.WARNING(
+                self.style.WARNING(  # type: ignore
                     f'Создаем только источники с приоритетом {options["priority"]}')  # type: ignore
             )
 
@@ -59,7 +149,7 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.WARNING('Удаляем существующие источники...')  # type: ignore
             )
-            FIPISourceMap.objects.all().delete()  # type: ignore
+            FIPISourceMap.objects.all().delete()  # type: ignore            
 
         # Создаем источники
         created_count = 0
@@ -108,7 +198,7 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(
                     # type: ignore
-                    self.style.ERROR(f'❌ Ошибка при создании {source.name}: {e}')
+                    self.style.ERROR(f'❌ Ошибка при создании {source.name}: {e}')  # type: ignore
                 )
                 logger.error(f'Ошибка при создании источника {source.id}: {e}')
 
@@ -118,7 +208,7 @@ class Command(BaseCommand):
     def dry_run(self, sources):
         """Показать что будет создано без сохранения"""
         self.stdout.write(
-            self.style.WARNING(
+            self.style.WARNING(  # type: ignore
                 '🔍 DRY RUN - источники НЕ будут сохранены в БД')  # type: ignore
         )
         self.stdout.write('=' * 60)
@@ -141,7 +231,7 @@ class Command(BaseCommand):
             }[priority]
 
             self.stdout.write(
-                self.style.SUCCESS(
+                self.style.SUCCESS(  # type: ignore
                     f'\n📋 {priority_name} ({len(by_priority[priority])} источников):')  # type: ignore
             )
 
@@ -182,7 +272,7 @@ class Command(BaseCommand):
         # Статистика по приоритетам
         self.stdout.write('\n📈 По приоритетам:')
         for priority in [1, 2, 3, 4]:
-            count = FIPISourceMap.objects.filter(
+            count = FIPISourceMap.objects.filter(  # type: ignore
                 priority=priority).count()  # type: ignore
             priority_name = {
                 1: 'Критически важные',
@@ -195,13 +285,13 @@ class Command(BaseCommand):
         # Статистика по типам данных
         self.stdout.write('\n📈 По типам данных:')
         for data_type, _ in FIPISourceMap.DATA_TYPES:
-            count = FIPISourceMap.objects.filter(
+            count = FIPISourceMap.objects.filter(  # type: ignore
                 data_type=data_type).count()  # type: ignore
             if count > 0:
                 self.stdout.write(f'  • {data_type}: {count}')
 
         self.stdout.write('\n' + '=' * 60)
         self.stdout.write(
-            self.style.SUCCESS(
+            self.style.SUCCESS(  # type: ignore
                 '🎉 Инициализация карты источников завершена!')  # type: ignore
         )
