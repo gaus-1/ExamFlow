@@ -56,9 +56,7 @@ INSTALLED_APPS = [
     'ai.apps.AiConfig',    # ИИ-ассистент и голосовой помощник
     
     # Внешние библиотеки
-    'corsheaders',
     'django_redis',
-    'csp',  # Content Security Policy (django-csp)
 ]
 
 MIDDLEWARE = [
@@ -475,9 +473,11 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 # Настройки паролей
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',  # Fallback если cffi доступен
 ]
 
 # MFA настройки (готовность к внедрению)

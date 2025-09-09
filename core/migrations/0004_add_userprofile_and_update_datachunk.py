@@ -11,19 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Добавляем поля в DataChunk
-        migrations.AddField(
-            model_name='datachunk',
-            name='subject',
-            field=models.CharField(blank=True, max_length=50, verbose_name='Предмет'),
-        ),
-        migrations.AddField(
-            model_name='datachunk',
-            name='document_type',
-            field=models.CharField(blank=True, max_length=50, verbose_name='Тип документа'),
-        ),
-        
-        # Создаем модель UserProfile
+        # Создаем модель UserProfile (поля DataChunk уже добавлены в 0003)
         migrations.CreateModel(
             name='UserProfile',
             fields=[
