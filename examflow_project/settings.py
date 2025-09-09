@@ -511,10 +511,10 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': '/api/',
     'COMPONENT_SPLIT_REQUEST': True,
     'SORT_OPERATIONS': False,
-    'ENUM_NAME_OVERRIDES': {
-        'SubscriptionTypeEnum': 'core.models.UserProfile.subscription_type',
-        'DifficultyPreferenceEnum': 'core.models.UserProfile.difficulty_preference',
-    },
+    # 'ENUM_NAME_OVERRIDES': {
+    #     'SubscriptionTypeEnum': 'core.models.UserProfile.subscription_type',
+    #     'DifficultyPreferenceEnum': 'core.models.UserProfile.difficulty_preference',
+    # },
     'TAGS': [
         {'name': 'AI', 'description': 'AI-помощник и RAG система'},
         {'name': 'Subjects', 'description': 'Предметы и задания'},
