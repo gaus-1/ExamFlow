@@ -140,8 +140,8 @@ class AIAssistantAPI(View):
 
             # Пытаемся использовать RAG-систему
             try:
-                from core.rag_system.orchestrator import AIOrchestrator
-                orchestrator = AIOrchestrator()
+                from core.rag_system.orchestrator import RAGOrchestrator
+                orchestrator = RAGOrchestrator()
                 response_data = orchestrator.process_query(prompt)
                 logger.info(f"AI API: Использована RAG-система для: {prompt[:50]}...")
             except Exception as rag_error:

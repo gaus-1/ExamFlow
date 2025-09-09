@@ -84,7 +84,7 @@ class UserProgress(models.Model):
         max_length=200,
         blank=True,
         verbose_name="Ответ пользователя")
-    is_correct = models.BooleanField(default=False,
+    is_correct = models.BooleanField(default=False,  # type: ignore
                                      verbose_name="Правильно решено")  # type: ignore
     attempts = models.IntegerField(
         default=1, verbose_name="Количество попыток")  # type: ignore
@@ -158,7 +158,7 @@ class UnifiedProfile(models.Model):
     @property
     def experience_to_next_level(self):
         """Опыт, необходимый для следующего уровня"""
-        return (self.level * 100) - (self.experience_points %
+        return (self.level * 100) - (self.experience_points %  # type: ignore
                                      (self.level * 100))  # type: ignore
 
     def add_experience(self, points):
@@ -196,7 +196,7 @@ class DailyChallenge(models.Model):
         choices=CHALLENGE_TYPES,
         verbose_name="Тип вызова")
     target_value = models.IntegerField(verbose_name="Целевое значение")
-    reward_xp = models.IntegerField(default=50,
+    reward_xp = models.IntegerField(default=50,  # type: ignore
                                     verbose_name="Награда (XP)")  # type: ignore
     date = models.DateField(verbose_name="Дата")
 
@@ -242,17 +242,17 @@ class UserChallenge(models.Model):
             return 0
         return min(
             100,
-            (self.current_progress /
-             self.challenge.target_value) *
+            (self.current_progress /  # type: ignore
+             self.challenge.target_value) *  # type: ignore
             100)  # type: ignore
 
 
 class ChatSession(models.Model):
     """Сессия чата пользователя с ботом для сохранения контекста"""
     user = models.ForeignKey(
-        'auth.User',
+        'auth.User',  # type: ignore
         on_delete=models.CASCADE,
-        verbose_name="Пользователь")
+        verbose_name="Пользователь")  # type: ignore
     telegram_id = models.BigIntegerField(verbose_name="Telegram ID")
     session_id = models.CharField(max_length=100, unique=True, verbose_name="ID сессии")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создана")
@@ -377,10 +377,14 @@ class DataChunk(models.Model):
     source_data = models.ForeignKey(
         FIPIData,
         on_delete=models.CASCADE,
-        verbose_name="Исходные данные")
+        verbose_name="Исходные данные")  # type: ignore
     chunk_text = models.TextField(verbose_name="Текст чанка")
     chunk_index = models.IntegerField(verbose_name="Индекс чанка")
-    embedding = models.JSONField(verbose_name="Векторное представление")
+    embedding = models.JSONField(verbose_name="Векторное представление (JSON)")
+    # pgvector поле для быстрого поиска
+    embedding_vector = models.TextField(blank=True, null=True, help_text='Vector embedding for semantic search (pgvector)')
+    subject = models.CharField(max_length=50, blank=True, verbose_name="Предмет")
+    document_type = models.CharField(max_length=50, blank=True, verbose_name="Тип документа")
     metadata = models.JSONField(default=dict, blank=True, verbose_name="Метаданные")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
@@ -395,8 +399,55 @@ class DataChunk(models.Model):
         ]
 
     def __str__(self):
-        # type: ignore
-        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..."
+        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..."  # type: ignore
+
+
+class UserProfile(models.Model):
+    """Модель профиля пользователя для персонализации"""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь")  # type: ignore
+    query_stats = models.JSONField(default=dict, blank=True, verbose_name="Статистика запросов")
+    recent_queries = models.JSONField(default=list, blank=True, verbose_name="Последние запросы")
+    preferred_subjects = models.JSONField(default=list, blank=True, verbose_name="Предпочитаемые предметы")
+    difficulty_preference = models.CharField(
+        max_length=20,
+        choices=[
+            ('easy', 'Легкий'),
+            ('medium', 'Средний'),
+            ('hard', 'Сложный'),
+        ],
+        default='medium',
+        verbose_name="Предпочитаемая сложность")
+    subscription_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('free', 'Бесплатный'),
+            ('premium', 'Премиум'),
+        ],
+        default='free',
+        verbose_name="Тип подписки")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
+    class Meta:
+        verbose_name = "Профиль пользователя"
+        verbose_name_plural = "Профили пользователей"
+
+    def __str__(self):
+        return f"Профиль {self.user.username}"  # type: ignore
+
+    @property
+    def total_queries(self):
+        """Общее количество запросов"""
+        return sum(self.query_stats.values()) if self.query_stats else 0  # type: ignore
+
+    @property
+    def is_premium(self):
+        """Проверяет, является ли пользователь премиум"""
+        return self.subscription_type == 'premium'
 
 
 class FIPISourceMap(models.Model):
@@ -468,7 +519,7 @@ class FIPISourceMap(models.Model):
     # Приоритет и частота обновления
     priority = models.IntegerField(
         choices=PRIORITIES,
-        default=3,
+        default=3,  # type: ignore
         verbose_name="Приоритет")  # type: ignore
     update_frequency = models.CharField(
         max_length=20,

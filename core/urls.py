@@ -10,6 +10,7 @@ from django.contrib.sitemaps import Sitemap
 from django.shortcuts import render
 from django.shortcuts import redirect
 from learning.models import Subject  # type: ignore
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 
 class SubjectSitemap(Sitemap):
@@ -77,6 +78,10 @@ def faq_view(request):
 from . import api  # noqa: E402
 from .ultra_simple_health import ultra_simple_health, minimal_health_check  # noqa: E402
 from core.rag_system.search_api import fipi_semantic_search  # noqa: E402
+from core.rag_system.ai_api import (
+    ai_ask, ai_subjects, ai_user_profile, 
+    ai_problem_submit, ai_statistics
+)  # noqa: E402
 
 urlpatterns = [
     # API для RAG-системы
@@ -93,6 +98,21 @@ urlpatterns = [
     path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
     path('faq/', faq_view, name='faq'),
     path('api/fipi/search/', fipi_semantic_search, name='fipi_semantic_search'),
+    
+    # Новые AI API эндпоинты
+    path('api/ai/ask/', ai_ask, name='ai_ask'),
+    path('api/ai/subjects/', ai_subjects, name='ai_subjects'),
+    path('api/ai/user/profile/', ai_user_profile, name='ai_user_profile'),
+    path('api/ai/problem/submit/', ai_problem_submit, name='ai_problem_submit'),
+    path('api/ai/statistics/', ai_statistics, name='ai_statistics'),
+    
+    # Страница подписки
+    path('subscription/', lambda request: render(request, 'subscription.html'), name='subscription'),
+    
+    # API документация (Swagger/OpenAPI)
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     # SEO-friendly ЧПУ (301) для ЕГЭ/ОГЭ: ведём на список предметов (без ломки текущих маршрутов)
     path('ege/matematika/', lambda r: redirect('/subjects/?utm=seo_ege_math', permanent=True)),
     path('ege/russkiy/', lambda r: redirect('/subjects/?utm=seo_ege_rus', permanent=True)),

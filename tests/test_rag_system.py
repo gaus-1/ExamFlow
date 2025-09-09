@@ -4,16 +4,16 @@ Unit тесты для RAG системы
 
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from core.rag_system.orchestrator import AIOrchestrator
+from core.rag_system.orchestrator import RAGOrchestrator
 from core.rag_system.vector_store import VectorStore
 
 
-class TestAIOrchestrator(TestCase):
+class TestRAGOrchestrator(TestCase):
     """Тесты для AI Orchestrator"""
     
     def setUp(self):
         """Настройка тестов"""
-        self.orchestrator = AIOrchestrator()
+        self.orchestrator = RAGOrchestrator()
     
     @patch('core.rag_system.orchestrator.VectorStore')
     def test_process_query_success(self, mock_vector_store):
@@ -40,7 +40,7 @@ class TestAIOrchestrator(TestCase):
     
     def test_get_user_context_empty(self):
         """Тест получения контекста пользователя (пустой)"""
-        context = self.orchestrator.get_user_context(999)  # Несуществующий пользователь
+        context = self.orchestrator.get_user_context(999)  # Несуществующий пользователь # type: ignore
         self.assertEqual(context, {})
     
     def test_build_context_with_results(self):
@@ -60,7 +60,7 @@ class TestAIOrchestrator(TestCase):
             }
         ]
         
-        context = self.orchestrator.build_context(search_results, {})
+        context = self.orchestrator.build_context(search_results, {})  # type: ignore
         
         self.assertIn('Контекст 1', context)
         self.assertIn('Контекст 2', context)
@@ -69,7 +69,7 @@ class TestAIOrchestrator(TestCase):
     
     def test_build_context_empty(self):
         """Тест построения контекста без результатов"""
-        context = self.orchestrator.build_context([], {})
+        context = self.orchestrator.build_context([], {})  # type: ignore
         self.assertEqual(context, "Релевантная информация не найдена.")
     
     def test_generate_prompt_optimized(self):
@@ -82,7 +82,7 @@ class TestAIOrchestrator(TestCase):
             'streak': 3
         }
         
-        prompt = self.orchestrator.generate_prompt(query, context, user_context)
+        prompt = self.orchestrator.generate_prompt(query, context, user_context)  # type: ignore
         
         self.assertIn(query, prompt)
         self.assertIn(context, prompt)
@@ -96,7 +96,7 @@ class TestAIOrchestrator(TestCase):
         query = "Тестовый вопрос"
         context = "Тестовый контекст"
         
-        prompt = self.orchestrator.generate_prompt(query, context, {})
+        prompt = self.orchestrator.generate_prompt(query, context, {})  # type: ignore  
         
         self.assertIn(query, prompt)
         self.assertIn(context, prompt)
@@ -112,17 +112,17 @@ class TestAIOrchestrator(TestCase):
         mock_genai.GenerativeModel.return_value = mock_model
         
         # Пересоздаем orchestrator с мокнутой моделью
-        orchestrator = AIOrchestrator()
-        orchestrator.model = mock_model
+        orchestrator = RAGOrchestrator()
+        orchestrator.model = mock_model  # type: ignore
         
-        response = orchestrator.get_ai_response("Тестовый промпт")
+        response = orchestrator.get_ai_response("Тестовый промпт")  # type: ignore
         
         self.assertEqual(response, "Ответ от Gemini")
         mock_model.generate_content.assert_called_once()
     
     def test_get_fallback_response(self):
         """Тест fallback ответа"""
-        response = self.orchestrator.get_fallback_response("Тестовый вопрос", "Ошибка")
+        response = self.orchestrator.get_fallback_response("Тестовый вопрос", "Ошибка")  # type: ignore
         
         self.assertIn('Извините', response['answer'])
         self.assertIn('Тестовый вопрос', response['answer'])
@@ -144,7 +144,7 @@ class TestVectorStore(TestCase):
             'embedding': [0.1, 0.2, 0.3, 0.4, 0.5]
         }
         
-        embedding = self.vector_store.create_embedding("Тестовый текст")
+        embedding = self.vector_store.create_embedding("Тестовый текст")  # type: ignore
         
         self.assertEqual(len(embedding), 5)
         self.assertEqual(embedding, [0.1, 0.2, 0.3, 0.4, 0.5])
@@ -198,7 +198,7 @@ class TestVectorStore(TestCase):
                 )
             ]
             
-            results = self.vector_store.search("тестовый запрос", limit=5)
+            results = self.vector_store.search("тестовый запрос", limit=5)  # type: ignore
             
             self.assertIsInstance(results, list)
             if results:  # Если есть результаты
@@ -213,7 +213,7 @@ class TestIntegration(TestCase):
     
     def setUp(self):
         """Настройка тестов"""
-        self.orchestrator = AIOrchestrator()
+        self.orchestrator = RAGOrchestrator()
     
     @patch('core.rag_system.orchestrator.VectorStore')
     @patch('core.rag_system.orchestrator.genai')

@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 import json
 
-from core.rag_system.orchestrator import AIOrchestrator
+from core.rag_system.orchestrator import RAGOrchestrator
 from core.rag_system.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ class AIQueryView(View):
 
     def __init__(self):
         super().__init__()
-        self.orchestrator = AIOrchestrator()
+        self.orchestrator = RAGOrchestrator()
 
     def post(self, request):
         """
@@ -164,7 +164,7 @@ class HealthCheckView(View):
 
             # Проверяем оркестратор
             try:
-                AIOrchestrator()
+                RAGOrchestrator()
                 health_status['components']['orchestrator'] = {
                     'status': 'healthy'
                 }

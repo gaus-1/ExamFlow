@@ -38,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'corsheaders',
+    'csp',
+    'drf_spectacular',
     
     # Основные модули (legacy)
     'core',
@@ -497,6 +501,28 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/[a-zA-Z0-9-]+\.onrender\.com$",
 ]
+
+# Настройки для drf-spectacular (Swagger/OpenAPI)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'ExamFlow API',
+    'DESCRIPTION': 'API для платформы подготовки к ЕГЭ/ОГЭ с AI-помощником',
+    'VERSION': '2.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
+    'ENUM_NAME_OVERRIDES': {
+        'SubscriptionTypeEnum': 'core.models.UserProfile.subscription_type',
+        'DifficultyPreferenceEnum': 'core.models.UserProfile.difficulty_preference',
+    },
+    'TAGS': [
+        {'name': 'AI', 'description': 'AI-помощник и RAG система'},
+        {'name': 'Subjects', 'description': 'Предметы и задания'},
+        {'name': 'User', 'description': 'Пользователи и профили'},
+        {'name': 'FIPI', 'description': 'Поиск по материалам ФИПИ'},
+        {'name': 'Health', 'description': 'Мониторинг состояния системы'},
+    ]
+}
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'GET',

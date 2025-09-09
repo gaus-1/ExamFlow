@@ -1,11 +1,13 @@
 """
-Векторное хранилище для семантического поиска
+Векторное хранилище для семантического поиска с поддержкой pgvector
 """
 
 import logging
 import numpy as np
-from typing import List, Dict
+import json
+from typing import List, Dict, Optional
 from django.conf import settings
+from django.db import connection
 
 logger = logging.getLogger(__name__)
 
@@ -137,9 +139,11 @@ class VectorStore:
             text: str,
             source_data_id: int,
             chunk_index: int,
-            metadata: Dict = None) -> bool:  # type: ignore
+            metadata: Dict = None,  # type: ignore
+            subject: str = "",
+            document_type: str = "") -> bool:  # type: ignore
         """
-        Добавляет новый чанк в векторное хранилище
+        Добавляет новый чанк в векторное хранилище с pgvector поддержкой
         """
         try:
             from core.models import DataChunk, FIPIData
@@ -150,12 +154,18 @@ class VectorStore:
             # Получаем исходные данные
             source_data = FIPIData.objects.get(id=source_data_id)  # type: ignore
 
+            # Конвертируем embedding в pgvector формат
+            embedding_vector = self._convert_to_pgvector(embedding)
+
             # Создаем чанк (id не используется далее)
             _chunk = DataChunk.objects.create(  # type: ignore
                 source_data=source_data,
                 chunk_text=text,
                 chunk_index=chunk_index,
                 embedding=embedding,
+                embedding_vector=embedding_vector,
+                subject=subject,
+                document_type=document_type,
                 metadata=metadata or {}
             )
 
@@ -165,6 +175,84 @@ class VectorStore:
         except Exception as e:
             logger.error(f"Ошибка при добавлении чанка: {e}")
             return False
+
+    def _convert_to_pgvector(self, embedding: List[float]) -> str:
+        """
+        Конвертирует embedding в формат pgvector
+        """
+        return '[' + ','.join(map(str, embedding)) + ']'
+
+    def semantic_search(
+            self,
+            query: str,
+            subject_filter: str = "",
+            document_type_filter: str = "",
+            limit: int = 5) -> List[Dict]:
+        """
+        Выполняет семантический поиск с использованием pgvector ANN
+        """
+        try:
+            # Создаем эмбеддинг запроса
+            query_embedding = self.create_query_embedding(query)
+            query_vector = self._convert_to_pgvector(query_embedding)
+
+            # Строим SQL запрос с pgvector
+            sql = """
+                SELECT 
+                    dc.id,
+                    dc.chunk_text,
+                    dc.subject,
+                    dc.document_type,
+                    dc.metadata,
+                    fd.title as source_title,
+                    fd.url as source_url,
+                    fd.data_type as source_type,
+                    1 - (dc.embedding_vector <=> %s::vector) as similarity
+                FROM core_datachunk dc
+                JOIN core_fipidata fd ON dc.source_data_id = fd.id
+                WHERE 1=1
+            """
+            params = [query_vector]
+
+            # Добавляем фильтры
+            if subject_filter:
+                sql += " AND dc.subject = %s"
+                params.append(subject_filter)
+            
+            if document_type_filter:
+                sql += " AND dc.document_type = %s"
+                params.append(document_type_filter)
+
+            # Добавляем сортировку по similarity и лимит
+            sql += " ORDER BY dc.embedding_vector <=> %s::vector LIMIT %s"
+            params.extend([query_vector, limit])  # type: ignore
+
+            # Выполняем запрос
+            with connection.cursor() as cursor:
+                cursor.execute(sql, params)
+                results = cursor.fetchall()
+
+            # Форматируем результаты
+            formatted_results = []
+            for row in results:
+                formatted_results.append({
+                    'id': row[0],
+                    'text': row[1],
+                    'subject': row[2],
+                    'document_type': row[3],
+                    'metadata': json.loads(row[4]) if row[4] else {},
+                    'source_title': row[5],
+                    'source_url': row[6],
+                    'source_type': row[7],
+                    'similarity': float(row[8])
+                })
+
+            logger.info(f"Найдено {len(formatted_results)} релевантных результатов для запроса: {query[:50]}...")
+            return formatted_results
+
+        except Exception as e:
+            logger.error(f"Ошибка при семантическом поиске: {e}")
+            return []
 
     def search(self, query: str, limit: int = 5) -> List[Dict]:
         """
