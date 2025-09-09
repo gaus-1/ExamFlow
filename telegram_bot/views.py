@@ -14,7 +14,10 @@ import requests  # type: ignore
 from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from telegram import Update
+try:
+    from telegram import Update
+except ImportError:
+    Update = None
 from .bot_main import get_bot
 from django.conf import settings
 from django.utils import timezone
@@ -92,6 +95,10 @@ def telegram_webhook(request):
         logger.info(f"Bot instance получен: {bot is not None}")
 
         # Создаем объект Update
+        if Update is None:
+            logger.error("Telegram library not installed")
+            return JsonResponse({"error": "Telegram library not available"}, status=500)
+            
         update = Update.de_json(data, bot)
         logger.info(f"Update создан: {update is not None}")
 
@@ -162,7 +169,7 @@ def telegram_webhook(request):
 
             # Обрабатываем обновление в отдельном потоке, чтобы мгновенно отвечать
             # Telegram
-            def _run_async(u: Update):
+            def _run_async(u):
                 try:
                     import asyncio as _aio
                     _aio.run(handle_telegram_update(u))
@@ -181,7 +188,7 @@ def telegram_webhook(request):
         return HttpResponse(b"ERROR", status=500)
 
 
-async def handle_telegram_update(update: Update):
+async def handle_telegram_update(update):  # type: ignore
     """
     Асинхронно обрабатывает обновление от Telegram
 
