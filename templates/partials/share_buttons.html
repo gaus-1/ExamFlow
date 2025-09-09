@@ -2,9 +2,6 @@
   <a class="text-sm text-blue-600" target="_blank"
      data-analytics="share_telegram"
      href="https://t.me/share/url?url={{ share_url }}&text={{ share_text }}">Поделиться в Telegram</a>
-  <a class="text-sm text-blue-600" target="_blank"
-     data-analytics="share_vk"
-     href="https://vk.com/share.php?url={{ share_url }}">Поделиться в VK</a>
   <button type="button" class="text-sm text-blue-600" data-analytics="share_copy" onclick="(function(){
     try{navigator.clipboard.writeText('{{ share_url }}');}catch(e){}
     if (window.trackEvent) trackEvent('share_copy', {url:'{{ share_url }}'});
