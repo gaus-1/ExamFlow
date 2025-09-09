@@ -373,9 +373,9 @@
         <p class="subject-description text-sm text-muted mb-4">
           Алгебра, геометрия, тригонометрия
         </p>
-        <button class="btn btn-primary btn-sm" onclick="startSubjectPractice('math')">
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary btn-sm">
           Начать изучение
-        </button>
+        </a>
       </div>
       
       <!-- Русский язык -->
@@ -385,9 +385,9 @@
         <p class="subject-description text-sm text-muted mb-4">
           Грамматика, сочинение, анализ текста
         </p>
-        <button class="btn btn-primary btn-sm" onclick="startSubjectPractice('russian')">
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary btn-sm">
           Начать изучение
-        </button>
+        </a>
       </div>
       
       
