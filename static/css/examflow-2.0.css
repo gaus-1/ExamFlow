@@ -42,21 +42,18 @@
 
 .logo-subtitle {
   font-family: var(--font-primary);
-  font-size: 0.67rem; /* Уменьшено в 1.5 раза (16px / 1.5 = 10.67px) */
-  font-weight: 500; /* medium (500) */
-  color: #555555; /* нейтрально-серый */
+  font-size: 0.67rem;
+  font-weight: 500;
+  color: #555555;
   line-height: var(--leading-tight);
-  letter-spacing: 0.2px; /* Уменьшен межбуквенный интервал */
-  max-width: 100%; /* Не выходит за границы логотипа */
+  letter-spacing: 0.2px;
+  text-align: center;
+  margin-top: calc(var(--space-sm) * 1.25);
+  width: fit-content;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: center;
-  margin-top: calc(var(--space-sm) * 1.5); /* Увеличили отступ ~на 50% */
-  width: 100%; /* Занимает всю ширину контейнера */
-  box-sizing: border-box;
-  /* Ограничиваем ширину подзаголовка шириной контейнера логотипа */
-  max-width: calc(46px + var(--space-sm) + 8ch); /* ширина изображения + gap + примерная ширина текста */
   margin-left: auto;
   margin-right: auto;
 }
@@ -78,9 +75,9 @@
   }
   
   .logo-subtitle {
-    font-size: 0.67rem; /* Уменьшено в 1.5 раза (10.67px) */
+    font-size: 0.67rem;
     white-space: nowrap;
-    max-width: calc(46px + var(--space-sm) + 8ch); /* Адаптируем ширину */
+    max-width: 100%;
   }
 }
 
@@ -100,9 +97,9 @@
   }
   
   .logo-subtitle {
-    font-size: 0.6rem; /* Уменьшено в 1.5 раза (8.67px) */
-    white-space: normal; /* Разрешаем перенос на мобильных */
-    max-width: calc(40px + var(--space-sm) + 10ch); /* Чуть шире на мобильных */
+    font-size: 0.6rem;
+    white-space: nowrap;
+    max-width: 100%;
     text-align: center;
     margin-top: var(--space-sm);
   }
@@ -125,8 +122,8 @@
   }
   
   .logo-subtitle {
-    font-size: 0.55rem; /* Еще меньше для очень маленьких экранов */
-    max-width: calc(36px + 8px + 6ch); /* Адаптируем ширину */
+    font-size: 0.55rem;
+    max-width: 100%;
   }
 }
 /* ========================================
