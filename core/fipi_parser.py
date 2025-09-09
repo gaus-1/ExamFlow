@@ -276,9 +276,9 @@ class DataIntegrator:
                 subject.name, subject.exam_type)
 
             for task_data in subject_tasks:
-                # Находим подходящую тему
-                topic = next((t for t in topics if t.subject ==
-                             subject and task_data.get('topic') in t.name), None)
+                # Находим подходящую тему (не используем переменную явно)
+                _topic = next((t for t in topics if t.subject ==
+                               subject and task_data.get('topic') in t.name), None)
 
                 task, created = Task.objects.get_or_create(  # type: ignore
                     title=task_data['title'],

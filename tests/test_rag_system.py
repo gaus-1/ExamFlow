@@ -2,7 +2,6 @@
 Unit тесты для RAG системы
 """
 
-import json
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from core.rag_system.orchestrator import AIOrchestrator

@@ -3,7 +3,6 @@
 Главный скрипт для запуска всех оптимизаций ExamFlow
 """
 
-import os
 import sys
 import subprocess
 from pathlib import Path
@@ -210,7 +209,7 @@ def main():
     
     # Выводим итоги
     print(f"\n{'='*60}")
-    print(f"🎉 ОПТИМИЗАЦИЯ ЗАВЕРШЕНА!")
+    print("🎉 ОПТИМИЗАЦИЯ ЗАВЕРШЕНА!")
     print(f"{'='*60}")
     print(f"✅ Успешно: {success_count}/{total_count}")
     print(f"❌ С ошибками: {total_count - success_count}/{total_count}")

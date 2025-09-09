@@ -6,7 +6,6 @@ import json
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from unittest.mock import patch, MagicMock
-from ai.api import AIAssistantAPI, ProblemsAPI, UserProfileAPI
 
 
 class TestAIAssistantAPI(TestCase):

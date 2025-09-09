@@ -17,9 +17,9 @@ sys.path.append(str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-from django.core.management import execute_from_command_line
-from django.db import connection
-from django.db.utils import OperationalError
+from django.core.management import execute_from_command_line  # noqa: E402
+from django.db import connection  # noqa: E402
+from django.db.utils import OperationalError  # noqa: E402
 
 def check_database():
     """Проверяет подключение к базе данных"""
@@ -47,11 +47,10 @@ def check_tables():
     """Проверяет наличие основных таблиц"""
     try:
         from learning.models import Subject, Task
-        from authentication.models import UserProfile
         
         # Проверяем количество записей
-        subject_count = Subject.objects.count()
-        task_count = Task.objects.count()
+        subject_count = Subject.objects.count()  # type: ignore
+        task_count = Task.objects.count()  # type: ignore
         
         print(f"✅ Таблица Subject: {subject_count} записей")
         print(f"✅ Таблица Task: {task_count} записей")
@@ -64,9 +63,9 @@ def check_tables():
 def create_sample_data():
     """Создает образцы данных если таблицы пустые"""
     try:
-        from learning.models import Subject, Topic, Task
+        from learning.models import Subject
         
-        if Subject.objects.count() == 0:
+        if Subject.objects.count() == 0:  # type: ignore
             print("📚 Создаем образцы предметов...")
             
             # Создаем предметы
@@ -81,7 +80,7 @@ def create_sample_data():
                 Subject(name="Информатика", description="Программирование и алгоритмы"),
             ]
             
-            Subject.objects.bulk_create(subjects)
+            Subject.objects.bulk_create(subjects)  # type: ignore           
             print(f"✅ Создано {len(subjects)} предметов")
         
         return True

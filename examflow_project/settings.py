@@ -6,7 +6,7 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # для корректной работы путей
-import sys
+import sys  # noqa: E402
 sys.path.append(str(BASE_DIR))
 
 # Настройки разработки - не подходят для продакшена

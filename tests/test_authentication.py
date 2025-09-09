@@ -2,11 +2,8 @@
 Тесты для модуля аутентификации
 """
 
-import pytest
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from django.urls import reverse
-from django.http import HttpResponse
 from authentication.forms import TechRegisterForm, TechLoginForm
 
 
@@ -78,7 +75,7 @@ class TestAuthentication(TestCase):
     def test_login_form_valid(self):
         """Тест валидной формы входа"""
         # Создаем пользователя
-        user = User.objects.create_user(
+        _user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
             password='testpassword123'
@@ -88,7 +85,7 @@ class TestAuthentication(TestCase):
             'username': 'test@example.com',
             'password': 'testpassword123'
         }
-        form = TechLoginForm(data=form_data)
+        _form = TechLoginForm(data=form_data)
         # Форма может быть невалидной без дополнительной настройки аутентификации
 
     def test_register_view_get(self):
@@ -144,7 +141,7 @@ class TestAuthentication(TestCase):
     def test_logout_view(self):
         """Тест выхода из системы"""
         # Создаем и логиним пользователя
-        user = User.objects.create_user(
+        _user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
             password='testpassword123'
@@ -152,7 +149,7 @@ class TestAuthentication(TestCase):
         self.client.login(username='testuser', password='testpassword123')
         
         # Проверяем, что пользователь залогинен
-        self.assertTrue(user.is_authenticated)
+        self.assertTrue(_user.is_authenticated)  # type: ignore
         
         # Выходим из системы
         response = self.client.get('/logout/')  # Используем legacy URL
@@ -163,7 +160,7 @@ class TestAuthentication(TestCase):
     def test_password_change_view(self):
         """Тест изменения пароля"""
         # Создаем и логиним пользователя
-        user = User.objects.create_user(
+        _user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
             password='testpassword123'
@@ -181,7 +178,7 @@ class TestAuthentication(TestCase):
     def test_password_reset_view(self):
         """Тест сброса пароля"""
         # Создаем и логиним пользователя
-        user = User.objects.create_user(
+        _user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
             password='testpassword123'

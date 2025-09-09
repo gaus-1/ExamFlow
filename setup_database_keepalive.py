@@ -5,7 +5,6 @@
 запуска скрипта поддержания активности базы данных каждые 5 минут.
 """
 
-import os
 import sys
 import subprocess
 import logging

@@ -153,7 +153,7 @@ class Command(BaseCommand):
         # Итоговая статистика
         self.stdout.write('=' * 60)
         self.stdout.write(
-            self.style.SUCCESS(f'📊 Итоговая статистика:')  # type: ignore
+            self.style.SUCCESS('📊 Итоговая статистика:')  # type: ignore
         )
         self.stdout.write(f'  Всего документов: {total_documents}')
         self.stdout.write(f'  Успешно обработано: {processed_count}')

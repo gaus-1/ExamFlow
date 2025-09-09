@@ -32,9 +32,9 @@ if not GEMINI_API_KEY:
 try:
     genai.configure(api_key=GEMINI_API_KEY)  # type: ignore
     # Используем более быструю модель с настройками для скорости
-    model = genai.GenerativeModel(
+    model = genai.GenerativeModel(  # type: ignore
         'gemini-1.5-flash',
-        generation_config=genai.types.GenerationConfig(
+        generation_config=genai.types.GenerationConfig(  # type: ignore
             max_output_tokens=1000,  # Ограничиваем длину ответа
             temperature=0.7,  # Баланс между креативностью и скоростью
             top_p=0.8,
@@ -162,7 +162,7 @@ class AIAssistantAPI(View):
 Отвечай быстро и структурированно."""
 
                 # Получаем ответ от Gemini
-                response = model.generate_content(context)
+                response = model.generate_content(context)  # type: ignore
                 answer = response.text
 
                 # Определяем тему для практики
@@ -288,7 +288,7 @@ class ProblemsAPI(View):
         - limit: количество задач (по умолчанию 5)
         """
         topic = request.GET.get('topic', '')
-        limit = int(request.GET.get('limit', 5))
+        limit = int(request.GET.get('limit', 5))  # type: ignore
 
         if not topic:
             return JsonResponse({
@@ -317,8 +317,8 @@ class ProblemsAPI(View):
         """
         try:
             data = json.loads(request.body)
-            problem_id = data.get('problem_id')
-            answer = data.get('answer')
+            problem_id = data.get('problem_id')  # type: ignore
+            answer = data.get('answer')  # type: ignore         
 
             if not problem_id or answer is None:
                 return JsonResponse({
@@ -344,7 +344,7 @@ class ProblemsAPI(View):
         Получает задачи по теме из реальной базы данных
         """
         try:
-            from core.models import Task, Subject  # type: ignore
+            from core.models import Task  # type: ignore
 
             # Получаем предмет по теме
             subject_mapping = {
@@ -465,7 +465,7 @@ class UserProfileAPI(View):
         """
         GET запрос для получения профиля пользователя
         """
-        user = request.user
+        user = request.user  # type: ignore
 
         try:
             # Получаем реальные данные из базы
@@ -539,21 +539,21 @@ class UserProfileAPI(View):
         """
         try:
             data = json.loads(request.body)
-            action = data.get('action')
+            action = data.get('action')  # type: ignore
 
             if action == 'solve_problem':
                 # Обновляем прогресс решения задачи
-                problem_id = data.get('problem_id')
-                is_correct = data.get('is_correct', False)
+                problem_id = data.get('problem_id')  # type: ignore     
+                is_correct = data.get('is_correct', False)  # type: ignore
                 subject = data.get('subject', 'general')
 
                 return self.update_problem_progress(
-                    request.user, problem_id, is_correct, subject)
+                    request.user, problem_id, is_correct, subject)  # type: ignore
 
             elif action == 'complete_challenge':
                 # Обновляем прогресс челленджа
-                challenge_id = data.get('challenge_id')
-                return self.update_challenge_progress(request.user, challenge_id)
+                challenge_id = data.get('challenge_id')  # type: ignore
+                return self.update_challenge_progress(request.user, challenge_id)  # type: ignore
 
             else:
                 return JsonResponse({

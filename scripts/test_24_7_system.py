@@ -7,7 +7,7 @@ import requests
 import time
 import json
 from typing import Dict, Any, List
-from datetime import datetime, timedelta
+from datetime import datetime
 
 class SystemTester:
     """Тестирование системы ExamFlow 2.0"""
@@ -37,7 +37,7 @@ class SystemTester:
                 try:
                     data = response.json()
                     result['data'] = data
-                except:
+                except Exception:
                     result['data'] = response.text[:200]
             
             self.results.append(result)
@@ -235,7 +235,7 @@ class SystemTester:
         print("=" * 60)
         
         summary = report['test_summary']
-        print(f"📈 Общая статистика:")
+        print("📈 Общая статистика:")
         print(f"   Всего тестов: {summary['total_tests']}")
         print(f"   Успешных: {summary['successful_tests']}")
         print(f"   Неудачных: {summary['failed_tests']}")

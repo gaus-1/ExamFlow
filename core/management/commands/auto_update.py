@@ -131,7 +131,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS('✅ Ручное обновление завершено!')
             )
             self.stdout.write(
-                self.style.SUCCESS(f'📊 Результаты:')
+                self.style.SUCCESS('📊 Результаты:')
             )
             self.stdout.write(f'  • Предметов создано: {result["subjects"]}')
             self.stdout.write(f'  • Заданий загружено: {result["tasks"]}')
@@ -149,7 +149,7 @@ class Command(BaseCommand):
                 self.stdout.write('\n' + '=' * 60)
                 self.stdout.write('🤖 ExamFlow Auto-Updater Service')
                 self.stdout.write('=' * 60)
-                self.stdout.write(f'🟢 Статус: Активен')
+                self.stdout.write('🟢 Статус: Активен')
 
                 import schedule
                 jobs = schedule.jobs

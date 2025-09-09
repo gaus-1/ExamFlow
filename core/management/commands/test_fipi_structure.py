@@ -153,7 +153,7 @@ class Command(BaseCommand):
                     self.stdout.write(f'  ✅ Успешно: {len(str(content))} символов')
                     success_count += 1
                 else:
-                    self.stdout.write(f'  ❌ Ошибка: не удалось получить содержимое')
+                    self.stdout.write('  ❌ Ошибка: не удалось получить содержимое')
                     error_count += 1
 
                 # Небольшая задержка

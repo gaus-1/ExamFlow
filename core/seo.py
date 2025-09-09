@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Dict
 from django.conf import settings
-from django.urls import reverse
 
 
 SITE_URL = getattr(settings, 'WEBSITE_URL', 'https://examflow.ru')

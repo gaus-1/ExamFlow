@@ -351,7 +351,7 @@ if __name__ == "__main__":
     result = run_data_update()
 
     if result['success']:
-        print(f"✅ Обновление успешно завершено!")
+        print("✅ Обновление успешно завершено!")
         print(f"📊 Предметов: {result['subjects_processed']}")
         print(f"📝 Заданий: {result['tasks_processed']}")
         print(f"⏱️ Время: {result['execution_time']:.2f} сек")

@@ -64,7 +64,7 @@ class Command(BaseCommand):
                 self.stdout.write('=' * 60)
                 self.stdout.write(
                     self.style.SUCCESS(  # type: ignore
-                        f'✅ ЗАГРУЗКА ЗАВЕРШЕНА УСПЕШНО!'
+                        '✅ ЗАГРУЗКА ЗАВЕРШЕНА УСПЕШНО!'
                     )
                 )
                 self.stdout.write(f'⏱️ Время выполнения: {duration}')

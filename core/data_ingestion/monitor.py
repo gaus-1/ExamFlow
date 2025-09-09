@@ -23,7 +23,7 @@ class DataMonitor:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
 
-    def check_url_changes(self, url: str, last_hash: str = None) -> Dict:
+    def check_url_changes(self, url: str, last_hash: str = None) -> Dict:  # type: ignore
         """
         Проверяет изменения на URL
         """
@@ -65,18 +65,18 @@ class DataMonitor:
         from core.models import FIPIData
 
         # Получаем уникальные URL из базы данных
-        urls = FIPIData.objects.values_list('url', flat=True).distinct()
+        urls = FIPIData.objects.values_list('url', flat=True).distinct()  # type: ignore
 
         updates = []
 
         for url in urls:
             # Получаем последний хеш для этого URL
-            last_record = FIPIData.objects.filter(
-                url=url).order_by('-collected_at').first()
-            last_hash = last_record.content_hash if last_record else None
+            last_record = FIPIData.objects.filter(  # type: ignore
+                url=url).order_by('-collected_at').first()  # type: ignore
+            last_hash = last_record.content_hash if last_record else None  # type: ignore
 
             # Проверяем изменения
-            check_result = self.check_url_changes(url, last_hash)
+            check_result = self.check_url_changes(url, last_hash)  # type: ignore   
 
             if check_result['has_changed']:
                 updates.append({
@@ -101,10 +101,10 @@ class DataMonitor:
         try:
             from core.models import FIPIData
 
-            data = FIPIData.objects.get(id=fipi_data_id)
+            data = FIPIData.objects.get(id=fipi_data_id)  # type: ignore
 
             # Создаем архивную запись
-            archived_data = {
+            _archived_data = {
                 'title': data.title,
                 'url': data.url,
                 'data_type': data.data_type,
@@ -204,13 +204,13 @@ class MonitoringScheduler:
         from core.models import FIPIData
 
         # Проверяем, когда последний раз запускался мониторинг
-        last_check = FIPIData.objects.order_by('-collected_at').first()
+        last_check = FIPIData.objects.order_by('-collected_at').first()  # type: ignore
 
         if not last_check:
             return True
 
         # Запускаем мониторинг раз в час
-        time_since_last = timezone.now() - last_check.collected_at
+        time_since_last = timezone.now() - last_check.collected_at  # type: ignore
         return time_since_last > timedelta(hours=1)
 
     def run_if_needed(self) -> Optional[Dict]:

@@ -379,11 +379,11 @@ class PDFVectorizer:
         try:
             import google.generativeai as genai
 
-            genai.configure(api_key=settings.GEMINI_API_KEY)
+            genai.configure(api_key=settings.GEMINI_API_KEY)  # type: ignore
             # Используем модель эмбеддингов
-            embed_model = genai.EmbeddingModel(
+            embed_model = genai.EmbeddingModel(  # type: ignore
                 model_name='text-embedding-004')  # type: ignore
-            response = embed_model.embed_content(input=text)
+            response = embed_model.embed_content(input=text)  # type: ignore        
 
             # Ответ SDK может быть объектом с полем embedding
             if hasattr(response, 'embedding'):
@@ -497,13 +497,13 @@ class PDFProcessor:
         saved_count = 0
 
         try:
-            with transaction.atomic():
+            with transaction.atomic():  # type: ignore
                 for i, vectorized_chunk in enumerate(vectorized_chunks):
                     chunk = vectorized_chunk['chunk']
                     embedding = vectorized_chunk['embedding']
 
                     # Создаем запись в DataChunk
-                    data_chunk = DataChunk.objects.create(  # type: ignore
+                    _ = DataChunk.objects.create(  # type: ignore
                         source_data=fipi_data,
                         chunk_text=chunk.text,
                         chunk_index=i,

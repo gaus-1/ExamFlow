@@ -7,9 +7,7 @@
 import requests
 import subprocess
 import sys
-import json
 from pathlib import Path
-from urllib.parse import urlparse
 
 # Цвета для вывода
 class Colors:

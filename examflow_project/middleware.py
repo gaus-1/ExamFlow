@@ -78,7 +78,7 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         
         # Проверяем количество запросов с одного IP
         if hasattr(settings, 'SECURITY_MONITORING'):
-            threshold = settings.SECURITY_MONITORING.get('suspicious_ip_threshold', 10)
+            _threshold = settings.SECURITY_MONITORING.get('suspicious_ip_threshold', 10)
             # Здесь можно добавить логику подсчета запросов по IP
         
         return False

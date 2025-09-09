@@ -30,10 +30,10 @@ class VectorStore:
             import google.generativeai as genai
 
             # Настраиваем API
-            genai.configure(api_key=settings.GEMINI_API_KEY)
+            genai.configure(api_key=settings.GEMINI_API_KEY)  # type: ignore
 
             # Создаем эмбеддинг
-            result = genai.embed_content(
+            result = genai.embed_content(  # type: ignore
                 model="models/text-embedding-004",
                 content=text,
                 task_type="retrieval_document"
@@ -54,10 +54,10 @@ class VectorStore:
             import google.generativeai as genai
 
             # Настраиваем API
-            genai.configure(api_key=settings.GEMINI_API_KEY)
+            genai.configure(api_key=settings.GEMINI_API_KEY)  # type: ignore
 
             # Создаем эмбеддинг для запроса
-            result = genai.embed_content(
+            result = genai.embed_content(  # type: ignore
                 model="models/text-embedding-004",
                 content=query,
                 task_type="retrieval_query"
@@ -74,8 +74,8 @@ class VectorStore:
         Вычисляет косинусное сходство между векторами
         """
         try:
-            vec1 = np.array(vec1)
-            vec2 = np.array(vec2)
+            vec1 = np.array(vec1)  # type: ignore
+            vec2 = np.array(vec2)  # type: ignore
 
             # Нормализуем векторы
             norm1 = np.linalg.norm(vec1)
@@ -103,7 +103,7 @@ class VectorStore:
             from core.models import DataChunk
 
             # Получаем все чанки
-            chunks = DataChunk.objects.all()
+            chunks = DataChunk.objects.all()  # type: ignore
 
             similarities = []
 
@@ -137,7 +137,7 @@ class VectorStore:
             text: str,
             source_data_id: int,
             chunk_index: int,
-            metadata: Dict = None) -> bool:
+            metadata: Dict = None) -> bool:  # type: ignore
         """
         Добавляет новый чанк в векторное хранилище
         """
@@ -148,10 +148,10 @@ class VectorStore:
             embedding = self.create_embedding(text)
 
             # Получаем исходные данные
-            source_data = FIPIData.objects.get(id=source_data_id)
+            source_data = FIPIData.objects.get(id=source_data_id)  # type: ignore
 
-            # Создаем чанк
-            chunk = DataChunk.objects.create(
+            # Создаем чанк (id не используется далее)
+            _chunk = DataChunk.objects.create(  # type: ignore
                 source_data=source_data,
                 chunk_text=text,
                 chunk_index=chunk_index,
@@ -205,9 +205,9 @@ class VectorStore:
         try:
             from core.models import DataChunk, FIPIData
 
-            total_chunks = DataChunk.objects.count()
-            total_sources = FIPIData.objects.count()
-            processed_sources = FIPIData.objects.filter(is_processed=True).count()
+            total_chunks = DataChunk.objects.count()  # type: ignore
+            total_sources = FIPIData.objects.count()  # type: ignore
+            processed_sources = FIPIData.objects.filter(is_processed=True).count()  # type: ignore      
 
             return {
                 'total_chunks': total_chunks,

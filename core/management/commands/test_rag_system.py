@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 response = orchestrator.process_query(query, user_id)
 
                 # Выводим результат
-                self.stdout.write(f'Ответ получен')  # type: ignore
+                self.stdout.write('Ответ получен')  # type: ignore
                 self.stdout.write(f'Ответ: {response["answer"][:200]}...')
                 self.stdout.write(f'Источники: {len(response["sources"])}')
                 self.stdout.write(f'Практика: {response["practice"]["topic"]}')

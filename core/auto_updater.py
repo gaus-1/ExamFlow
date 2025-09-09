@@ -108,7 +108,7 @@ class AutoUpdater:
             total_subjects = Subject.objects.count()
             total_tasks = Task.objects.filter(is_active=True).count()
 
-            logger.info(f"✅ Еженедельное обновление завершено")
+            logger.info("✅ Еженедельное обновление завершено")
 
             self._send_admin_notification(
                 f"📊 Еженедельное обновление ExamFlow\n"
@@ -236,7 +236,7 @@ class AutoUpdater:
             # Добавляем примеры заданий
             sample_tasks = self.fipi_loader.create_sample_tasks()
 
-            logger.info(f"✅ Ручное обновление завершено")
+            logger.info("✅ Ручное обновление завершено")
             logger.info(
                 f"📊 Предметов: {subjects_count}, Заданий: {tasks_count}, Примеров: {sample_tasks}")
 

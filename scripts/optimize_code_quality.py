@@ -3,7 +3,6 @@
 Скрипт для улучшения качества кода
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -79,7 +78,7 @@ def add_function_type_hints(content: str) -> str:
     
     def add_hints(match):
         func_name = match.group(1)
-        params = match.group(2)
+        _params = match.group(2)
         
         # Простые type hints для основных функций
         if func_name in ['post', 'get']:

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def get_premium_status(request):
     """Получает статус премиум-подписки пользователя"""
     try:
-        access_control = get_access_control()
+        access_control = get_access_control()  # type: ignore
 
         status = {
             'is_premium': access_control.is_premium_user(
@@ -142,7 +142,7 @@ def export_to_pdf(request):
         if content_type == 'fipi_data':
             try:
                 fipi_data = FIPIData.objects.get(id=content_id)  # type: ignore
-                content = {
+                _content = {
                     'title': fipi_data.title,
                     'content': fipi_data.content,
                     'data_type': fipi_data.get_data_type_display(),  # type: ignore
@@ -203,7 +203,7 @@ def advanced_search(request):
 
         # Выполняем расширенный поиск
         orchestrator = get_ai_orchestrator()
-        results = orchestrator.search_content(
+        results = orchestrator.search_content(  # type: ignore
             query=query,
             user=request.user,
             filters=filters,
@@ -244,7 +244,7 @@ def get_personalized_recommendations(request):
 
         # Получаем персональные рекомендации
         orchestrator = get_ai_orchestrator()
-        recommendations = orchestrator.get_personalized_recommendations(
+        recommendations = orchestrator.get_personalized_recommendations(  # type: ignore
             user=request.user,
             limit=limit
         )
@@ -300,7 +300,7 @@ def compare_versions(request):
 
         # Выполняем сравнение
         orchestrator = get_ai_orchestrator()
-        comparison = orchestrator.compare_versions(version1, version2)
+        comparison = orchestrator.compare_versions(version1, version2)  # type: ignore
 
         return JsonResponse({
             'success': True,
@@ -320,7 +320,7 @@ def compare_versions(request):
 def get_premium_features(request):
     """Получает список доступных премиум-функций"""
     try:
-        access_control = get_access_control()
+        access_control = get_access_control()  # type: ignore
         user_features = access_control.get_user_features(request.user)
 
         all_features = {

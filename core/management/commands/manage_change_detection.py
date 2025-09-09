@@ -106,7 +106,7 @@ class Command(BaseCommand):
                 stats = service.get_statistics()
                 detector_stats = stats['detector_stats']
 
-                self.stdout.write(f'\n📈 Статистика:')
+                self.stdout.write('\n📈 Статистика:')
                 self.stdout.write(
                     f'  Всего изменений: {detector_stats["total_changes"]}')
                 self.stdout.write(f'  Размер очереди: {detector_stats["queue_size"]}')
@@ -114,7 +114,7 @@ class Command(BaseCommand):
 
                 change_counts = detector_stats['change_counts']
                 if any(change_counts.values()):
-                    self.stdout.write(f'\n📋 Изменения по типам:')
+                    self.stdout.write('\n📋 Изменения по типам:')
                     for change_type, count in change_counts.items():
                         if count > 0:
                             icon = {
@@ -194,12 +194,12 @@ class Command(BaseCommand):
 
             # Статистика детектора
             detector_stats = stats['detector_stats']
-            self.stdout.write(f'\n📊 Детектор изменений:')
+            self.stdout.write('\n📊 Детектор изменений:')
             self.stdout.write(f'  Всего изменений: {detector_stats["total_changes"]}')
             self.stdout.write(f'  Размер очереди: {detector_stats["queue_size"]}')
 
             change_counts = detector_stats['change_counts']
-            self.stdout.write(f'\n📋 Изменения по типам:')
+            self.stdout.write('\n📋 Изменения по типам:')
             for change_type, count in change_counts.items():
                 icon = {
                     'new': '🆕',

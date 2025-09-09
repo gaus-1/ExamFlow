@@ -14,7 +14,6 @@ import requests  # type: ignore
 from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST  # type: ignore
 from telegram import Update
 from .bot_main import get_bot
 from django.conf import settings
@@ -51,7 +50,7 @@ def telegram_webhook(request):
     Принимает JSON с обновлениями от Telegram API
     и передает их в обработчики бота
     """
-    logger.info(f"=== НАЧАЛО ОБРАБОТКИ WEBHOOK ===")
+    logger.info("=== НАЧАЛО ОБРАБОТКИ WEBHOOK ===")
     logger.info(f"Время: {datetime.now()}")
     logger.info(f"IP: {request.META.get('REMOTE_ADDR', 'unknown')}")
     logger.info(f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
@@ -174,7 +173,7 @@ def telegram_webhook(request):
 
         # Немедленно подтверждаем приём, чтобы избежать таймаута Telegram
         logger.info("Webhook успешно обработан, возвращаем OK")
-        logger.info(f"=== КОНЕЦ ОБРАБОТКИ WEBHOOK ===")
+        logger.info("=== КОНЕЦ ОБРАБОТКИ WEBHOOK ===")
         return HttpResponse(b"OK")
 
     except Exception as e:
@@ -208,8 +207,7 @@ async def handle_telegram_update(update: Update):
 
         # Импортируем обработчики
         from .bot_handlers import (
-            start, subjects_menu, show_subject_topics, show_task_handler,  # type: ignore
-            handle_answer, show_stats, voice_hint, handle_unknown_callback  # type: ignore
+            start, handle_answer  # type: ignore
         )
 
         # Создаем mock-контекст
@@ -254,7 +252,6 @@ async def handle_telegram_update(update: Update):
                     subjects_menu as h_subjects_menu,
                     show_subject_topics as h_show_subject_topics,
                     show_task_handler as h_show_task,  # type: ignore
-                    handle_answer as h_handle_answer,  # type: ignore
                     show_stats as h_show_stats,
                     voice_hint as h_voice_hint,  # type: ignore
                     learning_plan_menu as h_learning_plan_menu,

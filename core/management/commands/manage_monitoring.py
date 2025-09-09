@@ -97,7 +97,7 @@ class Command(BaseCommand):
             if service.is_running:
                 # Сводка уведомлений
                 alerts_summary = service.get_alerts_summary()
-                self.stdout.write(f'\n📋 Уведомления:')
+                self.stdout.write('\n📋 Уведомления:')
                 self.stdout.write(f'  Активных: {alerts_summary["total_active"]}')
 
                 for level, count in alerts_summary['by_level'].items():
@@ -112,7 +112,7 @@ class Command(BaseCommand):
 
                 # Последние уведомления
                 if alerts_summary['recent_alerts']:
-                    self.stdout.write(f'\n🔔 Последние уведомления:')
+                    self.stdout.write('\n🔔 Последние уведомления:')
                     for alert in alerts_summary['recent_alerts'][-5:]:
                         timestamp = alert['timestamp'][:19].replace('T', ' ')
                         level_icon = {
@@ -153,7 +153,7 @@ class Command(BaseCommand):
             self.stdout.write(f'Время проверки: {health["timestamp"]}')
 
             # Детали по компонентам
-            self.stdout.write(f'\n🔧 Компоненты:')
+            self.stdout.write('\n🔧 Компоненты:')
             for check_name, check_result in health['checks'].items():
                 status = check_result.get('status', 'unknown')
                 status_icon = {

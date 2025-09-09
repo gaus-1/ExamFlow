@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hmac
-import hashlib
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin

@@ -3,11 +3,9 @@
 Скрипт для оптимизации производительности
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
-import json
 
 def install_performance_tools():
     """Устанавливает инструменты для оптимизации"""

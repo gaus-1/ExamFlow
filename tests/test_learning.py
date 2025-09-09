@@ -2,10 +2,8 @@
 Тесты для модуля обучения
 """
 
-import pytest
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from django.urls import reverse
 from core.models import Subject, Task, UserProgress
 
 

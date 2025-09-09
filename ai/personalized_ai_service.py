@@ -84,14 +84,14 @@ class PersonalizedAiService:
         # Добавляем информацию о прогрессе
         progress = user_insights.get('progress_summary', {})
         if progress:
-            enhanced_prompt += f"\n\nКонтекст о пользователе:\n"
+            enhanced_prompt += "\n\nКонтекст о пользователе:\n"
             enhanced_prompt += f"- Решено заданий: {progress.get('solved_tasks', 0)}\n"
             enhanced_prompt += f"- Общая точность: {progress.get('success_rate', 0)}%\n"
 
         # Добавляем информацию о слабых темах
         weak_topics = user_insights.get('weak_topics', [])
         if weak_topics:
-            enhanced_prompt += f"\nСлабые темы пользователя:\n"
+            enhanced_prompt += "\nСлабые темы пользователя:\n"
             for topic in weak_topics[:3]:
                 enhanced_prompt += f"- {topic.get('subject', 'Неизвестно')}: "
                 enhanced_prompt += f"{topic.get('failed_tasks', 0)} проваленных заданий\n"

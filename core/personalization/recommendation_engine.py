@@ -29,7 +29,7 @@ class RecommendationEngine:
         Получает персонализированные рекомендации для пользователя
         """
         try:
-            from core.models import UnifiedProfile, UserProgress, Task, Subject  # type: ignore
+            from core.models import UnifiedProfile  # type: ignore
 
             # Получаем профиль пользователя
             user_profile = UnifiedProfile.objects.filter(  # type: ignore
@@ -65,7 +65,7 @@ class RecommendationEngine:
         Анализирует прогресс пользователя
         """
         try:
-            from core.models import UserProgress, Task  # type: ignore
+            from core.models import UserProgress  # type: ignore
 
             # Получаем прогресс по предметам
             progress_entries = UserProgress.objects.filter(

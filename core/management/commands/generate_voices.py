@@ -78,7 +78,7 @@ class Command(BaseCommand):
         """Генерирует аудио для множества заданий"""
         self.stdout.write(
             self.style.SUCCESS(
-                f'🎤 Начинаем генерацию голосовых файлов...')  # type: ignore
+                '🎤 Начинаем генерацию голосовых файлов...')  # type: ignore
         )
 
         # Выбираем задания
@@ -132,7 +132,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(  # type: ignore
-                f'🎉 Генерация завершена!'  # type: ignore
+                '🎉 Генерация завершена!'  # type: ignore
             )
         )
         self.stdout.write(

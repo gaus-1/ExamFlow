@@ -9,7 +9,6 @@ import sys
 import django
 import requests
 import subprocess
-import time
 from pathlib import Path
 
 # Настройка Django
@@ -17,9 +16,8 @@ sys.path.append(str(Path(__file__).parent))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-from django.conf import settings
-from django.core.management import execute_from_command_line
-from django.db import connection
+from django.conf import settings  # noqa: E402
+from django.db import connection  # noqa: E402
 
 def check_django_server():
     """Проверка Django сервера"""
@@ -72,7 +70,7 @@ def check_models():
         topics_count = Topic.objects.count()  # type: ignore
         tasks_count = Task.objects.count()  # type: ignore
         
-        print(f"✅ Модели работают:")
+        print("✅ Модели работают:")
         print(f"   📚 Предметов: {subjects_count}")
         print(f"   🎯 Тем: {topics_count}")
         print(f"   📝 Заданий: {tasks_count}")

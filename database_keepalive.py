@@ -8,7 +8,7 @@ import os
 import time
 import logging
 import psycopg2
-from datetime import datetime, timedelta
+from datetime import datetime
 import schedule
 from dotenv import load_dotenv
 

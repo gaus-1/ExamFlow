@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 '--continuous', '--interval', str(site_interval)
             ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-            self.stdout.write(f'✅ Keep-alive запущены в фоне:')
+            self.stdout.write('✅ Keep-alive запущены в фоне:')
             self.stdout.write(f'   База данных: PID {db_process.pid}')
             self.stdout.write(f'   Сайт: PID {site_process.pid}')
             self.stdout.write('')

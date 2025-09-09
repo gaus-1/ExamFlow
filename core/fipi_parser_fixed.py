@@ -289,7 +289,7 @@ def run_full_parsing(max_tasks_per_subject: int = 20) -> bool:
         integrator = DataIntegrator()
         results = integrator.integrate_subjects_and_tasks(max_tasks_per_subject)
 
-        logger.info(f"📊 Результаты парсинга:")
+        logger.info("📊 Результаты парсинга:")
         logger.info(f"   Предметов создано: {results['subjects_created']}")
         logger.info(f"   Заданий создано: {results['tasks_created']}")
 

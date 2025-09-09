@@ -3,7 +3,6 @@
 Скрипт для минификации статических ресурсов ExamFlow
 """
 
-import os
 import re
 from pathlib import Path
 

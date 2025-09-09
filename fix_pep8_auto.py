@@ -5,7 +5,6 @@
 
 import os
 import re
-from pathlib import Path
 
 
 def fix_pep8_file(file_path):

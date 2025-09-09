@@ -2,9 +2,7 @@
 Тесты для фронтенд-стандартов 2025 ExamFlow
 """
 
-import pytest
 from django.test import TestCase, Client
-from django.urls import reverse
 from django.conf import settings
 
 

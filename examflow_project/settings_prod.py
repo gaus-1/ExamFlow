@@ -4,7 +4,7 @@
 
 import os
 import dj_database_url
-from .settings import *
+from .settings import *  # noqa: F403,F401
 
 # Принудительно отключаем DEBUG в продакшене
 DEBUG = False
@@ -26,7 +26,7 @@ CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Настройки статических файлов для продакшена
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # noqa: F405
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Настройки базы данных для продакшена
@@ -106,7 +106,7 @@ if os.getenv('RENDER'):
     # Автоматически добавляем хост Render
     RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
     if RENDER_HOST:
-        ALLOWED_HOSTS.append(RENDER_HOST)
+        ALLOWED_HOSTS.append(RENDER_HOST)  # noqa: F405
     
     # Настройки для статических файлов на Render
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

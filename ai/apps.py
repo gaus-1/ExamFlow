@@ -10,6 +10,6 @@ class AiConfig(AppConfig):
         """Инициализация модуля при запуске Django"""
         try:
             # Импортируем сигналы
-            import ai.signals  # type: ignore
+            import ai.signals  # noqa: F401  # type: ignore
         except ImportError:
             pass

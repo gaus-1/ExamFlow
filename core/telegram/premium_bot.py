@@ -375,7 +375,7 @@ class PremiumTelegramBot:
             comparison = orchestrator.compare_versions(version1, version2)
 
             # Формируем результат
-            result_text = f"🔄 <b>Сравнение версий</b>\n\n"
+            result_text = "🔄 <b>Сравнение версий</b>\n\n"
             result_text += f"📄 <b>Версия 1:</b> {version1.title}\n"
             result_text += f"📄 <b>Версия 2:</b> {version2.title}\n\n"
 

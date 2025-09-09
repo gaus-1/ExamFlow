@@ -65,7 +65,7 @@ async def show_my_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = "📊 *Ваша аналитика*\n\n"
 
         if progress:
-            message += f"📈 *Прогресс:*\n"
+            message += "📈 *Прогресс:*\n"
             message += f"   • Решено: {progress.get('solved_tasks', 0)}\n"
             message += f"   • Всего: {progress.get('total_tasks', 0)}\n"
             message += f"   • Процент: {progress.get('completion_percentage', 0)}%\n\n"

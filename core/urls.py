@@ -74,8 +74,8 @@ def faq_view(request):
     return render(request, 'faq.html', context)
 
 
-from . import api
-from .ultra_simple_health import ultra_simple_health, minimal_health_check
+from . import api  # noqa: E402
+from .ultra_simple_health import ultra_simple_health, minimal_health_check  # noqa: E402
 
 urlpatterns = [
     # API для RAG-системы

@@ -162,19 +162,19 @@ def demo_theme_management():
     print("-" * 40)
 
     # Методы UserThemePreference
-    print(f"🎯 Методы UserThemePreference:")
+    print("🎯 Методы UserThemePreference:")
     print(f"   Текущая тема: {preference.get_theme_display()}")
     print(f"   Можно переключить: {preference.can_switch_theme()}")
 
     # Методы ThemeUsage
     latest_usage = ThemeUsage.objects.filter(user=user).latest('created_at')
-    print(f"📈 Методы ThemeUsage:")
+    print("📈 Методы ThemeUsage:")
     print(f"   Последнее использование: {latest_usage.get_theme_display()}")
     print(f"   Время сессии: {latest_usage.get_session_duration_minutes()} мин")
 
     # Методы ThemeCustomization
     if customization.is_active:
-        print(f"🎨 Методы ThemeCustomization:")
+        print("🎨 Методы ThemeCustomization:")
         print(f"   Есть кастомизация: {customization.has_customizations()}")
         print(
             f"   Основной цвет: {customization.get_custom_color('primary', '#000000')}")

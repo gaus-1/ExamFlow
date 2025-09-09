@@ -4,15 +4,14 @@
 """
 
 import os
-import sys
 import django
 
 # Настройка Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-from core.models import FIPIData, FIPISourceMap, DataChunk
-from authentication.models import UserProfile, Subscription
+from core.models import FIPIData, FIPISourceMap, DataChunk  # noqa: E402
+from authentication.models import UserProfile, Subscription  # noqa: E402
 
 def check_database():
     """Проверяет состояние базы данных"""
@@ -20,11 +19,11 @@ def check_database():
     
     # Проверяем модели
     try:
-        fipi_count = FIPIData.objects.count()
-        source_map_count = FIPISourceMap.objects.count()
-        chunks_count = DataChunk.objects.count()
-        users_count = UserProfile.objects.count()
-        subscriptions_count = Subscription.objects.count()
+        fipi_count = FIPIData.objects.count()  # type: ignore   
+        source_map_count = FIPISourceMap.objects.count()  # type: ignore
+        chunks_count = DataChunk.objects.count()  # type: ignore
+        users_count = UserProfile.objects.count()  # type: ignore
+        subscriptions_count = Subscription.objects.count()  # type: ignore
         
         print(f"📊 FIPIData (документы): {fipi_count}")
         print(f"🗺️  FIPISourceMap (источники): {source_map_count}")
@@ -35,13 +34,13 @@ def check_database():
         # Показываем последние документы
         if fipi_count > 0:
             print("\n📄 Последние документы:")
-            for doc in FIPIData.objects.all()[:5]:
+            for doc in FIPIData.objects.all()[:5]:  # type: ignore
                 print(f"  - {doc.title} ({doc.data_type})")
         
         # Показываем источники
         if source_map_count > 0:
             print("\n🔗 Источники данных:")
-            for source in FIPISourceMap.objects.all()[:5]:
+            for source in FIPISourceMap.objects.all()[:5]:  # type: ignore
                 print(f"  - {source.url} ({source.priority})")
         
         return True
@@ -58,10 +57,10 @@ def check_ingestion_system():
         from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
         from core.data_ingestion.ingestion_engine import IngestionEngine
         
-        scraper = AdvancedFIPIScraper()
+        _scraper = AdvancedFIPIScraper()
         print("✅ AdvancedFIPIScraper инициализирован")
         
-        engine = IngestionEngine()
+        _engine = IngestionEngine()
         print("✅ IngestionEngine инициализирован")
         
         return True
@@ -77,8 +76,8 @@ def check_premium_system():
     try:
         from core.premium.access_control import get_access_control, get_usage_tracker
         
-        access_control = get_access_control()
-        usage_tracker = get_usage_tracker()
+        _access_control = get_access_control()  # type: ignore
+        _usage_tracker = get_usage_tracker()  # type: ignore
         
         print("✅ AccessControlService инициализирован")
         print("✅ UsageTracker инициализирован")

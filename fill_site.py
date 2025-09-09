@@ -4,7 +4,6 @@
 """
 
 import os
-import sys
 import django
 import time
 
@@ -12,10 +11,9 @@ import time
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-from core.models import FIPIData, FIPISourceMap, DataChunk
-from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
-from core.data_ingestion.ingestion_engine import IngestionEngine, TaskPriority
-from django.utils import timezone
+from core.models import FIPIData, FIPISourceMap  # noqa: E402
+from core.data_ingestion.ingestion_engine import IngestionEngine, TaskPriority  # noqa: E402
+from django.utils import timezone  # noqa: E402
 
 def init_source_map():
     """Инициализирует карту источников"""
@@ -98,7 +96,7 @@ def process_pdf_documents():
     print("📄 Обработка PDF документов...")
     
     from core.data_ingestion.pdf_processor import PDFProcessor, process_document
-    processor = PDFProcessor()
+    _processor = PDFProcessor()
     
     # Получаем необработанные PDF
     pdf_docs = FIPIData.objects.filter(  # type: ignore
