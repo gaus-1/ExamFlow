@@ -43,7 +43,7 @@ class Command(BaseCommand):  # type: ignore
 
             async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик команды /start"""
-                await update.message.reply_text(
+                await update.message.reply_text(  # type: ignore
                     "👋 Привет! Я AI-помощник ExamFlow.\n\n"
                     "Доступные команды:\n"
                     "/search <запрос> - поиск по материалам ФИПИ\n"
@@ -54,7 +54,7 @@ class Command(BaseCommand):  # type: ignore
 
             async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик команды /help"""
-                await update.message.reply_text(
+                await update.message.reply_text(  # type: ignore
                     "📚 Помощь по командам:\n\n"
                     "/search <запрос> - поиск по всем материалам ФИПИ\n"
                     "Пример: /search как решать квадратные уравнения\n\n"
@@ -69,13 +69,13 @@ class Command(BaseCommand):  # type: ignore
                 """Обработчик команды /search"""
                 query = ' '.join(context.args) if context.args else ''
                 if not query:
-                    await update.message.reply_text(
+                    await update.message.reply_text(  # type: ignore
                         "❌ Укажите запрос для поиска.\n"
                         "Пример: /search как решать квадратные уравнения"
                     )
                     return
 
-                await update.message.reply_text("🔍 Ищу информацию...")
+                await update.message.reply_text("🔍 Ищу информацию...")  # type: ignore
                 
                 try:
                     result = orchestrator.process_query(query=query)
@@ -87,29 +87,29 @@ class Command(BaseCommand):  # type: ignore
                             for source in result['sources'][:3]:  # Показываем только первые 3
                                 response += f"• {source.get('title', 'Без названия')}\n"
                         
-                        await update.message.reply_text(response)
+                        await update.message.reply_text(response)  # type: ignore
                     else:
-                        await update.message.reply_text(
+                        await update.message.reply_text(  # type: ignore
                             "😔 Не удалось найти релевантную информацию по вашему запросу."
                         )
                         
                 except Exception as e:
                     logger.error(f"Ошибка в search_command: {e}")
-                    await update.message.reply_text(
+                    await update.message.reply_text(  # type: ignore
                         "❌ Произошла ошибка при поиске. Попробуйте позже."
                     )
 
             async def fipi_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик команды /fipi"""
-                if len(context.args) < 2:
-                    await update.message.reply_text(
+                if len(context.args) < 2:  # type: ignore
+                    await update.message.reply_text(  # type: ignore
                         "❌ Укажите предмет и тип документа.\n"
                         "Пример: /fipi математика demo_variant"
                     )
                     return
 
-                subject = context.args[0].lower()
-                doc_type = context.args[1].lower()
+                subject = context.args[0].lower()  # type: ignore
+                doc_type = context.args[1].lower()  # type: ignore
                 
                 # Маппинг предметов
                 subject_map = {
@@ -123,7 +123,7 @@ class Command(BaseCommand):  # type: ignore
                 
                 mapped_subject = subject_map.get(subject, subject.title())
                 
-                await update.message.reply_text(f"🔍 Ищу по предмету: {mapped_subject}, тип: {doc_type}")
+                await update.message.reply_text(f"🔍 Ищу по предмету: {mapped_subject}, тип: {doc_type}")  # type: ignore
                 
                 try:
                     result = orchestrator.process_query(
@@ -139,25 +139,25 @@ class Command(BaseCommand):  # type: ignore
                             for source in result['sources'][:3]:
                                 response += f"• {source.get('title', 'Без названия')}\n"
                         
-                        await update.message.reply_text(response)
+                        await update.message.reply_text(response)  # type: ignore
                     else:
-                        await update.message.reply_text(
+                        await update.message.reply_text(  # type: ignore
                             f"😔 Материалы по предмету '{mapped_subject}' и типу '{doc_type}' не найдены."
                         )
                         
                 except Exception as e:
                     logger.error(f"Ошибка в fipi_command: {e}")
-                    await update.message.reply_text(
+                    await update.message.reply_text(  # type: ignore
                         "❌ Произошла ошибка при поиске. Попробуйте позже."
                     )
 
             async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик обычных сообщений"""
-                query = update.message.text
+                query = update.message.text  # type: ignore
                 if not query:
                     return
 
-                await update.message.reply_text("🤔 Обрабатываю ваш вопрос...")
+                await update.message.reply_text("🤔 Обрабатываю ваш вопрос...")  # type: ignore
                 
                 try:
                     result = orchestrator.process_query(query=query)
@@ -169,16 +169,16 @@ class Command(BaseCommand):  # type: ignore
                             for source in result['sources'][:2]:
                                 response += f"• {source.get('title', 'Без названия')}\n"
                         
-                        await update.message.reply_text(response)
+                        await update.message.reply_text(response)  # type: ignore
                     else:
-                        await update.message.reply_text(
+                        await update.message.reply_text(  # type: ignore
                             "😔 Не удалось найти релевантную информацию. "
                             "Попробуйте переформулировать вопрос или используйте команду /search"
                         )
                         
                 except Exception as e:
                     logger.error(f"Ошибка в handle_message: {e}")
-                    await update.message.reply_text(
+                    await update.message.reply_text(  # type: ignore
                         "❌ Произошла ошибка при обработке запроса. Попробуйте позже."
                     )
 
@@ -205,7 +205,7 @@ class Command(BaseCommand):  # type: ignore
                 )
                 
                 # Запускаем polling
-                await application.run_polling()
+                await application.run_polling()  # type: ignore 
 
             # Запускаем бота
             asyncio.run(main())
