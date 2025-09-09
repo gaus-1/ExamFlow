@@ -711,10 +711,10 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = {
     'DIRECTIVES': {
         'default-src': ("'self'",),
         'script-src': ("'self'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru'),
-        'style-src': ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'),
+        'style-src': ("'self'", "'unsafe-inline'"),
         'img-src': ("'self'", 'data:', 'https:'),
         'connect-src': ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com'),
-        'font-src': ("'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'),
+        'font-src': ("'self'",),
         'frame-ancestors': ("'none'",),
     }
 }
@@ -726,10 +726,10 @@ if os.getenv('CSP_REPORT_URI'):
 CSP_REPORT_ONLY = True
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", 'https://www.googletagmanager.com', 'https://mc.yandex.ru')
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", 'https://fonts.googleapis.com')
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", 'data:', 'https:')
 CSP_CONNECT_SRC = ("'self'", 'https://generativelanguage.googleapis.com', 'https://mc.yandex.ru', 'https://www.google-analytics.com')
-CSP_FONT_SRC = ("'self'", 'https://fonts.gstatic.com')
+CSP_FONT_SRC = ("'self'",)
 CSP_FRAME_ANCESTORS = ("'none'",)
 
 # Telegram webhook secret
