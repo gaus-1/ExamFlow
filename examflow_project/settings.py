@@ -523,6 +523,14 @@ SPECTACULAR_SETTINGS = {
         {'name': 'Health', 'description': 'Мониторинг состояния системы'},
     ]
 }
+
+# Настройки Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'GET',
