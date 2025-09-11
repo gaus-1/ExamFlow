@@ -78,10 +78,13 @@ def faq_view(request):
 from . import api  # noqa: E402
 from .ultra_simple_health import ultra_simple_health, minimal_health_check  # noqa: E402
 from core.rag_system.search_api import fipi_semantic_search  # noqa: E402
-from core.rag_system.ai_api import (
-    ai_ask, ai_subjects, ai_user_profile, 
-    ai_problem_submit, ai_statistics
-)  # noqa: E402
+from core.rag_system.ai_api import (  # noqa: E402
+    ai_ask,
+    ai_subjects,
+    ai_user_profile,
+    ai_problem_submit,
+    ai_statistics,
+)
 
 urlpatterns = [
     # API для RAG-системы
