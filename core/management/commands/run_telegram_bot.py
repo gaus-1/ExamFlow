@@ -28,7 +28,8 @@ class Command(BaseCommand):  # type: ignore
             import asyncio
             from telegram import Update
             from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-            from core.rag_system.orchestrator import RAGOrchestrator
+            from bot.service import BotService
+            from bot.formatters import format_answer
 
             # Получаем токен бота
             bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
@@ -38,8 +39,8 @@ class Command(BaseCommand):  # type: ignore
                 )
                 return
 
-            # Инициализируем оркестратор
-            orchestrator = RAGOrchestrator()
+            # Сервис бота
+            bot_service = BotService()
 
             async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик команды /start"""
@@ -76,18 +77,12 @@ class Command(BaseCommand):  # type: ignore
                     return
 
                 await update.message.reply_text("🔍 Ищу информацию...")  # type: ignore
-                
+
                 try:
-                    result = orchestrator.process_query(query=query)
+                    result = await bot_service.process_query(query)
                     
                     if result.get('answer'):
-                        response = f"🤖 {result['answer']}\n\n"
-                        if result.get('sources'):
-                            response += "📚 Источники:\n"
-                            for source in result['sources'][:3]:  # Показываем только первые 3
-                                response += f"• {source.get('title', 'Без названия')}\n"
-                        
-                        await update.message.reply_text(response)  # type: ignore
+                        await update.message.reply_text(format_answer("🤖", result, 3))  # type: ignore
                     else:
                         await update.message.reply_text(  # type: ignore
                             "😔 Не удалось найти релевантную информацию по вашему запросу."
@@ -126,20 +121,14 @@ class Command(BaseCommand):  # type: ignore
                 await update.message.reply_text(f"🔍 Ищу по предмету: {mapped_subject}, тип: {doc_type}")  # type: ignore
                 
                 try:
-                    result = orchestrator.process_query(
-                        query="материалы для подготовки",
-                        subject=mapped_subject,
-                        document_type=doc_type
+                    result = await bot_service.process_query(
+                        "материалы для подготовки",
+                        mapped_subject,
+                        doc_type
                     )
                     
                     if result.get('answer'):
-                        response = f"📖 {result['answer']}\n\n"
-                        if result.get('sources'):
-                            response += "📚 Найденные материалы:\n"
-                            for source in result['sources'][:3]:
-                                response += f"• {source.get('title', 'Без названия')}\n"
-                        
-                        await update.message.reply_text(response)  # type: ignore
+                        await update.message.reply_text(format_answer("📖", result, 3))  # type: ignore
                     else:
                         await update.message.reply_text(  # type: ignore
                             f"😔 Материалы по предмету '{mapped_subject}' и типу '{doc_type}' не найдены."
@@ -160,16 +149,10 @@ class Command(BaseCommand):  # type: ignore
                 await update.message.reply_text("🤔 Обрабатываю ваш вопрос...")  # type: ignore
                 
                 try:
-                    result = orchestrator.process_query(query=query)
+                    result = await bot_service.process_query(query)
                     
                     if result.get('answer'):
-                        response = f"💡 {result['answer']}\n\n"
-                        if result.get('sources'):
-                            response += "📚 Источники:\n"
-                            for source in result['sources'][:2]:
-                                response += f"• {source.get('title', 'Без названия')}\n"
-                        
-                        await update.message.reply_text(response)  # type: ignore
+                        await update.message.reply_text(format_answer("💡", result, 2))  # type: ignore
                     else:
                         await update.message.reply_text(  # type: ignore
                             "😔 Не удалось найти релевантную информацию. "
@@ -182,33 +165,29 @@ class Command(BaseCommand):  # type: ignore
                         "❌ Произошла ошибка при обработке запроса. Попробуйте позже."
                     )
 
-            async def main():
-                """Основная функция запуска бота"""
-                # Создаем приложение
-                application = Application.builder().token(bot_token).build()
+            # Синхронный запуск без прямого управления asyncio
+            # Создаем приложение
+            application = Application.builder().token(bot_token).build()
 
-                # Добавляем обработчики
-                application.add_handler(CommandHandler("start", start))
-                application.add_handler(CommandHandler("help", help_command))
-                application.add_handler(CommandHandler("search", search_command))
-                application.add_handler(CommandHandler("fipi", fipi_command))
-                application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-                # Запускаем бота
-                if options['webhook']:
-                    self.stdout.write(
-                        self.style.WARNING('⚠️ Webhook режим не реализован, используем polling')  # type: ignore
-                    )
-                
-                self.stdout.write(
-                    self.style.SUCCESS('✅ Бот запущен! Нажмите Ctrl+C для остановки.')  # type: ignore
-                )
-                
-                # Запускаем polling
-                await application.run_polling()  # type: ignore 
+            # Добавляем обработчики
+            application.add_handler(CommandHandler("start", start))
+            application.add_handler(CommandHandler("help", help_command))
+            application.add_handler(CommandHandler("search", search_command))
+            application.add_handler(CommandHandler("fipi", fipi_command))
+            application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
             # Запускаем бота
-            asyncio.run(main())
+            if options['webhook']:
+                self.stdout.write(
+                    self.style.WARNING('⚠️ Webhook режим не реализован, используем polling')  # type: ignore
+                )
+
+            self.stdout.write(
+                self.style.SUCCESS('✅ Бот запущен! Нажмите Ctrl+C для остановки.')  # type: ignore
+            )
+
+            # Блокирующий polling (внутри PTB корректно управляет asyncio)
+            application.run_polling()  # type: ignore
 
         except ImportError:
             self.stdout.write(
