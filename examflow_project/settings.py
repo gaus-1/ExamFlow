@@ -502,34 +502,16 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/[a-zA-Z0-9-]+\.onrender\.com$",
 ]
 
-# Настройки для drf-spectacular (Swagger/OpenAPI)
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'ExamFlow API',
-    'DESCRIPTION': 'API для платформы подготовки к ЕГЭ/ОГЭ с AI-помощником',
-    'VERSION': '2.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'SCHEMA_PATH_PREFIX': '/api/',
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SORT_OPERATIONS': False,
-    # 'ENUM_NAME_OVERRIDES': {
-    #     'SubscriptionTypeEnum': 'core.models.UserProfile.subscription_type',
-    #     'DifficultyPreferenceEnum': 'core.models.UserProfile.difficulty_preference',
-    # },
-    'TAGS': [
-        {'name': 'AI', 'description': 'AI-помощник и RAG система'},
-        {'name': 'Subjects', 'description': 'Предметы и задания'},
-        {'name': 'User', 'description': 'Пользователи и профили'},
-        {'name': 'FIPI', 'description': 'Поиск по материалам ФИПИ'},
-        {'name': 'Health', 'description': 'Мониторинг состояния системы'},
-    ]
-}
-
-# Настройки Django REST Framework
-REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-}
+from .settings_components.spectacular import SPECTACULAR_SETTINGS  # noqa: E402
+from .settings_components.rest_framework import REST_FRAMEWORK  # noqa: E402
+from .settings_components.csp import (  # noqa: E402
+    CSP_DEFAULT_SRC,
+    CSP_SCRIPT_SRC,
+    CSP_STYLE_SRC,
+    CSP_IMG_SRC,
+    CSP_CONNECT_SRC,
+    CSP_FRAME_ANCESTORS,
+)
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
