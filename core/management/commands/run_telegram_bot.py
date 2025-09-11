@@ -25,7 +25,7 @@ class Command(BaseCommand):  # type: ignore
         )
 
         try:
-            import asyncio
+            import asyncio  # noqa: F401
             from telegram import Update
             from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
             from bot.service import BotService
