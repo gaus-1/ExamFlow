@@ -5,8 +5,7 @@ RAG Оркестратор - центральный сервис для упра
 import logging
 import time
 import hashlib
-import json
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
@@ -20,11 +19,16 @@ class RAGOrchestrator:
     """
 
     def __init__(self):
-        self.max_context_tokens = 4000  # Максимум токенов для контекста
+        # Получаем настройки из конфигурации
+        rag_config = getattr(settings, 'RAG_CONFIG', {})
+        cache_config = getattr(settings, 'CACHE_TTL', {})
+        
+        self.max_context_tokens = rag_config.get('MAX_CONTEXT_LENGTH', 4000)
         self.max_response_tokens = 1000  # Максимум токенов для ответа
         self.timeout_seconds = 30  # Таймаут для AI запросов
-        self.cache_ttl = 3600  # TTL кеша в секундах (1 час)
-        self.top_k_chunks = 5  # Количество чанков для контекста
+        self.cache_ttl = cache_config.get('RAG_RESULTS', 600)  # 10 минут по умолчанию
+        self.top_k_chunks = rag_config.get('MAX_SOURCES', 5)
+        self.similarity_threshold = rag_config.get('SIMILARITY_THRESHOLD', 0.7)
 
     def process_query(
             self,
@@ -38,23 +42,34 @@ class RAGOrchestrator:
         start_time = time.time()
         
         try:
-            # Проверяем кеш
-            cache_key = self._generate_cache_key(query, subject, document_type)
-            cached_result = cache.get(cache_key)
+            # Проверяем кеш полного ответа
+            cached_result = self._get_cached_ai_response(query, subject, document_type)
             if cached_result:
                 logger.info(f"Ответ получен из кеша для запроса: {query[:50]}...")
+                cached_result['cached'] = True
                 return cached_result
 
-            # Выполняем семантический поиск
-            from core.rag_system.vector_store import VectorStore
-            vector_store = VectorStore()
+            # Проверяем кеш результатов поиска
+            search_results = self._get_cached_search_results(query, subject, document_type)
             
-            search_results = vector_store.semantic_search(
-                query=query,
-                subject_filter=subject,
-                document_type_filter=document_type,
-                limit=self.top_k_chunks
-            )
+            if not search_results:
+                # Выполняем семантический поиск
+                from core.rag_system.vector_store import VectorStore
+                vector_store = VectorStore()
+                
+                search_results = vector_store.semantic_search(
+                    query=query,
+                    subject_filter=subject,
+                    document_type_filter=document_type,
+                    limit=self.top_k_chunks
+                )
+                
+                # Кэшируем результаты поиска
+                if search_results:
+                    self._cache_search_results(query, subject, document_type, search_results)
+                    logger.info(f"Результаты поиска сохранены в кеш для запроса: {query[:50]}...")
+            else:
+                logger.info(f"Результаты поиска получены из кеша для запроса: {query[:50]}...")
 
             if not search_results:
                 return {
@@ -86,7 +101,7 @@ class RAGOrchestrator:
             }
 
             # Сохраняем в кеш
-            cache.set(cache_key, result, self.cache_ttl)
+            self._cache_ai_response(query, subject, document_type, result)
             
             # Обновляем профиль пользователя (если есть)
             if user_id:
@@ -106,12 +121,42 @@ class RAGOrchestrator:
                 'error': str(e)
             }
 
-    def _generate_cache_key(self, query: str, subject: str, document_type: str) -> str:
+    def _generate_cache_key(self, query: str, subject: str, document_type: str, cache_type: str = "query") -> str:
         """
         Генерирует ключ кеша для запроса
         """
         content = f"{query}|{subject}|{document_type}"
-        return f"rag_query:{hashlib.md5(content.encode()).hexdigest()}"
+        hash_key = hashlib.md5(content.encode()).hexdigest()
+        return f"rag_{cache_type}:{hash_key}"
+    
+    def _get_cached_search_results(self, query: str, subject: str, document_type: str) -> Optional[List[Dict]]:
+        """
+        Получает результаты семантического поиска из кеша
+        """
+        cache_key = self._generate_cache_key(query, subject, document_type, "search")
+        return cache.get(cache_key)
+    
+    def _cache_search_results(self, query: str, subject: str, document_type: str, results: List[Dict]) -> None:
+        """
+        Сохраняет результаты семантического поиска в кеш
+        """
+        cache_key = self._generate_cache_key(query, subject, document_type, "search")
+        # Кэшируем результаты поиска на более длительное время
+        cache.set(cache_key, results, timeout=self.cache_ttl * 2)
+    
+    def _get_cached_ai_response(self, query: str, subject: str, document_type: str) -> Optional[Dict]:
+        """
+        Получает ответ AI из кеша
+        """
+        cache_key = self._generate_cache_key(query, subject, document_type, "ai_response")
+        return cache.get(cache_key)
+    
+    def _cache_ai_response(self, query: str, subject: str, document_type: str, response: Dict) -> None:
+        """
+        Сохраняет ответ AI в кеш
+        """
+        cache_key = self._generate_cache_key(query, subject, document_type, "ai_response")
+        cache.set(cache_key, response, timeout=self.cache_ttl)
 
     def _aggregate_context(self, search_results: List[Dict]) -> str:
         """
@@ -168,6 +213,22 @@ class RAGOrchestrator:
         except Exception as e:
             logger.error(f"Ошибка при генерации ответа: {e}")
             return f"Не удалось сгенерировать ответ: {str(e)}"
+
+    def get_fallback_response(self, query: str) -> str:
+        """
+        Возвращает простой fallback-ответ без обращения к внешнему AI.
+
+        Используется при региональных ограничениях или сбоях API.
+        """
+        safe_query = (query or '').strip()
+        prefix = "Сейчас недоступна генерация подробного ответа. Дам краткую подсказку."
+        if not safe_query:
+            return f"{prefix}\n\nПопробуйте уточнить запрос: добавьте тему, класс и тип задания."
+        return (
+            f"{prefix}\n\nВаш запрос: '{safe_query}'.\n"
+            "Попробуйте: 1) уточнить формулировку, 2) разделить на подшаги, "
+            "3) указать предмет (Математика/Русский) и тип документа (demo_variant/codifier/specification)."
+        )
 
     def _create_prompt(self, query: str, context: str, subject: str) -> str:
         """

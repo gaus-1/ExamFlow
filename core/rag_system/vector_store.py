@@ -5,7 +5,7 @@
 import logging
 import numpy as np
 import json
-from typing import List, Dict, Optional
+from typing import List, Dict
 from django.conf import settings
 from django.db import connection
 

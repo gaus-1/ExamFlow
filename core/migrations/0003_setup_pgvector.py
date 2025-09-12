@@ -1,7 +1,6 @@
 # Generated manually for pgvector setup
 
 from django.db import migrations, models
-from django.contrib.postgres.operations import CreateExtension
 
 
 class Migration(migrations.Migration):

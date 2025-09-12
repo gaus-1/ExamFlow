@@ -36,8 +36,8 @@ urlpatterns = [
     # Модуль обучения
     path('', include('learning.urls')),  # Основные маршруты для обучения
     
-    # Модуль Telegram бота (временно отключен)
-    # path('bot/', include('telegram_bot.urls')),
+    # Модуль Telegram бота
+    path('bot/', include('telegram_bot.urls')),
     
     # Модуль аналитики
     path('analytics/', include('analytics.urls')),

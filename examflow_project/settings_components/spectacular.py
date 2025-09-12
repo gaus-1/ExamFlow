@@ -6,6 +6,7 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': '/api/',
     'COMPONENT_SPLIT_REQUEST': True,
     'SORT_OPERATIONS': False,
+    'ENUM_NAME_OVERRIDES': {},
     'TAGS': [
         {'name': 'AI', 'description': 'AI-помощник и RAG система'},
         {'name': 'Subjects', 'description': 'Предметы и задания'},

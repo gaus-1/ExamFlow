@@ -21,3 +21,4 @@ def format_answer(prefix_emoji: str, result: Dict, sources_limit: int = 3) -> st
     return "\n".join(parts)
 
 
+

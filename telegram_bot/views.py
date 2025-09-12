@@ -188,6 +188,7 @@ def telegram_webhook(request):
         return HttpResponse(b"ERROR", status=500)
 
 
+
 async def handle_telegram_update(update):  # type: ignore
     """
     Асинхронно обрабатывает обновление от Telegram
