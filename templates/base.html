@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
     <title>{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}</title>
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
@@ -69,6 +74,9 @@
     <link href="{% static 'vendor/fontawesome/css/all.min.css' %}" rel="stylesheet">
     
     <!-- Основные стили -->
+    <!-- CSS-переменные и современные стили -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}?v={{ STATIC_VERSION }}" type="text/css">
+    
     <!-- Старые стили (закомментированы для отката) -->
     <!-- <link rel="stylesheet" href="{% static 'css/aesop-styles.css' %}" type="text/css"> -->
     

@@ -90,7 +90,10 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
             'sslmode': 'require',
-            'connect_timeout': 10,
+            'connect_timeout': 30,
+            'sslcert': None,
+            'sslkey': None,
+            'sslrootcert': None,
         },
     }
 }

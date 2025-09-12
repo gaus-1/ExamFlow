@@ -56,7 +56,7 @@ if not DEBUG:
         if 'OPTIONS' not in db_config:
             db_config['OPTIONS'] = {}
         db_config['OPTIONS']['sslmode'] = 'require'  # type: ignore
-        db_config['OPTIONS']['connect_timeout'] = 10  # type: ignore
+        db_config['OPTIONS']['connect_timeout'] = 10
         DATABASES['default'] = dict(db_config)  # type: ignore
     
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки
