@@ -38,13 +38,13 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'django.log'),
+            'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs', 'django.log'),
             'formatter': 'verbose',
         },
         'security_file': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs', 'security', 'security.log'),
+            'filename': os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs', 'security', 'security.log'),
             'formatter': 'security',
         },
         'mail_admins': {
