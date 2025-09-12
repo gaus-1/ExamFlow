@@ -89,11 +89,8 @@ DATABASES = {
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
         'OPTIONS': {
-            'sslmode': 'require',
+            'sslmode': 'prefer',  # Изменено с 'require' на 'prefer' для локальной разработки
             'connect_timeout': 30,
-            'sslcert': None,
-            'sslkey': None,
-            'sslrootcert': None,
         },
     }
 }

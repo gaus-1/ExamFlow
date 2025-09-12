@@ -52,11 +52,14 @@ if not DEBUG:
     database_url = os.getenv('DATABASE_URL')
     if database_url:
         db_config = dj_database_url.parse(database_url)
-        # Добавляем SSL настройки для Render
+        # Добавляем SSL настройки для Render с более мягкими параметрами
         if 'OPTIONS' not in db_config:
             db_config['OPTIONS'] = {}
-        db_config['OPTIONS']['sslmode'] = 'require'  # type: ignore
-        db_config['OPTIONS']['connect_timeout'] = 10
+        db_config['OPTIONS']['sslmode'] = 'prefer'  # type: ignore
+        db_config['OPTIONS']['connect_timeout'] = 30  # type: ignore
+        db_config['OPTIONS']['keepalives_idle'] = 600  # type: ignore
+        db_config['OPTIONS']['keepalives_interval'] = 30  # type: ignore
+        db_config['OPTIONS']['keepalives_count'] = 3  # type: ignore
         DATABASES['default'] = dict(db_config)  # type: ignore
     
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки

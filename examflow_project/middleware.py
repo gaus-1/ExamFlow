@@ -1,10 +1,12 @@
 """
-Middleware для обработки заголовков безопасности
+Middleware для обработки заголовков безопасности и ошибок базы данных
 """
 
 import logging
 from django.utils.deprecation import MiddlewareMixin
 from django.conf import settings
+from django.db import connection
+from django.db.utils import OperationalError
 
 logger = logging.getLogger(__name__)
 
