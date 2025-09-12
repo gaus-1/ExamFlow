@@ -51,7 +51,13 @@ if not DEBUG:
     # Настройки базы данных для продакшена (если используется DATABASE_URL)
     database_url = os.getenv('DATABASE_URL')
     if database_url:
-        DATABASES['default'] = dict(dj_database_url.parse(database_url))  # type: ignore
+        db_config = dj_database_url.parse(database_url)
+        # Добавляем SSL настройки для Render
+        if 'OPTIONS' not in db_config:
+            db_config['OPTIONS'] = {}
+        db_config['OPTIONS']['sslmode'] = 'require'  # type: ignore
+        db_config['OPTIONS']['connect_timeout'] = 10  # type: ignore
+        DATABASES['default'] = dict(db_config)  # type: ignore
     
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки
     try:

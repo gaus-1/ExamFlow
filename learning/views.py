@@ -14,9 +14,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
+from django.utils import timezone
+import logging
 from learning.models import Subject, Task  # type: ignore
 from core.models import UserProgress  # type: ignore
 import core.seo as seo_utils
+
+logger = logging.getLogger(__name__)
 import random
 import time
 
@@ -33,23 +37,29 @@ def home(request):
     - Тарифные планы
     - Блок персонализации (для авторизованных)
     """
-    # Получаем статистику (без падения, если столбцы ещё не в БД)
+    # Получаем статистику с обработкой ошибок БД
     try:
         base_qs = Subject.objects.filter(is_archived=False, is_primary=True)  # type: ignore
         subjects_count = base_qs.count()  # type: ignore
-    except Exception:
-        base_qs = Subject.objects.all()  # type: ignore
-        subjects_count = base_qs.count()  # type: ignore
-
-    tasks_count = Task.objects.count()  # type: ignore
+        tasks_count = Task.objects.count()  # type: ignore
+    except Exception as e:
+        # Если БД недоступна, используем значения по умолчанию
+        logger.warning(f"Database error in home view: {e}")
+        base_qs = Subject.objects.none()  # type: ignore
+        subjects_count = 0
+        tasks_count = 0
 
     # Фокус: только математика и русский; безопасный запасной вариант
     try:
-        math_qs = base_qs.filter(name__icontains='математ')  # type: ignore
-        rus_qs = base_qs.filter(name__icontains='русск')  # type: ignore
-        subjects = math_qs.union(rus_qs).order_by('name')  # type: ignore
-    except Exception:
-        subjects = base_qs.order_by('name')  # type: ignore
+        if base_qs.exists():  # type: ignore
+            math_qs = base_qs.filter(name__icontains='математ')  # type: ignore
+            rus_qs = base_qs.filter(name__icontains='русск')  # type: ignore
+            subjects = math_qs.union(rus_qs).order_by('name')  # type: ignore
+        else:
+            subjects = base_qs  # type: ignore
+    except Exception as e:
+        logger.warning(f"Error filtering subjects: {e}")
+        subjects = base_qs  # type: ignore
 
     context = {
         'subjects_count': subjects_count,
