@@ -55,11 +55,19 @@ if not DEBUG:
         # Добавляем SSL настройки для Render с более мягкими параметрами
         if 'OPTIONS' not in db_config:
             db_config['OPTIONS'] = {}
-        db_config['OPTIONS']['sslmode'] = 'prefer'  # type: ignore
+        
+        # Настройки для psycopg2 (используется на Render)
+        db_config['OPTIONS']['sslmode'] = 'require'  # type: ignore
         db_config['OPTIONS']['connect_timeout'] = 30  # type: ignore
         db_config['OPTIONS']['keepalives_idle'] = 600  # type: ignore
         db_config['OPTIONS']['keepalives_interval'] = 30  # type: ignore
         db_config['OPTIONS']['keepalives_count'] = 3  # type: ignore
+        db_config['OPTIONS']['application_name'] = 'examflow_render'  # type: ignore
+        
+        # Дополнительные настройки для стабильности
+        db_config['CONN_MAX_AGE'] = 600  # type: ignore
+        db_config['CONN_HEALTH_CHECKS'] = True  # type: ignore
+        
         DATABASES['default'] = dict(db_config)  # type: ignore
     
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки

@@ -7,8 +7,34 @@ from django.utils.deprecation import MiddlewareMixin
 from django.conf import settings
 from django.db import connection
 from django.db.utils import OperationalError
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
+
+
+class DatabaseErrorMiddleware(MiddlewareMixin):
+    """
+    Middleware для обработки ошибок базы данных
+    """
+    
+    def process_exception(self, request, exception):
+        """Обрабатывает исключения базы данных"""
+        if isinstance(exception, OperationalError):
+            logger.error(f"Database error: {exception}")
+            # Закрываем проблемное соединение
+            try:
+                connection.close()
+            except Exception:
+                pass
+            
+            # Возвращаем простую страницу без обращения к БД
+            if request.path == '/':
+                return JsonResponse({
+                    'error': 'Database temporarily unavailable',
+                    'message': 'Пожалуйста, попробуйте позже'
+                }, status=503)
+        
+        return None
 
 
 class SecurityHeadersMiddleware(MiddlewareMixin):
