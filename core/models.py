@@ -229,8 +229,8 @@ class UserChallenge(models.Model):
             return 0
         return min(
             100,
-             self.challenge.target_value) *  # type: ignore
-            100)  # type: ignore
+            (self.current_value / self.challenge.target_value) * 100  # type: ignore
+        )
 
 class ChatSession(models.Model):
     """Сессия чата пользователя с ботом для сохранения контекста"""
