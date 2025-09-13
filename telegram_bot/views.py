@@ -339,8 +339,9 @@ def test_bot_api(request):
     try:
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
         if not token:
-            return JsonResponse(
-        resp = requests.get("https://api.telegram.org/bot{token}/getMe", timeout=8)
+            return JsonResponse({'status': 'error', 'message': 'Bot token not configured'}, status=500)
+        
+        resp = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=8)
         data = resp.json()
         if not data.get('ok'):
             return JsonResponse({'status': 'error', 'api': 'getMe',
