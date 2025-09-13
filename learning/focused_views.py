@@ -153,6 +153,7 @@ def get_subject_statistics(request):
             'subjects_count': math_subjects.count(),
             'total_tasks': sum(subject.task_count for subject in math_subjects),
             'subjects': [
+                {
                     'name': subject.name,
                     'tasks': subject.task_count,
                     'exam_type': subject.get_exam_type_display()
@@ -164,6 +165,7 @@ def get_subject_statistics(request):
             'subjects_count': russian_subjects.count(),
             'total_tasks': sum(subject.task_count for subject in russian_subjects),
             'subjects': [
+                {
                     'name': subject.name,
                     'tasks': subject.task_count,
                     'exam_type': subject.get_exam_type_display()
