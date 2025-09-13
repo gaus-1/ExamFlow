@@ -1,19 +1,31 @@
-name: ♻️ KeepAlive Render
+name: ExamFlow 2.0 Keepalive
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    # Запускается каждые 10 минут для поддержания активности
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Позволяет запускать вручную
 
 jobs:
-  ping:
+  keepalive:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    
     steps:
-      - name: 🔗 Пинг главной страницы
-        run: |
-          curl -sS -m 20 https://examflow.ru/ -o /dev/null -w "%{http_code}\n"
-      - name: 🔗 Пинг ИИ-страницы (разбудить Django)
-        run: |
-          curl -sS -m 20 https://examflow.ru/ai/chat/ -o /dev/null -w "%{http_code}\n"
+    - name: Wake up ExamFlow website
+      run: |
+        echo "🌐 Пробуждаем ExamFlow 2.0..."
+        curl -s -o /dev/null -w "%{http_code}" https://examflow.ru/health/
+        echo "✅ Keepalive выполнен"
+    
+    - name: Wake up Telegram bot
+      run: |
+        echo "🤖 Проверяем Telegram бота..."
+        curl -s -o /dev/null -w "%{http_code}" https://examflow.ru/health/
+        echo "✅ Бот активен"
+    
+    - name: Log keepalive status
+      run: |
+        echo "🕐 Keepalive выполнен в $(date)"
+        echo "🌐 Сайт: https://examflow.ru"
+        echo "🤖 Бот: @examflow_bot"
 

@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
-from django.db.utils import OperationalError
 from django.core.management import call_command
 
 class Command(BaseCommand):
@@ -9,30 +8,32 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('🔧 ИСПРАВЛЕНИЕ МИГРАЦИЙ EXAMFLOW')
         self.stdout.write('=' * 50)
-        
+
         try:
             # Шаг 1: Проверяем базу данных
             self.stdout.write('📊 Проверяем базу данных...')
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
-            self.stdout.write(self.style.SUCCESS('✅ База данных доступна'))  # type: ignore
-            
+            self.stdout.write(self.style.SUCCESS(
+                '✅ База данных доступна'))  # type: ignore
+
             # Шаг 2: Создаем таблицы вручную если нужно
             self.stdout.write('🔄 Создаем таблицы вручную...')
             self.create_tables_manually()
-            
+
             # Шаг 3: Применяем миграции
             self.stdout.write('📦 Применяем миграции...')
             call_command('migrate', '--fake-initial')
-            
+
             # Шаг 4: Проверяем статус
             self.stdout.write('✅ Проверяем статус миграций...')
             call_command('showmigrations')
             self.stdout.write('=' * 50)
-            self.stdout.write(self.style.SUCCESS('🎉 МИГРАЦИИ ИСПРАВЛЕНЫ!'))  # type: ignore
-            
+            self.stdout.write(self.style.SUCCESS(
+                '🎉 МИГРАЦИИ ИСПРАВЛЕНЫ!'))  # type: ignore
+
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'❌ Ошибка: {e}'))  # type: ignore
+            self.stdout.write(self.style.ERROR('❌ Ошибка: {e}'))  # type: ignore
 
     def create_tables_manually(self):
         """Создает основные таблицы вручную"""
@@ -50,8 +51,8 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Таблица learning_subject создана/проверена')
             except Exception as e:
-                self.stdout.write(f'⚠️ learning_subject: {e}')
-            
+                self.stdout.write('⚠️ learning_subject: {e}')
+
             # Создаем таблицу learning_task если её нет
             try:
                 cursor.execute("""
@@ -69,8 +70,8 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Таблица learning_task создана/проверена')
             except Exception as e:
-                self.stdout.write(f'⚠️ learning_task: {e}')
-            
+                self.stdout.write('⚠️ learning_task: {e}')
+
             # Создаем таблицу authentication_userprofile если её нет
             try:
                 cursor.execute("""
@@ -82,6 +83,7 @@ class Command(BaseCommand):
                         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                     );
                 """)
-                self.stdout.write('✅ Таблица authentication_userprofile создана/проверена')
+                self.stdout.write(
+                    '✅ Таблица authentication_userprofile создана/проверена')
             except Exception as e:
-                self.stdout.write(f'⚠️ authentication_userprofile: {e}')
+                self.stdout.write('⚠️ authentication_userprofile: {e}')

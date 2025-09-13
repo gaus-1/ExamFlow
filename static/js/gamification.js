@@ -1,350 +1,301 @@
-/**
- * ExamFlow Gamification - Система геймификации
- * Реализует очки, уровни, достижения и прогресс
- */
+/* ========================================
+ * Геймификация ExamFlow 2.0
+ * Версия: 3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА
+ * Без загрузки профиля пользователя через API
+  ======================================== */
+
+console.log('🏆 Загружен gamification.js v3.2 - ИСПРАВЛЕННАЯ ВЕРСИЯ ДЛЯ ПРОДАКШНА!');
 
 class ExamFlowGamification {
-    constructor() {
-        this.userData = this.loadUserData();
-        this.init();
+  constructor() {
+    console.log('🔧 Инициализируем геймификацию v3.1...');
+    this.userData = this.loadUserData();
+    this.init();
+  }
+  
+  init() {
+    console.log('✅ Геймификация инициализирована успешно!');
+    this.updateProgressDisplay();
+    this.updateAchievementsDisplay();
+    this.setupEventListeners();
+  }
+  
+  loadUserData() {
+    console.log('📊 Загружаем данные пользователя из localStorage...');
+    const saved = localStorage.getItem('examflow_user_data');
+    if (saved) {
+      console.log('✅ Данные пользователя найдены в localStorage');
+      return JSON.parse(saved);
     }
-
-    init() {
-        this.setupProgressBars();
-        this.setupAchievements();
-        this.setupDailyChallenges();
-        this.setupLeaderboard();
-        this.updateUI();
+    
+    console.log('🆕 Создаем новые данные пользователя по умолчанию');
+    // Данные по умолчанию для демонстрации
+    return {
+      level: 5,
+      xp: 750,
+      totalXp: 1250,
+      solvedTasks: 47,
+      achievements: 12,
+      achievementsList: [
+        { id: 'first_task', name: 'Первая задача', icon: '🎯', earned: true },
+        { id: 'streak_5', name: 'Серия успехов', icon: '🔥', earned: true },
+        { id: 'ai_questions_10', name: 'Любознательный', icon: '🧠', earned: true },
+        { id: 'speed_30s', name: 'Скорость', icon: '⚡', earned: true },
+        { id: 'master_100', name: 'Мастер', icon: '🏆', earned: false },
+        { id: 'expert_level_10', name: 'Эксперт', icon: '🌟', earned: false },
+        { id: 'all_subjects', name: 'Эрудит', icon: '📚', earned: false },
+        { id: 'all_achievements', name: 'Легенда', icon: '💎', earned: false }
+      ]
+    };
+  }
+  
+  saveUserData() {
+    console.log('💾 Сохраняем данные пользователя в localStorage...');
+    localStorage.setItem('examflow_user_data', JSON.stringify(this.userData));
+  }
+  
+  addXP(amount, reason = '') {
+    console.log(`⭐ Добавляем ${amount} XP (${reason})`);
+    const oldLevel = this.userData.level;
+    this.userData.xp += amount;
+    this.userData.totalXp += amount;
+    
+    // Проверяем повышение уровня
+    const newLevel = this.calculateLevel(this.userData.totalXp);
+    if (newLevel > oldLevel) {
+      this.userData.level = newLevel;
+      this.showLevelUpNotification(newLevel);
     }
-
-    loadUserData() {
-        const saved = localStorage.getItem('examflow_user_data');
-        if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch (e) {
-                console.error('Ошибка загрузки данных пользователя:', e);
-            }
+    
+    this.saveUserData();
+    this.updateProgressDisplay();
+    
+    // Показываем уведомление о получении XP
+    this.showXPNotification(amount, reason);
+  }
+  
+  calculateLevel(totalXp) {
+    // Формула: каждый уровень требует level * 200 XP
+    return Math.floor(Math.sqrt(totalXp / 200)) + 1;
+  }
+  
+  getLevelInfo(level) {
+    const levelNames = {
+      1: 'Новичок',
+      2: 'Ученик',
+      3: 'Студент',
+      4: 'Знаток',
+      5: 'Опытный ученик',
+      6: 'Специалист',
+      7: 'Мастер',
+      8: 'Эксперт',
+      9: 'Гуру',
+      10: 'Легенда'
+    };
+    
+    return {
+      name: levelNames[level] || `Уровень ${level}`,
+      xpRequired: level * level * 200,
+      xpForNext: (level + 1) * (level + 1) * 200
+    };
+  }
+  
+  updateProgressDisplay() {
+    console.log('🎨 Обновляем отображение прогресса...');
+    const levelInfo = this.getLevelInfo(this.userData.level);
+    const progressPercent = ((this.userData.totalXp - levelInfo.xpRequired) / (levelInfo.xpForNext - levelInfo.xpRequired)) * 100;
+    
+    // Обновляем отображение уровня
+    const levelBadge = document.querySelector('.level-badge');
+    const levelTitle = document.querySelector('.level-title');
+    const levelSubtitle = document.querySelector('.level-subtitle');
+    const progressBar = document.querySelector('.progress-bar');
+    const progressText = document.querySelector('.progress-label span:last-child');
+    
+    if (levelBadge) levelBadge.textContent = `Уровень ${this.userData.level}`;
+    if (levelTitle) levelTitle.textContent = levelInfo.name;
+    if (levelSubtitle) levelSubtitle.textContent = `До следующего уровня: ${levelInfo.xpForNext - this.userData.totalXp} XP`;
+    if (progressBar) progressBar.style.width = `${Math.min(progressPercent, 100)}%`;
+    if (progressText) progressText.textContent = `${this.userData.totalXp} / ${levelInfo.xpForNext} XP`;
+    
+    // Обновляем статистику
+    const xpStat = document.querySelector('.stats-grid .stat-item:nth-child(1) .stat-number');
+    const tasksStat = document.querySelector('.stats-grid .stat-item:nth-child(2) .stat-number');
+    const achievementsStat = document.querySelector('.stats-grid .stat-item:nth-child(3) .stat-number');
+    
+    if (xpStat) xpStat.textContent = this.userData.totalXp.toLocaleString();
+    if (tasksStat) tasksStat.textContent = this.userData.solvedTasks;
+    if (achievementsStat) achievementsStat.textContent = this.userData.achievements;
+  }
+  
+  updateAchievementsDisplay() {
+    console.log('🏆 Обновляем отображение достижений...');
+    const achievementsGrid = document.querySelector('.achievements-grid');
+    if (!achievementsGrid) return;
+    
+    achievementsGrid.innerHTML = '';
+    
+    this.userData.achievementsList.forEach(achievement => {
+      const achievementEl = document.createElement('div');
+      achievementEl.className = `achievement-item text-center p-4 rounded-lg ${
+        achievement.earned 
+          ? 'bg-success/10 border border-success/20' 
+          : 'bg-gray-100 border border-gray-200 opacity-50'
+      }`;
+      
+      achievementEl.innerHTML = `
+        <div class="achievement-icon text-3xl mb-2">${achievement.icon}</div>
+        <div class="achievement-title text-sm font-medium">${achievement.name}</div>
+        <div class="achievement-desc text-xs text-muted">${this.getAchievementDescription(achievement.id)}</div>
+      `;
+      
+      achievementsGrid.appendChild(achievementEl);
+    });
+  }
+  
+  getAchievementDescription(achievementId) {
+    const descriptions = {
+      'first_task': 'Решите первую задачу',
+      'streak_5': '5 правильных ответов подряд',
+      'ai_questions_10': 'Задайте 10 вопросов ИИ',
+      'speed_30s': 'Решите задачу за 30 секунд',
+      'master_100': 'Решите 100 задач',
+      'expert_level_10': 'Достигните 10 уровня',
+      'all_subjects': 'Изучите все предметы',
+      'all_achievements': 'Получите все достижения'
+    };
+    
+    return descriptions[achievementId] || 'Неизвестное достижение';
+  }
+  
+  checkAchievements() {
+    let newAchievements = 0;
+    
+    // Проверяем достижения
+    if (this.userData.solvedTasks >= 1 && !this.hasAchievement('first_task')) {
+      this.unlockAchievement('first_task');
+      newAchievements++;
+    }
+    
+    if (this.userData.solvedTasks >= 100 && !this.hasAchievement('master_100')) {
+      this.unlockAchievement('master_100');
+      newAchievements++;
+    }
+    
+    if (this.userData.level >= 10 && !this.hasAchievement('expert_level_10')) {
+      this.unlockAchievement('expert_level_10');
+      newAchievements++;
+    }
+    
+    if (newAchievements > 0) {
+      this.showAchievementNotification(newAchievements);
+      this.updateAchievementsDisplay();
+    }
+  }
+  
+  hasAchievement(achievementId) {
+    const achievement = this.userData.achievementsList.find(a => a.id === achievementId);
+    return achievement ? achievement.earned : false;
+  }
+  
+  unlockAchievement(achievementId) {
+    const achievement = this.userData.achievementsList.find(a => a.id === achievementId);
+    if (achievement && !achievement.earned) {
+      achievement.earned = true;
+      this.userData.achievements++;
+      this.saveUserData();
+    }
+  }
+  
+  showXPNotification(amount, reason) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-in';
+    notification.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="text-lg">+${amount} XP</span>
+        ${reason ? `<span class="text-sm opacity-90">(${reason})</span>` : ''}
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+  
+  showLevelUpNotification(level) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-scale-in';
+    notification.innerHTML = `
+      <div class="text-center">
+        <div class="text-4xl mb-2">🎉</div>
+        <div class="text-xl font-bold mb-1">Поздравляем!</div>
+        <div class="text-lg">Вы достигли ${level} уровня!</div>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 4000);
+  }
+  
+  showAchievementNotification(count) {
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 left-4 bg-accent text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-slide-in';
+    notification.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="text-lg">🏆</span>
+        <span>Получено ${count} новое достижение!</span>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+  
+  setupEventListeners() {
+    console.log('👂 Настраиваем обработчики событий...');
+    
+    // Слушаем события от AI ассистента
+    document.addEventListener('aiQuestionAsked', () => {
+      console.log('🤖 Обработано событие aiQuestionAsked');
+      this.addXP(5, 'Вопрос ИИ');
+      this.checkAchievements();
+    });
+    
+    // Слушаем события решения задач
+    document.addEventListener('taskSolved', (event) => {
+      console.log('✅ Обработано событие taskSolved', event.detail);
+      const { correct, time } = event.detail;
+      if (correct) {
+        this.userData.solvedTasks++;
+        this.addXP(20, 'Правильный ответ');
+        
+        if (time && time < 30) {
+          this.addXP(10, 'Быстрый ответ');
         }
-        
-        // Данные по умолчанию для нового пользователя
-        return {
-            level: 1,
-            experience: 0,
-            totalPoints: 0,
-            subjects: {},
-            achievements: [],
-            dailyChallenges: [],
-            lastLogin: new Date().toISOString(),
-            streak: 0
-        };
-    }
-
-    saveUserData() {
-        try {
-            localStorage.setItem('examflow_user_data', JSON.stringify(this.userData));
-        } catch (e) {
-            console.error('Ошибка сохранения данных пользователя:', e);
-        }
-    }
-
-    getAchievements() {
-        return [
-            { id: 'first_task', name: 'Первое задание', description: 'Решите первое задание', points: 10 },
-            { id: 'subject_master', name: 'Мастер предмета', description: 'Изучите 5 тем по предмету', points: 50 },
-            { id: 'streak_7', name: 'Неделя обучения', description: 'Занимайтесь 7 дней подряд', points: 100 },
-            { id: 'level_5', name: 'Опытный ученик', description: 'Достигните 5 уровня', points: 200 },
-            { id: 'perfect_score', name: 'Отличник', description: 'Получите 100% по теме', points: 150 }
-        ];
-    }
-
-    addExperience(amount, subject = null) {
-        this.userData.experience += amount;
-        this.userData.totalPoints += amount;
-        
-        if (subject) {
-            if (!this.userData.subjects[subject]) {
-                this.userData.subjects[subject] = { experience: 0, topics: [] };
-            }
-            this.userData.subjects[subject].experience += amount;
-        }
-        
-        this.checkLevelUp();
-        this.checkAchievements();
-        this.saveUserData();
-        this.updateUI();
-    }
-
-    checkLevelUp() {
-        const currentLevel = this.userData.level;
-        const requiredExp = currentLevel * 100; // 100 XP на уровень
-        
-        if (this.userData.experience >= requiredExp) {
-            this.userData.level++;
-            this.showNotification(`🎉 Поздравляем! Вы достигли ${this.userData.level} уровня!`);
-        }
-    }
-
-    checkAchievements() {
-        const achievements = this.getAchievements();
-        const unlocked = new Set(this.userData.achievements);
-        
-        achievements.forEach(achievement => {
-            if (unlocked.has(achievement.id)) return;
-            
-            let shouldUnlock = false;
-            
-            switch (achievement.id) {
-                case 'first_task':
-                    shouldUnlock = this.userData.totalPoints >= 10;
-                    break;
-                case 'subject_master':
-                    shouldUnlock = Object.values(this.userData.subjects).some(subject => 
-                        subject.topics && subject.topics.length >= 5
-                    );
-                    break;
-                case 'streak_7':
-                    shouldUnlock = this.userData.streak >= 7;
-                    break;
-                case 'level_5':
-                    shouldUnlock = this.userData.level >= 5;
-                    break;
-                case 'perfect_score':
-                    shouldUnlock = Object.values(this.userData.subjects).some(subject => 
-                        subject.topics && subject.topics.some(topic => topic.score === 100)
-                    );
-                    break;
-            }
-            
-            if (shouldUnlock) {
-                this.userData.achievements.push(achievement.id);
-                this.addExperience(achievement.points);
-                this.showNotification(`🏆 Достижение разблокировано: ${achievement.name}!`);
-            }
-        });
-    }
-
-    getSubjectProgress(subject) {
-        const subjectData = this.userData.subjects[subject];
-        if (!subjectData) return 0;
-        
-        return Math.min(100, Math.floor((subjectData.experience / 100) * 100));
-    }
-
-    setupProgressBars() {
-        // Основной прогресс-бар уровня
-        const levelProgress = document.querySelector('.level-progress-bar');
-        if (levelProgress) {
-            const progress = (this.userData.experience % 100) / 100 * 100;
-            levelProgress.style.width = `${progress}%`;
-        }
-        
-        // Прогресс-бары по предметам
-        const subjectProgressBars = document.querySelectorAll('.subject-progress');
-        subjectProgressBars.forEach(bar => {
-            const subject = bar.dataset.subject;
-            if (subject) {
-                const progress = this.getSubjectProgress(subject);
-                bar.style.width = `${progress}%`;
-            }
-        });
-    }
-
-    setupAchievements() {
-        const container = document.querySelector('.achievements-container');
-        if (!container) return;
-        
-        const achievements = this.getAchievements();
-        const unlocked = new Set(this.userData.achievements);
-        
-        achievements.forEach(achievement => {
-            const isUnlocked = unlocked.has(achievement.id);
-            const element = this.createAchievementElement(achievement, isUnlocked);
-            container.appendChild(element);
-        });
-    }
-
-    createAchievementElement(achievement, unlocked) {
-        const div = document.createElement('div');
-        div.className = `achievement ${unlocked ? 'unlocked' : 'locked'}`;
-        div.innerHTML = `
-            <div class="achievement-icon">${unlocked ? '🏆' : '🔒'}</div>
-            <div class="achievement-info">
-                <h4>${achievement.name}</h4>
-                <p>${achievement.description}</p>
-                <span class="points">+${achievement.points} XP</span>
-            </div>
-        `;
-        return div;
-    }
-
-    setupDailyChallenges() {
-        this.generateDailyChallenges();
-        this.displayDailyChallenges();
-    }
-
-    generateDailyChallenges() {
-        const today = new Date().toDateString();
-        if (this.userData.dailyChallenges.length === 0 || 
-            this.userData.dailyChallenges[0].date !== today) {
-            
-            this.userData.dailyChallenges = [
-                { id: 'solve_5', text: 'Решить 5 заданий', target: 5, current: 0, points: 25, date: today },
-                { id: 'study_2_topics', text: 'Изучить 2 новые темы', target: 2, current: 0, points: 30, date: today },
-                { id: 'perfect_score', text: 'Получить 100% по одной теме', target: 1, current: 0, points: 50, date: today }
-            ];
-        }
-    }
-
-    displayDailyChallenges() {
-        const container = document.querySelector('.daily-challenges');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        this.userData.dailyChallenges.forEach(challenge => {
-            const element = this.createChallengeElement(challenge);
-            container.appendChild(element);
-        });
-    }
-
-    createChallengeElement(challenge) {
-        const div = document.createElement('div');
-        div.className = 'daily-challenge';
-        const progress = Math.min(100, (challenge.current / challenge.target) * 100);
-        const completed = challenge.current >= challenge.target;
-        
-        div.innerHTML = `
-            <div class="challenge-progress">
-                <div class="progress-bar" style="width: ${progress}%"></div>
-            </div>
-            <div class="challenge-info">
-                <span class="challenge-text">${challenge.text}</span>
-                <span class="challenge-status">${challenge.current}/${challenge.target}</span>
-                <span class="challenge-points">+${challenge.points} XP</span>
-            </div>
-            ${completed ? '<span class="completed">✓</span>' : ''}
-        `;
-        
-        return div;
-    }
-
-    setupLeaderboard() {
-        const container = document.querySelector('.leaderboard');
-        if (!container) return;
-        
-        // Имитируем таблицу лидеров (в реальной версии будет API)
-        const mockLeaderboard = [
-            { name: 'Алексей', level: 8, points: 1250 },
-            { name: 'Мария', level: 7, points: 1100 },
-            { name: 'Дмитрий', level: 6, points: 950 },
-            { name: 'Анна', level: 5, points: 800 },
-            { name: 'Сергей', level: 4, points: 650 }
-        ];
-        
-        mockLeaderboard.forEach((user, index) => {
-            const div = document.createElement('div');
-            div.className = 'leaderboard-item';
-            div.innerHTML = `
-                <span class="rank">${index + 1}</span>
-                <span class="name">${user.name}</span>
-                <span class="level">Ур. ${user.level}</span>
-                <span class="points">${user.points} XP</span>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    calculateUserRank() {
-        // Простая логика ранжирования
-        if (this.userData.level >= 8) return 'Эксперт';
-        if (this.userData.level >= 5) return 'Продвинутый';
-        if (this.userData.level >= 3) return 'Средний';
-        return 'Начинающий';
-    }
-
-    updateUI() {
-        // Обновляем уровень и опыт
-        const levelElement = document.querySelector('.user-level');
-        if (levelElement) {
-            levelElement.textContent = `Уровень ${this.userData.level}`;
-        }
-        
-        const expElement = document.querySelector('.user-experience');
-        if (expElement) {
-            expElement.textContent = `${this.userData.experience} XP`;
-        }
-        
-        const rankElement = document.querySelector('.user-rank');
-        if (rankElement) {
-            rankElement.textContent = this.calculateUserRank();
-        }
-        
-        // Обновляем прогресс-бары
-        this.setupProgressBars();
-        
-        // Обновляем достижения
-        this.setupAchievements();
-        
-        // Обновляем ежедневные задания
-        this.displayDailyChallenges();
-    }
-
-    showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'gamification-notification';
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 100);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 3000);
-    }
-
-    resetProgress() {
-        if (confirm('Вы уверены, что хотите сбросить весь прогресс? Это действие нельзя отменить.')) {
-            this.userData = {
-                level: 1,
-                experience: 0,
-                totalPoints: 0,
-                subjects: {},
-                achievements: [],
-                dailyChallenges: [],
-                lastLogin: new Date().toISOString(),
-                streak: 0
-            };
-            this.saveUserData();
-            this.updateUI();
-            this.showNotification('Прогресс сброшен');
-        }
-    }
-
-    exportUserData() {
-        const dataStr = JSON.stringify(this.userData, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'examflow_user_data.json';
-        link.click();
-        
-        URL.revokeObjectURL(url);
-    }
+      }
+      this.checkAchievements();
+    });
+    
+    console.log('✅ Обработчики событий настроены успешно');
+  }
 }
 
-// Инициализация геймификации при загрузке страницы
+// Инициализация геймификации
+let gamification;
 document.addEventListener('DOMContentLoaded', () => {
-    window.examflowGamification = new ExamFlowGamification();
+  console.log('🚀 DOM загружен, инициализируем геймификацию...');
+  try {
+    gamification = new ExamFlowGamification();
+    console.log('✅ Геймификация успешно инициализирована!');
+  } catch (error) {
+    console.error('❌ Ошибка при инициализации геймификации:', error);
+  }
 });
-
-// Экспорт для использования в других модулях
-window.ExamFlowGamification = ExamFlowGamification;

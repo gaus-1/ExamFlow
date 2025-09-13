@@ -1,0 +1,38 @@
+name: Security audit
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 3 * * 1"  # еженедельно по понедельникам
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pip-audit
+        run: pip install --upgrade pip pip-audit
+      - name: Install project (no dev extras)
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-optimization.txt ]; then pip install -r requirements-optimization.txt; fi
+      - name: Run pip-audit
+        run: pip-audit --progress-spinner=off || true
+
+  zap-baseline:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: https://examflow.ru
+          rules_file_name: '.zap/rules.tsv'
+          allow_issue_writing: false
+          cmd_options: '-a'
+

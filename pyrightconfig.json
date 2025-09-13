@@ -1,42 +1,28 @@
 {
-    "include": [
-        "."
-    ],
-    "exclude": [
-        "**/node_modules",
-        "**/__pycache__",
-        ".git",
-        ".pytest_cache",
-        "static/images"
-    ],
-    "ignore": [
-        "ai/models.py",
-        "themes/models.py"
-    ],
-    "defineConstant": {},
-    "stubPath": "",
-    "reportMissingImports": "none",
-    "reportMissingTypeStubs": "none",
-    "pythonVersion": "3.11",
-    "pythonPlatform": "All",
-    "executionEnvironments": [
-        {
-            "root": ".",
-            "pythonVersion": "3.11",
-            "pythonPlatform": "All",
-            "extraPaths": []
-        }
-    ],
-    "typeCheckingMode": "basic",
-    "useLibraryCodeForTypes": true,
-    "autoImportCompletions": true,
-    "autoSearchPaths": true,
-    "reportGeneralTypeIssues": "none",
-    "reportOptionalSubscript": "none",
-    "reportOptionalMemberAccess": "none",
-    "reportOptionalCall": "none",
-    "reportOptionalIterable": "none",
-    "reportOptionalContextManager": "none",
-    "reportOptionalOperand": "none",
-    "reportTypedDictNotRequiredAccess": "none"
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.git",
+    "**/venv",
+    "**/.venv",
+    "**/env",
+    "**/.env",
+    "**/migrations",
+    "**/static",
+    "**/media",
+    "**/docs/_build",
+    "**/.pytest_cache",
+    "**/coverage",
+    "**/htmlcov",
+    "**/dist",
+    "**/build",
+    "**/*.egg-info"
+  ],
+  "ignore": [
+    "**/migrations/**",
+    "**/static/**",
+    "**/media/**"
+  ],
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "basic"
 }

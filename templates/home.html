@@ -7,18 +7,25 @@
 <!-- Hero Section -->
 <section class="section-padding-lg text-center" style="background: #fffef2;">
     <div class="container">
-        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6 heading-animate" style="color: #252525;">
+        <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-2 heading-animate" style="color: #252525;">
             <span class="text-reveal">Современная платформа</span><br>
             <span class="text-reveal">подготовки к ЕГЭ и ОГЭ</span>
         </h1>
+        <div class="brand-subtitle" aria-label="Get ready. Check. Stay informed.">
+            <span class="brand-subtitle__item">Get ready</span>
+            <span class="brand-subtitle__sep">•</span>
+            <span class="brand-subtitle__item">Check</span>
+            <span class="brand-subtitle__sep">•</span>
+            <span class="brand-subtitle__item brand-subtitle__item--accent">Stay informed</span>
+        </div>
         
         <p class="text-xl md:text-2xl mb-8 max-w-4xl mx-auto leading-relaxed text-reveal" style="color: #666;">
             Актуальные задания на основе открытых материалов ФИПИ. Персонализация и геймификация для максимальной эффективности.
         </p>
         
         <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12 text-reveal">
-            <a href="{% url 'register' %}" class="btn-primary text-lg px-8 py-4 btn-animate">
-                Начать подготовку
+            <a href="{% url 'auth:simple_login' %}" class="btn-primary text-lg px-8 py-4 btn-animate">
+                Продолжить через
             </a>
             <a href="{% url 'learning:subjects_list' %}" class="btn-secondary text-lg px-8 py-4 btn-animate">
                 Выбрать предмет
@@ -61,10 +68,8 @@
         
         <div class="fipi-tabs animate-on-scroll" data-animation="fade-in-delayed" data-delay="200">
             <div class="fipi-tab-header">
-                <button class="fipi-tab active">Все предметы</button>
-                <button class="fipi-tab">Математика</button>
+                <button class="fipi-tab active">Математика</button>
                 <button class="fipi-tab">Русский язык</button>
-                <button class="fipi-tab">Физика</button>
             </div>
             
             <div class="fipi-tab-content active animate-on-scroll">
@@ -74,8 +79,6 @@
                             <option value="">Выберите предмет</option>
                             <option value="math">Математика</option>
                             <option value="russian">Русский язык</option>
-                            <option value="physics">Физика</option>
-                            <option value="chemistry">Химия</option>
                         </select>
                         <select class="filter-select">
                             <option value="">Сложность</option>
@@ -108,15 +111,7 @@
                         </div>
                     </div>
                     
-                    <div class="subject-card animate-on-scroll" data-animation="scale-in" data-delay="300">
-                        <div class="subject-icon">⚡</div>
-                        <h3 class="subject-title">Физика</h3>
-                        <p class="subject-description">Механика, электричество, оптика</p>
-                        <div class="subject-stats">
-                            <span>320 заданий</span>
-                            <span>ЕГЭ/ОГЭ</span>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
             
@@ -130,7 +125,7 @@
                         <div class="accordion-content">
                             <p>Уравнения, неравенства, функции, прогрессии</p>
                             <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
                             </div>
                         </div>
                     </div>
@@ -143,7 +138,7 @@
                         <div class="accordion-content">
                             <p>Планиметрия, стереометрия, векторы</p>
                             <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
                             </div>
                         </div>
                     </div>
@@ -156,7 +151,7 @@
                         <div class="accordion-content">
                             <p>Синусы, косинусы, тангенсы, уравнения</p>
                             <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
                             </div>
                         </div>
                     </div>
@@ -173,7 +168,7 @@
                         <div class="accordion-content">
                             <p>Части речи, синтаксис, пунктуация</p>
                             <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
                             </div>
                         </div>
                     </div>
@@ -186,42 +181,14 @@
                         <div class="accordion-content">
                             <p>Структура, аргументы, примеры</p>
                             <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
+                                <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">Начать изучение</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="fipi-tab-content">
-                <div class="accordion">
-                    <div class="accordion-item">
-                        <div class="accordion-header">
-                            <h3 class="accordion-title">Механика</h3>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p>Кинематика, динамика, статика</p>
-                            <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item">
-                        <div class="accordion-header">
-                            <h3 class="accordion-title">Электричество</h3>
-                            <i class="fas fa-chevron-down accordion-icon"></i>
-                        </div>
-                        <div class="accordion-content">
-                            <p>Электростатика, ток, магнетизм</p>
-                            <div class="mt-4">
-                                <a href="#" class="btn btn-primary">Начать изучение</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </section>
@@ -233,10 +200,10 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
             <div class="text-center text-reveal">
                 <div class="text-6xl md:text-7xl font-bold mb-2 stat-counter" style="color: #252525;">
-                    8<span class="text-4xl">+</span>
+                    2
                 </div>
                 <div class="text-lg font-semibold" style="color: #666;">
-                    предметов ЕГЭ/ОГЭ
+                    предмета ЕГЭ/ОГЭ
                 </div>
             </div>
             
@@ -276,7 +243,8 @@
                 <!-- QR код для Telegram бота -->
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/ExamFlowBot" 
                      alt="QR код для Telegram бота" 
-                     class="w-48 h-48 mx-auto rounded-lg">
+                     class="w-48 h-48 mx-auto rounded-lg"
+                     loading="lazy">
                 <div class="w-48 h-48 mx-auto bg-gray-100 rounded-lg flex items-center justify-center" style="display: none;">
                     <i class="fas fa-qrcode text-6xl" style="color: #ccc;"></i>
                 </div>
@@ -325,7 +293,7 @@
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
                 </div>
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
             <div class="subject-card card-hover text-center animate-on-scroll">
                 <div class="flex justify-between items-start mb-4">
@@ -333,70 +301,10 @@
                     <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
                 </div>
                 <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Физика</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Химия</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Биология</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-                        <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">История</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">География</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
->
-            </div>
-            
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Литература</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
-            </div>
-            
-            <div class="card card-hover text-center animate-on-scroll">
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="text-xl font-bold" style="color: #252525;">Информатика</h3>
-                    <span class="text-sm px-3 py-1 bg-blue-100 text-blue-800 rounded-full">ЕГЭ</span>
-                </div>
-                <p class="text-sm mb-4" style="color: #666;">Задания доступны</p>
-                <a href="#" class="btn-primary w-full text-center text-sm">Изучать</a>
+                <a href="{% url 'learning:subjects_list' %}" class="btn-primary w-full text-center text-sm">Изучать</a>
             </div>
         {% endfor %}
-    </div>
+        </div>
         
         <div class="text-center mt-12">
             <a href="{% url 'learning:subjects_list' %}" class="btn-secondary">
@@ -651,7 +559,7 @@
 
 <!-- Подключение JavaScript для анимаций и геймификации -->
 <script src="{% static 'js/examflow-animations.js' %}"></script>
-<script src="{% static 'js/gamification.js' %}"></script>
+<script src="{% static 'js/gamification.js' %}?v=2.8&t={{ timestamp }}&cache=false"></script>
 <script src="{% static 'js/home-init.js' %}"></script>
 
 <!-- Тарифные планы -->
@@ -664,48 +572,40 @@
             Выберите подходящий план для эффективной подготовки
         </p>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div class="pricing-card text-reveal">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Бесплатный</h3>
+                <h3 class="text-2xl font-bold mb-2" style="color: #252525;">Бесплатно</h3>
+                <p class="text-sm text-gray-600 mb-4">ограничение запросов к ИИ</p>
                 <div class="text-4xl font-bold mb-6" style="color: #252525;">0 ₽</div>
+                <p class="text-lg mb-6" style="color: #666;">Полный функционал платформы с дневными лимитами</p>
                 <ul class="text-gray-600 space-y-3 mb-8">
-                    <li>• 5 заданий в день</li>
-                    <li>• Базовая статистика</li>
-                    <li>• Доступ к боту</li>
-                    <li>• Умный ИИ-помощник</li>
-                    <li>• Персонализация</li>
+                    <li>• Доступ ко всем разделам</li>
+                    <li>• Лимит на запросы к ИИ</li>
+                    <li>• Все задания ФИПИ</li>
+                    <li>• Telegram бот</li>
+                    <li>• Базовая аналитика</li>
+                    <li>• Геймификация</li>
                 </ul>
-                <a href="{% url 'register' %}" class="btn btn-primary w-full btn-animate">Начать бесплатно</a>
+                <a href="{% url 'auth:simple_login' %}" class="btn btn-primary w-full btn-animate">Начать бесплатно</a>
             </div>
             
             <div class="pricing-card popular text-reveal">
                 <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    ПОПУЛЯРНЫЙ
+                    РЕКОМЕНДУЕМ
                 </div>
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Месячный</h3>
+                <h3 class="text-2xl font-bold mb-2" style="color: #252525;">Подписка</h3>
+                <p class="text-sm text-gray-600 mb-4">без ограничений</p>
                 <div class="text-4xl font-bold mb-6" style="color: #252525;">990 ₽<span class="text-lg">/мес</span></div>
+                <p class="text-lg mb-6" style="color: #666;">Все возможности без лимитов</p>
                 <ul class="text-gray-600 space-y-3 mb-8">
-                    <li>• Неограниченные задания</li>
-                    <li>• Полная статистика</li>
-                    <li>• Умный ИИ-помощник</li>
-                    <li>• ИИ персонализация</li>
+                    <li>• Всё из бесплатного</li>
+                    <li>• Безлимитные запросы к ИИ</li>
                     <li>• Приоритетная поддержка</li>
-                </ul>
-                <a href="#" class="btn btn-primary w-full btn-animate">Оформить подписку</a>
-            </div>
-            
-            <div class="pricing-card text-reveal">
-                <h3 class="text-2xl font-bold mb-4" style="color: #252525;">Годовой</h3>
-                <div class="text-4xl font-bold mb-6" style="color: #252525;">9900 ₽<span class="text-lg">/год</span></div>
-                <div class="text-sm text-green-600 mb-4 font-semibold">Экономия 17%</div>
-                <ul class="text-gray-600 space-y-3 mb-8">
-                    <li>• Все возможности месячного</li>
-                    <li>• Скидка 17%</li>
-                    <li>• Эксклюзивный контент</li>
+                    <li>• Расширенная аналитика</li>
+                    <li>• Эксклюзивные задания</li>
                     <li>• Персональный куратор</li>
-                    <li>• Сертификат о прохождении</li>
                 </ul>
-                <a href="#" class="btn btn-primary w-full btn-animate">Купить со скидкой</a>
+                <a href="{% url 'subscribe' %}" class="btn btn-primary w-full btn-animate">Оформить подписку</a>
             </div>
         </div>
     </div>
@@ -744,8 +644,8 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
                     <div class="text-reveal">
-                        <div class="text-4xl font-bold mb-2 stat-counter" style="color: #252525;">12+</div>
-                        <div class="text-lg" style="color: #666;">предметов ЕГЭ/ОГЭ</div>
+                        <div class="text-4xl font-bold mb-2 stat-counter" style="color: #252525;">2</div>
+                        <div class="text-lg" style="color: #666;">предмета ЕГЭ/ОГЭ</div>
                     </div>
                     
                     <div class="text-reveal">
@@ -819,7 +719,7 @@
                     Эффективная подготовка к ЕГЭ и ОГЭ с заданиями на основе открытых материалов ФИПИ
                 </p>
                 <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors footer-link rotate btn-animate">
+                    <a href="https://t.me/ExamFlowBot" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition-colors footer-link rotate btn-animate">
                         <i class="fab fa-telegram text-xl"></i>
                     </a>
                 </div>
@@ -828,18 +728,18 @@
             <div class="text-reveal">
                 <h4 class="text-lg font-semibold mb-4">Полезные ссылки</h4>
                 <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors btn-animate">ФИПИ</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors btn-animate">Решу ЕГЭ</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors btn-animate">Telegram Бот</a></li>
+                    <li><a href="https://fipi.ru" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition-colors btn-animate">ФИПИ</a></li>
+                    <li><a href="https://ege.sdamgia.ru" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition-colors btn-animate">Решу ЕГЭ</a></li>
+                    <li><a href="https://t.me/ExamFlowBot" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition-colors btn-animate">Telegram Бот</a></li>
                 </ul>
             </div>
             
             <div class="text-reveal">
                 <h4 class="text-lg font-semibold mb-4">Поддержка</h4>
                 <ul class="space-y-2">
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors btn-animate">Помощь</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors btn-animate">FAQ</a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors btn-animate">Контакты</a></li>
+                    <li><a href="{% url 'features' %}" class="text-gray-400 hover:text-white transition-colors btn-animate">Помощь</a></li>
+                    <li><a href="{% url 'features' %}#faq" class="text-gray-400 hover:text-white transition-colors btn-animate">FAQ</a></li>
+                    <li><a href="https://t.me/ExamFlowBot" target="_blank" rel="noopener" class="text-gray-400 hover:text-white transition-colors btn-animate">Контакты</a></li>
                 </ul>
             </div>
         </div>

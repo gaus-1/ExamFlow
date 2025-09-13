@@ -1,0 +1,164 @@
+name: 🔍 Проверка оптимизации
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 2 * * 1'  # Еженедельно по понедельникам в 2:00
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    name: 🔒 Проверка безопасности
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-optimization.txt
+    
+    - name: Run security checks
+      run: |
+        bandit -r . -f json -o bandit-report.json || true
+        safety check || true
+        pip-audit || true
+    
+    - name: Upload security report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-report
+        path: bandit-report.json
+
+  performance-check:
+    runs-on: ubuntu-latest
+    name: ⚡ Проверка производительности
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-optimization.txt
+    
+    - name: Set up database
+      run: |
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+    
+    - name: Run performance tests
+      run: |
+        python manage.py test tests.test_performance --verbosity=2
+    
+    - name: Check Lighthouse score
+      run: |
+        npm install -g @lhci/cli@0.12.x
+        lhci autorun --upload.target=temporary-public-storage
+
+  code-quality-check:
+    runs-on: ubuntu-latest
+    name: 🔧 Проверка качества кода
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-optimization.txt
+    
+    - name: Run Black
+      run: black --check .
+    
+    - name: Run isort
+      run: isort --check-only .
+    
+    - name: Run flake8
+      run: flake8 .
+    
+    - name: Run mypy
+      run: mypy . || true
+    
+    - name: Run pylint
+      run: pylint --disable=C0114,C0116 core/ ai/ learning/ || true
+
+  test-coverage:
+    runs-on: ubuntu-latest
+    name: 🧪 Покрытие тестами
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-optimization.txt
+    
+    - name: Set up database
+      run: |
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+    
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=. --cov-report=xml --cov-report=html
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  optimization-summary:
+    runs-on: ubuntu-latest
+    name: 📊 Сводка оптимизации
+    needs: [security-check, performance-check, code-quality-check, test-coverage]
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Generate optimization report
+      run: |
+        echo "# 📊 ОТЧЕТ ОБ ОПТИМИЗАЦИИ" > optimization-report.md
+        echo "Дата: $(date)" >> optimization-report.md
+        echo "" >> optimization-report.md
+        echo "## Результаты проверок:" >> optimization-report.md
+        echo "- Безопасность: ${{ needs.security-check.result }}" >> optimization-report.md
+        echo "- Производительность: ${{ needs.performance-check.result }}" >> optimization-report.md
+        echo "- Качество кода: ${{ needs.code-quality-check.result }}" >> optimization-report.md
+        echo "- Покрытие тестами: ${{ needs.test-coverage.result }}" >> optimization-report.md
+    
+    - name: Upload optimization report
+      uses: actions/upload-artifact@v3
+      with:
+        name: optimization-report
+        path: optimization-report.md

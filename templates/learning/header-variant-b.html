@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ExamFlow 2.0 - Вариант B (Градиентный переход){% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   ВАРИАНТ B: ГРАДИЕНТНЫЙ ПЕРЕХОД
+   ======================================== */
+
+.header-variant-b .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+/* Логотип с подписью и градиентным разделением */
+.header-variant-b .logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.header-variant-b .logo-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-right: 30px;
+  position: relative;
+}
+
+.header-variant-b .logo-container::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--color-gray-200) 0%,
+    var(--color-gray-300) 30%,
+    var(--color-gray-400) 50%,
+    var(--color-gray-300) 70%,
+    var(--color-gray-200) 100%
+  );
+  opacity: 0.5;
+}
+
+.header-variant-b .logo-image {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.header-variant-b .logo-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Подпись с улучшенной типографикой и градиентным фоном */
+.header-variant-b .brand-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--font-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  color: var(--color-gray-600);
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  white-space: nowrap;
+  padding: var(--space-sm) var(--space-md);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(249, 250, 251, 0.9) 50%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+  border-radius: 8px;
+  border: 1px solid rgba(229, 231, 235, 0.6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.header-variant-b .brand-subtitle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.1) 50%,
+    transparent 100%
+  );
+  transition: left 0.6s ease;
+}
+
+.header-variant-b .brand-subtitle:hover::before {
+  left: 100%;
+}
+
+.header-variant-b .brand-subtitle__item {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  transition: color 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.header-variant-b .brand-subtitle__sep {
+  font-size: 0.9em;
+  opacity: 0.4;
+  color: var(--color-gray-400);
+  font-weight: var(--font-normal);
+  position: relative;
+  z-index: 1;
+}
+
+.header-variant-b .brand-subtitle__item--accent {
+  color: var(--color-gray-700);
+  font-weight: var(--font-semibold);
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover эффекты */
+.header-variant-b .brand-subtitle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.header-variant-b .brand-subtitle:hover .brand-subtitle__item {
+  color: var(--color-gray-700);
+}
+
+.header-variant-b .brand-subtitle:hover .brand-subtitle__item--accent {
+  color: var(--color-gray-800);
+}
+
+/* Адаптивность */
+@media (min-width: 1024px) {
+  .header-variant-b .brand-subtitle {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header-variant-b .brand-subtitle {
+    font-size: 18px;
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .header-variant-b .logo-container {
+    padding-right: 20px;
+  }
+  
+  .header-variant-b .logo-container::after {
+    width: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .header-variant-b .header-content {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  
+  .header-variant-b .logo-section {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  
+  .header-variant-b .logo-container {
+    padding-right: 0;
+  }
+  
+  .header-variant-b .logo-container::after {
+    display: none;
+  }
+  
+  .header-variant-b .brand-subtitle {
+    font-size: 16px;
+    text-align: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .header-variant-b .brand-subtitle__item:nth-child(3) {
+    flex-basis: 100%;
+    text-align: center;
+  }
+  
+  .header-variant-b .brand-subtitle__sep:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-variant-b .brand-subtitle {
+    font-size: 14px;
+    gap: 0.4em;
+    padding: var(--space-xs);
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="header header-variant-b">
+  <div class="container container-xl">
+    <div class="header-content">
+      <!-- Логотип с подписью и градиентным разделением -->
+      <div class="logo-section">
+        <div class="logo-container">
+          <img src="{% static 'images/logo-new.png' %}" alt="ExamFlow" class="logo-image">
+          <span class="logo-text">ExamFlow</span>
+        </div>
+        
+        <div class="brand-subtitle" aria-label="Get ready. Check. Stay informed.">
+          <span class="brand-subtitle__item">Get ready</span>
+          <span class="brand-subtitle__sep">•</span>
+          <span class="brand-subtitle__item">Check</span>
+          <span class="brand-subtitle__sep">•</span>
+          <span class="brand-subtitle__item brand-subtitle__item--accent">Stay informed</span>
+        </div>
+      </div>
+      
+      <!-- Навигация -->
+      <nav class="header-nav">
+        <ul class="nav-list flex items-center gap-6">
+          <li><a href="#features" class="nav-link">Возможности</a></li>
+          <li><a href="#subjects" class="nav-link">Предметы</a></li>
+          <li><a href="#pricing" class="nav-link">Тарифы</a></li>
+          <li><a href="#about" class="nav-link">О нас</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Действия -->
+      <div class="header-actions flex items-center gap-2">
+        <button class="btn btn-ghost btn-sm">Задать вопрос</button>
+        <button class="btn btn-primary btn-sm">Войти</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Демонстрационный контент -->
+<section class="py-20 bg-gray-50">
+  <div class="container container-lg text-center">
+    <h2 class="text-3xl font-bold mb-4">Вариант B: Градиентный переход</h2>
+    <p class="text-gray-600 mb-8">Современное разделение с помощью увеличенного отступа и градиентного фона</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+      <div class="bg-white p-6 rounded-lg shadow-sm">
+        <h3 class="font-semibold mb-2">Преимущества</h3>
+        <ul class="text-sm text-gray-600 space-y-1">
+          <li>• Современный дизайн с градиентами</li>
+          <li>• Выделяет подпись как важный элемент</li>
+          <li>• Интерактивные hover-эффекты</li>
+          <li>• Создает глубину и объем</li>
+        </ul>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow-sm">
+        <h3 class="font-semibold mb-2">Решает проблемы</h3>
+        <ul class="text-sm text-gray-600 space-y-1">
+          <li>• Четко отделяет от логотипа</li>
+          <li>• Повышает контрастность</li>
+          <li>• Создает визуальную иерархию</li>
+          <li>• Привлекает внимание к подписи</li>
+        </ul>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow-sm">
+        <h3 class="font-semibold mb-2">Адаптивность</h3>
+        <ul class="text-sm text-gray-600 space-y-1">
+          <li>• Десктоп: горизонтально с фоном</li>
+          <li>• Планшет: уменьшенные отступы</li>
+          <li>• Мобильный: вертикально, без разделителя</li>
+          <li>• Сохраняет интерактивность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
