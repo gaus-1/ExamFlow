@@ -402,11 +402,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
         keyboard = [
-                create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
-                create_standard_button("📚 ПРАКТИКА", "subjects"),
-                create_standard_button("🏆 ПРОГРЕСС", "stats")], [
-                InlineKeyboardButton(
-                    "🌐 САЙТ", url="https://examflow.onrender.com")]]
+            [create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")],
+            [create_standard_button("📚 ПРАКТИКА", "subjects"),
+             create_standard_button("🏆 ПРОГРЕСС", "stats")],
+            [InlineKeyboardButton(
+                "🌐 САЙТ", url="https://examflow.onrender.com")]
+        ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if is_callback:
@@ -462,11 +463,12 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
     keyboard = [
-            create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
-            create_standard_button("📚 ПРАКТИКА", "subjects"),
-            create_standard_button("🏆 ПРОГРЕСС", "stats")], [
-            InlineKeyboardButton(
-                "🌐 САЙТ", url="https://examflow.onrender.com")]]
+        [create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")],
+        [create_standard_button("📚 ПРАКТИКА", "subjects"),
+         create_standard_button("🏆 ПРОГРЕСС", "stats")],
+        [InlineKeyboardButton(
+            "🌐 САЙТ", url="https://examflow.onrender.com")]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     try:
@@ -1621,7 +1623,7 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
     next_level_points = level * 100
     progress_percentage = (points % 100) / 100 * 100
 
-    progress_bar = "█" * int(progress_percentage / 10) + "░" * \
+    progress_bar = "█" * int(progress_percentage / 10) + "░" * (10 - int(progress_percentage / 10))
 
     progress_text = """
 📈 **ОБЩИЙ ПРОГРЕСС**
