@@ -17,7 +17,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Загружает все данные ФИПИ и РешуЕГЭ в базу ExamFlow'
 
@@ -67,9 +66,9 @@ class Command(BaseCommand):
                         '✅ ЗАГРУЗКА ЗАВЕРШЕНА УСПЕШНО!'
                     )
                 )
-                self.stdout.write(f'⏱️ Время выполнения: {duration}')
+                self.stdout.write('⏱️ Время выполнения: {duration}')
                 self.stdout.write(
-                    f'📅 Завершено: {end_time.strftime("%Y-%m-%d %H:%M:%S")}')
+                    '📅 Завершено: {end_time.strftime("%Y-%m-%d %H:%M:%S")}')
 
                 # Показываем статистику
                 self._show_statistics()
@@ -87,10 +86,10 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 self.style.ERROR(  # type: ignore
-                    f'❌ КРИТИЧЕСКАЯ ОШИБКА: {e}'
+                    '❌ КРИТИЧЕСКАЯ ОШИБКА: {e}'
                 )
             )
-            logger.error(f"Ошибка в команде load_fipi_data: {e}")
+            logger.error("Ошибка в команде load_fipi_data: {e}")
             return 1
 
     def _update_subjects_only(self):
@@ -104,13 +103,13 @@ class Command(BaseCommand):
             subjects = integrator._create_subjects()
             topics = integrator._create_topics(subjects)
 
-            self.stdout.write(f'✅ Создано предметов: {len(subjects)}')
-            self.stdout.write(f'✅ Создано тем: {len(topics)}')
+            self.stdout.write('✅ Создано предметов: {len(subjects)}')
+            self.stdout.write('✅ Создано тем: {len(topics)}')
 
             return True
 
         except Exception as e:
-            self.stdout.write(f'❌ Ошибка обновления предметов: {e}')
+            self.stdout.write('❌ Ошибка обновления предметов: {e}')
             return False
 
     def _update_tasks_only(self):
@@ -133,12 +132,12 @@ class Command(BaseCommand):
             # Создаем только задания
             tasks = integrator._create_tasks(subjects, topics)
 
-            self.stdout.write(f'✅ Создано заданий: {len(tasks)}')
+            self.stdout.write('✅ Создано заданий: {len(tasks)}')
 
             return True
 
         except Exception as e:
-            self.stdout.write(f'❌ Ошибка обновления заданий: {e}')
+            self.stdout.write('❌ Ошибка обновления заданий: {e}')
             return False
 
     def _show_statistics(self):
@@ -151,9 +150,9 @@ class Command(BaseCommand):
             tasks_count = Task.objects.count()  # type: ignore
 
             self.stdout.write('📊 СТАТИСТИКА:')
-            self.stdout.write(f'   📚 Предметов: {subjects_count}')
-            self.stdout.write(f'   🏷️ Тем: {topics_count}')
-            self.stdout.write(f'   📝 Заданий: {tasks_count}')
+            self.stdout.write('   📚 Предметов: {subjects_count}')
+            self.stdout.write('   🏷️ Тем: {topics_count}')
+            self.stdout.write('   📝 Заданий: {tasks_count}')
 
             # Показываем детали по предметам
             self.stdout.write('\n📚 ДЕТАЛИ ПО ПРЕМЕТАМ:')
@@ -163,9 +162,9 @@ class Command(BaseCommand):
                 subject_topics = Topic.objects.filter(
                     subject=subject).count()  # type: ignore
                 self.stdout.write(  # type: ignore
-                    f'   {subject.name} ({subject.exam_type}): '
-                    f'{subject_tasks} заданий, {subject_topics} тем'
+                    '   {subject.name} ({subject.exam_type}): '
+                    '{subject_tasks} заданий, {subject_topics} тем'
                 )
 
         except Exception as e:
-            self.stdout.write(f'⚠️ Не удалось показать статистику: {e}')
+            self.stdout.write('⚠️ Не удалось показать статистику: {e}')

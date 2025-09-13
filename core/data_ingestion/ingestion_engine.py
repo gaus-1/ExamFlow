@@ -18,11 +18,10 @@ import sys
 from django.utils import timezone
 from django.db import transaction
 
-from core.models import FIPISourceMap, FIPIData
+from core.models import FIPISourceMap, FIPIData  # type: ignore
 from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
 
 logger = logging.getLogger(__name__)
-
 
 class TaskStatus(Enum):
     """Статусы задач"""
@@ -33,14 +32,12 @@ class TaskStatus(Enum):
     RETRYING = "retrying"
     CANCELLED = "cancelled"
 
-
 class TaskPriority(Enum):
     """Приоритеты задач"""
     CRITICAL = 1
     HIGH = 2
     MEDIUM = 3
     LOW = 4
-
 
 @dataclass
 class IngestionTask:
@@ -86,7 +83,6 @@ class IngestionTask:
             data['completed_at'] = datetime.fromisoformat(data['completed_at'])
         return cls(**data)
 
-
 class TaskQueue:
     """Очередь задач с приоритетами"""
 
@@ -106,7 +102,7 @@ class TaskQueue:
             self._task_registry[task.id] = task
             self._queues[task.priority].put(task)
             logger.info(
-                f"Задача {task.id} добавлена в очередь с приоритетом {task.priority.name}")
+                "Задача {task.id} добавлена в очередь с приоритетом {task.priority.name}")
 
     def get_next_task(self) -> Optional[IngestionTask]:
         """Получает следующую задачу по приоритету"""
@@ -142,7 +138,6 @@ class TaskQueue:
                 stats[priority.name] = queue.qsize()
             return stats
 
-
 class IngestionWorker:
     """Воркер для выполнения задач сбора данных"""
 
@@ -162,14 +157,14 @@ class IngestionWorker:
         self.is_running = True
         self._thread = threading.Thread(target=self._worker_loop, daemon=True)
         self._thread.start()
-        logger.info(f"Воркер {self.worker_id} запущен")
+        logger.info("Воркер {self.worker_id} запущен")
 
     def stop(self):
         """Останавливает воркер"""
         self.is_running = False
         if self._thread:
             self._thread.join(timeout=5)
-        logger.info(f"Воркер {self.worker_id} остановлен")
+        logger.info("Воркер {self.worker_id} остановлен")
 
     def _worker_loop(self):
         """Основной цикл воркера"""
@@ -183,7 +178,7 @@ class IngestionWorker:
                 self._execute_task(task)
 
             except Exception as e:
-                logger.error(f"Ошибка в воркере {self.worker_id}: {e}")
+                logger.error("Ошибка в воркере {self.worker_id}: {e}")
                 time.sleep(5)  # Пауза при ошибке
 
     def _execute_task(self, task: IngestionTask):
@@ -193,14 +188,14 @@ class IngestionWorker:
         task.started_at = timezone.now()
         self.task_queue.update_task(task)
 
-        logger.info(f"Воркер {self.worker_id} выполняет задачу {task.id}")
+        logger.info("Воркер {self.worker_id} выполняет задачу {task.id}")
 
         try:
             # Получаем содержимое страницы
             content = self.scraper.get_page_content(task.url)
 
             if content is None:
-                raise Exception(f"Не удалось получить содержимое для {task.url}")
+                raise Exception("Не удалось получить содержимое для {task.url}")
 
             # Создаем хеш содержимого
             content_hash = self.scraper.get_content_hash(str(content))
@@ -208,7 +203,7 @@ class IngestionWorker:
             # Проверяем, изменилось ли содержимое
             source = FIPISourceMap.objects.get(source_id=task.source_id)  # type: ignore
             if source.content_hash == content_hash:
-                logger.info(f"Содержимое не изменилось для {task.source_id}")
+                logger.info("Содержимое не изменилось для {task.source_id}")
                 task.status = TaskStatus.COMPLETED
                 task.result_data = {
                     'status': 'no_changes',
@@ -223,10 +218,10 @@ class IngestionWorker:
                 source.mark_as_checked(content_hash)
 
             task.completed_at = timezone.now()
-            logger.info(f"Задача {task.id} выполнена успешно")
+            logger.info("Задача {task.id} выполнена успешно")
 
         except Exception as e:
-            logger.error(f"Ошибка при выполнении задачи {task.id}: {e}")
+            logger.error("Ошибка при выполнении задачи {task.id}: {e}")
             task.error_message = str(e)
             task.retry_count += 1
 
@@ -235,11 +230,11 @@ class IngestionWorker:
                 # Возвращаем задачу в очередь для повтора
                 self.task_queue.add_task(task)
                 logger.info(
-                    f"Задача {task.id} будет повторена (попытка {task.retry_count}/{task.max_retries})")
+                    "Задача {task.id} будет повторена (попытка {task.retry_count}/{task.max_retries})")
             else:
                 task.status = TaskStatus.FAILED
                 logger.error(
-                    f"Задача {task.id} провалена после {task.max_retries} попыток")
+                    "Задача {task.id} провалена после {task.max_retries} попыток")
 
         finally:
             self.task_queue.update_task(task)
@@ -248,9 +243,9 @@ class IngestionWorker:
     def _save_data(self, task: IngestionTask, content: str, content_hash: str) -> Dict:
         """Сохраняет данные в базу"""
         try:
-            with transaction.atomic():
+            with transaction.atomic():  # type: ignore
                 # Проверяем, есть ли уже такая запись
-                if FIPIData.objects.filter(
+                if FIPIData.objects.filter(  # type: ignore
                         content_hash=content_hash).exists():  # type: ignore
                     return {'status': 'already_exists', 'content_hash': content_hash}
 
@@ -272,9 +267,8 @@ class IngestionWorker:
                 }
 
         except Exception as e:
-            logger.error(f"Ошибка при сохранении данных для задачи {task.id}: {e}")
+            logger.error("Ошибка при сохранении данных для задачи {task.id}: {e}")
             raise
-
 
 class IngestionEngine:
     """Основной движок сбора данных"""
@@ -296,11 +290,11 @@ class IngestionEngine:
             logger.warning("Движок уже запущен")
             return
 
-        logger.info(f"Запуск движка сбора данных с {self.max_workers} воркерами")
+        logger.info("Запуск движка сбора данных с {self.max_workers} воркерами")
 
         # Создаем и запускаем воркеры
         for i in range(self.max_workers):
-            worker = IngestionWorker(f"worker-{i+1}", self.task_queue)
+            worker = IngestionWorker("worker-{i+1}", self.task_queue)
             worker.start()
             self.workers.append(worker)
 
@@ -353,7 +347,7 @@ class IngestionEngine:
                     continue
 
                 # Создаем задачу
-                task_id = f"{source.source_id}_{int(time.time())}"
+                task_id = "{source.source_id}_{int(time.time())}"
                 priority = TaskPriority(source.priority)
 
                 task = IngestionTask(
@@ -367,11 +361,11 @@ class IngestionEngine:
                 self.task_queue.add_task(task)
                 added_count += 1
 
-            logger.info(f"Добавлено {added_count} задач в очередь")
+            logger.info("Добавлено {added_count} задач в очередь")
             return added_count
 
         except Exception as e:
-            logger.error(f"Ошибка при добавлении задач: {e}")
+            logger.error("Ошибка при добавлении задач: {e}")
             return 0
 
     def get_statistics(self) -> Dict:
@@ -417,24 +411,22 @@ class IngestionEngine:
                 # Логируем статистику каждые 30 секунд
                 stats = self.get_statistics()
                 logger.info(
-                    f"Статистика движка: {json.dumps(stats, indent=2, default=str)}")
+                    "Статистика движка: {json.dumps(stats, indent=2, default=str)}")
 
                 time.sleep(30)
 
             except Exception as e:
-                logger.error(f"Ошибка в мониторинге: {e}")
+                logger.error("Ошибка в мониторинге: {e}")
                 time.sleep(10)
 
     def _signal_handler(self, signum, frame):
         """Обработчик сигналов для graceful shutdown"""
-        logger.info(f"Получен сигнал {signum}, останавливаем движок...")
+        logger.info("Получен сигнал {signum}, останавливаем движок...")
         self.stop()
         sys.exit(0)
 
-
 # Глобальный экземпляр движка
 _ingestion_engine: Optional[IngestionEngine] = None
-
 
 def get_ingestion_engine() -> IngestionEngine:
     """Получает глобальный экземпляр движка"""
@@ -443,13 +435,11 @@ def get_ingestion_engine() -> IngestionEngine:
         _ingestion_engine = IngestionEngine()
     return _ingestion_engine
 
-
 def start_ingestion_engine():
     """Запускает движок сбора данных"""
     engine = get_ingestion_engine()
     engine.start()
     return engine
-
 
 def stop_ingestion_engine():
     """Останавливает движок сбора данных"""

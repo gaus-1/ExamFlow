@@ -23,11 +23,9 @@ from learning.models import (
 )
 from authentication.models import Subscription
 
-
 def is_staff_or_superuser(user):
     """Проверяет, является ли пользователь администратором"""
     return user.is_staff or user.is_superuser
-
 
 @user_passes_test(is_staff_or_superuser)
 def dashboard(request):
@@ -93,7 +91,6 @@ def dashboard(request):
     }
 
     return render(request, 'analytics/dashboard.html', context)
-
 
 @user_passes_test(is_staff_or_superuser)
 def users_analytics(request):
@@ -161,7 +158,6 @@ def users_analytics(request):
     }
 
     return render(request, 'analytics/users.html', context)
-
 
 @user_passes_test(is_staff_or_superuser)
 def tasks_analytics(request):
@@ -231,7 +227,6 @@ def tasks_analytics(request):
 
     return render(request, 'analytics/tasks.html', context)
 
-
 def api_stats(request):
     """
     API для получения статистики в JSON формате
@@ -269,7 +264,6 @@ def api_stats(request):
 
     return JsonResponse(stats)
 
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def update_user_profile(request):
@@ -282,7 +276,7 @@ def update_user_profile(request):
         data = json.loads(request.body)
 
         # Логируем данные для отладки
-        print(f"📊 Получены данные профиля: {data}")
+        print("📊 Получены данные профиля: {data}")
 
         # Здесь можно добавить логику сохранения данных в базу
         # Пока просто возвращаем успех
@@ -304,5 +298,5 @@ def update_user_profile(request):
     except Exception as e:
         return JsonResponse({
             'status': 'error',
-            'message': f'Ошибка сервера: {str(e)}'
+            'message': 'Ошибка сервера: {str(e)}'
         }, status=500)

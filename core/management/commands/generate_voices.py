@@ -9,7 +9,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Генерирует голосовые файлы для заданий'
 
@@ -50,19 +49,19 @@ class Command(BaseCommand):
         """Генерирует аудио для одного задания"""
         try:
             task = Task.objects.get(id=task_id)
-            self.stdout.write(f'🎤 Генерация аудио для задания: {task.title}')
+            self.stdout.write('🎤 Генерация аудио для задания: {task.title}')
 
             result = voice_service.generate_task_audio(task)
 
             if result and result['task_audio']:
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f'✅ Аудио создано: {result["task_audio"]}')  # type: ignore
+                        '✅ Аудио создано: {result["task_audio"]}')  # type: ignore
                 )
                 if result['solution_audio']:
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f'✅ Аудио решения: {result["solution_audio"]}')  # type: ignore
+                            '✅ Аудио решения: {result["solution_audio"]}')  # type: ignore
                     )
             else:
                 self.stdout.write(
@@ -70,9 +69,9 @@ class Command(BaseCommand):
                 )
 
         except Task.DoesNotExist:
-            raise CommandError(f'❌ Задание с ID {task_id} не найдено')
+            raise CommandError('❌ Задание с ID {task_id} не найдено')
         except Exception as e:
-            raise CommandError(f'❌ Ошибка: {str(e)}')
+            raise CommandError('❌ Ошибка: {str(e)}')
 
     def generate_multiple_tasks(self, limit, force):
         """Генерирует аудио для множества заданий"""
@@ -84,10 +83,10 @@ class Command(BaseCommand):
         # Выбираем задания
         if force:
             tasks = Task.objects.filter(is_active=True)[:limit]
-            self.stdout.write(f'📋 Принудительная генерация для {tasks.count()} заданий')
+            self.stdout.write('📋 Принудительная генерация для {tasks.count()} заданий')
         else:
             tasks = Task.objects.filter(is_active=True, audio_file__isnull=True)[:limit]
-            self.stdout.write(f'📋 Генерация для {tasks.count()} заданий без аудио')
+            self.stdout.write('📋 Генерация для {tasks.count()} заданий без аудио')
 
         if not tasks:
             self.stdout.write(
@@ -100,7 +99,7 @@ class Command(BaseCommand):
 
         for i, task in enumerate(tasks, 1):
             try:
-                self.stdout.write(f'[{i}/{len(tasks)}] Обработка: {task.title[:50]}...')
+                self.stdout.write('[{i}/{len(tasks)}] Обработка: {task.title[:50]}...')
 
                 result = voice_service.generate_task_audio(task)
 
@@ -108,7 +107,7 @@ class Command(BaseCommand):
                     generated_count += 1
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f'  ✅ Создано: {result["task_audio"]}')  # type: ignore
+                            '  ✅ Создано: {result["task_audio"]}')  # type: ignore
                     )
                 else:
                     error_count += 1
@@ -120,13 +119,13 @@ class Command(BaseCommand):
                 if i % 10 == 0:
                     self.stdout.write(
                         self.style.WARNING(
-                            f'📊 Прогресс: {i}/{len(tasks)} | Создано: {generated_count} | Ошибок: {error_count}')  # type: ignore
+                            '📊 Прогресс: {i}/{len(tasks)} | Создано: {generated_count} | Ошибок: {error_count}')  # type: ignore
                     )
 
             except Exception as e:
                 error_count += 1
                 self.stdout.write(
-                    self.style.ERROR(f'  ❌ Ошибка: {str(e)}')  # type: ignore
+                    self.style.ERROR('  ❌ Ошибка: {str(e)}')  # type: ignore
                 )
                 continue
 
@@ -137,13 +136,13 @@ class Command(BaseCommand):
         )
         self.stdout.write(
             self.style.SUCCESS(  # type: ignore
-                f'📊 Создано файлов: {generated_count}'  # type: ignore
+                '📊 Создано файлов: {generated_count}'  # type: ignore
             )
         )
         if error_count > 0:
             self.stdout.write(
                 self.style.WARNING(  # type: ignore
-                    f'⚠️  Ошибок: {error_count}'  # type: ignore
+                    '⚠️  Ошибок: {error_count}'  # type: ignore
                 )
             )
 
@@ -155,6 +154,6 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(  # type: ignore
-                f'✅ Удалено файлов: {deleted_count}'  # type: ignore
+                '✅ Удалено файлов: {deleted_count}'  # type: ignore
             )
         )

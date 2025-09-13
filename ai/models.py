@@ -1,22 +1,14 @@
 # pyright: reportGeneralTypeIssues=false, reportUnknownMemberType=false,
-# reportAttributeAccessNotAllowed=false
+        # reportAttributeAccessNotAllowed=false
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
 
-
 class AiRequest(models.Model):
     """Модель для отслеживания запросов к ИИ"""
 
     REQUEST_TYPES = [
-        ('explanation', 'Объяснение темы'),
-        ('task_search', 'Поиск заданий'),
-        ('task_generation', 'Генерация заданий'),
-        ('question', 'Вопрос по подготовке'),
-        ('recommendation', 'Персональные рекомендации'),
-        ('motivation', 'Мотивация'),
-        ('solution_analysis', 'Анализ решения'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -35,17 +27,13 @@ class AiRequest(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        user_info = self.user.username if self.user else f'Гость ({self.session_id})'
-        return f'{user_info} - {self.get_request_type_display()} ({self.created_at.strftime("%d.%m.%Y %H:%M")})'
-
+        user_info = self.user.username if self.user else 'Гость ({self.session_id})'
+        return '{user_info} - {self.get_request_type_display()} ({self.created_at.strftime("%d.%m.%Y %H:%M")})'
 
 class AiLimit(models.Model):
     """Модель для управления лимитами ИИ"""
 
     LIMIT_TYPES = [
-        ('daily', 'Дневной лимит'),
-        ('monthly', 'Месячный лимит'),
-        ('total', 'Общий лимит'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -63,8 +51,8 @@ class AiLimit(models.Model):
         unique_together = ['user', 'session_id', 'limit_type']
 
     def __str__(self):
-        user_info = self.user.username if self.user else f'Гость ({self.session_id})'
-        return f'{user_info} - {self.get_limit_type_display()}: {self.current_usage}/{self.max_limit}'
+        user_info = self.user.username if self.user else 'Гость ({self.session_id})'
+        return '{user_info} - {self.get_limit_type_display()}: {self.current_usage}/{self.max_limit}'
 
     def is_exceeded(self):
         """Проверяет, превышен ли лимит"""
@@ -98,16 +86,10 @@ class AiLimit(models.Model):
         else:  # total
             return now + timedelta(days=365)  # Год
 
-
 class AiProvider(models.Model):
     """Модель для управления провайдерами ИИ"""
 
     PROVIDER_TYPES = [
-        ('deepseek', 'DeepSeek Chat'),
-        ('gigachat', 'GigaChat'),
-        ('llama', 'LLaMA (локальный)'),
-        ('falcon', 'Falcon (локальный)'),
-        ('fallback', 'Fallback (резервный)'),
     ]
 
     name = models.CharField(max_length=100)
@@ -132,7 +114,7 @@ class AiProvider(models.Model):
         ordering = ['priority', 'name']
 
     def __str__(self):
-        return f'{self.name} ({self.get_provider_type_display()})'
+        return '{self.name} ({self.get_provider_type_display()})'
 
     def can_handle_request(self):
         """Проверяет, может ли провайдер обработать запрос"""
@@ -150,18 +132,10 @@ class AiProvider(models.Model):
         self.last_used = timezone.now()
         self.save()
 
-
 class AiPromptTemplate(models.Model):
     """Модель для шаблонов промптов"""
 
     TEMPLATE_TYPES = [
-        ('explanation', 'Объяснение темы'),
-        ('task_search', 'Поиск заданий'),
-        ('task_generation', 'Генерация заданий'),
-        ('question', 'Ответ на вопрос'),
-        ('recommendation', 'Рекомендации'),
-        ('motivation', 'Мотивация'),
-        ('solution_analysis', 'Анализ решения'),
     ]
 
     name = models.CharField(max_length=200)
@@ -180,7 +154,7 @@ class AiPromptTemplate(models.Model):
         ordering = ['priority', 'name']
 
     def __str__(self):
-        return f'{self.name} ({self.get_template_type_display()})'
+        return '{self.name} ({self.get_template_type_display()})'
 
     def format_prompt(self, **kwargs):
         """Форматирует промпт с подстановкой переменных"""
@@ -189,7 +163,6 @@ class AiPromptTemplate(models.Model):
         except KeyError:
             # Если не хватает переменных, возвращаем исходный шаблон
             return self.prompt_template
-
 
 class AiResponse(models.Model):
     """Модель для кэширования ответов ИИ"""
@@ -209,7 +182,7 @@ class AiResponse(models.Model):
         ordering = ['-last_used']
 
     def __str__(self):
-        return f'Ответ {self.id} ({self.created_at.strftime("%d.%m.%Y %H:%M")})'
+        return 'Ответ {self.id} ({self.created_at.strftime("%d.%m.%Y %H:%M")})'
 
     def increment_usage(self):
         """Увеличивает счетчик использования"""

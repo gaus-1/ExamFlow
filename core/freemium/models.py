@@ -6,13 +6,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-
 class UserSubscription(models.Model):
     """Подписка пользователя"""
 
     SUBSCRIPTION_TYPES = [
-        ('free', 'Бесплатный'),
-        ('premium', 'Подписка'),
     ]
 
     user = models.OneToOneField(
@@ -34,7 +31,7 @@ class UserSubscription(models.Model):
 
     def __str__(self):
         # type: ignore
-        return f"{self.user.username} - {self.get_subscription_type_display()}"
+        return "{self.user.username} - {self.get_subscription_type_display()}"
 
     @property
     def is_premium(self):
@@ -47,7 +44,6 @@ class UserSubscription(models.Model):
         if not self.expires_at:
             return False
         return timezone.now() > self.expires_at
-
 
 class DailyUsage(models.Model):
     """Ежедневное использование ИИ"""
@@ -65,7 +61,7 @@ class DailyUsage(models.Model):
 
     def __str__(self):
         # type: ignore
-        return f"{self.user.username} - {self.date} - {self.ai_requests_count} запросов"
+        return "{self.user.username} - {self.date} - {self.ai_requests_count} запросов"
 
     @classmethod
     def get_today_usage(cls, user):
@@ -97,7 +93,6 @@ class DailyUsage(models.Model):
             return True
         return False
 
-
 class SubscriptionLimit(models.Model):
     """Лимиты подписок"""
 
@@ -121,7 +116,7 @@ class SubscriptionLimit(models.Model):
         verbose_name_plural = 'Лимиты подписок'
 
     def __str__(self):
-        return f"Лимиты для {self.get_subscription_type_display()}"  # type: ignore
+        return "Лимиты для {self.get_subscription_type_display()}"  # type: ignore
 
     @classmethod
     def get_limits(cls, subscription_type):

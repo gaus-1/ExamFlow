@@ -9,7 +9,6 @@ from django.db import connection
 import os
 import sys
 
-
 class Command(BaseCommand):
     help = 'Проверяет готовность ExamFlow 2.0 к деплою на Render'
 
@@ -45,7 +44,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'   ❌ Ошибка Django конфигурации: {e}')
+                self.style.ERROR('   ❌ Ошибка Django конфигурации: {e}')
             )
             failed_checks += 1
 
@@ -61,7 +60,7 @@ class Command(BaseCommand):
                 passed_checks += 1
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'   ❌ Ошибка базы данных: {e}')  # type: ignore
+                self.style.ERROR('   ❌ Ошибка базы данных: {e}')  # type: ignore
             )
             failed_checks += 1
 
@@ -76,7 +75,7 @@ class Command(BaseCommand):
             passed_checks += 1
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'   ❌ Ошибка миграций: {e}')  # type: ignore
+                self.style.ERROR('   ❌ Ошибка миграций: {e}')  # type: ignore
             )
             failed_checks += 1
 
@@ -91,7 +90,7 @@ class Command(BaseCommand):
                 if len(static_files) > 0:
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f'   ✅ Статические файлы готовы ({len(static_files)} файлов)')  # type: ignore
+                            '   ✅ Статические файлы готовы ({len(static_files)} файлов)')  # type: ignore
                     )
                     passed_checks += 1
                 else:
@@ -118,7 +117,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'   ❌ Ошибка проверки статических файлов: {e}')
+                self.style.ERROR('   ❌ Ошибка проверки статических файлов: {e}')
             )
             failed_checks += 1
 
@@ -136,10 +135,10 @@ class Command(BaseCommand):
             if os.getenv(var):
                 env_checks += 1
                 if verbose:
-                    self.stdout.write(f'   ✅ {var}: установлен')
+                    self.stdout.write('   ✅ {var}: установлен')
             else:
                 if verbose:
-                    self.stdout.write(f'   ⚠️  {var}: не установлен')
+                    self.stdout.write('   ⚠️  {var}: не установлен')
 
         if env_checks >= len(required_vars) * 0.8:  # 80% переменных
             self.stdout.write(
@@ -178,7 +177,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'   ❌ Отсутствуют файлы: {", ".join(missing_files)}')
+                self.style.ERROR('   ❌ Отсутствуют файлы: {", ".join(missing_files)}')
             )
             failed_checks += 1
 
@@ -193,16 +192,16 @@ class Command(BaseCommand):
             passed_checks += 1
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'   ❌ Ошибка тестов: {e}')  # type: ignore
+                self.style.ERROR('   ❌ Ошибка тестов: {e}')  # type: ignore
             )
             failed_checks += 1
 
         # Итоги
         self.stdout.write('\n' + '=' * 60)
         self.stdout.write('📊 РЕЗУЛЬТАТЫ ПРОВЕРКИ:')
-        self.stdout.write(f'   Всего проверок: {total_checks}')
-        self.stdout.write(f'   Пройдено: {passed_checks}')
-        self.stdout.write(f'   Провалено: {failed_checks}')
+        self.stdout.write('   Всего проверок: {total_checks}')
+        self.stdout.write('   Пройдено: {passed_checks}')
+        self.stdout.write('   Провалено: {failed_checks}')
 
         if failed_checks == 0:
             self.stdout.write(
@@ -216,7 +215,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'\n⚠️  Найдено {failed_checks} проблем!')
+                self.style.ERROR('\n⚠️  Найдено {failed_checks} проблем!')
             )
             self.stdout.write('Исправьте их перед деплоем.')
             sys.exit(1)

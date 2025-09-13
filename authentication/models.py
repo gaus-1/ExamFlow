@@ -10,7 +10,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-
 class TimeStampedModel(models.Model):
     """Абстрактная модель с временными метками"""
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,7 +17,6 @@ class TimeStampedModel(models.Model):
 
     class Meta:
         abstract = True
-
 
 class UserProfile(TimeStampedModel):
     """Расширенный профиль пользователя"""
@@ -41,7 +39,7 @@ class UserProfile(TimeStampedModel):
     last_daily_reset = models.DateField(default=timezone.now)
 
     def __str__(self):
-        return f"Профиль {self.user.username}"
+        return "Профиль {self.user.username}"
 
     @property
     def is_premium(self):
@@ -66,7 +64,6 @@ class UserProfile(TimeStampedModel):
         verbose_name = "Профиль пользователя"
         verbose_name_plural = "Профили пользователей"
 
-
 class Subscription(TimeStampedModel):
     """Подписка пользователя"""
     user = models.ForeignKey(
@@ -85,7 +82,7 @@ class Subscription(TimeStampedModel):
     auto_renewal = models.BooleanField(default=True, verbose_name="Автопродление")
 
     def __str__(self):
-        return f"Подписка {self.user.username} - {self.get_subscription_type_display()}"
+        return "Подписка {self.user.username} - {self.get_subscription_type_display()}"
 
     class Meta:
         verbose_name = "Подписка"

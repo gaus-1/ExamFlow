@@ -9,7 +9,6 @@ from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
-
 class PremiumAccessMiddleware(MiddlewareMixin):
     """
     Middleware для проверки доступа к премиум функциям
@@ -47,7 +46,8 @@ class PremiumAccessMiddleware(MiddlewareMixin):
 
             # Получаем профиль пользователя
             from core.models import UserProfile
-            profile, _ = UserProfile.objects.get_or_create(user=request.user)  # type: ignore
+            profile, _ = UserProfile.objects.get_or_create(  # type: ignore
+                user=request.user)  # type: ignore
 
             # Если пользователь премиум, разрешаем полный доступ
             if profile.is_premium:
@@ -57,7 +57,7 @@ class PremiumAccessMiddleware(MiddlewareMixin):
             return self._check_rate_limit(request, user_id=request.user.id)
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке премиум доступа: {e}")
+            logger.error("Ошибка при проверке премиум доступа: {e}")
             # В случае ошибки разрешаем ограниченный доступ
             return self._check_rate_limit(request, is_anonymous=True)
 
@@ -73,12 +73,12 @@ class PremiumAccessMiddleware(MiddlewareMixin):
         else:
             daily_limit = 20
             hourly_limit = 5
-            cache_key_prefix = f"user_{user_id}"
+            cache_key_prefix = "user_{user_id}"
 
         # Проверяем дневной лимит
-        daily_key = f"{cache_key_prefix}_daily_{request.META.get('REMOTE_ADDR', 'unknown')}"
+        daily_key = "{cache_key_prefix}_daily_{request.META.get('REMOTE_ADDR', 'unknown')}"
         daily_count = cache.get(daily_key, 0)
-        
+
         if daily_count >= daily_limit:
             return JsonResponse({
                 "error": "Daily request limit exceeded",
@@ -87,9 +87,9 @@ class PremiumAccessMiddleware(MiddlewareMixin):
             }, status=429)
 
         # Проверяем часовой лимит
-        hourly_key = f"{cache_key_prefix}_hourly_{request.META.get('REMOTE_ADDR', 'unknown')}"
+        hourly_key = "{cache_key_prefix}_hourly_{request.META.get('REMOTE_ADDR', 'unknown')}"
         hourly_count = cache.get(hourly_key, 0)
-        
+
         if hourly_count >= hourly_limit:
             return JsonResponse({
                 "error": "Hourly request limit exceeded",

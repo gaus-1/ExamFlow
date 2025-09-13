@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-
 class Command(BaseCommand):  # type: ignore
     help = "Инициализирует карту источников FIPI для математики и русского"
 
@@ -9,11 +8,11 @@ class Command(BaseCommand):  # type: ignore
         try:
             from core.models import FIPISourceMap  # type: ignore
         except Exception:
-            self.stdout.write(self.style.ERROR("Модель FIPISourceMap недоступна"))  # type: ignore
+            self.stdout.write(self.style.ERROR(
+                "Модель FIPISourceMap недоступна"))  # type: ignore
             return
 
         seeds = [
-            {
                 "name": "ЕГЭ Математика — Демоверсия",
                 "url": "https://fipi.ru/ege/demoversii/po-matematike",
                 "type": "PDF",
@@ -23,7 +22,6 @@ class Command(BaseCommand):  # type: ignore
                 "update_frequency": "yearly",
                 "priority": 100,
             },
-            {
                 "name": "ЕГЭ Математика — Спецификация",
                 "url": "https://fipi.ru/ege/specifikacii/po-matematike",
                 "type": "PDF",
@@ -33,7 +31,6 @@ class Command(BaseCommand):  # type: ignore
                 "update_frequency": "yearly",
                 "priority": 100,
             },
-            {
                 "name": "ЕГЭ Математика — Кодификатор",
                 "url": "https://fipi.ru/ege/kodifikatory/po-matematike",
                 "type": "PDF",
@@ -43,7 +40,6 @@ class Command(BaseCommand):  # type: ignore
                 "update_frequency": "yearly",
                 "priority": 90,
             },
-            {
                 "name": "ЕГЭ Русский — Демоверсия",
                 "url": "https://fipi.ru/ege/demoversii/po-russkomu-yazyku",
                 "type": "PDF",
@@ -53,7 +49,6 @@ class Command(BaseCommand):  # type: ignore
                 "update_frequency": "yearly",
                 "priority": 100,
             },
-            {
                 "name": "ЕГЭ Русский — Спецификация",
                 "url": "https://fipi.ru/ege/specifikacii/po-russkomu-yazyku",
                 "type": "PDF",
@@ -63,7 +58,6 @@ class Command(BaseCommand):  # type: ignore
                 "update_frequency": "yearly",
                 "priority": 100,
             },
-            {
                 "name": "ЕГЭ Русский — Кодификатор",
                 "url": "https://fipi.ru/ege/kodifikatory/po-russkomu-yazyku",
                 "type": "PDF",
@@ -85,5 +79,6 @@ class Command(BaseCommand):  # type: ignore
                     created += 1
 
         self.stdout.write(
-            self.style.SUCCESS(f"Готово: добавлено {created} источников (или уже были).")  # type: ignore
+            self.style.SUCCESS(
+                "Готово: добавлено {created} источников (или уже были).")  # type: ignore
         )

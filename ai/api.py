@@ -42,9 +42,8 @@ try:
         )
     )  # type: ignore
 except Exception as e:
-    logger.error(f"Ошибка инициализации Gemini API: {e}")
+    logger.error("Ошибка инициализации Gemini API: {e}")
     model = None
-
 
 @method_decorator([login_required, check_ai_limits], name='dispatch')
 class AIAssistantAPI(View):
@@ -60,12 +59,10 @@ class AIAssistantAPI(View):
         Обрабатывает POST запросы к ИИ-ассистенту
 
         Ожидает JSON:
-        {
             "prompt": "Вопрос пользователя"
         }
 
         Возвращает JSON:
-        {
             "answer": "Ответ ИИ",
             "sources": [{"title": "Название", "url": "ссылка"}],
             "practice": {
@@ -75,7 +72,7 @@ class AIAssistantAPI(View):
         }
         """
         try:
-            logger.info(f"AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
+            logger.info("AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
 
             # Валидация размера запроса
             if len(request.body) > 10000:  # 10KB лимит
@@ -99,7 +96,7 @@ class AIAssistantAPI(View):
 
             # Базовая санитизация
             prompt = prompt.replace('<', '&lt;').replace('>', '&gt;')
-            logger.info(f"AI API: Промпт: {prompt[:100]}...")
+            logger.info("AI API: Промпт: {prompt[:100]}...")
 
             # Проверяем, что модель инициализирована
             if model is None:
@@ -117,9 +114,9 @@ class AIAssistantAPI(View):
                 'error': 'Неверный JSON'
             }, status=400)
         except Exception as e:
-            logger.error(f"AI API Error: {e}")
+            logger.error("AI API Error: {e}")
             return JsonResponse({
-                'error': f'Внутренняя ошибка сервера: {str(e)}'
+                'error': 'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
 
     def generate_ai_response(self, prompt):
@@ -129,13 +126,13 @@ class AIAssistantAPI(View):
         try:
             # Создаем хеш для кэширования (используем SHA-256 для безопасности)
             prompt_hash = hashlib.sha256(prompt.lower().strip().encode()).hexdigest()
-            cache_key = f"ai_response_{prompt_hash}"
+            cache_key = "ai_response_{prompt_hash}"
 
             # Проверяем кэш
             cached_response = cache.get(cache_key)
             if cached_response:
                 logger.info(
-                    f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
+                    "AI API: Используем кэшированный ответ для: {prompt[:50]}...")
                 return cached_response
 
             # Пытаемся использовать RAG-систему
@@ -143,13 +140,13 @@ class AIAssistantAPI(View):
                 from core.rag_system.orchestrator import RAGOrchestrator
                 orchestrator = RAGOrchestrator()
                 response_data = orchestrator.process_query(prompt)
-                logger.info(f"AI API: Использована RAG-система для: {prompt[:50]}...")
+                logger.info("AI API: Использована RAG-система для: {prompt[:50]}...")
             except Exception as rag_error:
                 logger.warning(
-                    f"RAG-система недоступна: {rag_error}, используем fallback")
+                    "RAG-система недоступна: {rag_error}, используем fallback")
 
                 # Fallback на базовый Gemini API
-                context = f"""Эксперт ЕГЭ. Отвечай кратко и по делу.
+                context = """Эксперт ЕГЭ. Отвечай кратко и по делу.
 
 Вопрос: {prompt}
 
@@ -174,27 +171,24 @@ class AIAssistantAPI(View):
                     'sources': self.get_sources_for_subject(practice_topic),
                     'practice': {
                         'topic': practice_topic,
-                        'description': f'Практикуйтесь в решении задач по теме "{practice_topic}"'}}
+                        'description': 'Практикуйтесь в решении задач по теме "{practice_topic}"'}}
 
             # Сохраняем в кэш на 1 час
             cache.set(cache_key, response_data, 3600)
-            logger.info(f"AI API: Сохранили ответ в кэш для: {prompt[:50]}...")
+            logger.info("AI API: Сохранили ответ в кэш для: {prompt[:50]}...")
 
             return response_data
 
         except Exception as e:
-            logger.error(f"AI API Error: {e}")
+            logger.error("AI API Error: {e}")
             # Fallback на базовый ответ
             error_msg = (
                 f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. "
-                f"Попробуйте переформулировать или обратитесь к официальным источникам.\n\n"
+                "Попробуйте переформулировать или обратитесь к официальным источникам.\n\n"
                 f"Ваш вопрос: {prompt}")
             return {
                 'answer': error_msg,
-                'sources': [
-                    {'title': 'ФИПИ - ЕГЭ', 'url': 'https://fipi.ru/ege'},
-                    {'title': 'ExamFlow - Главная', 'url': 'https://examflow.ru/'}
-                ],
+                'sources': [],
                 'practice': {
                     'topic': 'general',
                     'description': 'Выберите предмет для начала практики'
@@ -230,44 +224,25 @@ class AIAssistantAPI(View):
         """
         sources_map = {
             'mathematics': [
-                {'title': 'ФИПИ - Математика', 'url': 'https://fipi.ru/ege/matematika'},
-                {'title': 'Открытый банк заданий', 'url': 'https://math-ege.sdamgia.ru/'}
             ],
             'russian': [
-                {'title': 'ФИПИ - Русский язык', 'url': 'https://fipi.ru/ege/russkiy-yazyk'},
-                {'title': 'Грамота.ру', 'url': 'https://gramota.ru/'}
             ],
             'physics': [
-                {'title': 'ФИПИ - Физика', 'url': 'https://fipi.ru/ege/fizika'},
-                {'title': 'Физика для всех', 'url': 'https://physics.ru/'}
             ],
             'chemistry': [
-                {'title': 'ФИПИ - Химия', 'url': 'https://fipi.ru/ege/khimiya'},
-                {'title': 'Химия для всех', 'url': 'https://chemistry.ru/'}
             ],
             'biology': [
-                {'title': 'ФИПИ - Биология', 'url': 'https://fipi.ru/ege/biologiya'},
-                {'title': 'Биология для всех', 'url': 'https://biology.ru/'}
             ],
             'history': [
-                {'title': 'ФИПИ - История', 'url': 'https://fipi.ru/ege/istoriya'},
-                {'title': 'История России', 'url': 'https://history.ru/'}
             ],
             'social_studies': [
-                {'title': 'ФИПИ - Обществознание', 'url': 'https://fipi.ru/ege/obshchestvoznanie'},
-                {'title': 'Обществознание', 'url': 'https://social.ru/'}
             ],
             'english': [
-                {'title': 'ФИПИ - Английский язык', 'url': 'https://fipi.ru/ege/angliyskiy-yazyk'},
-                {'title': 'Английский для ЕГЭ', 'url': 'https://english-ege.ru/'}
             ]
         }
 
         return sources_map.get(subject, [
-            {'title': 'ФИПИ - ЕГЭ', 'url': 'https://fipi.ru/ege'},
-            {'title': 'ExamFlow - Главная', 'url': 'https://examflow.ru/'}
         ])
-
 
 class ProblemsAPI(View):
     """
@@ -310,7 +285,6 @@ class ProblemsAPI(View):
         POST запрос для проверки ответа
 
         Ожидает JSON:
-        {
             "problem_id": "ID задачи",
             "answer": "Ответ пользователя"
         }
@@ -318,7 +292,7 @@ class ProblemsAPI(View):
         try:
             data = json.loads(request.body)
             problem_id = data.get('problem_id')  # type: ignore
-            answer = data.get('answer')  # type: ignore         
+            answer = data.get('answer')  # type: ignore
 
             if not problem_id or answer is None:
                 return JsonResponse({
@@ -382,7 +356,7 @@ class ProblemsAPI(View):
             # Fallback если модели не доступны
             return self.get_fallback_problems(topic, limit)
         except Exception as e:
-            logger.error(f"Error getting problems: {e}")
+            logger.error("Error getting problems: {e}")
             return self.get_fallback_problems(topic, limit)
 
     def get_fallback_problems(self, topic, limit):
@@ -397,7 +371,6 @@ class ProblemsAPI(View):
                                                           'x₁ = -1, x₂ = -6'],
                                               'correct_answer': 0,
                                               'hint': 'Используйте формулу дискриминанта: D = b² - 4ac'},
-                                             {'id': 2,
                                               'text': 'Найдите площадь круга с радиусом 5 см',
                                               'options': ['25π см²',
                                                           '50π см²',
@@ -434,10 +407,10 @@ class ProblemsAPI(View):
                 return answer == 0
 
         except Task.DoesNotExist:  # type: ignore
-            logger.error(f"Task {problem_id} not found")
+            logger.error("Task {problem_id} not found")
             return False
         except Exception as e:
-            logger.error(f"Error checking answer: {e}")
+            logger.error("Error checking answer: {e}")
             return False
 
     def get_feedback(self, is_correct):
@@ -448,7 +421,6 @@ class ProblemsAPI(View):
             return "Отлично! Ответ правильный! 🎉"
         else:
             return "Попробуйте еще раз. Не отчаивайтесь! 💪"
-
 
 class UserProfileAPI(View):
     """
@@ -510,7 +482,6 @@ class UserProfileAPI(View):
                 'total_problems_solved': total_problems_solved,
                 'streak': streak,
                 'achievements': [
-                    {
                         'name': a.name,
                         'description': a.description} for a in achievements] if achievements else [],
                 'subjects_progress': subjects_progress}
@@ -518,7 +489,7 @@ class UserProfileAPI(View):
             return JsonResponse(profile)
 
         except Exception as e:
-            logger.error(f"Error getting user profile: {e}")
+            logger.error("Error getting user profile: {e}")
             # Fallback профиль
             profile = {
                 'id': user.id,
@@ -543,7 +514,7 @@ class UserProfileAPI(View):
 
             if action == 'solve_problem':
                 # Обновляем прогресс решения задачи
-                problem_id = data.get('problem_id')  # type: ignore     
+                problem_id = data.get('problem_id')  # type: ignore
                 is_correct = data.get('is_correct', False)  # type: ignore
                 subject = data.get('subject', 'general')
 
@@ -553,7 +524,8 @@ class UserProfileAPI(View):
             elif action == 'complete_challenge':
                 # Обновляем прогресс челленджа
                 challenge_id = data.get('challenge_id')  # type: ignore
-                return self.update_challenge_progress(request.user, challenge_id)  # type: ignore
+                return self.update_challenge_progress(
+                    request.user, challenge_id)  # type: ignore
 
             else:
                 return JsonResponse({
@@ -624,7 +596,7 @@ class UserProfileAPI(View):
             })
 
         except Exception as e:
-            logger.error(f"Error updating problem progress: {e}")
+            logger.error("Error updating problem progress: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     def update_challenge_progress(self, user, challenge_id):
@@ -655,9 +627,8 @@ class UserProfileAPI(View):
             })
 
         except Exception as e:
-            logger.error(f"Error updating challenge progress: {e}")
+            logger.error("Error updating challenge progress: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
 
 # URL маршруты для API
 @csrf_exempt
@@ -668,19 +639,18 @@ def ai_chat_api(request):
 
     Обрабатывает POST запросы к /ai/api/chat/
     """
-    logger.info(f"AI Chat API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
-    logger.info(f"AI Chat API: Метод: {request.method}")
-    logger.info(f"AI Chat API: Headers: {dict(request.headers)}")
+    logger.info("AI Chat API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
+    logger.info("AI Chat API: Метод: {request.method}")
+    logger.info("AI Chat API: Headers: {dict(request.headers)}")
 
     try:
         view = AIAssistantAPI()
         return view.post(request)
     except Exception as e:
-        logger.error(f"AI Chat API Error: {e}")
+        logger.error("AI Chat API Error: {e}")
         return JsonResponse({
-            'error': f'Внутренняя ошибка сервера: {str(e)}'
+            'error': 'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
@@ -695,7 +665,6 @@ def problems_api(request):
         return view.get(request)
     else:
         return view.post(request)
-
 
 @require_http_methods(["GET", "POST"])
 def user_profile_api(request):

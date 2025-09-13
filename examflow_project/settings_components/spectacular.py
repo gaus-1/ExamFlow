@@ -8,12 +8,5 @@ SPECTACULAR_SETTINGS = {
     'SORT_OPERATIONS': False,
     'ENUM_NAME_OVERRIDES': {},
     'TAGS': [
-        {'name': 'AI', 'description': 'AI-помощник и RAG система'},
-        {'name': 'Subjects', 'description': 'Предметы и задания'},
-        {'name': 'User', 'description': 'Пользователи и профили'},
-        {'name': 'FIPI', 'description': 'Поиск по материалам ФИПИ'},
-        {'name': 'Health', 'description': 'Мониторинг состояния системы'},
     ]
 }
-
-

@@ -10,7 +10,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class UnifiedProfileService:
     """Сервис для управления унифицированными профилями"""
 
@@ -21,7 +20,7 @@ class UnifiedProfileService:
             profile, created = UnifiedProfile.objects.get_or_create(
                 telegram_id=telegram_id,
                 defaults={
-                    'display_name': kwargs.get('display_name', f'Пользователь {telegram_id}'),
+                    'display_name': kwargs.get('display_name', 'Пользователь {telegram_id}'),
                     'telegram_username': kwargs.get('telegram_username', ''),
                     'notification_settings': {
                         'daily_challenges': True,
@@ -34,7 +33,7 @@ class UnifiedProfileService:
 
             if created:
                 logger.info(
-                    f"Создан новый унифицированный профиль для TG ID: {telegram_id}")
+                    "Создан новый унифицированный профиль для TG ID: {telegram_id}")
 
             # Обновляем последнюю активность
             profile.last_activity = timezone.now()
@@ -44,7 +43,7 @@ class UnifiedProfileService:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при создании/получении профиля для TG ID {telegram_id}: {e}")
+                "Ошибка при создании/получении профиля для TG ID {telegram_id}: {e}")
             raise
 
     @staticmethod
@@ -54,10 +53,10 @@ class UnifiedProfileService:
             profile.user = user
             profile.save()
             logger.info(
-                f"Профиль {profile.telegram_id} связан с Django пользователем {user.username}")
+                "Профиль {profile.telegram_id} связан с Django пользователем {user.username}")
             return True
         except Exception as e:
-            logger.error(f"Ошибка при связывании профиля с пользователем: {e}")
+            logger.error("Ошибка при связывании профиля с пользователем: {e}")
             return False
 
     @staticmethod
@@ -98,7 +97,7 @@ class UnifiedProfileService:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при обновлении статистики профиля {profile.telegram_id}: {e}")
+                "Ошибка при обновлении статистики профиля {profile.telegram_id}: {e}")
             return {'level_up': False, 'achievements': []}
 
     @staticmethod
@@ -180,13 +179,13 @@ class UnifiedProfileService:
                         profile.add_experience(challenge.reward_xp)
 
                         logger.info(
-                            f"Пользователь {profile.telegram_id} завершил вызов: {challenge.title}")
+                            "Пользователь {profile.telegram_id} завершил вызов: {challenge.title}")
 
                     user_challenge.save()
 
         except Exception as e:
             logger.error(
-                f"Ошибка при обновлении ежедневных вызовов для профиля {profile.telegram_id}: {e}")
+                "Ошибка при обновлении ежедневных вызовов для профиля {profile.telegram_id}: {e}")
 
     @staticmethod
     def get_daily_challenges(profile: UnifiedProfile) -> Dict[str, Any]:
@@ -229,7 +228,7 @@ class UnifiedProfileService:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при получении ежедневных вызовов для профиля {profile.telegram_id}: {e}")
+                "Ошибка при получении ежедневных вызовов для профиля {profile.telegram_id}: {e}")
             return {'challenges': [], 'completed_count': 0, 'total_count': 0}
 
     @staticmethod
@@ -256,9 +255,8 @@ class UnifiedProfileService:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при получении статистики профиля {profile.telegram_id}: {e}")
+                "Ошибка при получении статистики профиля {profile.telegram_id}: {e}")
             return {}
-
 
 class DailyChallengeService:
     """Сервис для управления ежедневными вызовами"""
@@ -274,14 +272,12 @@ class DailyChallengeService:
             DailyChallenge.objects.filter(date=date).delete()
 
             challenges = [
-                {
                     'title': 'Решить 5 задач',
                     'description': 'Решите правильно 5 задач любой сложности',
                     'challenge_type': 'solve_tasks',
                     'target_value': 5,
                     'reward_xp': 50
                 },
-                {
                     'title': 'Серия из 3 задач',
                     'description': 'Решите подряд 3 задачи без ошибок',
                     'challenge_type': 'streak',
@@ -299,9 +295,9 @@ class DailyChallengeService:
                 created_challenges.append(challenge)
 
             logger.info(
-                f"Созданы ежедневные вызовы на {date}: {len(created_challenges)} вызовов")
+                "Созданы ежедневные вызовы на {date}: {len(created_challenges)} вызовов")
             return created_challenges
 
         except Exception as e:
-            logger.error(f"Ошибка при создании ежедневных вызовов на {date}: {e}")
+            logger.error("Ошибка при создании ежедневных вызовов на {date}: {e}")
             return []

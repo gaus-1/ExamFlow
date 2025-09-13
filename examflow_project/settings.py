@@ -21,11 +21,11 @@ if DEBUG:
     INSTALLED_APPS += [
         'django_extensions',
     ]
-    
+
     # Отключение CSP в режиме разработки для удобства
     CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
     CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
-    
+
     # Включение отладочной панели
     if os.getenv('ENABLE_DEBUG_TOOLBAR', 'False').lower() == 'true':
         INSTALLED_APPS += ['debug_toolbar']
@@ -40,14 +40,14 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    
+
     # Настройки сессий для продакшена
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    
+
     # Настройки статических файлов для продакшена
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
+
     # Настройки базы данных для продакшена (если используется DATABASE_URL)
     database_url = os.getenv('DATABASE_URL')
     if database_url:
@@ -55,7 +55,7 @@ if not DEBUG:
         # Добавляем SSL настройки для Render с более мягкими параметрами
         if 'OPTIONS' not in db_config:
             db_config['OPTIONS'] = {}
-        
+
         # Настройки для psycopg2 (используется на Render)
         db_config['OPTIONS']['sslmode'] = 'require'  # type: ignore
         db_config['OPTIONS']['connect_timeout'] = 30  # type: ignore
@@ -63,13 +63,17 @@ if not DEBUG:
         db_config['OPTIONS']['keepalives_interval'] = 30  # type: ignore
         db_config['OPTIONS']['keepalives_count'] = 3  # type: ignore
         db_config['OPTIONS']['application_name'] = 'examflow_render'  # type: ignore
-        
+
         # Дополнительные настройки для стабильности
         db_config['CONN_MAX_AGE'] = 600  # type: ignore
         db_config['CONN_HEALTH_CHECKS'] = True  # type: ignore
         
+        # Убираем проблемные параметры для psycopg2
+        if 'CLIENT_CLASS' in db_config:
+            del db_config['CLIENT_CLASS']
+
         DATABASES['default'] = dict(db_config)  # type: ignore
-    
+
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки
     try:
         import drf_spectacular
@@ -96,14 +100,14 @@ RAG_CONFIG = {
     'MAX_SOURCES': 5,
     'CACHE_TTL': 600,  # 10 минут
     'SIMILARITY_THRESHOLD': 0.7,
-}
+    }
 
 # Настройки FIPI
 FIPI_CONFIG = {
     'BASE_URL': 'https://fipi.ru',
     'UPDATE_INTERVAL': 3600,  # 1 час
     'MAX_RETRIES': 3,
-}
+    }
 
 # Настройки Telegram бота
 TELEGRAM_BOT_CONFIG = {
@@ -111,7 +115,7 @@ TELEGRAM_BOT_CONFIG = {
     'POLLING_INTERVAL': 1,
     'MAX_CONNECTIONS': 100,
     'TIMEOUT': 30,
-}
+    }
 
 # Настройки кэширования
 CACHE_TTL = {
@@ -125,7 +129,7 @@ MONITORING_CONFIG = {
     'HEALTH_CHECK_INTERVAL': 60,  # 1 минута
     'UPTIME_CHECK_INTERVAL': 300,  # 5 минут
     'ERROR_REPORTING': True,
-}
+    }
 
 # Настройки безопасности
 SECURITY_CONFIG = {
@@ -133,7 +137,7 @@ SECURITY_CONFIG = {
     'MAX_LOGIN_ATTEMPTS': 5,
     'LOCKOUT_DURATION': 900,  # 15 минут
     'PASSWORD_MIN_LENGTH': 8,
-}
+    }
 
 # Настройки персонализации
 PERSONALIZATION_CONFIG = {
@@ -141,7 +145,7 @@ PERSONALIZATION_CONFIG = {
     'ENABLE_RECOMMENDATIONS': True,
     'ENABLE_PROGRESS_TRACKING': True,
     'MAX_LEARNING_HISTORY': 1000,
-}
+    }
 
 # Настройки уведомлений
 NOTIFICATION_CONFIG = {
@@ -149,7 +153,7 @@ NOTIFICATION_CONFIG = {
     'TELEGRAM_ENABLED': True,
     'PUSH_ENABLED': False,
     'DIGEST_FREQUENCY': 'weekly',
-}
+    }
 
 # Настройки для тестирования
 if 'test' in sys.argv:
@@ -157,7 +161,7 @@ if 'test' in sys.argv:
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
-    
+
     # Использование SQLite для тестов
     DATABASES = {
         'default': {
@@ -165,7 +169,7 @@ if 'test' in sys.argv:
             'NAME': ':memory:',
         }
     }
-    
+
     # Отключение кэширования в тестах
     CACHES = {
         'default': {

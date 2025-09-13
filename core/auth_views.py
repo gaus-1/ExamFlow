@@ -24,7 +24,6 @@ except ImportError:
 from authentication.models import UserProfile, Subscription
 from learning.models import UserRating, Achievement
 
-
 def register_view(request):
     """Регистрация нового пользователя"""
     if request.user.is_authenticated:
@@ -56,12 +55,11 @@ def register_view(request):
                             request, 'Регистрация успешна! Добро пожаловать в ExamFlow!')
                         return redirect('dashboard')
             except Exception as e:
-                messages.error(request, f'Ошибка при регистрации: {str(e)}')
+                messages.error(request, 'Ошибка при регистрации: {str(e)}')
     else:
         form = TechRegisterForm()
 
     return render(request, 'auth/register.html', {'form': form})
-
 
 def login_view(request):
     """Вход пользователя"""
@@ -83,7 +81,7 @@ def login_view(request):
                 profile.save()
 
                 messages.success(
-                    request, f'Добро пожаловать, {user.first_name or user.username}!')
+                    request, 'Добро пожаловать, {user.first_name or user.username}!')
                 next_url = request.GET.get('next', 'dashboard')
                 return redirect(next_url)
             else:
@@ -93,13 +91,11 @@ def login_view(request):
 
     return render(request, 'auth/login.html', {'form': form})
 
-
 def logout_view(request):
     """Выход пользователя"""
     logout(request)
     messages.info(request, 'Вы успешно вышли из системы')
     return redirect('learning:home')
-
 
 @login_required
 def dashboard_view(request):
@@ -142,7 +138,6 @@ def dashboard_view(request):
 
     return render(request, 'auth/dashboard.html', context)
 
-
 @login_required
 def profile_view(request):
     """Профиль пользователя"""
@@ -159,7 +154,6 @@ def profile_view(request):
         form = ProfileUpdateForm(instance=profile, user=request.user)
 
     return render(request, 'auth/profile.html', {'form': form, 'profile': profile})
-
 
 @login_required
 @require_http_methods(["POST"])
@@ -192,7 +186,7 @@ def subscribe_view(request):
             user=request.user,
             subscription_type=subscription_type,
             amount=amount,
-            payment_id=f"sub_{timezone.now().timestamp()}_{request.user.id}",
+            payment_id="sub_{timezone.now().timestamp()}_{request.user.id}",
             payment_method=payment_method,
             status='pending',
             starts_at=starts_at,
@@ -203,10 +197,10 @@ def subscribe_view(request):
         # Пока имитируем успешную оплату
         if payment_method == 'card':
             # Интеграция с CloudPayments
-            payment_url = f"/payment/card/{subscription.id}/"
+            payment_url = "/payment/card/{subscription.id}/"
         else:
             # Интеграция с Bitcoin
-            payment_url = f"/payment/btc/{subscription.id}/"
+            payment_url = "/payment/btc/{subscription.id}/"
 
         return JsonResponse({
             'success': True,
@@ -217,7 +211,6 @@ def subscribe_view(request):
 
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
-
 
 @login_required
 def achievements_view(request):
@@ -236,7 +229,6 @@ def achievements_view(request):
     }
 
     return render(request, 'auth/achievements.html', context)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -258,7 +250,7 @@ def telegram_auth(request):
         except UserProfile.DoesNotExist:  # type: ignore
             # Создаем нового пользователя
             user = User.objects.create_user(
-                username=f'tg_{telegram_id}',
+                username='tg_{telegram_id}',
                 first_name=first_name
             )
             profile = UserProfile.objects.create(  # type: ignore

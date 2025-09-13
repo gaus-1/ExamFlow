@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.core.management import call_command
 
-
 class Command(BaseCommand):
     help = 'Принудительно исправляет базу данных ExamFlow'
 
@@ -39,7 +38,7 @@ class Command(BaseCommand):
                 '🎉 БАЗА ДАННЫХ ИСПРАВЛЕНА!'))  # type: ignore
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'❌ Ошибка: {e}'))  # type: ignore
+            self.stdout.write(self.style.ERROR('❌ Ошибка: {e}'))  # type: ignore
 
     def create_missing_fields(self):
         """Принудительно создает недостающие поля"""
@@ -52,7 +51,7 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Поле exam_type добавлено в learning_subject')
             except Exception as e:
-                self.stdout.write(f'⚠️ exam_type: {e}')
+                self.stdout.write('⚠️ exam_type: {e}')
 
             # Создаем поле code в learning_topic
             try:
@@ -62,7 +61,7 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Поле code добавлено в learning_topic')
             except Exception as e:
-                self.stdout.write(f'⚠️ code: {e}')
+                self.stdout.write('⚠️ code: {e}')
 
             # Проверяем и создаем таблицы если их нет
             try:
@@ -75,7 +74,7 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Таблица learning_subject проверена/создана')
             except Exception as e:
-                self.stdout.write(f'⚠️ learning_subject: {e}')
+                self.stdout.write('⚠️ learning_subject: {e}')
 
             try:
                 cursor.execute("""
@@ -92,4 +91,4 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Таблица learning_task проверена/создана')
             except Exception as e:
-                self.stdout.write(f'⚠️ learning_task: {e}')
+                self.stdout.write('⚠️ learning_task: {e}')

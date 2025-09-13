@@ -18,7 +18,6 @@ from .personalization_system import (
 
 logger = logging.getLogger(__name__)
 
-
 @login_required
 @require_http_methods(["GET"])
 def get_personalized_recommendations(request):
@@ -33,12 +32,11 @@ def get_personalized_recommendations(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении рекомендаций: {e}")
+        logger.error("Ошибка при получении рекомендаций: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении рекомендаций'
         }, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -55,12 +53,11 @@ def get_study_plan(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении плана обучения: {e}")
+        logger.error("Ошибка при получении плана обучения: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении плана обучения'
         }, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -77,12 +74,11 @@ def get_weak_topics(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении слабых тем: {e}")
+        logger.error("Ошибка при получении слабых тем: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении слабых тем'
         }, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -99,12 +95,11 @@ def get_user_preferences(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении предпочтений: {e}")
+        logger.error("Ошибка при получении предпочтений: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении предпочтений'
         }, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -121,12 +116,11 @@ def get_study_patterns(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении паттернов обучения: {e}")
+        logger.error("Ошибка при получении паттернов обучения: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении паттернов обучения'
         }, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -143,7 +137,6 @@ def get_recommended_tasks(request):
         tasks_data = []
         for task in recommended_tasks:
             tasks_data.append(
-                {
                     'id': getattr(
                         task, 'id', None), 'title': getattr(
                         task, 'title', ''), 'description': getattr(
@@ -164,12 +157,11 @@ def get_recommended_tasks(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении рекомендованных заданий: {e}")
+        logger.error("Ошибка при получении рекомендованных заданий: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении рекомендованных заданий'
         }, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -197,12 +189,11 @@ def get_progress_analytics(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении аналитики: {e}")
+        logger.error("Ошибка при получении аналитики: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении аналитики'
         }, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -232,12 +223,11 @@ def update_user_preferences(request):
             'error': 'Неверный формат JSON'
         }, status=400)
     except Exception as e:
-        logger.error(f"Ошибка при обновлении предпочтений: {e}")
+        logger.error("Ошибка при обновлении предпочтений: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при обновлении предпочтений'
         }, status=500)
-
 
 def get_personalization_summary(request):
     """Получает краткую сводку персонализации (для неавторизованных пользователей)"""
@@ -265,7 +255,7 @@ def get_personalization_summary(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка при получении сводки персонализации: {e}")
+        logger.error("Ошибка при получении сводки персонализации: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка при получении сводки'

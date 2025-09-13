@@ -8,7 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class AIPriorityManager:
     """Менеджер приоритетов для ИИ-помощника"""
 
@@ -32,7 +31,7 @@ class AIPriorityManager:
         ]
 
         self.prompts = {
-            'math_prof': """
+            'math_pro': """
             Ты эксперт по профильной математике ЕГЭ.
 
             ОБЯЗАТЕЛЬНО:
@@ -197,11 +196,11 @@ class AIPriorityManager:
         if subject == 'математика':
             if exam_type == 'ege':
                 # Определяем профильная или базовая
-                return self.prompts['math_prof']  # По умолчанию профильная
+                return self.prompts['math_pro']  # По умолчанию профильная
             elif exam_type == 'oge':
                 return self.prompts['math_oge']
             else:
-                return self.prompts['math_prof']
+                return self.prompts['math_pro']
 
         elif subject == 'русский':
             if exam_type == 'ege':
@@ -288,7 +287,7 @@ class AIPriorityManager:
     def log_question_analysis(self, question: str, analysis: Dict[str, Any]):
         """Логирует анализ вопроса для мониторинга"""
 
-        logger.info(f"Question analysis: {analysis}")
+        logger.info("Question analysis: {analysis}")
 
         # Можно добавить отправку в аналитику
         # analytics.track('ai_question_analyzed', {
@@ -296,7 +295,6 @@ class AIPriorityManager:
         #     'priority': analysis['priority'],
         #     'exam_type': analysis['exam_type']
         # })
-
 
 # Глобальный экземпляр менеджера приоритетов
 priority_manager = AIPriorityManager()

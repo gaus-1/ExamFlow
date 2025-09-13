@@ -11,7 +11,6 @@ from core.models import FIPISourceMap
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Тестирует карту структуры fipi.ru и собирает данные'
 
@@ -90,18 +89,18 @@ class Command(BaseCommand):
 
                 if created:
                     created_count += 1
-                    self.stdout.write(f'✅ Создан: {source.name}')
+                    self.stdout.write('✅ Создан: {source.name}')
                 else:
                     updated_count += 1
-                    self.stdout.write(f'🔄 Обновлен: {source.name}')
+                    self.stdout.write('🔄 Обновлен: {source.name}')
 
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Ошибка при создании {source.name}: {e}')
+                    self.style.ERROR('❌ Ошибка при создании {source.name}: {e}')
                 )
 
         self.stdout.write(
-            self.style.SUCCESS(f'Создано: {created_count}, Обновлено: {updated_count}')
+            self.style.SUCCESS('Создано: {created_count}, Обновлено: {updated_count}')
         )
 
     def test_scraping(self, priority=None):
@@ -118,7 +117,7 @@ class Command(BaseCommand):
                 is_active=True,
                 priority=priority
             )[:5]  # Ограничиваем для теста
-            self.stdout.write(f'Тестируем источники с приоритетом {priority}')
+            self.stdout.write('Тестируем источники с приоритетом {priority}')
         else:
             sources = FIPISourceMap.objects.filter(
                 is_active=True,
@@ -138,7 +137,7 @@ class Command(BaseCommand):
 
         for source in sources:
             try:
-                self.stdout.write(f'Тестируем: {source.name}')
+                self.stdout.write('Тестируем: {source.name}')
 
                 # Получаем содержимое
                 content = scraper.get_page_content(source.url)
@@ -150,7 +149,7 @@ class Command(BaseCommand):
                     # Обновляем источник
                     source.mark_as_checked(content_hash)
 
-                    self.stdout.write(f'  ✅ Успешно: {len(str(content))} символов')
+                    self.stdout.write('  ✅ Успешно: {len(str(content))} символов')
                     success_count += 1
                 else:
                     self.stdout.write('  ❌ Ошибка: не удалось получить содержимое')
@@ -161,11 +160,11 @@ class Command(BaseCommand):
                 time.sleep(1)
 
             except Exception as e:
-                self.stdout.write(f'  ❌ Ошибка: {e}')
+                self.stdout.write('  ❌ Ошибка: {e}')
                 error_count += 1
 
         self.stdout.write(self.style.SUCCESS(
-            f'Тестирование завершено: {success_count} успешно, {error_count} ошибок'))
+            'Тестирование завершено: {success_count} успешно, {error_count} ошибок'))
 
     def show_statistics(self):
         """Показывает статистику"""
@@ -178,8 +177,8 @@ class Command(BaseCommand):
         total_sources = FIPISourceMap.objects.count()
         active_sources = FIPISourceMap.objects.filter(is_active=True).count()
 
-        self.stdout.write(f'📋 Всего источников: {total_sources}')
-        self.stdout.write(f'✅ Активных источников: {active_sources}')
+        self.stdout.write('📋 Всего источников: {total_sources}')
+        self.stdout.write('✅ Активных источников: {active_sources}')
 
         # Статистика по приоритетам
         self.stdout.write('\n📈 По приоритетам:')
@@ -191,28 +190,28 @@ class Command(BaseCommand):
                 3: 'Средний приоритет',
                 4: 'Низкий приоритет',
             }[priority]
-            self.stdout.write(f'  • {priority_name}: {count}')
+            self.stdout.write('  • {priority_name}: {count}')
 
         # Статистика по типам данных
         self.stdout.write('\n📈 По типам данных:')
         for data_type, _ in FIPISourceMap.DATA_TYPES:
             count = FIPISourceMap.objects.filter(data_type=data_type).count()
             if count > 0:
-                self.stdout.write(f'  • {data_type}: {count}')
+                self.stdout.write('  • {data_type}: {count}')
 
         # Статистика по типам экзаменов
         self.stdout.write('\n📈 По типам экзаменов:')
         for exam_type, _ in FIPISourceMap.EXAM_TYPES:
             count = FIPISourceMap.objects.filter(exam_type=exam_type).count()
             if count > 0:
-                self.stdout.write(f'  • {exam_type}: {count}')
+                self.stdout.write('  • {exam_type}: {count}')
 
         # Статистика по форматам
         self.stdout.write('\n📈 По форматам файлов:')
         for file_format, _ in FIPISourceMap.FILE_FORMATS:
             count = FIPISourceMap.objects.filter(file_format=file_format).count()
             if count > 0:
-                self.stdout.write(f'  • {file_format}: {count}')
+                self.stdout.write('  • {file_format}: {count}')
 
     def show_help(self):
         """Показывает справку по использованию"""

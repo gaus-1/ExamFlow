@@ -4,13 +4,11 @@
 
 import logging
 
-
 from core.premium.access_control import get_access_control, get_usage_tracker
 from core.models import FIPIData
 from core.rag_system.orchestrator import get_ai_orchestrator
 
 logger = logging.getLogger(__name__)
-
 
 class PremiumTelegramBot:
     """Расширенная функциональность бота для премиум-пользователей"""
@@ -50,13 +48,13 @@ class PremiumTelegramBot:
 
             if is_premium:
                 status_text += "✅ <b>Премиум-пользователь</b>\n"
-                status_text += f"📅 Подписка: {'Активна' if has_subscription else 'Неактивна'}\n\n"
+                status_text += "📅 Подписка: {'Активна' if has_subscription else 'Неактивна'}\n\n"
 
                 status_text += "🎯 <b>Доступные функции:</b>\n"
                 for feature in features:
                     if feature != 'basic':
                         feature_name = self.get_feature_name(feature)
-                        status_text += f"• {feature_name}\n"
+                        status_text += "• {feature_name}\n"
             else:
                 status_text += "❌ <b>Базовый пользователь</b>\n\n"
                 status_text += "💡 <b>Обновитесь до премиум для получения:</b>\n"
@@ -76,7 +74,7 @@ class PremiumTelegramBot:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка показа статуса премиум: {e}")
+            logger.error("Ошибка показа статуса премиум: {e}")
             self.bot.send_message(
                 message.chat.id,
                 "❌ Ошибка получения статуса подписки"
@@ -135,20 +133,20 @@ class PremiumTelegramBot:
 
             # Здесь должна быть логика генерации PDF
             # Пока отправляем заглушку
-            pdf_url = f"https://examflow.ru/api/premium/pdf/{document_id}/download/"
+            pdf_url = "https://examflow.ru/api/premium/pdf/{document_id}/download/"
 
             # Обновляем сообщение
             self.bot.edit_message_text(
-                f"✅ <b>PDF готов!</b>\n\n"
-                f"📄 <b>{fipi_data.title}</b>\n"
-                f"🔗 <a href='{pdf_url}'>Скачать PDF</a>",
+                "✅ <b>PDF готов!</b>\n\n"
+                "📄 <b>{fipi_data.title}</b>\n"
+                "🔗 <a href='{pdf_url}'>Скачать PDF</a>",
                 message.chat.id,
                 export_msg.message_id,
                 parse_mode='HTML'
             )
 
         except Exception as e:
-            logger.error(f"Ошибка экспорта в PDF: {e}")
+            logger.error("Ошибка экспорта в PDF: {e}")
             self.bot.send_message(
                 message.chat.id,
                 "❌ Ошибка генерации PDF"
@@ -193,7 +191,7 @@ class PremiumTelegramBot:
             # Отправляем сообщение о начале поиска
             search_msg = self.bot.send_message(
                 message.chat.id,
-                f"🔍 Ищу: <b>{query}</b>\n\nПожалуйста, подождите...",
+                "🔍 Ищу: <b>{query}</b>\n\nПожалуйста, подождите...",
                 parse_mode='HTML'
             )
 
@@ -207,7 +205,7 @@ class PremiumTelegramBot:
 
             if not results:
                 self.bot.edit_message_text(
-                    f"🔍 <b>Поиск: {query}</b>\n\n"
+                    "🔍 <b>Поиск: {query}</b>\n\n"
                     "❌ Ничего не найдено",
                     message.chat.id,
                     search_msg.message_id,
@@ -216,7 +214,7 @@ class PremiumTelegramBot:
                 return
 
             # Формируем результат
-            result_text = f"🔍 <b>Результаты поиска: {query}</b>\n\n"
+            result_text = "🔍 <b>Результаты поиска: {query}</b>\n\n"
 
             for i, result in enumerate(results[:5], 1):
                 title = result.get('title', 'Без названия')
@@ -224,10 +222,10 @@ class PremiumTelegramBot:
                     :200] + '...' if len(result.get('content', '')) > 200 else result.get('content', '')
                 url = result.get('url', '')
 
-                result_text += f"{i}. <b>{title}</b>\n"
-                result_text += f"   {content}\n"
+                result_text += "{i}. <b>{title}</b>\n"
+                result_text += "   {content}\n"
                 if url:
-                    result_text += f"   🔗 <a href='{url}'>Подробнее</a>\n"
+                    result_text += "   🔗 <a href='{url}'>Подробнее</a>\n"
                 result_text += "\n"
 
             self.bot.edit_message_text(
@@ -239,7 +237,7 @@ class PremiumTelegramBot:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка расширенного поиска: {e}")
+            logger.error("Ошибка расширенного поиска: {e}")
             self.bot.send_message(
                 message.chat.id,
                 "❌ Ошибка выполнения поиска"
@@ -297,10 +295,10 @@ class PremiumTelegramBot:
                 reason = rec.get('reason', 'Рекомендуется на основе ваших предпочтений')
                 url = rec.get('url', '')
 
-                result_text += f"{i}. <b>{title}</b>\n"
-                result_text += f"   💡 {reason}\n"
+                result_text += "{i}. <b>{title}</b>\n"
+                result_text += "   💡 {reason}\n"
                 if url:
-                    result_text += f"   🔗 <a href='{url}'>Изучить</a>\n"
+                    result_text += "   🔗 <a href='{url}'>Изучить</a>\n"
                 result_text += "\n"
 
             self.bot.edit_message_text(
@@ -312,7 +310,7 @@ class PremiumTelegramBot:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка получения рекомендаций: {e}")
+            logger.error("Ошибка получения рекомендаций: {e}")
             self.bot.send_message(
                 message.chat.id,
                 "❌ Ошибка генерации рекомендаций"
@@ -376,15 +374,15 @@ class PremiumTelegramBot:
 
             # Формируем результат
             result_text = "🔄 <b>Сравнение версий</b>\n\n"
-            result_text += f"📄 <b>Версия 1:</b> {version1.title}\n"
-            result_text += f"📄 <b>Версия 2:</b> {version2.title}\n\n"
+            result_text += "📄 <b>Версия 1:</b> {version1.title}\n"
+            result_text += "📄 <b>Версия 2:</b> {version2.title}\n\n"
 
             if comparison:
                 changes = comparison.get('changes', [])
                 if changes:
                     result_text += "📋 <b>Основные изменения:</b>\n"
                     for change in changes[:5]:
-                        result_text += f"• {change}\n"
+                        result_text += "• {change}\n"
                 else:
                     result_text += "✅ Изменений не обнаружено"
             else:
@@ -398,7 +396,7 @@ class PremiumTelegramBot:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка сравнения версий: {e}")
+            logger.error("Ошибка сравнения версий: {e}")
             self.bot.send_message(
                 message.chat.id,
                 "❌ Ошибка сравнения версий"
@@ -419,9 +417,9 @@ class PremiumTelegramBot:
                 stats = self.usage_tracker.get_usage_stats(user, action)
                 action_name = self.get_action_name(action)
 
-                stats_text += f"📈 <b>{action_name}</b>\n"
-                stats_text += f"   Использовано: {stats['current']}/{stats['limit']}\n"
-                stats_text += f"   Осталось: {stats['remaining']}\n\n"
+                stats_text += "📈 <b>{action_name}</b>\n"
+                stats_text += "   Использовано: {stats['current']}/{stats['limit']}\n"
+                stats_text += "   Осталось: {stats['remaining']}\n\n"
 
             self.bot.send_message(
                 message.chat.id,
@@ -430,7 +428,7 @@ class PremiumTelegramBot:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка показа статистики: {e}")
+            logger.error("Ошибка показа статистики: {e}")
             self.bot.send_message(
                 message.chat.id,
                 "❌ Ошибка получения статистики"

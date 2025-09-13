@@ -9,7 +9,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Проверяет конфигурацию Telegram бота'
 
@@ -20,8 +19,8 @@ class Command(BaseCommand):
         # Проверяем токен
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
         if token:
-            self.stdout.write(f'✅ TELEGRAM_BOT_TOKEN: {token[:10]}...')
-            logger.info(f'TELEGRAM_BOT_TOKEN настроен: {token[:10]}...')
+            self.stdout.write('✅ TELEGRAM_BOT_TOKEN: {token[:10]}...')
+            logger.info('TELEGRAM_BOT_TOKEN настроен: {token[:10]}...')
         else:
             self.stdout.write('❌ TELEGRAM_BOT_TOKEN не настроен!')
             self.stdout.write('   Добавьте TELEGRAM_BOT_TOKEN в Environment Variables')
@@ -31,7 +30,7 @@ class Command(BaseCommand):
         # Проверяем SITE_URL
         site_url = getattr(settings, 'SITE_URL', None)
         if site_url:
-            self.stdout.write(f'✅ SITE_URL: {site_url}')
+            self.stdout.write('✅ SITE_URL: {site_url}')
         else:
             self.stdout.write('❌ SITE_URL не настроен!')
             self.stdout.write('   Добавьте SITE_URL в Environment Variables')
@@ -47,8 +46,8 @@ class Command(BaseCommand):
             self.stdout.write('✅ База данных доступна')
             logger.info('База данных доступна')
         except Exception as e:
-            self.stdout.write(f'❌ Ошибка базы данных: {e}')
-            logger.error(f'Ошибка базы данных: {e}')
+            self.stdout.write('❌ Ошибка базы данных: {e}')
+            logger.error('Ошибка базы данных: {e}')
             return
 
         # Проверяем доступность бота
@@ -58,11 +57,11 @@ class Command(BaseCommand):
             # get_me() - асинхронная функция, нужно использовать синхронно
             import asyncio
             bot_info = asyncio.run(bot.get_me())
-            self.stdout.write(f'✅ Бот доступен: @{bot_info.username}')
-            logger.info(f'Бот доступен: @{bot_info.username}')
+            self.stdout.write('✅ Бот доступен: @{bot_info.username}')
+            logger.info('Бот доступен: @{bot_info.username}')
         except Exception as e:
-            self.stdout.write(f'❌ Ошибка бота: {e}')
-            logger.error(f'Ошибка бота: {e}')
+            self.stdout.write('❌ Ошибка бота: {e}')
+            logger.error('Ошибка бота: {e}')
             return
 
         self.stdout.write('=' * 50)

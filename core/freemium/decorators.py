@@ -8,7 +8,6 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from .models import DailyUsage
 
-
 def check_ai_limits(view_func):
     """Декоратор для проверки лимитов ИИ"""
     @wraps(view_func)
@@ -49,7 +48,6 @@ def check_ai_limits(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
-
 def require_premium(view_func):
     """Декоратор для проверки премиум подписки"""
     @wraps(view_func)
@@ -74,7 +72,6 @@ def require_premium(view_func):
 
         return view_func(request, *args, **kwargs)
     return wrapper
-
 
 def check_subscription_limits(view_func):
     """Декоратор для проверки общих лимитов подписки"""

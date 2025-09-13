@@ -10,7 +10,6 @@ from ai.services import AiService
 
 logger = logging.getLogger(__name__)
 
-
 class PersonalizedAiService:
     """AI-сервис с персонализацией для ExamFlow"""
 
@@ -38,7 +37,7 @@ class PersonalizedAiService:
                     ai_response = self.ai_service.ask_with_rag(
                         enhanced_prompt, user, task, context_type)
                 except Exception as e:
-                    logger.warning(f"RAG ошибка, используем обычный запрос: {e}")
+                    logger.warning("RAG ошибка, используем обычный запрос: {e}")
                     ai_response = self.ai_service.ask(enhanced_prompt, user)
             else:
                 ai_response = self.ai_service.ask(enhanced_prompt, user)
@@ -47,7 +46,7 @@ class PersonalizedAiService:
                 return {
                     'success': False,
                     'error': ai_response['error'],
-                    'response': f"❌ Ошибка: {ai_response['error']}"
+                    'response': "❌ Ошибка: {ai_response['error']}"
                 }
 
             # Обогащаем ответ персонализированными рекомендациями
@@ -65,11 +64,11 @@ class PersonalizedAiService:
                             user_insights, context_type, task)}}
 
         except Exception as e:
-            logger.error(f"Ошибка в PersonalizedAiService: {e}")
+            logger.error("Ошибка в PersonalizedAiService: {e}")
             return {
                 'success': False,
                 'error': str(e),
-                'response': f"❌ Произошла ошибка при получении персонализированного ответа: {str(e)}"}
+                'response': "❌ Произошла ошибка при получении персонализированного ответа: {str(e)}"}
 
     def _enhance_prompt_with_context(
             self,
@@ -85,21 +84,21 @@ class PersonalizedAiService:
         progress = user_insights.get('progress_summary', {})
         if progress:
             enhanced_prompt += "\n\nКонтекст о пользователе:\n"
-            enhanced_prompt += f"- Решено заданий: {progress.get('solved_tasks', 0)}\n"
-            enhanced_prompt += f"- Общая точность: {progress.get('success_rate', 0)}%\n"
+            enhanced_prompt += "- Решено заданий: {progress.get('solved_tasks', 0)}\n"
+            enhanced_prompt += "- Общая точность: {progress.get('success_rate', 0)}%\n"
 
         # Добавляем информацию о слабых темах
         weak_topics = user_insights.get('weak_topics', [])
         if weak_topics:
             enhanced_prompt += "\nСлабые темы пользователя:\n"
             for topic in weak_topics[:3]:
-                enhanced_prompt += f"- {topic.get('subject', 'Неизвестно')}: "
-                enhanced_prompt += f"{topic.get('failed_tasks', 0)} проваленных заданий\n"
+                enhanced_prompt += "- {topic.get('subject', 'Неизвестно')}: "
+                enhanced_prompt += "{topic.get('failed_tasks', 0)} проваленных заданий\n"
 
         # Добавляем предпочтения
         preferences = user_insights.get('preferences', {})
         if preferences.get('favorite_subjects'):
-            enhanced_prompt += f"\nЛюбимые предметы: {', '.join(preferences['favorite_subjects'])}\n"
+            enhanced_prompt += "\nЛюбимые предметы: {', '.join(preferences['favorite_subjects'])}\n"
 
         # Добавляем контекст типа запроса
         if context_type == 'task_help':
@@ -168,8 +167,8 @@ class PersonalizedAiService:
             for topic in weak_topics[:2]:
                 recommendations.append({
                     'type': 'weak_topic',
-                    'title': f"Поработать над темой: {topic.get('subject', 'Неизвестно')}",
-                    'description': f"Провалено {topic.get('failed_tasks', 0)} заданий",
+                    'title': "Поработать над темой: {topic.get('subject', 'Неизвестно')}",
+                    'description': "Провалено {topic.get('failed_tasks', 0)} заданий",
                     'action': "Решить задания по этой теме"
                 })
 
@@ -181,7 +180,7 @@ class PersonalizedAiService:
             recommendations.append({
                 'type': 'difficulty',
                 'title': "Попробовать более сложные задания",
-                'description': f"Ваш текущий уровень: {difficulty_pref}/5",
+                'description': "Ваш текущий уровень: {difficulty_pref}/5",
                 'action': "Выбрать задания сложности 4-5"
             })
 

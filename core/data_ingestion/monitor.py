@@ -11,7 +11,6 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-
 class DataMonitor:
     """
     Класс для мониторинга обновлений данных
@@ -47,7 +46,7 @@ class DataMonitor:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке URL {url}: {e}")
+            logger.error("Ошибка при проверке URL {url}: {e}")
             return {
                 'url': url,
                 'content_hash': None,
@@ -76,7 +75,7 @@ class DataMonitor:
             last_hash = last_record.content_hash if last_record else None  # type: ignore
 
             # Проверяем изменения
-            check_result = self.check_url_changes(url, last_hash)  # type: ignore   
+            check_result = self.check_url_changes(url, last_hash)  # type: ignore
 
             if check_result['has_changed']:
                 updates.append({
@@ -89,9 +88,9 @@ class DataMonitor:
                     'checked_at': check_result['last_checked']
                 })
 
-                logger.info(f"Обнаружены изменения: {url}")
+                logger.info("Обнаружены изменения: {url}")
 
-        logger.info(f"Найдено {len(updates)} обновлений")
+        logger.info("Найдено {len(updates)} обновлений")
         return updates
 
     def archive_old_data(self, fipi_data_id: int) -> bool:
@@ -116,12 +115,12 @@ class DataMonitor:
             }
 
             # Сохраняем в архив (можно в отдельную таблицу или файл)
-            logger.info(f"Архивированы данные: {data.title}")
+            logger.info("Архивированы данные: {data.title}")
 
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при архивировании данных {fipi_data_id}: {e}")
+            logger.error("Ошибка при архивировании данных {fipi_data_id}: {e}")
             return False
 
     def schedule_data_collection(self) -> bool:
@@ -145,7 +144,7 @@ class DataMonitor:
                 return False
 
         except Exception as e:
-            logger.error(f"Ошибка при планируемом сборе данных: {e}")
+            logger.error("Ошибка при планируемом сборе данных: {e}")
             return False
 
     def run_monitoring_cycle(self) -> Dict:
@@ -170,7 +169,7 @@ class DataMonitor:
             # Если есть обновления, запускаем сбор данных
             if updates:
                 logger.info(
-                    f"Найдено {len(updates)} обновлений, запускаем сбор данных...")
+                    "Найдено {len(updates)} обновлений, запускаем сбор данных...")
 
                 if self.schedule_data_collection():
                     results['data_collected'] = 1
@@ -181,13 +180,12 @@ class DataMonitor:
             logger.info("Цикл мониторинга завершен")
 
         except Exception as e:
-            error_msg = f"Ошибка в цикле мониторинга: {e}"
+            error_msg = "Ошибка в цикле мониторинга: {e}"
             logger.error(error_msg)
             results['errors'].append(error_msg)
             results['completed_at'] = timezone.now()
 
         return results
-
 
 class MonitoringScheduler:
     """

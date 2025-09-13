@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b=8q90=se^7twm97htmj$v2n-(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1,testserver,examflow.onrender.com').split(',') if h.strip()]
+ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru, www.examflow.ru, localhost, 127.0.0.1, testserver, examflow.onrender.com').split(', ') if h.strip()]
 
 # Добавим хост Render автоматически, если предоставлен платформой
 RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
@@ -31,10 +31,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'csp',
     'drf_spectacular',
-    
+
     # Основные модули (legacy)
     'core',
-    
+
     # Новые модульные приложения
     'learning',
     'authentication',
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'analytics',
     'themes',
     'telegram_bot',
-]
+    ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -57,12 +57,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.premium.middleware.PremiumAccessMiddleware',
-]
+    ]
 
 ROOT_URLCONF = 'examflow_project.urls'
 
 TEMPLATES = [
-    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
@@ -76,7 +75,7 @@ TEMPLATES = [
             ],
         },
     },
-]
+    ]
 
 WSGI_APPLICATION = 'examflow_project.wsgi.application'
 
@@ -98,19 +97,15 @@ DATABASES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
-    {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
-    {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-]
+    ]
 
 # Internationalization
 LANGUAGE_CODE = 'ru-ru'
@@ -123,7 +118,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-]
+    ]
 
 # Media files
 MEDIA_URL = '/media/'
@@ -156,7 +151,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.examflow.ru",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-]
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -165,9 +160,6 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': os.getenv('REDIS_URL', 'redis://localhost:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
     }
 }
 

@@ -8,7 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Тестирует RAG-систему с различными запросами'
 
@@ -40,7 +39,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'Ошибка инициализации RAG-системы: {e}')
+                self.style.ERROR('Ошибка инициализации RAG-системы: {e}')
             )
             return
 
@@ -59,7 +58,7 @@ class Command(BaseCommand):
         user_id = options.get('user_id')
 
         for i, query in enumerate(test_queries, 1):
-            self.stdout.write(f'\n📝 Тест {i}: {query}')
+            self.stdout.write('\n📝 Тест {i}: {query}')
             self.stdout.write('-' * 50)
 
             try:
@@ -68,17 +67,17 @@ class Command(BaseCommand):
 
                 # Выводим результат
                 self.stdout.write('Ответ получен')  # type: ignore
-                self.stdout.write(f'Ответ: {response["answer"][:200]}...')
-                self.stdout.write(f'Источники: {len(response["sources"])}')
-                self.stdout.write(f'Практика: {response["practice"]["topic"]}')
+                self.stdout.write('Ответ: {response["answer"][:200]}...')
+                self.stdout.write('Источники: {len(response["sources"])}')
+                self.stdout.write('Практика: {response["practice"]["topic"]}')
 
                 if response.get('error'):
-                    self.stdout.write(f'Ошибка: {response["error"]}')  # type: ignore
+                    self.stdout.write('Ошибка: {response["error"]}')  # type: ignore
 
             except Exception as e:
                 self.stdout.write(
                     # type: ignore
-                    self.style.ERROR(f'Ошибка при обработке запроса: {e}')
+                    self.style.ERROR('Ошибка при обработке запроса: {e}')
                 )
 
         self.stdout.write(

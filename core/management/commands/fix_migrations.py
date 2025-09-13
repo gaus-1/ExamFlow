@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.core.management import call_command
 
-
 class Command(BaseCommand):
     help = 'Исправляет проблемы с миграциями и создает необходимые таблицы'
 
@@ -34,7 +33,7 @@ class Command(BaseCommand):
                 '🎉 МИГРАЦИИ ИСПРАВЛЕНЫ!'))  # type: ignore
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'❌ Ошибка: {e}'))  # type: ignore
+            self.stdout.write(self.style.ERROR('❌ Ошибка: {e}'))  # type: ignore
 
     def create_tables_manually(self):
         """Создает основные таблицы вручную"""
@@ -52,7 +51,7 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Таблица learning_subject создана/проверена')
             except Exception as e:
-                self.stdout.write(f'⚠️ learning_subject: {e}')
+                self.stdout.write('⚠️ learning_subject: {e}')
 
             # Создаем таблицу learning_task если её нет
             try:
@@ -71,7 +70,7 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write('✅ Таблица learning_task создана/проверена')
             except Exception as e:
-                self.stdout.write(f'⚠️ learning_task: {e}')
+                self.stdout.write('⚠️ learning_task: {e}')
 
             # Создаем таблицу authentication_userprofile если её нет
             try:
@@ -87,4 +86,4 @@ class Command(BaseCommand):
                 self.stdout.write(
                     '✅ Таблица authentication_userprofile создана/проверена')
             except Exception as e:
-                self.stdout.write(f'⚠️ authentication_userprofile: {e}')
+                self.stdout.write('⚠️ authentication_userprofile: {e}')

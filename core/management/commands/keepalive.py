@@ -15,7 +15,6 @@ from django.db import connection
 
 logger = logging.getLogger(__name__)
 
-
 class KeepaliveService:
     """Сервис для поддержания активности всех компонентов"""
 
@@ -24,9 +23,9 @@ class KeepaliveService:
             settings,
             'WEBSITE_URL',
             'https://examflow.onrender.com')
-        self.health_url = f"{self.website_url}/health/"
+        self.health_url = "{self.website_url}/health/"
         self.bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
-        self.telegram_api_url = f"https://api.telegram.org/bot{self.bot_token}/getMe"
+        self.telegram_api_url = "https://api.telegram.org/bot{self.bot_token}/getMe"
 
     def check_website(self):
         """Проверяет доступность сайта"""
@@ -36,10 +35,10 @@ class KeepaliveService:
                 logger.info("✅ Сайт активен")
                 return True
             else:
-                logger.warning(f"⚠️ Сайт отвечает с кодом {response.status_code}")
+                logger.warning("⚠️ Сайт отвечает с кодом {response.status_code}")
                 return False
         except Exception as e:
-            logger.error(f"❌ Ошибка проверки сайта: {e}")
+            logger.error("❌ Ошибка проверки сайта: {e}")
             return False
 
     def check_database(self):
@@ -55,7 +54,7 @@ class KeepaliveService:
                     logger.warning("⚠️ База данных не отвечает корректно")
                     return False
         except Exception as e:
-            logger.error(f"❌ Ошибка проверки базы данных: {e}")
+            logger.error("❌ Ошибка проверки базы данных: {e}")
             return False
 
     def check_bot(self):
@@ -69,14 +68,14 @@ class KeepaliveService:
                     return True
                 else:
                     logger.warning(
-                        f"⚠️ Telegram бот не отвечает: {data.get('description')}")
+                        "⚠️ Telegram бот не отвечает: {data.get('description')}")
                     return False
             else:
                 logger.warning(
-                    f"⚠️ Telegram API отвечает с кодом {response.status_code}")
+                    "⚠️ Telegram API отвечает с кодом {response.status_code}")
                 return False
         except Exception as e:
-            logger.error(f"❌ Ошибка проверки Telegram бота: {e}")
+            logger.error("❌ Ошибка проверки Telegram бота: {e}")
             return False
 
     def wake_up_website(self):
@@ -87,10 +86,10 @@ class KeepaliveService:
                 logger.info("✅ Сайт разбужен успешно")
                 return True
             else:
-                logger.warning(f"⚠️ Сайт отвечает с кодом {response.status_code}")
+                logger.warning("⚠️ Сайт отвечает с кодом {response.status_code}")
                 return False
         except Exception as e:
-            logger.error(f"❌ Ошибка пробуждения сайта: {e}")
+            logger.error("❌ Ошибка пробуждения сайта: {e}")
             return False
 
     def wake_up_database(self):
@@ -100,15 +99,15 @@ class KeepaliveService:
                 cursor.execute("SELECT COUNT(*) FROM core_unifiedprofile")
                 result = cursor.fetchone()
                 logger.info(
-                    f"✅ База данных разбужена, профилей: {result[0] if result else 0}")
+                    "✅ База данных разбужена, профилей: {result[0] if result else 0}")
                 return True
         except Exception as e:
-            logger.error(f"❌ Ошибка пробуждения базы данных: {e}")
+            logger.error("❌ Ошибка пробуждения базы данных: {e}")
             return False
 
     def run_keepalive_cycle(self, interval=300):  # 5 минут
         """Запускает цикл keepalive"""
-        logger.info(f"🚀 Запуск keepalive цикла с интервалом {interval} секунд")
+        logger.info("🚀 Запуск keepalive цикла с интервалом {interval} секунд")
 
         while True:
             try:
@@ -131,7 +130,7 @@ class KeepaliveService:
                 # Логируем статус
                 status = "✅" if all([website_ok, database_ok, bot_ok]) else "⚠️"
                 logger.info(
-                    f"{status} Статус компонентов: Сайт={website_ok}, БД={database_ok}, Бот={bot_ok}")
+                    "{status} Статус компонентов: Сайт={website_ok}, БД={database_ok}, Бот={bot_ok}")
 
                 # Ждем до следующей проверки
                 time.sleep(interval)
@@ -140,9 +139,8 @@ class KeepaliveService:
                 logger.info("🛑 Keepalive цикл остановлен пользователем")
                 break
             except Exception as e:
-                logger.error(f"❌ Ошибка в keepalive цикле: {e}")
+                logger.error("❌ Ошибка в keepalive цикле: {e}")
                 time.sleep(60)  # Ждем минуту перед повторной попыткой
-
 
 class Command(BaseCommand):
     help = 'Поддерживает активность всех компонентов ExamFlow 2.0'
@@ -175,22 +173,22 @@ class Command(BaseCommand):
 
             if options['component'] == 'website' or options['component'] == 'all':
                 website_ok = keepalive.check_website()
-                self.stdout.write(f"Сайт: {'✅' if website_ok else '❌'}")
+                self.stdout.write("Сайт: {'✅' if website_ok else '❌'}")
 
             if options['component'] == 'database' or options['component'] == 'all':
                 database_ok = keepalive.check_database()
-                self.stdout.write(f"База данных: {'✅' if database_ok else '❌'}")
+                self.stdout.write("База данных: {'✅' if database_ok else '❌'}")
 
             if options['component'] == 'bot' or options['component'] == 'all':
                 bot_ok = keepalive.check_bot()
-                self.stdout.write(f"Telegram бот: {'✅' if bot_ok else '❌'}")
+                self.stdout.write("Telegram бот: {'✅' if bot_ok else '❌'}")
 
             self.stdout.write(self.style.SUCCESS("Проверка завершена"))  # type: ignore
 
         else:
             # Непрерывный цикл
             self.stdout.write(
-                f"🚀 Запуск keepalive сервиса с интервалом {options['interval']} секунд")
+                "🚀 Запуск keepalive сервиса с интервалом {options['interval']} секунд")
             self.stdout.write("Нажмите Ctrl+C для остановки")
 
             try:

@@ -12,19 +12,20 @@ from django.shortcuts import redirect
 from learning.models import Subject  # type: ignore
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
-
 class SubjectSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.9
 
     def items(self):
         try:
-            return Subject.objects.filter(is_archived=False, is_primary=True).order_by('id')  # type: ignore
+            return Subject.objects.filter(
+                is_archived=False,
+                is_primary=True).order_by('id')  # type: ignore
         except Exception:
             return Subject.objects.all().order_by('id')  # type: ignore
 
     def location(self, obj):  # type: ignore
-        return f"/subject/{obj.id}/"
+        return "/subject/{obj.id}/"
 
 class StaticSitemap(Sitemap):
     changefreq = "weekly"
@@ -36,18 +37,24 @@ class StaticSitemap(Sitemap):
     def location(self, item):
         return item
 
-
 def robots_txt(_request):
     lines = [
         "User-agent: *",
         "Allow: /",
         "Disallow: /admin/",
         "Disallow: /accounts/",
-        "Sitemap: %s/sitemap.xml" % getattr(settings, 'WEBSITE_URL', 'https://examflow.ru'),
-        "Host: %s" % getattr(settings, 'WEBSITE_URL', 'https://examflow.ru'),
+        "Sitemap: %s/sitemap.xml" %
+        getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.ru'),
+        "Host: %s" %
+        getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.ru'),
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")  # type: ignore
-
 
 def faq_view(request):
     qa = {
@@ -61,19 +68,34 @@ def faq_view(request):
     context = {
         'page_title': 'FAQ — ответы по подготовке к ЕГЭ/ОГЭ — ExamFlow',
         'page_description': 'Частые вопросы о подготовке к ЕГЭ/ОГЭ по математике и русскому: ошибки, критерии ФИПИ, видеоразборы.',
-        'canonical_url': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/faq/',
+        'canonical_url': getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.ru') +
+        '/faq/',
         'og_title': 'FAQ — ExamFlow',
         'og_description': 'Ответы на частые вопросы по ЕГЭ/ОГЭ (математика и русский).',
-        'og_image': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/static/images/logo-512.png',
-        'og_url': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/faq/',
+        'og_image': getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.ru') +
+        '/static/images/logo-512.png',
+        'og_url': getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.ru') +
+        '/faq/',
         'twitter_title': 'FAQ — ExamFlow',
         'twitter_description': 'Частые вопросы по подготовке к ЕГЭ/ОГЭ.',
-        'twitter_image': getattr(settings, 'WEBSITE_URL', 'https://examflow.ru') + '/static/images/logo-512.png',
+        'twitter_image': getattr(
+            settings,
+            'WEBSITE_URL',
+            'https://examflow.ru') +
+        '/static/images/logo-512.png',
         'jsonld': core_seo.jsonld_faq(qa),
         'qa': qa,
     }
     return render(request, 'faq.html', context)
-
 
 from . import api  # noqa: E402
 from .ultra_simple_health import ultra_simple_health, minimal_health_check  # noqa: E402
@@ -84,7 +106,7 @@ from core.rag_system.ai_api import (  # noqa: E402
     ai_user_profile,
     ai_problem_submit,
     ai_statistics,
-)
+    )
 
 urlpatterns = [
     # API для RAG-системы
@@ -98,27 +120,52 @@ urlpatterns = [
     path('health/simple/', minimal_health_check, name='health_check_simple'),
     path('health/minimal/', minimal_health_check, name='health_check_minimal'),
     path('robots.txt', robots_txt, name='robots_txt'),
-    path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
+    path(
+        'sitemap.xml', sitemap_views.sitemap, {
+            'sitemaps': {
+                'subjects': SubjectSitemap, 'static': StaticSitemap}}, name='sitemap'),
     path('faq/', faq_view, name='faq'),
     path('api/fipi/search/', fipi_semantic_search, name='fipi_semantic_search'),
-    
+
     # Новые AI API эндпоинты
     path('api/ai/ask/', ai_ask, name='ai_ask'),
     path('api/ai/subjects/', ai_subjects, name='ai_subjects'),
     path('api/ai/user/profile/', ai_user_profile, name='ai_user_profile'),
     path('api/ai/problem/submit/', ai_problem_submit, name='ai_problem_submit'),
     path('api/ai/statistics/', ai_statistics, name='ai_statistics'),
-    
+
     # Страница подписки
-    path('subscription/', lambda request: render(request, 'subscription.html'), name='subscription'),
-    
+    path(
+        'subscription/',
+        lambda request: render(
+            request,
+            'subscription.html'),
+        name='subscription'),
+
     # API документация (Swagger/OpenAPI)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    # SEO-friendly ЧПУ (301) для ЕГЭ/ОГЭ: ведём на список предметов (без ломки текущих маршрутов)
-    path('ege/matematika/', lambda r: redirect('/subjects/?utm=seo_ege_math', permanent=True)),
-    path('ege/russkiy/', lambda r: redirect('/subjects/?utm=seo_ege_rus', permanent=True)),
-    path('oge/matematika/', lambda r: redirect('/subjects/?utm=seo_oge_math', permanent=True)),
-    path('oge/russkiy/', lambda r: redirect('/subjects/?utm=seo_oge_rus', permanent=True)),
-]
+    # SEO-friendly ЧПУ (301) для ЕГЭ/ОГЭ: ведём на список предметов (без ломки
+    # текущих маршрутов)
+    path(
+        'ege/matematika/',
+        lambda r: redirect(
+            '/subjects/?utm=seo_ege_math',
+            permanent=True)),
+    path(
+        'ege/russkiy/',
+        lambda r: redirect(
+            '/subjects/?utm=seo_ege_rus',
+            permanent=True)),
+    path(
+        'oge/matematika/',
+        lambda r: redirect(
+            '/subjects/?utm=seo_oge_math',
+            permanent=True)),
+    path(
+        'oge/russkiy/',
+        lambda r: redirect(
+            '/subjects/?utm=seo_oge_rus',
+            permanent=True)),
+        ]

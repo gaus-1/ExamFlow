@@ -19,14 +19,12 @@ from core.models import FIPISourceMap, FIPIData
 
 logger = logging.getLogger(__name__)
 
-
 class AlertLevel(Enum):
     """Уровни уведомлений"""
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
     CRITICAL = "critical"
-
 
 @dataclass
 class Alert:
@@ -51,7 +49,6 @@ class Alert:
             'resolved': self.resolved,
             'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None
         }
-
 
 class HealthChecker:
     """Проверка состояния системы"""
@@ -118,7 +115,7 @@ class HealthChecker:
         except Exception as e:
             return {
                 'status': 'critical',
-                'message': f'Ошибка базы данных: {e}',
+                'message': 'Ошибка базы данных: {e}',
                 'error': str(e)
             }
 
@@ -147,10 +144,10 @@ class HealthChecker:
 
             if old_sources > 10:
                 status = 'warning'
-                message = f'{old_sources} источников давно не обновлялись'
+                message = '{old_sources} источников давно не обновлялись'
             elif old_sources > 50:
                 status = 'critical'
-                message = f'Критически много ({old_sources}) источников не обновлялись'
+                message = 'Критически много ({old_sources}) источников не обновлялись'
 
             return {
                 'status': status,
@@ -164,7 +161,7 @@ class HealthChecker:
         except Exception as e:
             return {
                 'status': 'critical',
-                'message': f'Ошибка проверки источников: {e}',
+                'message': 'Ошибка проверки источников: {e}',
                 'error': str(e)
             }
 
@@ -193,10 +190,10 @@ class HealthChecker:
                 message = 'Нет активных воркеров'
             elif active_workers < total_workers:
                 status = 'warning'
-                message = f'Только {active_workers}/{total_workers} воркеров активны'
+                message = 'Только {active_workers}/{total_workers} воркеров активны'
             else:
                 status = 'healthy'
-                message = f'Все {active_workers} воркеров активны'
+                message = 'Все {active_workers} воркеров активны'
 
             return {
                 'status': status,
@@ -206,7 +203,7 @@ class HealthChecker:
         except Exception as e:
             return {
                 'status': 'critical',
-                'message': f'Ошибка проверки движка: {e}',
+                'message': 'Ошибка проверки движка: {e}',
                 'error': str(e)
             }
 
@@ -233,10 +230,9 @@ class HealthChecker:
         except Exception as e:
             return {
                 'status': 'critical',
-                'message': f'Ошибка проверки планировщика: {e}',
+                'message': 'Ошибка проверки планировщика: {e}',
                 'error': str(e)
             }
-
 
 class AlertManager:
     """Менеджер уведомлений"""
@@ -257,7 +253,7 @@ class AlertManager:
     def create_alert(self, level: AlertLevel, title: str, message: str,
                      source: str = "system") -> Alert:
         """Создает новое уведомление"""
-        alert_id = f"{source}_{int(time.time())}"
+        alert_id = "{source}_{int(time.time())}"
         alert = Alert(
             id=alert_id,
             level=level,
@@ -273,7 +269,7 @@ class AlertManager:
         # Отправляем уведомления
         self._send_notifications(alert)
 
-        logger.info(f"Создано уведомление {level.value}: {title}")
+        logger.info("Создано уведомление {level.value}: {title}")
         return alert
 
     def resolve_alert(self, alert_id: str) -> bool:
@@ -282,7 +278,7 @@ class AlertManager:
             alert = self.alerts[alert_id]
             alert.resolved = True
             alert.resolved_at = timezone.now()
-            logger.info(f"Уведомление {alert_id} разрешено")
+            logger.info("Уведомление {alert_id} разрешено")
             return True
         return False
 
@@ -312,12 +308,12 @@ class AlertManager:
             AlertLevel.CRITICAL: logging.CRITICAL
         }[alert.level]
 
-        logger.log(log_level, f"[{alert.source}] {alert.title}: {alert.message}")
+        logger.log(log_level, "[{alert.source}] {alert.title}: {alert.message}")
 
     def _send_email_alert(self, alert: Alert):
         """Отправляет уведомление по email"""
         try:
-            subject = f"[{alert.level.value.upper()}] {alert.title}"
+            subject = "[{alert.level.value.upper()}] {alert.title}"
 
             # Создаем HTML-сообщение
             context = {
@@ -343,10 +339,10 @@ class AlertManager:
                 fail_silently=False
             )
 
-            logger.info(f"Email уведомление отправлено: {alert.title}")
+            logger.info("Email уведомление отправлено: {alert.title}")
 
         except Exception as e:
-            logger.error(f"Ошибка отправки email уведомления: {e}")
+            logger.error("Ошибка отправки email уведомления: {e}")
 
     def _send_webhook_alert(self, alert: Alert):
         """Отправляет уведомление через webhook"""
@@ -370,13 +366,12 @@ class AlertManager:
             )
 
             if response.status_code == 200:
-                logger.info(f"Webhook уведомление отправлено: {alert.title}")
+                logger.info("Webhook уведомление отправлено: {alert.title}")
             else:
-                logger.warning(f"Webhook вернул статус {response.status_code}")
+                logger.warning("Webhook вернул статус {response.status_code}")
 
         except Exception as e:
-            logger.error(f"Ошибка отправки webhook уведомления: {e}")
-
+            logger.error("Ошибка отправки webhook уведомления: {e}")
 
 class MonitoringService:
     """Основной сервис мониторинга"""
@@ -419,7 +414,7 @@ class MonitoringService:
                 time.sleep(self.health_checker.check_interval)
 
             except Exception as e:
-                logger.error(f"Ошибка в цикле мониторинга: {e}")
+                logger.error("Ошибка в цикле мониторинга: {e}")
                 time.sleep(60)  # Пауза при ошибке
 
     def _analyze_health_status(self, health: Dict[str, Any]):
@@ -432,7 +427,7 @@ class MonitoringService:
                 if check_result.get('status') == 'critical':
                     self.alert_manager.create_alert(
                         level=AlertLevel.CRITICAL,
-                        title=f"Критическая проблема: {check_name}",
+                        title="Критическая проблема: {check_name}",
                         message=check_result.get('message', 'Неизвестная ошибка'),
                         source=check_name
                     )
@@ -443,7 +438,7 @@ class MonitoringService:
                 if check_result.get('status') == 'warning':
                     self.alert_manager.create_alert(
                         level=AlertLevel.WARNING,
-                        title=f"Предупреждение: {check_name}",
+                        title="Предупреждение: {check_name}",
                         message=check_result.get('message', 'Неизвестная проблема'),
                         source=check_name
                     )
@@ -467,10 +462,8 @@ class MonitoringService:
             ]
         }
 
-
 # Глобальный экземпляр сервиса мониторинга
 _monitoring_service: Optional[MonitoringService] = None
-
 
 def get_monitoring_service() -> MonitoringService:
     """Получает глобальный экземпляр сервиса мониторинга"""
@@ -479,13 +472,11 @@ def get_monitoring_service() -> MonitoringService:
         _monitoring_service = MonitoringService()
     return _monitoring_service
 
-
 def start_monitoring():
     """Запускает сервис мониторинга"""
     service = get_monitoring_service()
     service.start()
     return service
-
 
 def stop_monitoring():
     """Останавливает сервис мониторинга"""

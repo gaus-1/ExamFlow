@@ -26,4 +26,4 @@ urlpatterns = [
 
     # API
     path('api/status/', views.bot_api_status, name='api_status'),
-]
+        ]

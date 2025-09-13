@@ -10,7 +10,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Управление Telegram ботом ExamFlow'
 
@@ -76,7 +75,7 @@ class Command(BaseCommand):
                     return
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Ошибка создания бота: {e}')  # type: ignore
+                    self.style.ERROR('❌ Ошибка создания бота: {e}')  # type: ignore
                 )
                 return
 
@@ -93,7 +92,7 @@ class Command(BaseCommand):
                     )
                 except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f'❌ Ошибка запуска бота: {e}')  # type: ignore
+                        self.style.ERROR('❌ Ошибка запуска бота: {e}')  # type: ignore
                     )
             else:
                 # Запуск в интерактивном режиме
@@ -112,12 +111,12 @@ class Command(BaseCommand):
                     )
                 except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f'❌ Ошибка запуска: {e}')  # type: ignore
+                        self.style.ERROR('❌ Ошибка запуска: {e}')  # type: ignore
                     )
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Неожиданная ошибка: {str(e)}')  # type: ignore
+                self.style.ERROR('❌ Неожиданная ошибка: {str(e)}')  # type: ignore
             )
 
     def stop_bot(self):
@@ -144,12 +143,12 @@ class Command(BaseCommand):
             os.remove(pid_file)
 
             self.stdout.write(
-                self.style.SUCCESS(f'✅ Бот остановлен (PID: {pid})')  # type: ignore
+                self.style.SUCCESS('✅ Бот остановлен (PID: {pid})')  # type: ignore
             )
 
         except (ValueError, ProcessLookupError) as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка остановки: {str(e)}')  # type: ignore
+                self.style.ERROR('❌ Ошибка остановки: {str(e)}')  # type: ignore
             )
             # Удаляем некорректный PID файл
             if os.path.exists(pid_file):
@@ -168,7 +167,7 @@ class Command(BaseCommand):
             pid = self.get_bot_pid()
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'🟢 Telegram бот запущен (PID: {pid})')  # type: ignore
+                    '🟢 Telegram бот запущен (PID: {pid})')  # type: ignore
             )
 
             # Проверяем, отвечает ли бот
@@ -181,7 +180,7 @@ class Command(BaseCommand):
 
                 bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
                 if bot_token:
-                    url = f"https://api.telegram.org/bot{bot_token}/getMe"
+                    url = "https://api.telegram.org/bot{bot_token}/getMe"
                     response = requests.get(url, timeout=5)
 
                     if response.status_code == 200:
@@ -190,7 +189,7 @@ class Command(BaseCommand):
                             bot_name = bot_info['result']['username']
                             self.stdout.write(
                                 self.style.SUCCESS(
-                                    f'✅ Бот отвечает: @{bot_name}')  # type: ignore
+                                    '✅ Бот отвечает: @{bot_name}')  # type: ignore
                             )
                         else:
                             self.stdout.write(
@@ -200,7 +199,7 @@ class Command(BaseCommand):
                     else:
                         self.stdout.write(
                             # type: ignore
-                            self.style.ERROR(f'❌ Ошибка API: {response.status_code}')
+                            self.style.ERROR('❌ Ошибка API: {response.status_code}')
                         )
                 else:
                     self.stdout.write(
@@ -211,7 +210,7 @@ class Command(BaseCommand):
             except Exception as e:
                 self.stdout.write(
                     self.style.WARNING(
-                        f'⚠️  Не удалось проверить API: {str(e)}')  # type: ignore
+                        '⚠️  Не удалось проверить API: {str(e)}')  # type: ignore
                 )
         else:
             self.stdout.write(

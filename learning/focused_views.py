@@ -7,7 +7,6 @@ from django.http import JsonResponse
 from django.db.models import Q
 from .models import Subject, Task, Topic
 
-
 def focused_subjects_list(request):
     """Список предметов с фокусом на математике и русском языке"""
     # Получаем только основные предметы (не архивированные)
@@ -28,7 +27,6 @@ def focused_subjects_list(request):
     }
 
     return render(request, 'learning/focused_subjects.html', context)
-
 
 def math_subject_detail(request, subject_id):
     """Детальная страница предмета математики"""
@@ -57,7 +55,6 @@ def math_subject_detail(request, subject_id):
             'message': 'Предмет математики не найден'
         })
 
-
 def russian_subject_detail(request, subject_id):
     """Детальная страница предмета русского языка"""
     try:
@@ -84,7 +81,6 @@ def russian_subject_detail(request, subject_id):
         return render(request, 'learning/subject_not_found.html', {
             'message': 'Предмет русского языка не найден'
         })
-
 
 def focused_search(request):
     """Поиск с фокусом на математике и русском языке"""
@@ -119,7 +115,7 @@ def focused_search(request):
             'title': task.title,
             'subject': task.subject.name,
             'type': 'math',
-            'url': f'/task/{task.id}/'
+            'url': '/task/{task.id}/'
         })
 
     # Добавляем результаты по русскому языку
@@ -129,7 +125,7 @@ def focused_search(request):
             'title': task.title,
             'subject': task.subject.name,
             'type': 'russian',
-            'url': f'/task/{task.id}/'
+            'url': '/task/{task.id}/'
         })
 
     return JsonResponse({
@@ -137,7 +133,6 @@ def focused_search(request):
         'total': len(results),
         'focus_message': 'Поиск сфокусирован на математике и русском языке'
     })
-
 
 def get_subject_statistics(request):
     """Статистика по предметам"""
@@ -158,7 +153,6 @@ def get_subject_statistics(request):
             'subjects_count': math_subjects.count(),
             'total_tasks': sum(subject.task_count for subject in math_subjects),
             'subjects': [
-                {
                     'name': subject.name,
                     'tasks': subject.task_count,
                     'exam_type': subject.get_exam_type_display()
@@ -170,7 +164,6 @@ def get_subject_statistics(request):
             'subjects_count': russian_subjects.count(),
             'total_tasks': sum(subject.task_count for subject in russian_subjects),
             'subjects': [
-                {
                     'name': subject.name,
                     'tasks': subject.task_count,
                     'exam_type': subject.get_exam_type_display()

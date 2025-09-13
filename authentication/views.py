@@ -10,11 +10,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.utils.crypto import get_random_string
 
-
 def simple_login(request):
     """Упрощенная страница входа"""
     return render(request, 'auth/simple_login.html')
-
 
 def telegram_login(request):
     """Инициация входа через Telegram"""
@@ -29,9 +27,8 @@ def telegram_login(request):
         'request_access': 'write'
     }
 
-    telegram_url = f"https://oauth.telegram.org/auth?{urlencode(params)}"
+    telegram_url = "https://oauth.telegram.org/auth?{urlencode(params)}"
     return redirect(telegram_url)
-
 
 def telegram_callback(request):
     """Callback для Telegram авторизации"""
@@ -46,14 +43,14 @@ def telegram_callback(request):
 
         # Создаем или находим пользователя
         telegram_id = auth_data.get('id')
-        username = f"telegram_{telegram_id}"
+        username = "telegram_{telegram_id}"
 
         user, created = User.objects.get_or_create(
             username=username,
             defaults={
                 'first_name': auth_data.get('first_name', ''),
                 'last_name': auth_data.get('last_name', ''),
-                'email': f"{username}@telegram.local"
+                'email': "{username}@telegram.local"
             }
         )
 
@@ -68,9 +65,8 @@ def telegram_callback(request):
         return redirect('learning:home')
 
     except Exception as e:
-        messages.error(request, f'Ошибка авторизации: {str(e)}')
+        messages.error(request, 'Ошибка авторизации: {str(e)}')
         return redirect('auth:simple_login')
-
 
 def google_login(request):
     """Инициация входа через Google"""
@@ -86,9 +82,8 @@ def google_login(request):
         'state': get_random_string(32)
     }
 
-    google_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+    google_url = "https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
     return redirect(google_url)
-
 
 def google_callback(request):
     """Callback для Google авторизации"""
@@ -103,11 +98,11 @@ def google_callback(request):
 
         # Создаем пользователя (демо)
         user, created = User.objects.get_or_create(
-            username=f"google_{get_random_string(8)}",
+            username="google_{get_random_string(8)}",
             defaults={
                 'first_name': 'Google',
                 'last_name': 'User',
-                'email': f"google_{get_random_string(8)}@google.local"
+                'email': "google_{get_random_string(8)}@google.local"
             }
         )
 
@@ -121,9 +116,8 @@ def google_callback(request):
         return redirect('learning:home')
 
     except Exception as e:
-        messages.error(request, f'Ошибка авторизации: {str(e)}')
+        messages.error(request, 'Ошибка авторизации: {str(e)}')
         return redirect('auth:simple_login')
-
 
 def yandex_login(request):
     """Инициация входа через Яндекс"""
@@ -138,9 +132,8 @@ def yandex_login(request):
         'state': get_random_string(32)
     }
 
-    yandex_url = f"https://oauth.yandex.ru/authorize?{urlencode(params)}"
+    yandex_url = "https://oauth.yandex.ru/authorize?{urlencode(params)}"
     return redirect(yandex_url)
-
 
 def yandex_callback(request):
     """Callback для Яндекс авторизации"""
@@ -152,11 +145,11 @@ def yandex_callback(request):
 
         # Создаем пользователя (демо)
         user, created = User.objects.get_or_create(
-            username=f"yandex_{get_random_string(8)}",
+            username="yandex_{get_random_string(8)}",
             defaults={
                 'first_name': 'Яндекс',
                 'last_name': 'Пользователь',
-                'email': f"yandex_{get_random_string(8)}@yandex.local"
+                'email': "yandex_{get_random_string(8)}@yandex.local"
             }
         )
 
@@ -170,20 +163,19 @@ def yandex_callback(request):
         return redirect('learning:home')
 
     except Exception as e:
-        messages.error(request, f'Ошибка авторизации: {str(e)}')
+        messages.error(request, 'Ошибка авторизации: {str(e)}')
         return redirect('auth:simple_login')
-
 
 def guest_access(request):
     """Гостевой доступ"""
     # Создаем временного пользователя
-    guest_username = f"guest_{get_random_string(8)}"
+    guest_username = "guest_{get_random_string(8)}"
     user, created = User.objects.get_or_create(
         username=guest_username,
         defaults={
             'first_name': 'Гость',
             'last_name': '',
-            'email': f"{guest_username}@guest.local"
+            'email': "{guest_username}@guest.local"
         }
     )
 
@@ -192,13 +184,11 @@ def guest_access(request):
 
     return redirect('learning:subjects_list')
 
-
 def logout_view(request):
     """Выход из системы"""
     logout(request)
     messages.success(request, 'Вы успешно вышли из системы')
     return redirect('learning:home')
-
 
 def _verify_telegram_auth(auth_data):
     """Проверка подписи Telegram (упрощенно)"""

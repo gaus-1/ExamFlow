@@ -10,7 +10,6 @@ from datetime import timedelta
 
 logger = logging.getLogger(__name__)
 
-
 class RecommendationEngine:
     """
     Движок персонализации и рекомендаций
@@ -57,7 +56,7 @@ class RecommendationEngine:
             return recommendations
 
         except Exception as e:
-            logger.error(f"Ошибка при получении рекомендаций: {e}")
+            logger.error("Ошибка при получении рекомендаций: {e}")
             return self.get_default_recommendations()
 
     def analyze_user_progress(self, user_id: int) -> Dict:
@@ -113,7 +112,7 @@ class RecommendationEngine:
             return analysis
 
         except Exception as e:
-            logger.error(f"Ошибка при анализе прогресса: {e}")
+            logger.error("Ошибка при анализе прогресса: {e}")
             return {}
 
     def get_topics_to_focus(self, user_analysis: Dict) -> List[Dict]:
@@ -134,7 +133,7 @@ class RecommendationEngine:
                 focus_topics.append({
                     'subject': subject_name,
                     'priority': 'high',
-                    'reason': f'Точность: {performance["accuracy"]:.1f}%',
+                    'reason': 'Точность: {performance["accuracy"]:.1f}%',
                     'recommended_actions': [
                         'Решайте больше задач по этой теме',
                         'Изучите теорию заново',
@@ -182,7 +181,7 @@ class RecommendationEngine:
             return tasks[:limit]
 
         except Exception as e:
-            logger.error(f"Ошибка при получении задач: {e}")
+            logger.error("Ошибка при получении задач: {e}")
             return []
 
     def get_learning_path(self, user_analysis: Dict) -> List[Dict]:
@@ -194,21 +193,18 @@ class RecommendationEngine:
         # Базовый путь для новичков
         if user_analysis.get('total_problems_solved', 0) < 10:
             learning_path = [
-                {
                     'step': 1,
                     'title': 'Изучение основ',
                     'description': 'Начните с базовых понятий и теории',
                     'estimated_time': '1-2 недели',
                     'priority': 'high'
                 },
-                {
                     'step': 2,
                     'title': 'Практические задания',
                     'description': 'Решайте простые задачи для закрепления',
                     'estimated_time': '2-3 недели',
                     'priority': 'high'
                 },
-                {
                     'step': 3,
                     'title': 'Сложные задачи',
                     'description': 'Переходите к более сложным заданиям',
@@ -223,8 +219,8 @@ class RecommendationEngine:
             for i, subject in enumerate(weak_subjects[:3], 1):
                 learning_path.append({
                     'step': i,
-                    'title': f'Улучшение по {subject}',
-                    'description': f'Сосредоточьтесь на улучшении результатов по {subject}',
+                    'title': 'Улучшение по {subject}',
+                    'description': 'Сосредоточьтесь на улучшении результатов по {subject}',
                     'estimated_time': '2-3 недели',
                     'priority': 'high'
                 })
@@ -266,7 +262,7 @@ class RecommendationEngine:
                     'subject': subject,
                     'accuracy': performance['accuracy'],
                     'problems_solved': performance['problems_solved'],
-                    'encouragement': f'Отличные результаты по {subject}!'
+                    'encouragement': 'Отличные результаты по {subject}!'
                 })
 
         return strengths
@@ -283,7 +279,7 @@ class RecommendationEngine:
             goals.append({
                 'type': 'accuracy',
                 'title': 'Повысить точность',
-                'description': f'Увеличить среднюю точность с {current_accuracy:.1f}% до 75%',
+                'description': 'Увеличить среднюю точность с {current_accuracy:.1f}% до 75%',
                 'target_value': 75,
                 'current_value': current_accuracy,
                 'deadline': '2 недели'
@@ -295,7 +291,7 @@ class RecommendationEngine:
             goals.append({
                 'type': 'quantity',
                 'title': 'Решить больше задач',
-                'description': f'Решить {50 - total_solved} задач до 50',
+                'description': 'Решить {50 - total_solved} задач до 50',
                 'target_value': 50,
                 'current_value': total_solved,
                 'deadline': '1 месяц'
@@ -321,7 +317,7 @@ class RecommendationEngine:
             return total_problems / 30  # Задач в день
 
         except Exception as e:
-            logger.error(f"Ошибка при вычислении скорости обучения: {e}")
+            logger.error("Ошибка при вычислении скорости обучения: {e}")
             return 0.0
 
     def get_default_recommendations(self) -> Dict:
@@ -330,7 +326,6 @@ class RecommendationEngine:
         """
         return {
             'topics_to_focus': [
-                {
                     'subject': 'Математика',
                     'priority': 'high',
                     'reason': 'Базовый предмет для ЕГЭ',
@@ -343,7 +338,6 @@ class RecommendationEngine:
             ],
             'practice_tasks': [],
             'learning_path': [
-                {
                     'step': 1,
                     'title': 'Начало обучения',
                     'description': 'Изучите основы выбранного предмета',
@@ -354,7 +348,6 @@ class RecommendationEngine:
             'weak_areas': [],
             'strengths': [],
             'next_goals': [
-                {
                     'type': 'general',
                     'title': 'Начать обучение',
                     'description': 'Выберите предмет и начните решать задачи',

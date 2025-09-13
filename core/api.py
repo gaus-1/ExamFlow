@@ -14,7 +14,6 @@ from core.rag_system.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class AIQueryView(View):
     """
@@ -41,12 +40,12 @@ class AIQueryView(View):
                     'answer': 'Пожалуйста, задайте вопрос по подготовке к ЕГЭ.'
                 }, status=400)
 
-            logger.info(f"Получен запрос от пользователя {user_id}: {query[:100]}...")
+            logger.info("Получен запрос от пользователя {user_id}: {query[:100]}...")
 
             # Обрабатываем запрос через оркестратор
             response = self.orchestrator.process_query(query, user_id)
 
-            logger.info(f"Запрос обработан успешно для пользователя {user_id}")
+            logger.info("Запрос обработан успешно для пользователя {user_id}")
             return JsonResponse(response)
 
         except json.JSONDecodeError:
@@ -55,12 +54,11 @@ class AIQueryView(View):
                 'answer': 'Произошла ошибка при обработке запроса.'
             }, status=400)
         except Exception as e:
-            logger.error(f"Ошибка в AIQueryView: {e}")
+            logger.error("Ошибка в AIQueryView: {e}")
             return JsonResponse({
                 'error': str(e),
                 'answer': 'Произошла ошибка при обработке запроса. Попробуйте позже.'
             }, status=500)
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class VectorStoreStatsView(View):
@@ -82,12 +80,11 @@ class VectorStoreStatsView(View):
             })
 
         except Exception as e:
-            logger.error(f"Ошибка при получении статистики: {e}")
+            logger.error("Ошибка при получении статистики: {e}")
             return JsonResponse({
                 'status': 'error',
                 'error': str(e)
             }, status=500)
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SearchView(View):
@@ -124,11 +121,10 @@ class SearchView(View):
                 'error': 'Неверный JSON'
             }, status=400)
         except Exception as e:
-            logger.error(f"Ошибка при поиске: {e}")
+            logger.error("Ошибка при поиске: {e}")
             return JsonResponse({
                 'error': str(e)
             }, status=500)
-
 
 @method_decorator(csrf_exempt, name='dispatch')
 class HealthCheckView(View):
@@ -181,48 +177,40 @@ class HealthCheckView(View):
             return JsonResponse(health_status)
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке состояния: {e}")
+            logger.error("Ошибка при проверке состояния: {e}")
             return JsonResponse({
                 'status': 'unhealthy',
                 'error': str(e)
             }, status=500)
-
 
 # Legacy API functions for backward compatibility
 def get_random_task(request):
     """Legacy API - returns random task"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
 def get_subjects(request):
     """Legacy API - returns subjects"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
-
 
 def get_tasks_by_subject(request, subject_id):
     """Legacy API - returns tasks by subject"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
 def get_task_by_id(request, task_id):
     """Legacy API - returns task by ID"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
-
 
 def search_tasks(request):
     """Legacy API - searches tasks"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
 def get_topics(request):
     """Legacy API - returns topics"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
-
 def get_statistics(request):
     """Legacy API - returns statistics"""
     return JsonResponse({'error': 'API deprecated'}, status=410)
-
 
 def create_subscription(request):
     """Legacy API - creates subscription"""

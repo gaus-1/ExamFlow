@@ -4,7 +4,7 @@
 
 import os
 import dj_database_url
-from .settings import *  # noqa: F403,F401
+from .settings import *  # noqa: F403, F401
 
 # Принудительно отключаем DEBUG в продакшене
 DEBUG = False
@@ -65,7 +65,7 @@ LOGGING = {
             'propagate': False,
         },
     },
-}
+    }
 
 # Настройки кеширования для продакшена
 CACHES = {
@@ -87,15 +87,15 @@ CORS_ALLOWED_ORIGINS = [
     'https://examflow.ru',
     'https://www.examflow.ru',
     'https://examflow.onrender.com',
-]
+    ]
 
 # Настройки Content Security Policy
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://www.googletagmanager.com")
-CSP_IMG_SRC = ("'self'", "data:", "https:")
-CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
-CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com")
+CSP_DEFAULT_SRC = ("'sel'", )
+CSP_STYLE_SRC = ("'sel'", "'unsafe-inline'", "https://fonts.googleapis.com")
+CSP_SCRIPT_SRC = ("'sel'", "'unsafe-inline'", "https://www.googletagmanager.com")
+CSP_IMG_SRC = ("'sel'", "data:", "https:")
+CSP_FONT_SRC = ("'sel'", "https://fonts.gstatic.com")
+CSP_CONNECT_SRC = ("'sel'", "https://generativelanguage.googleapis.com")
 
 # Настройки rate limiting для продакшена
 RATELIMIT_USE_CACHE = 'default'
@@ -107,6 +107,6 @@ if os.getenv('RENDER'):
     RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
     if RENDER_HOST:
         ALLOWED_HOSTS.append(RENDER_HOST)  # noqa: F405
-    
+
     # Настройки для статических файлов на Render
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

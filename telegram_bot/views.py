@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 # При необходимости можно вернуть списки сетей Telegram и корректную проверку CIDR
 ALLOWED_IPS = []
 
-
 def is_allowed_ip(ip):
     """Проверяет, разрешен ли IP для webhook"""
     if not ALLOWED_IPS:  # Если список пустой - разрешаем все
@@ -44,7 +43,6 @@ def is_allowed_ip(ip):
             return True
     return False
 
-
 @csrf_exempt
 def telegram_webhook(request):
     """
@@ -54,9 +52,9 @@ def telegram_webhook(request):
     и передает их в обработчики бота
     """
     logger.info("=== НАЧАЛО ОБРАБОТКИ WEBHOOK ===")
-    logger.info(f"Время: {datetime.now()}")
-    logger.info(f"IP: {request.META.get('REMOTE_ADDR', 'unknown')}")
-    logger.info(f"User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
+    logger.info("Время: {datetime.now()}")
+    logger.info("IP: {request.META.get('REMOTE_ADDR', 'unknown')}")
+    logger.info("User-Agent: {request.META.get('HTTP_USER_AGENT', 'unknown')}")
 
     try:
         # Разрешаем быстрый health-check GET без 500
@@ -67,20 +65,20 @@ def telegram_webhook(request):
             'HTTP_X_FORWARDED_FOR',
             request.META.get('REMOTE_ADDR'))
         if not is_allowed_ip(client_ip):
-            logger.warning(f"Webhook заблокирован с IP: {client_ip}")
+            logger.warning("Webhook заблокирован с IP: {client_ip}")
             return HttpResponse(b"Forbidden", status=403)  # type: ignore
 
         # 🔒 БЕЗОПАСНОСТЬ: Проверка размера данных
         content_length = getattr(request, 'content_length', None)
         if content_length and content_length > 1024 * 1024:  # 1MB limit
             logger.warning(
-                f"Webhook заблокирован - слишком большой размер: {content_length}")
+                "Webhook заблокирован - слишком большой размер: {content_length}")
             return HttpResponse(b"Payload too large", status=413)  # type: ignore
 
         # Детальное логирование входящего webhook
-        logger.info(f"Webhook получен: {request.method} {request.path}")
-        logger.info(f"Headers: {dict(request.headers)}")
-        logger.info(f"Body length: {len(request.body)} bytes")
+        logger.info("Webhook получен: {request.method} {request.path}")
+        logger.info("Headers: {dict(request.headers)}")
+        logger.info("Body length: {len(request.body)} bytes")
 
         # Парсим JSON данные (без 500 при пустом/битом теле)
         try:
@@ -88,19 +86,19 @@ def telegram_webhook(request):
         except Exception:
             logger.warning("Пустой или некорректный JSON в webhook — возвращаем OK")
             return HttpResponse(b"OK")
-        logger.info(f"Webhook data: {json.dumps(data, indent=2, ensure_ascii=False)}")
+        logger.info("Webhook data: {json.dumps(data, indent=2, ensure_ascii=False)}")
 
         # Получаем экземпляр бота
         bot = get_bot()
-        logger.info(f"Bot instance получен: {bot is not None}")
+        logger.info("Bot instance получен: {bot is not None}")
 
         # Создаем объект Update
         if Update is None:
             logger.error("Telegram library not installed")
             return JsonResponse({"error": "Telegram library not available"}, status=500)
-            
+
         update = Update.de_json(data, bot)
-        logger.info(f"Update создан: {update is not None}")
+        logger.info("Update создан: {update is not None}")
 
         if update:
             # Быстрая реакция на /start в синхронном режиме (диагностика отклика)
@@ -108,7 +106,7 @@ def telegram_webhook(request):
                 if update.message and (
                         update.message.text or '').strip().lower().startswith('/start'):
                     chat_id = update.message.chat_id
-                    logger.info(f"Обрабатываем /start для chat_id: {chat_id}")
+                    logger.info("Обрабатываем /start для chat_id: {chat_id}")
 
                     # Пытаемся отправить через Bot API (http), чтобы исключить проблемы
                     # клиента
@@ -118,10 +116,7 @@ def telegram_webhook(request):
                         # ответов
                         reply_kb = {
                             'inline_keyboard': [[
-                                {'text': "📚 Предметы", 'callback_data': 'subjects'},
-                                {'text': "🎯 Случайное", 'callback_data': 'random_task'}
                             ], [
-                                {'text': "📊 Статистика", 'callback_data': 'stats'}
                             ]]
                         }
                         token = settings.TELEGRAM_BOT_TOKEN
@@ -129,10 +124,10 @@ def telegram_webhook(request):
                             logger.error("TELEGRAM_BOT_TOKEN не настроен в settings!")
                             return HttpResponse(b"ERROR: No token", status=500)
                         logger.info(
-                            f"Отправляем HTTP-ответ через Bot API для токена: {token[:10]}...")
+                            "Отправляем HTTP-ответ через Bot API для токена: {token[:10]}...")
 
                         response = requests.post(
-                            f"https://api.telegram.org/bot{token}/sendMessage",
+                            "https://api.telegram.org/bot{token}/sendMessage",
                             json={
                                 'chat_id': chat_id,
                                 'text': 'Добро пожаловать в ExamFlow! Выберите действие:',
@@ -140,9 +135,9 @@ def telegram_webhook(request):
                             timeout=8,
                         )
                         logger.info(
-                            f"HTTP-ответ отправлен, статус: {response.status_code}, ответ: {response.text}")
+                            "HTTP-ответ отправлен, статус: {response.status_code}, ответ: {response.text}")
                     except Exception as http_ex:
-                        logger.warning(f"HTTP-ответ на /start не удался: {http_ex}")
+                        logger.warning("HTTP-ответ на /start не удался: {http_ex}")
                         # Резерв: пробуем через python-telegram-bot
                         logger.info(
                             "Пробуем резервный способ через python-telegram-bot")
@@ -165,7 +160,7 @@ def telegram_webhook(request):
                         finally:
                             loop.close()
             except Exception as ex:
-                logger.warning(f"Не удалось отправить быстрый ответ на /start: {ex}")
+                logger.warning("Не удалось отправить быстрый ответ на /start: {ex}")
 
             # Обрабатываем обновление в отдельном потоке, чтобы мгновенно отвечать
             # Telegram
@@ -174,9 +169,9 @@ def telegram_webhook(request):
                     import asyncio as _aio
                     _aio.run(handle_telegram_update(u))
                 except Exception as ex:
-                    logger.error(f"Ошибка фоновой обработки обновления: {ex}")
+                    logger.error("Ошибка фоновой обработки обновления: {ex}")
 
-            threading.Thread(target=_run_async, args=(update,), daemon=True).start()
+            threading.Thread(target=_run_async, args=(update, ), daemon=True).start()
 
         # Немедленно подтверждаем приём, чтобы избежать таймаута Telegram
         logger.info("Webhook успешно обработан, возвращаем OK")
@@ -184,10 +179,8 @@ def telegram_webhook(request):
         return HttpResponse(b"OK")
 
     except Exception as e:
-        logger.error(f"Ошибка обработки webhook: {e}")
+        logger.error("Ошибка обработки webhook: {e}")
         return HttpResponse(b"ERROR", status=500)
-
-
 
 async def handle_telegram_update(update):  # type: ignore
     """
@@ -211,7 +204,7 @@ async def handle_telegram_update(update):  # type: ignore
                     )
                 )
             except Exception as e:
-                logger.error(f"Ошибка быстрой отправки /start: {e}")
+                logger.error("Ошибка быстрой отправки /start: {e}")
 
         # Импортируем обработчики
         from .bot_handlers import (
@@ -240,7 +233,7 @@ async def handle_telegram_update(update):  # type: ignore
             try:
                 await update.callback_query.answer()
             except Exception as ack_err:
-                logger.warning(f"Не удалось ответить на callback_query: {ack_err}")
+                logger.warning("Не удалось ответить на callback_query: {ack_err}")
 
             callback_data = update.callback_query.data or ""
             chat_id = None
@@ -300,7 +293,7 @@ async def handle_telegram_update(update):  # type: ignore
                 else:
                     await h_unknown(update, context)  # type: ignore
             except Exception as cb_err:
-                logger.error(f"Ошибка обработки callback '{callback_data}': {cb_err}")
+                logger.error("Ошибка обработки callback '{callback_data}': {cb_err}")
                 # Отправим аккуратное сообщение пользователю, чтобы он не остался без
                 # ответа
                 try:
@@ -309,11 +302,10 @@ async def handle_telegram_update(update):  # type: ignore
                         await context.bot.send_message(chat_id=chat_id, text="❌ Временная ошибка. Попробуйте ещё раз или отправьте /start")
                 except Exception as send_err:
                     logger.error(
-                        f"Не удалось отправить сообщение об ошибке: {send_err}")
+                        "Не удалось отправить сообщение об ошибке: {send_err}")
 
     except Exception as e:
-        logger.error(f"Ошибка обработки обновления: {e}")
-
+        logger.error("Ошибка обработки обновления: {e}")
 
 class MockContext:
     """
@@ -327,11 +319,9 @@ class MockContext:
         self.user_data = {}
         self.chat_data = {}
 
-
 def is_superuser(user):
     """Проверяет, является ли пользователь суперпользователем"""
     return user.is_superuser
-
 
 def test_webhook(request):
     """Тестовая функция для проверки webhook endpoint"""
@@ -340,10 +330,9 @@ def test_webhook(request):
         'message': 'Webhook endpoint доступен',
         'timestamp': timezone.now().isoformat(),
         'token_exists': bool(settings.TELEGRAM_BOT_TOKEN),
-        'token_preview': f"{settings.TELEGRAM_BOT_TOKEN[:12]}..." if settings.TELEGRAM_BOT_TOKEN else None,
+        'token_preview': "{settings.TELEGRAM_BOT_TOKEN[:12]}..." if settings.TELEGRAM_BOT_TOKEN else None,
         'bot_available': True
     })
-
 
 def test_bot_api(request):
     """Тест API бота через прямой HTTP getMe (без async)"""
@@ -351,8 +340,7 @@ def test_bot_api(request):
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
         if not token:
             return JsonResponse(
-                {'status': 'error', 'error': 'TELEGRAM_BOT_TOKEN не задан'}, status=500)
-        resp = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=8)
+        resp = requests.get("https://api.telegram.org/bot{token}/getMe", timeout=8)
         data = resp.json()
         if not data.get('ok'):
             return JsonResponse({'status': 'error', 'api': 'getMe',
@@ -366,7 +354,6 @@ def test_bot_api(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'error': str(
             e), 'timestamp': timezone.now().isoformat()}, status=500)
-
 
 def bot_control_panel(request):
     """Панель управления ботом"""
@@ -382,7 +369,7 @@ def bot_control_panel(request):
             'bot_id': bot_info.id,  # type: ignore
             'bot_username': bot_info.username,  # type: ignore
             'bot_name': bot_info.first_name,  # type: ignore
-            'webhook_url': f"{settings.SITE_URL}/bot/webhook/",
+            'webhook_url': "{settings.SITE_URL}/bot/webhook/",
             'timestamp': timezone.now().isoformat()
         }
 
@@ -396,7 +383,6 @@ def bot_control_panel(request):
             'error': str(e),
             'timestamp': timezone.now().isoformat()
         }, status=500)
-
 
 def bot_api_status(request):
     """

@@ -14,7 +14,6 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-
 class VoiceService:
     """Сервис для работы с голосовыми подсказками"""
 
@@ -43,7 +42,7 @@ class VoiceService:
         try:
             # Создаем уникальный хеш для кэширования
             text_hash = hashlib.md5(text.encode('utf-8')).hexdigest()
-            cache_key = f"voice_{voice_type}_{text_hash}"
+            cache_key = "voice_{voice_type}_{text_hash}"
 
             # Проверяем кэш
             cached_path = cache.get(cache_key)
@@ -51,7 +50,7 @@ class VoiceService:
                 os.path.join(
                     settings.MEDIA_ROOT,
                     cached_path)):
-                logger.info(f"Используем кэшированный аудиофайл: {cached_path}")
+                logger.info("Используем кэшированный аудиофайл: {cached_path}")
                 return cached_path
 
             # Очищаем текст для лучшего озвучивания
@@ -73,9 +72,9 @@ class VoiceService:
                 tts.save(tmp_file.name)
 
                 # Создаем финальный путь
-                filename = f"{voice_type}_{text_hash}.mp3"
+                filename = "{voice_type}_{text_hash}.mp3"
                 audio_path = self.audio_dir / filename
-                relative_path = f"audio/{filename}"
+                relative_path = "audio/{filename}"
 
                 # Перемещаем файл в медиа директорию
                 os.rename(tmp_file.name, str(audio_path))
@@ -83,11 +82,11 @@ class VoiceService:
                 # Кэшируем путь
                 cache.set(cache_key, relative_path, self.cache_timeout)
 
-                logger.info(f"Создан аудиофайл: {relative_path}")
+                logger.info("Создан аудиофайл: {relative_path}")
                 return relative_path
 
         except Exception as e:
-            logger.error(f"Ошибка генерации аудио: {str(e)}")
+            logger.error("Ошибка генерации аудио: {str(e)}")
             return None
 
     def _clean_text_for_speech(self, text):
@@ -143,20 +142,20 @@ class VoiceService:
         """Генерирует аудио для задания"""
         try:
             # Озвучиваем условие задания
-            task_text = f"Задание по предмету {task.subject.name}. {task.title}. {task.description}"
+            task_text = "Задание по предмету {task.subject.name}. {task.title}. {task.description}"
             task_audio = self.text_to_speech(task_text, task.id, 'task')
 
             # Озвучиваем решение если есть
             solution_audio = None
             if task.solution:
-                solution_text = f"Решение. {task.solution}"
+                solution_text = "Решение. {task.solution}"
                 solution_audio = self.text_to_speech(solution_text, task.id, 'solution')
 
             # Обновляем модель задания
             if task_audio:
                 task.audio_file = task_audio
                 task.save()
-                logger.info(f"Аудио для задания {task.id} сохранено")
+                logger.info("Аудио для задания {task.id} сохранено")
 
             return {
                 'task_audio': task_audio,
@@ -164,12 +163,12 @@ class VoiceService:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка генерации аудио для задания {task.id}: {str(e)}")
+            logger.error("Ошибка генерации аудио для задания {task.id}: {str(e)}")
             return None
 
     def generate_hint_audio(self, hint_text):
         """Генерирует аудио для подсказки"""
-        hint_text = f"Подсказка. {hint_text}"
+        hint_text = "Подсказка. {hint_text}"
         return self.text_to_speech(hint_text, voice_type='hint')
 
     def cleanup_old_audio(self, days=30):
@@ -184,23 +183,21 @@ class VoiceService:
                     audio_file.unlink()
                     deleted_count += 1
 
-            logger.info(f"Удалено старых аудиофайлов: {deleted_count}")
+            logger.info("Удалено старых аудиофайлов: {deleted_count}")
             return deleted_count
 
         except Exception as e:
-            logger.error(f"Ошибка очистки аудиофайлов: {str(e)}")
+            logger.error("Ошибка очистки аудиофайлов: {str(e)}")
             return 0
 
     def get_audio_url(self, relative_path):
         """Возвращает полный URL аудиофайла"""
         if not relative_path:
             return None
-        return f"{settings.MEDIA_URL}{relative_path}"
-
+        return "{settings.MEDIA_URL}{relative_path}"
 
 # Глобальный экземпляр сервиса
 voice_service = VoiceService()
-
 
 def generate_task_voices():
     """Генерирует голосовые файлы для всех активных заданий"""
@@ -208,7 +205,7 @@ def generate_task_voices():
 
     logger.info("Начинаем генерацию голосовых файлов...")
 
-    tasks = Task.objects.filter(is_active=True, audio_file__isnull=True)[
+    tasks = Task.objects.filter(is_active=True, audio_file__isnull=True)[  # type: ignore
         :50]  # Ограничиваем для экономии
     generated_count = 0
 
@@ -217,15 +214,15 @@ def generate_task_voices():
             result = voice_service.generate_task_audio(task)
             if result and result['task_audio']:
                 generated_count += 1
-                logger.info(f"Аудио создано для задания: {task.title}")
+                logger.info("Аудио создано для задания: {task.title}")
 
             # Пауза между генерациями для экономии ресурсов
             import time
             time.sleep(1)
 
         except Exception as e:
-            logger.error(f"Ошибка генерации аудио для {task.id}: {str(e)}")
+            logger.error("Ошибка генерации аудио для {task.id}: {str(e)}")
             continue
 
-    logger.info(f"Генерация завершена. Создано аудиофайлов: {generated_count}")
+    logger.info("Генерация завершена. Создано аудиофайлов: {generated_count}")
     return generated_count

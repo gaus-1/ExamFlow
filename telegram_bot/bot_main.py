@@ -27,7 +27,6 @@ import hmac
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
-
 # Настройка логирования
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -36,7 +35,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 🔒 БЕЗОПАСНОСТЬ: Проверка токена бота
-
 
 def validate_bot_token():
     """
@@ -57,7 +55,6 @@ def validate_bot_token():
 
 # 🔒 БЕЗОПАСНОСТЬ: Проверка webhook
 
-
 def validate_webhook_secret(secret_token, request_body, signature):
     """
     Проверяет подпись webhook для безопасности
@@ -71,8 +68,7 @@ def validate_webhook_secret(secret_token, request_body, signature):
         hashlib.sha256
     ).hexdigest()
 
-    return hmac.compare_digest(f"sha256={expected_signature}", signature)
-
+    return hmac.compare_digest("sha256={expected_signature}", signature)
 
 def get_bot():
     """
@@ -80,7 +76,6 @@ def get_bot():
     """
     from telegram import Bot
     return Bot(settings.TELEGRAM_BOT_TOKEN)
-
 
 def setup_bot_application():
     """
@@ -218,21 +213,20 @@ def setup_bot_application():
     logger.info("Telegram бот настроен и готов к работе")
     return application
 
-
 def main():
     """Основная функция для запуска бота"""
     application = setup_bot_application()
-    
+
     logger.info("Запуск бота в режиме polling")
     # Явно удаляем webhook, если активен, чтобы избежать 409 Conflict
     try:
         import asyncio
-        asyncio.run(application.bot.delete_webhook(drop_pending_updates=True))  # type: ignore
+        asyncio.run(application.bot.delete_webhook(
+            drop_pending_updates=True))  # type: ignore
     except Exception:
         pass
     # Стартуем polling и отбрасываем накопившиеся обновления
     application.run_polling(drop_pending_updates=True)  # type: ignore
-
 
 if __name__ == '__main__':
     """Запуск бота в режиме polling (для разработки)"""
@@ -242,7 +236,8 @@ if __name__ == '__main__':
     # Явно удаляем webhook, если активен, чтобы избежать 409 Conflict
     try:
         import asyncio
-        asyncio.run(application.bot.delete_webhook(drop_pending_updates=True))  # type: ignore
+        asyncio.run(application.bot.delete_webhook(
+            drop_pending_updates=True))  # type: ignore
     except Exception:
         pass
     # Стартуем polling и отбрасываем накопившиеся обновления

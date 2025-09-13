@@ -2,7 +2,6 @@ from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 
-
 @csrf_exempt
 @require_GET
 def fipi_semantic_search(request: HttpRequest) -> JsonResponse:
@@ -26,9 +25,10 @@ def fipi_semantic_search(request: HttpRequest) -> JsonResponse:
 
     store = VectorStore()
     try:
-        results = store.semantic_search(query=query, subject_filter=subject, limit=limit)  # type: ignore
+        results = store.semantic_search(
+            query=query,
+            subject_filter=subject,
+            limit=limit)  # type: ignore
         return JsonResponse({"results": results, "count": len(results)})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-
-

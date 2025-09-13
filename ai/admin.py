@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import AiRequest, AiLimit, AiProvider, AiPromptTemplate, AiResponse
 
-
 @admin.register(AiRequest)
 class AiRequestAdmin(admin.ModelAdmin):
     """Административная панель для запросов к ИИ"""
@@ -18,14 +17,11 @@ class AiRequestAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     fieldsets = (
-        ('Основная информация', {
             'fields': ('user', 'session_id', 'request_type', 'prompt', 'response')
         }),
-        ('Технические детали', {
             'fields': ('tokens_used', 'cost', 'ip_address', 'created_at')
         }),
     )
-
 
 @admin.register(AiLimit)
 class AiLimitAdmin(admin.ModelAdmin):
@@ -49,17 +45,13 @@ class AiLimitAdmin(admin.ModelAdmin):
     is_exceeded_display.short_description = 'Статус лимита'
 
     fieldsets = (
-        ('Основная информация', {
             'fields': ('user', 'session_id', 'limit_type', 'max_limit')
         }),
-        ('Использование', {
             'fields': ('current_usage', 'reset_date')
         }),
-        ('Системная информация', {
             'fields': ('created_at', 'updated_at')
         }),
     )
-
 
 @admin.register(AiProvider)
 class AiProviderAdmin(admin.ModelAdmin):
@@ -82,23 +74,17 @@ class AiProviderAdmin(admin.ModelAdmin):
         'success_rate']
 
     fieldsets = (
-        ('Основная информация', {
             'fields': ('name', 'provider_type', 'is_active', 'priority')
         }),
-        ('API настройки', {
             'fields': ('api_key', 'api_url', 'max_tokens_per_request')
         }),
-        ('Лимиты и стоимость', {
             'fields': ('daily_limit', 'daily_usage', 'cost_per_token')
         }),
-        ('Статистика', {
             'fields': ('response_time_avg', 'success_rate', 'last_used')
         }),
-        ('Системная информация', {
             'fields': ('created_at', 'updated_at')
         }),
     )
-
 
 @admin.register(AiPromptTemplate)
 class AiPromptTemplateAdmin(admin.ModelAdmin):
@@ -109,17 +95,13 @@ class AiPromptTemplateAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
     fieldsets = (
-        ('Основная информация', {
             'fields': ('name', 'template_type', 'is_active', 'priority')
         }),
-        ('Шаблон', {
             'fields': ('prompt_template', 'variables')
         }),
-        ('Системная информация', {
             'fields': ('created_at', 'updated_at')
         }),
     )
-
 
 @admin.register(AiResponse)
 class AiResponseAdmin(admin.ModelAdmin):
@@ -136,17 +118,13 @@ class AiResponseAdmin(admin.ModelAdmin):
     readonly_fields = ['prompt_hash', 'created_at', 'last_used', 'usage_count']
 
     fieldsets = (
-        ('Основная информация', {
             'fields': ('prompt_hash', 'provider')
         }),
-        ('Содержание', {
             'fields': ('prompt', 'response')
         }),
-        ('Статистика', {
             'fields': ('tokens_used', 'usage_count', 'created_at', 'last_used')
         }),
     )
-
 
 # Настройки административной панели
 admin.site.site_header = 'ExamFlow - Администрирование'

@@ -10,7 +10,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class DataType(Enum):
     """Типы данных на fipi.ru"""
     DEMO_VARIANT = "demo_variant"  # Демонстрационный вариант
@@ -21,7 +20,6 @@ class DataType(Enum):
     NEWS = "news"  # Новости и анонсы
     DOCUMENT = "document"  # Официальные документы
 
-
 class ExamType(Enum):
     """Типы экзаменов"""
     EGE = "ege"  # ЕГЭ
@@ -31,14 +29,12 @@ class ExamType(Enum):
     ESSAY = "essay"  # Итоговое сочинение
     INTERVIEW = "interview"  # Итоговое собеседование
 
-
 class Priority(Enum):
     """Приоритеты данных"""
     CRITICAL = 1  # Критически важные
     HIGH = 2  # Высокий приоритет
     MEDIUM = 3  # Средний приоритет
     LOW = 4  # Низкий приоритет
-
 
 class UpdateFrequency(Enum):
     """Частота обновления"""
@@ -47,7 +43,6 @@ class UpdateFrequency(Enum):
     WEEKLY = "weekly"  # Еженедельно
     DAILY = "daily"  # Ежедневно
     ON_DEMAND = "on_demand"  # По требованию
-
 
 @dataclass
 class FIPISource:
@@ -64,7 +59,6 @@ class FIPISource:
     description: str = ""
     last_checked: Optional[str] = None
     content_hash: Optional[str] = None
-
 
 class FIPIStructureMap:
     """Карта структуры сайта fipi.ru"""
@@ -258,10 +252,8 @@ class FIPIStructureMap:
 
         return stats
 
-
 # Создаем глобальный экземпляр карты
 fipi_structure_map = FIPIStructureMap()
-
 
 def get_fipi_structure_map() -> FIPIStructureMap:
     """Получить карту структуры fipi.ru"""

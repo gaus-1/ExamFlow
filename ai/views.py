@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 # Сервис ИИ: провайдеры, кэш и лимиты
 ai_service = None
 
-
 def get_ai_service():
     """Получает или создает экземпляр AiService"""
     global ai_service
@@ -25,10 +24,9 @@ def get_ai_service():
             ai_service = AiService()
             logger.info("AiService успешно создан")
         except Exception as e:
-            logger.error(f"Ошибка создания AiService: {e}")
+            logger.error("Ошибка создания AiService: {e}")
             return None
     return ai_service
-
 
 # ========================================
 # ОСНОВНЫЕ СТРАНИЦЫ ИИ
@@ -42,7 +40,6 @@ def ai_dashboard(request):
     }
     return render(request, 'ai/dashboard.html', context)
 
-
 def ai_chat(request):
     """Страница чата с ИИ"""
     try:
@@ -53,14 +50,13 @@ def ai_chat(request):
         return render(request, 'ai/chat.html', context)
     except Exception as e:  # type: ignore
         # Мягкий fallback: не отдаём 500, показываем информативную страницу
-        logger.error(f"Ошибка рендера страницы чата: {e}")
+        logger.error("Ошибка рендера страницы чата: {e}")
         context = {
             'title': 'Чат с ИИ - ExamFlow',
             'user': request.user,
             'error_message': 'Временная ошибка загрузки чата ИИ. Повторите попытку через минуту.',
         }
         return render(request, 'ai/chat.html', context)
-
 
 def ai_explain(request):
     """Страница объяснения тем ИИ"""
@@ -70,7 +66,6 @@ def ai_explain(request):
     }
     return render(request, 'ai/explain.html', context)
 
-
 def ai_search(request):
     """Страница поиска заданий ИИ"""
     context = {
@@ -79,7 +74,6 @@ def ai_search(request):
     }
     return render(request, 'ai/search.html', context)
 
-
 def ai_generate(request):
     """Страница генерации заданий ИИ"""
     context = {
@@ -87,7 +81,6 @@ def ai_generate(request):
         'user': request.user,
     }
     return render(request, 'ai/generate.html', context)
-
 
 # ========================================
 # API ДЛЯ ИИ
@@ -138,15 +131,12 @@ def api_chat(request):
 
         # Follow-ups: простые действия в экосистеме
         followups = [
-            {
                 'label': 'Показать задания по предметам',
-                'href': '/learning/subjects/'
+                'hre': '/learning/subjects/'
             },
-            {
                 'label': 'Случайное задание',
-                'href': '/learning/random/'
+                'hre': '/learning/random/'
             },
-            {
                 'label': 'Задать уточняющий вопрос',
                 'action': 'refocus-input'
             }
@@ -165,9 +155,8 @@ def api_chat(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Неверный JSON'}, status=400)
     except Exception as e:
-        logger.error(f"Ошибка в API чата: {e}")
+        logger.error("Ошибка в API чата: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -182,7 +171,7 @@ def api_explain(request):
             return JsonResponse({'error': 'Не указана тема'}, status=400)
 
         # TODO: Реализовать логику объяснения
-        explanation = f"Объяснение темы '{topic}' находится в разработке. Скоро здесь будет подробное объяснение с примерами."
+        explanation = "Объяснение темы '{topic}' находится в разработке. Скоро здесь будет подробное объяснение с примерами."
 
         return JsonResponse({
             'explanation': explanation,
@@ -191,9 +180,8 @@ def api_explain(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в API объяснения: {e}")
+        logger.error("Ошибка в API объяснения: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -209,9 +197,8 @@ def api_search(request):
 
         # TODO: Реализовать логику поиска
         results = [
-            {
                 'id': 1,
-                'title': f'Задание по запросу "{query}"',
+                'title': 'Задание по запросу "{query}"',
                 'description': 'Описание задания находится в разработке',
                 'subject': 'Математика',
                 'difficulty': 'Средний'
@@ -226,9 +213,8 @@ def api_search(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в API поиска: {e}")
+        logger.error("Ошибка в API поиска: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -245,8 +231,8 @@ def api_generate(request):
 
         # TODO: Реализовать логику генерации
         generated_task = {
-            'title': f'Сгенерированное задание по теме "{topic}"',
-            'content': f'Содержание задания по теме "{topic}" с уровнем сложности "{difficulty}" находится в разработке.',
+            'title': 'Сгенерированное задание по теме "{topic}"',
+            'content': 'Содержание задания по теме "{topic}" с уровнем сложности "{difficulty}" находится в разработке.',
             'answer': 'Ответ будет доступен после реализации функционала',
             'explanation': 'Подробное объяснение решения будет добавлено позже'}
 
@@ -257,9 +243,8 @@ def api_generate(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в API генерации: {e}")
+        logger.error("Ошибка в API генерации: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
-
 
 # ========================================
 # УПРАВЛЕНИЕ ЛИМИТАМИ
@@ -272,7 +257,6 @@ def ai_limits(request):
         'user': request.user,
     }
     return render(request, 'ai/limits.html', context)
-
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -312,9 +296,8 @@ def api_limits(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в API лимитов: {e}")
+        logger.error("Ошибка в API лимитов: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
-
 
 # ========================================
 # ГОЛОСОВОЙ ПОМОЩНИК
@@ -328,7 +311,6 @@ def voice_assistant(request):
     }
     return render(request, 'ai/voice.html', context)
 
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_voice(request):
@@ -340,19 +322,17 @@ def api_voice(request):
 
         if not audio_data and not command:
             return JsonResponse(
-                {'error': 'Не переданы аудио данные или команда'}, status=400)
 
         # TODO: Реализовать логику голосового помощника
         response = {
-            'text': f'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
+            'text': 'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
             'audio_url': None}
 
         return JsonResponse(response)
 
     except Exception as e:
-        logger.error(f"Ошибка в API голосового помощника: {e}")
+        logger.error("Ошибка в API голосового помощника: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
-
 
 # ========================================
 # АДМИНИСТРАТИВНЫЕ ФУНКЦИИ
@@ -366,7 +346,6 @@ def admin_providers(request):
         'user': request.user,
     }
     return render(request, 'ai/admin/providers.html', context)
-
 
 @staff_member_required
 def admin_templates(request):

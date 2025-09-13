@@ -13,7 +13,6 @@ from core.data_ingestion.scheduler import get_scheduler
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Управляет движком сбора данных'
 
@@ -90,9 +89,9 @@ class Command(BaseCommand):
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при запуске: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при запуске: {e}')  # type: ignore
             )
-            logger.error(f'Ошибка при запуске движка: {e}')
+            logger.error('Ошибка при запуске движка: {e}')
 
     def stop_engine(self, options):
         """Останавливает движок сбора данных"""
@@ -120,9 +119,9 @@ class Command(BaseCommand):
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при остановке: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при остановке: {e}')  # type: ignore
             )
-            logger.error(f'Ошибка при остановке движка: {e}')
+            logger.error('Ошибка при остановке движка: {e}')
 
     def show_status(self, options):
         """Показывает статус движка"""
@@ -137,21 +136,21 @@ class Command(BaseCommand):
                 status = scheduler.get_job_status()
 
                 self.stdout.write(
-                    f'Планировщик: {"🟢 Запущен" if status["scheduler_running"] else "🔴 Остановлен"}')  # type: ignore
+                    'Планировщик: {"🟢 Запущен" if status["scheduler_running"] else "🔴 Остановлен"}')  # type: ignore
                 self.stdout.write(
-                    f'Движок: {"🟢 Запущен" if status["engine_stats"]["is_running"] else "🔴 Остановлен"}')  # type: ignore
+                    'Движок: {"🟢 Запущен" if status["engine_stats"]["is_running"] else "🔴 Остановлен"}')  # type: ignore
 
                 self.stdout.write('\n📋 Запланированные задачи:')
                 for job in status['jobs']:
                     next_run = job['next_run_time'] or 'Не запланировано'
-                    self.stdout.write(f'  • {job["name"]}: {next_run}')
+                    self.stdout.write('  • {job["name"]}: {next_run}')
 
             else:
                 engine = get_ingestion_engine()
                 stats = engine.get_statistics()
 
                 self.stdout.write(
-                    f'Движок: {"🟢 Запущен" if stats["is_running"] else "🔴 Остановлен"}')  # type: ignore
+                    'Движок: {"🟢 Запущен" if stats["is_running"] else "🔴 Остановлен"}')  # type: ignore
 
                 if stats['is_running']:
                     self.stdout.write('\n👷 Воркеры:')
@@ -159,11 +158,11 @@ class Command(BaseCommand):
                         status_icon = "🟢" if worker['is_running'] else "🔴"
                         current_task = worker['current_task'] or "Без задач"
                         self.stdout.write(
-                            f'  • {worker["worker_id"]}: {status_icon} {current_task}')
+                            '  • {worker["worker_id"]}: {status_icon} {current_task}')
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при получении статуса: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при получении статуса: {e}')  # type: ignore
             )
 
     def add_tasks(self, options):
@@ -188,18 +187,18 @@ class Command(BaseCommand):
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'✅ Добавлено {count} задач в очередь')  # type: ignore
+                    '✅ Добавлено {count} задач в очередь')  # type: ignore
             )
 
             # Показываем статистику очереди
             stats = engine.get_statistics()
             self.stdout.write('\n📊 Статистика очереди:')
             for priority_name, queue_size in stats['queue_stats'].items():
-                self.stdout.write(f'  • {priority_name}: {queue_size} задач')
+                self.stdout.write('  • {priority_name}: {queue_size} задач')
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при добавлении задач: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при добавлении задач: {e}')  # type: ignore
             )
 
     def show_statistics(self, options):
@@ -217,20 +216,20 @@ class Command(BaseCommand):
                 # Статистика планировщика
                 self.stdout.write('📅 Планировщик:')
                 self.stdout.write(
-                    f'  Статус: {"🟢 Запущен" if status["scheduler_running"] else "🔴 Остановлен"}')
-                self.stdout.write(f'  Задач: {len(status["jobs"])}')
+                    '  Статус: {"🟢 Запущен" if status["scheduler_running"] else "🔴 Остановлен"}')
+                self.stdout.write('  Задач: {len(status["jobs"])}')
 
                 # Статистика движка
                 engine_stats = status['engine_stats']
                 self.stdout.write('\n🔧 Движок:')
                 self.stdout.write(
-                    f'  Статус: {"🟢 Запущен" if engine_stats["is_running"] else "🔴 Остановлен"}')
+                    '  Статус: {"🟢 Запущен" if engine_stats["is_running"] else "🔴 Остановлен"}')
 
                 if engine_stats['is_running']:
                     # Статистика очередей
                     self.stdout.write('\n📋 Очереди задач:')
                     for priority, size in engine_stats['queue_stats'].items():
-                        self.stdout.write(f'  • {priority}: {size} задач')
+                        self.stdout.write('  • {priority}: {size} задач')
 
                     # Статистика воркеров
                     self.stdout.write('\n👷 Воркеры:')
@@ -238,22 +237,22 @@ class Command(BaseCommand):
                         status_icon = "🟢" if worker['is_running'] else "🔴"
                         current_task = worker['current_task'] or "Без задач"
                         self.stdout.write(
-                            f'  • {worker["worker_id"]}: {status_icon} {current_task}')
+                            '  • {worker["worker_id"]}: {status_icon} {current_task}')
 
                     # Статистика задач
                     task_stats = engine_stats['task_stats']
                     self.stdout.write('\n📊 Статистика задач:')
-                    self.stdout.write(f'  Всего: {task_stats["total"]}')
+                    self.stdout.write('  Всего: {task_stats["total"]}')
 
                     if task_stats['by_status']:
                         self.stdout.write('  По статусам:')
                         for status, count in task_stats['by_status'].items():
-                            self.stdout.write(f'    • {status}: {count}')
+                            self.stdout.write('    • {status}: {count}')
 
                     if task_stats['by_priority']:
                         self.stdout.write('  По приоритетам:')
                         for priority, count in task_stats['by_priority'].items():
-                            self.stdout.write(f'    • {priority}: {count}')
+                            self.stdout.write('    • {priority}: {count}')
 
             else:
                 engine = get_ingestion_engine()
@@ -266,7 +265,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при получении статистики: {e}')
+                self.style.ERROR('❌ Ошибка при получении статистики: {e}')
             )
 
     def monitor_engine(self):
@@ -292,20 +291,20 @@ class Command(BaseCommand):
                 # Выводим заголовок
                 self.stdout.write(
                     self.style.SUCCESS(
-                        f'📊 Мониторинг движка - {timezone.now().strftime("%H:%M:%S")}')  # type: ignore
+                        '📊 Мониторинг движка - {timezone.now().strftime("%H:%M:%S")}')  # type: ignore
                 )
                 self.stdout.write('=' * 60)
 
                 # Статус движка
                 status_icon = "🟢" if engine_stats['is_running'] else "🔴"
                 self.stdout.write(
-                    f'Движок: {status_icon} {"Запущен" if engine_stats["is_running"] else "Остановлен"}')  # type: ignore
+                    'Движок: {status_icon} {"Запущен" if engine_stats["is_running"] else "Остановлен"}')  # type: ignore
 
                 if engine_stats['is_running']:
                     # Очереди
                     self.stdout.write('\n📋 Очереди:')
                     for priority, size in engine_stats['queue_stats'].items():
-                        self.stdout.write(f'  {priority}: {size}')
+                        self.stdout.write('  {priority}: {size}')
 
                     # Воркеры
                     self.stdout.write('\n👷 Воркеры:')
@@ -313,13 +312,13 @@ class Command(BaseCommand):
                         status_icon = "🟢" if worker['is_running'] else "🔴"
                         current_task = worker['current_task'] or "Без задач"
                         self.stdout.write(
-                            f'  {worker["worker_id"]}: {status_icon} {current_task}')
+                            '  {worker["worker_id"]}: {status_icon} {current_task}')
 
                     # Задачи
                     task_stats = engine_stats['task_stats']
-                    self.stdout.write(f'\n📊 Задач: {task_stats["total"]}')
+                    self.stdout.write('\n📊 Задач: {task_stats["total"]}')
                     for status, count in task_stats['by_status'].items():
-                        self.stdout.write(f'  {status}: {count}')
+                        self.stdout.write('  {status}: {count}')
 
                 time.sleep(2)
 
@@ -328,5 +327,5 @@ class Command(BaseCommand):
                 '\n' + self.style.SUCCESS('👋 Мониторинг остановлен'))  # type: ignore
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка в мониторинге: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка в мониторинге: {e}')  # type: ignore
             )

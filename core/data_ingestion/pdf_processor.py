@@ -27,7 +27,6 @@ from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
 
 logger = logging.getLogger(__name__)
 
-
 class PDFProcessingStatus(Enum):
     """Статусы обработки PDF"""
     PENDING = "pending"
@@ -35,7 +34,6 @@ class PDFProcessingStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     SKIPPED = "skipped"
-
 
 class ContentType(Enum):
     """Типы контента в PDF"""
@@ -46,7 +44,6 @@ class ContentType(Enum):
     HEADER = "header"
     FOOTER = "footer"
 
-
 @dataclass
 class PDFChunk:
     """Чанк обработанного PDF"""
@@ -56,7 +53,6 @@ class PDFChunk:
     bbox: Tuple[float, float, float, float]  # x0, y0, x1, y1
     confidence: float
     metadata: Dict[str, Any]
-
 
 class OCRProcessor:
     """Процессор OCR для извлечения текста из изображений"""
@@ -80,7 +76,7 @@ class OCRProcessor:
             total_confidence = 0
             confidence_count = 0
 
-            for i, conf in enumerate(ocr_data['conf']):
+            for i, conf in enumerate(ocr_data['con']):
                 if int(conf) > self.min_confidence:
                     text = ocr_data['text'][i].strip()
                     if text:
@@ -96,7 +92,7 @@ class OCRProcessor:
                 return "", 0.0
 
         except Exception as e:
-            logger.error(f"Ошибка OCR: {e}")
+            logger.error("Ошибка OCR: {e}")
             return "", 0.0
 
     def preprocess_image(self, image: Image.Image) -> Image.Image:
@@ -119,9 +115,8 @@ class OCRProcessor:
             return Image.fromarray(img_array)
 
         except Exception as e:
-            logger.error(f"Ошибка предобработки изображения: {e}")
+            logger.error("Ошибка предобработки изображения: {e}")
             return image
-
 
 class PDFTextExtractor:
     """Извлекает текст из PDF документов"""
@@ -163,7 +158,7 @@ class PDFTextExtractor:
                             ))
 
         except Exception as e:
-            logger.error(f"Ошибка извлечения текста с pdfplumber: {e}")
+            logger.error("Ошибка извлечения текста с pdfplumber: {e}")
 
         return chunks
 
@@ -186,7 +181,7 @@ class PDFTextExtractor:
                         page_number=page_num + 1,
                         bbox=page.rect,  # type: ignore
                         confidence=95.0,
-                        metadata={'extraction_method': 'pymupdf'}
+                        metadata={'extraction_method': 'pymupd'}
                     ))
 
                 # Извлекаем изображения для OCR
@@ -221,12 +216,12 @@ class PDFTextExtractor:
                         pix = None
 
                     except Exception as e:
-                        logger.error(f"Ошибка обработки изображения {img_index}: {e}")
+                        logger.error("Ошибка обработки изображения {img_index}: {e}")
 
             doc.close()
 
         except Exception as e:
-            logger.error(f"Ошибка извлечения текста с PyMuPDF: {e}")
+            logger.error("Ошибка извлечения текста с PyMuPDF: {e}")
 
         return chunks
 
@@ -244,7 +239,6 @@ class PDFTextExtractor:
 
         return "\n".join(text_rows)
 
-
 class PDFStructuringEngine:
     """Движок структурирования PDF контента"""
 
@@ -252,7 +246,7 @@ class PDFStructuringEngine:
         self.header_patterns = [
             r'^\d+\.\s+[А-ЯЁ]',  # 1. Заголовок
             r'^[А-ЯЁ][а-яё\s]+:$',  # Заголовок:
-            r'^[А-ЯЁ]{2,}$',  # ЗАГОЛОВОК
+            r'^[А-ЯЁ]{2, }$',  # ЗАГОЛОВОК
         ]
         self.formula_patterns = [
             r'\$[^$]+\$',  # $формула$
@@ -343,7 +337,6 @@ class PDFStructuringEngine:
 
         return sub_chunks
 
-
 class PDFVectorizer:
     """Векторизатор для PDF контента"""
 
@@ -367,10 +360,10 @@ class PDFVectorizer:
                     })
                 else:
                     logger.warning(
-                        f"Не удалось сгенерировать эмбеддинг для чанка: {chunk.text[:100]}...")
+                        "Не удалось сгенерировать эмбеддинг для чанка: {chunk.text[:100]}...")
 
             except Exception as e:
-                logger.error(f"Ошибка векторизации чанка: {e}")
+                logger.error("Ошибка векторизации чанка: {e}")
 
         return vectorized_chunks
 
@@ -383,7 +376,7 @@ class PDFVectorizer:
             # Используем модель эмбеддингов
             embed_model = genai.EmbeddingModel(  # type: ignore
                 model_name='text-embedding-004')  # type: ignore
-            response = embed_model.embed_content(input=text)  # type: ignore        
+            response = embed_model.embed_content(input=text)  # type: ignore
 
             # Ответ SDK может быть объектом с полем embedding
             if hasattr(response, 'embedding'):
@@ -393,9 +386,8 @@ class PDFVectorizer:
             return None
 
         except Exception as e:
-            logger.error(f"Ошибка получения эмбеддинга: {e}")
+            logger.error("Ошибка получения эмбеддинга: {e}")
             return None
-
 
 class PDFProcessor:
     """Основной процессор PDF документов"""
@@ -407,7 +399,7 @@ class PDFProcessor:
 
     def process_pdf(self, fipi_data: FIPIData) -> Dict[str, Any]:
         """Обрабатывает PDF документ"""
-        logger.info(f"Начинаем обработку PDF: {fipi_data.title}")
+        logger.info("Начинаем обработку PDF: {fipi_data.title}")
 
         try:
             # Скачиваем PDF если нужно
@@ -440,7 +432,7 @@ class PDFProcessor:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка обработки PDF {fipi_data.title}: {e}")
+            logger.error("Ошибка обработки PDF {fipi_data.title}: {e}")
             return {'status': 'failed', 'error': str(e)}
 
     def _download_pdf(self, url: str) -> Optional[str]:
@@ -452,19 +444,19 @@ class PDFProcessor:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                 'Referer': 'https://fipi.ru/',
-                'Accept': 'application/pdf,application/octet-stream;q=0.9,*/*;q=0.8',
+                'Accept': 'application/pdf, application/octet-stream;q=0.9, */*;q=0.8',
             }
 
             response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
 
             # Создаем временный файл
-            with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
+            with tempfile.NamedTemporaryFile(suffix='.pd', delete=False) as tmp_file:
                 tmp_file.write(response.content)
                 return tmp_file.name
 
         except Exception as e:
-            logger.error(f"Ошибка скачивания PDF {url}: {e}")
+            logger.error("Ошибка скачивания PDF {url}: {e}")
             return None
 
     def _extract_text_from_pdf(self, pdf_path: str) -> List[PDFChunk]:
@@ -475,19 +467,19 @@ class PDFProcessor:
         try:
             chunks = self.text_extractor.extract_text_with_pdfplumber(pdf_path)
             if chunks:
-                logger.info(f"Извлечено {len(chunks)} чанков с помощью pdfplumber")
+                logger.info("Извлечено {len(chunks)} чанков с помощью pdfplumber")
                 return chunks
         except Exception as e:
-            logger.warning(f"pdfplumber не сработал: {e}")
+            logger.warning("pdfplumber не сработал: {e}")
 
         # Пробуем PyMuPDF
         try:
             chunks = self.text_extractor.extract_text_with_pymupdf(pdf_path)
             if chunks:
-                logger.info(f"Извлечено {len(chunks)} чанков с помощью PyMuPDF")
+                logger.info("Извлечено {len(chunks)} чанков с помощью PyMuPDF")
                 return chunks
         except Exception as e:
-            logger.warning(f"PyMuPDF не сработал: {e}")
+            logger.warning("PyMuPDF не сработал: {e}")
 
         return chunks
 
@@ -520,14 +512,12 @@ class PDFProcessor:
                     saved_count += 1
 
         except Exception as e:
-            logger.error(f"Ошибка сохранения чанков: {e}")
+            logger.error("Ошибка сохранения чанков: {e}")
 
         return saved_count
 
-
 # Глобальный экземпляр процессора
 _pdf_processor: Optional[PDFProcessor] = None
-
 
 def get_pdf_processor() -> PDFProcessor:
     """Получает глобальный экземпляр процессора PDF"""
@@ -536,12 +526,10 @@ def get_pdf_processor() -> PDFProcessor:
         _pdf_processor = PDFProcessor()
     return _pdf_processor
 
-
 def process_pdf_document(fipi_data: FIPIData) -> Dict[str, Any]:
     """Обрабатывает PDF документ"""
     processor = get_pdf_processor()
     return processor.process_pdf(fipi_data)
-
 
 def process_document(url: str, fipi_id: int) -> Dict[str, Any]:
     """Совместимый интерфейс для вызова из fill_site: по URL и id."""

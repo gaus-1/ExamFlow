@@ -2,7 +2,6 @@ import qrcode  # type: ignore
 from io import BytesIO
 import base64
 
-
 def generate_qr_code(url):
     """Генерирует QR-код для указанного URL"""
     try:
@@ -21,7 +20,7 @@ def generate_qr_code(url):
         img.save(buffer, "PNG")  # Исправлено: убран именованный параметр
         img_str = base64.b64encode(buffer.getvalue()).decode()
 
-        return f"data:image/png;base64,{img_str}"
+        return "data:image/png;base64, {img_str}"
     except Exception as e:
         # Возвращаем заглушку в случае ошибки
-        return f"data:text/plain;base64,{base64.b64encode(f'QR Error: {str(e)}'.encode()).decode()}"
+        return "data:text/plain;base64, {base64.b64encode('QR Error: {str(e)}'.encode()).decode()}"

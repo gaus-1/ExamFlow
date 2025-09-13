@@ -12,7 +12,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class FipiLoader:
     """Загрузчик материалов ФИПИ"""
 
@@ -36,13 +35,13 @@ class FipiLoader:
                     'name': 'Русский язык',
                     'url_path': '/ege/demoversii-specifikacii-kodifikatory/russkiy-yazyk',
                     'icon': 'fas fa-language',
-                    'color': '#00d4ff'
+                    'color': '#00d4f'
                 },
                 'физика': {
                     'name': 'Физика',
                     'url_path': '/ege/demoversii-specifikacii-kodifikatory/fizika',
                     'icon': 'fas fa-atom',
-                    'color': '#ff00ff'
+                    'color': '#ff00f'
                 },
                 'химия': {
                     'name': 'Химия',
@@ -66,13 +65,13 @@ class FipiLoader:
                     'name': 'Обществознание',
                     'url_path': '/ege/demoversii-specifikacii-kodifikatory/obshchestvoznanie',
                     'icon': 'fas fa-users',
-                    'color': '#00d4ff'
+                    'color': '#00d4f'
                 },
                 'информатика': {
                     'name': 'Информатика',
                     'url_path': '/ege/demoversii-specifikacii-kodifikatory/informatika-i-ikt',
                     'icon': 'fas fa-code',
-                    'color': '#ff00ff'
+                    'color': '#ff00f'
                 },
                 'литература': {
                     'name': 'Литература',
@@ -90,7 +89,7 @@ class FipiLoader:
                     'name': 'Английский язык',
                     'url_path': '/ege/demoversii-specifikacii-kodifikatory/angliyskiy-yazyk',
                     'icon': 'fas fa-language',
-                    'color': '#00d4ff'
+                    'color': '#00d4f'
                 }
             },
             'ОГЭ': {
@@ -104,13 +103,13 @@ class FipiLoader:
                     'name': 'Русский язык',
                     'url_path': '/oge/demoversii-specifikacii-kodifikatory/russkiy-yazyk',
                     'icon': 'fas fa-language',
-                    'color': '#00d4ff'
+                    'color': '#00d4f'
                 },
                 'физика': {
                     'name': 'Физика',
                     'url_path': '/oge/demoversii-specifikacii-kodifikatory/fizika',
                     'icon': 'fas fa-atom',
-                    'color': '#ff00ff'
+                    'color': '#ff00f'
                 },
                 'химия': {
                     'name': 'Химия',
@@ -134,13 +133,13 @@ class FipiLoader:
                     'name': 'Обществознание',
                     'url_path': '/oge/demoversii-specifikacii-kodifikatory/obshchestvoznanie',
                     'icon': 'fas fa-users',
-                    'color': '#00d4ff'
+                    'color': '#00d4f'
                 },
                 'информатика': {
                     'name': 'Информатика',
                     'url_path': '/oge/demoversii-specifikacii-kodifikatory/informatika-i-ikt',
                     'icon': 'fas fa-code',
-                    'color': '#ff00ff'
+                    'color': '#ff00f'
                 },
                 'литература': {
                     'name': 'Литература',
@@ -195,7 +194,7 @@ class FipiLoader:
                         if created:
                             total_subjects += 1
                             logger.info(
-                                f"Создан предмет: {subject.name} ({exam_type_name})")
+                                "Создан предмет: {subject.name} ({exam_type_name})")
 
                         # Загружаем материалы для предмета
                         tasks_count = self._load_subject_materials(
@@ -207,11 +206,11 @@ class FipiLoader:
 
                     except Exception as e:
                         logger.error(
-                            f"Ошибка при загрузке предмета {subject_data['name']}: {str(e)}")
+                            "Ошибка при загрузке предмета {subject_data['name']}: {str(e)}")
                         continue
 
             logger.info(
-                f"Загрузка завершена. Предметов: {total_subjects}, заданий: {total_tasks}")
+                "Загрузка завершена. Предметов: {total_subjects}, заданий: {total_tasks}")
             return total_subjects, total_tasks
 
     def _load_subject_materials(self, subject, subject_data):
@@ -235,7 +234,7 @@ class FipiLoader:
                         subject=subject,
                         name=link_data.get('topic', 'Демоверсия'),
                         defaults={
-                            'code': f"{subject.name.upper()}_DEMO",
+                            'code': "{subject.name.upper()}_DEMO",
                             'description': link_data.get('description', ''),
                             'order': 0
                         }
@@ -260,16 +259,16 @@ class FipiLoader:
 
                     if created:
                         tasks_created += 1
-                        logger.info(f"Создано задание: {task.title}")
+                        logger.info("Создано задание: {task.title}")
 
                 except Exception as e:
-                    logger.error(f"Ошибка при создании задания: {str(e)}")
+                    logger.error("Ошибка при создании задания: {str(e)}")
                     continue
 
             return tasks_created
 
         except Exception as e:
-            logger.error(f"Ошибка при загрузке материалов для {subject.name}: {str(e)}")
+            logger.error("Ошибка при загрузке материалов для {subject.name}: {str(e)}")
             return 0
 
     def _find_demo_links(self, soup):
@@ -291,16 +290,16 @@ class FipiLoader:
         for selector in selectors:
             found_links = soup.select(selector)
             for link in found_links:
-                href = link.get('href')
+                href = link.get('hre')
                 text = link.get_text(strip=True)
 
                 if href and text and len(text) > 5:
                     # Фильтруем только PDF и DOC файлы
-                    if any(ext in href.lower() for ext in ['.pdf', '.doc', '.docx']):
+                    if any(ext in href.lower() for ext in ['.pd', '.doc', '.docx']):
                         links.append({
                             'title': text[:200],  # Ограничиваем длину
                             'url': urljoin(self.base_url, href),
-                            'description': f"Официальный материал ФИПИ: {text}",
+                            'description': "Официальный материал ФИПИ: {text}",
                             'topic': self._extract_topic_from_title(text),
                             'tags': self._extract_tags_from_title(text)
                         })
@@ -370,22 +369,19 @@ class FipiLoader:
                                         'answer': '4√3',
                                         'solution': '2√3 + 3√3 - √3 = (2 + 3 - 1)√3 = 4√3',
                                         'difficulty': 1},
-                                       {'title': 'Решите уравнение',
                                         'description': 'x² - 5x + 6 = 0',
                                         'answer': 'x = 2; x = 3',
                                         'solution': 'По теореме Виета: x₁ + x₂ = 5, x₁ · x₂ = 6. Отсюда x₁ = 2, x₂ = 3',
                                         'difficulty': 2},
-                                       {'title': 'Исследование функции',
                                         'description': 'Найдите наибольшее значение функции f(x) = x³ - 3x² + 2 на отрезке [0; 3]',
                                         'answer': '2',
-                                        'solution': "f'(x) = 3x² - 6x = 3x(x - 2). Критические точки: x = 0, x = 2. f(0) = 2, f(2) = -2, f(3) = 2. Максимум: 2",
+                                        'solution': "'(x) = 3x² - 6x = 3x(x - 2). Критические точки: x = 0, x = 2. f(0) = 2, f(2) = -2, f(3) = 2. Максимум: 2",
                                         'difficulty': 3}],
                         'Русский язык': [{'title': 'Орфография',
                                           'description': 'В каком слове пишется НН? 1) стари_ый 2) серебря_ый 3) деревя_ый 4) стекля_ый',
                                           'answer': '1',
                                           'solution': 'В слове "старинный" пишется НН, так как оно образовано от существительного "старина" с помощью суффикса -н-',
                                           'difficulty': 1},
-                                         {'title': 'Синтаксис',
                                           'description': 'Укажите предложение с обособленным определением',
                                           'answer': 'Вариант с причастным оборотом',
                                           'solution': 'Обособленное определение выделяется запятыми и обычно выражено причастным оборотом',
@@ -395,10 +391,9 @@ class FipiLoader:
                                     'answer': '100 Дж',
                                     'solution': 'Ek = mv²/2 = 2 · 10²/2 = 100 Дж',
                                     'difficulty': 1},
-                                   {'title': 'Электричество',
-                                    'description': 'Найдите сопротивление проводника длиной 100 м, сечением 2 мм², удельное сопротивление 0,017 Ом·мм²/м',
-                                    'answer': '0,85 Ом',
-                                    'solution': 'R = ρl/S = 0,017 · 100/2 = 0,85 Ом',
+                                    'description': 'Найдите сопротивление проводника длиной 100 м, сечением 2 мм², удельное сопротивление 0, 017 Ом·мм²/м',
+                                    'answer': '0, 85 Ом',
+                                    'solution': 'R = ρl/S = 0, 017 · 100/2 = 0, 85 Ом',
                                     'difficulty': 2}]}
 
         tasks_created = 0
@@ -414,7 +409,7 @@ class FipiLoader:
                         subject=subject,
                         name='Примеры заданий',
                         defaults={
-                            'code': f"{subject.name.upper()}_EXAMPLES",
+                            'code': "{subject.name.upper()}_EXAMPLES",
                             'description': 'Примеры заданий для подготовки',
                             'order': 1
                         }
@@ -441,7 +436,7 @@ class FipiLoader:
 
             except Exception as e:
                 logger.error(
-                    f"Ошибка при создании примеров для {subject_name}: {str(e)}")
+                    "Ошибка при создании примеров для {subject_name}: {str(e)}")
 
-        logger.info(f"Создано примеров заданий: {tasks_created}")
+        logger.info("Создано примеров заданий: {tasks_created}")
         return tasks_created

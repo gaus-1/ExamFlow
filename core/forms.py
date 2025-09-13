@@ -5,7 +5,6 @@
 Этот файл содержит только legacy формы для обратной совместимости.
 """
 
-
 # Импортируем формы из нового модуля для обратной совместимости
 try:
     from authentication.forms import TechRegisterForm, TechLoginForm, ProfileUpdateForm  # type: ignore

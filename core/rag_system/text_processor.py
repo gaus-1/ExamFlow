@@ -9,7 +9,6 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-
 class TextProcessor:
     """
     Класс для обработки и разбиения текста на чанки
@@ -30,7 +29,7 @@ class TextProcessor:
         text = re.sub(r'\s+', ' ', text)
 
         # Удаляем специальные символы
-        text = re.sub(r'[^\w\s\.\,\!\?\;\:\-\(\)]', '', text)
+        text = re.sub(r'[^\w\s\.\, \!\?\;\:\-\(\)]', '', text)
 
         return text.strip()
 
@@ -93,11 +92,11 @@ class TextProcessor:
                 })
 
             logger.info(
-                f"Создано {len(chunks)} чанков из текста длиной {len(clean_text)} символов")
+                "Создано {len(chunks)} чанков из текста длиной {len(clean_text)} символов")
             return chunks
 
         except Exception as e:
-            logger.error(f"Ошибка при создании чанков: {e}")
+            logger.error("Ошибка при создании чанков: {e}")
             return []
 
     def get_overlap_text(self, text: str) -> str:
@@ -129,13 +128,12 @@ class TextProcessor:
             fipi_data = FIPIData.objects.get(id=fipi_data_id)  # type: ignore
 
             if not fipi_data.content:
-                logger.warning(f"Нет содержимого для обработки: {fipi_data.title}")
+                logger.warning("Нет содержимого для обработки: {fipi_data.title}")
                 return False
 
             # Создаем чанки
             chunks = self.create_chunks(
                 fipi_data.content,
-                {
                     'source_type': fipi_data.data_type,
                     'subject': fipi_data.subject,
                     'url': fipi_data.url,
@@ -156,17 +154,17 @@ class TextProcessor:
                 )
 
                 if not success:
-                    logger.error(f"Ошибка при сохранении чанка {chunk_data['index']}")
+                    logger.error("Ошибка при сохранении чанка {chunk_data['index']}")
                     return False
 
             # Отмечаем данные как обработанные
             fipi_data.mark_as_processed()
 
-            logger.info(f"Обработаны данные ФИПИ: {fipi_data.title}")
+            logger.info("Обработаны данные ФИПИ: {fipi_data.title}")
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при обработке данных ФИПИ {fipi_data_id}: {e}")
+            logger.error("Ошибка при обработке данных ФИПИ {fipi_data_id}: {e}")
             return False
 
     def process_all_unprocessed_data(self) -> Dict:
@@ -196,15 +194,15 @@ class TextProcessor:
                     else:
                         results['errors'] += 1
                 except Exception as e:
-                    logger.error(f"Ошибка при обработке {data.id}: {e}")
+                    logger.error("Ошибка при обработке {data.id}: {e}")
                     results['errors'] += 1
 
             results['completed_at'] = timezone.now()
             logger.info(
-                f"Обработка завершена: {results['processed']}/{results['total']} успешно")
+                "Обработка завершена: {results['processed']}/{results['total']} успешно")
 
             return results
 
         except Exception as e:
-            logger.error(f"Ошибка при массовой обработке: {e}")
+            logger.error("Ошибка при массовой обработке: {e}")
             return {'error': str(e)}

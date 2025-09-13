@@ -10,20 +10,18 @@
 - Отображение прогресса
 """
 
+import time
+import random
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib import messages
-from django.utils import timezone
 import logging
 from learning.models import Subject, Task  # type: ignore
 from core.models import UserProgress  # type: ignore
 import core.seo as seo_utils
 
 logger = logging.getLogger(__name__)
-import random
-import time
-
 
 def home(request):
     """
@@ -39,12 +37,13 @@ def home(request):
     """
     # Получаем статистику с обработкой ошибок БД
     try:
-        base_qs = Subject.objects.filter(is_archived=False, is_primary=True)  # type: ignore
+        base_qs = Subject.objects.filter(
+            is_archived=False, is_primary=True)  # type: ignore
         subjects_count = base_qs.count()  # type: ignore
         tasks_count = Task.objects.count()  # type: ignore
     except Exception as e:
         # Если БД недоступна, используем значения по умолчанию
-        logger.warning(f"Database error in home view: {e}")
+        logger.warning("Database error in home view: {e}")
         base_qs = Subject.objects.none()  # type: ignore
         subjects_count = 0
         tasks_count = 0
@@ -58,7 +57,7 @@ def home(request):
         else:
             subjects = base_qs  # type: ignore
     except Exception as e:
-        logger.warning(f"Error filtering subjects: {e}")
+        logger.warning("Error filtering subjects: {e}")
         subjects = base_qs  # type: ignore
 
     context = {
@@ -72,7 +71,6 @@ def home(request):
     context.update(seo_utils.seo_for_home())
     return render(request, 'learning/home-examflow-2.0.html', context)
 
-
 def subjects_list(request):
     """
     Отображает список всех доступных предметов
@@ -84,7 +82,9 @@ def subjects_list(request):
     """
     # Получаем предметы c фокусом; безопасный fallback
     try:
-        subjects = Subject.objects.filter(is_archived=False, is_primary=True).order_by('name')  # type: ignore
+        subjects = Subject.objects.filter(
+            is_archived=False,
+            is_primary=True).order_by('name')  # type: ignore
     except Exception:
         subjects = Subject.objects.all().order_by('name')  # type: ignore
 
@@ -103,7 +103,6 @@ def subjects_list(request):
     # SEO для списка (фокусные предметы)
     ctx.update(seo_utils.seo_for_subject('математика и русский', '/subjects/'))
     return render(request, 'learning/subjects_list.html', ctx)
-
 
 def subject_detail(request, subject_id):
     """
@@ -132,7 +131,6 @@ def subject_detail(request, subject_id):
             'total_tasks': total_tasks,
             'solved_tasks': solved_tasks,
             'progress_percent': round(
-                (solved_tasks / total_tasks * 100) if total_tasks > 0 else 0,
                 1)}
 
         # Прогресс по темам (временно отключено)
@@ -145,14 +143,12 @@ def subject_detail(request, subject_id):
     ctx.update(seo_utils.seo_for_subject(subject.name, request.path))
     return render(request, 'learning/subject_detail.html', ctx)
 
-
 def topic_detail(request, topic_id):
     """
     Детальная страница темы (временно отключено)
     """
     # Временно перенаправляем на список предметов
     return redirect('learning:subjects_list')
-
 
 def task_detail(request, task_id):
     """
@@ -178,7 +174,6 @@ def task_detail(request, task_id):
         'task': task,
         'user_progress': user_progress
     })
-
 
 @login_required
 def solve_task(request, task_id):
@@ -223,7 +218,6 @@ def solve_task(request, task_id):
         'explanation': task.explanation or 'Объяснение пока не добавлено.',
         'message': 'Правильно! 🎉' if is_correct else 'Неправильно. Попробуйте еще раз! 🤔'
     })
-
 
 def random_task(request, subject_id=None):
     """

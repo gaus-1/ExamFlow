@@ -18,7 +18,6 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
 class UserBehaviorAnalyzer:
     """Анализатор поведения пользователей"""
 
@@ -70,12 +69,12 @@ class UserBehaviorAnalyzer:
             self.profile.preferences = json.dumps(user_profile, default=str)
             self.profile.save()
 
-            logger.info(f"Профиль пользователя {self.user.username} обновлен")
+            logger.info("Профиль пользователя {self.user.username} обновлен")
             return user_profile
 
         except Exception as e:
             logger.error(
-                f"Ошибка анализа поведения пользователя {self.user.username}: {e}")
+                "Ошибка анализа поведения пользователя {self.user.username}: {e}")
             return {}
 
     def _analyze_visit_patterns(self):
@@ -127,7 +126,7 @@ class UserBehaviorAnalyzer:
             return dict(sorted_preferences)
 
         except Exception as e:
-            logger.error(f"Ошибка анализа предпочтений по предметам: {e}")
+            logger.error("Ошибка анализа предпочтений по предметам: {e}")
             return {}
 
     def _analyze_task_preferences(self):
@@ -165,7 +164,7 @@ class UserBehaviorAnalyzer:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка анализа предпочтений по заданиям: {e}")
+            logger.error("Ошибка анализа предпочтений по заданиям: {e}")
             return {}
 
     def _analyze_time_patterns(self):
@@ -209,7 +208,7 @@ class UserBehaviorAnalyzer:
             return time_patterns
 
         except Exception as e:
-            logger.error(f"Ошибка анализа временных паттернов: {e}")
+            logger.error("Ошибка анализа временных паттернов: {e}")
             return {}
 
     def _calculate_preference_score(self, progress):
@@ -239,7 +238,7 @@ class UserBehaviorAnalyzer:
             return 2  # Средняя сложность по умолчанию
 
         except Exception as e:
-            logger.error(f"Ошибка определения предпочитаемой сложности: {e}")
+            logger.error("Ошибка определения предпочитаемой сложности: {e}")
             return 2
 
     def _get_preferred_topics(self):
@@ -259,7 +258,7 @@ class UserBehaviorAnalyzer:
             return [topic['task__subject__name'] for topic in topic_stats]
 
         except Exception as e:
-            logger.error(f"Ошибка определения предпочитаемых тем: {e}")
+            logger.error("Ошибка определения предпочитаемых тем: {e}")
             return []
 
     def _determine_learning_style(self):
@@ -279,7 +278,7 @@ class UserBehaviorAnalyzer:
                 return 'thorough'
 
         except Exception as e:
-            logger.error(f"Ошибка определения стиля обучения: {e}")
+            logger.error("Ошибка определения стиля обучения: {e}")
             return 'balanced'
 
     def _determine_difficulty_level(self):
@@ -304,9 +303,8 @@ class UserBehaviorAnalyzer:
                 return 'beginner'
 
         except Exception as e:
-            logger.error(f"Ошибка определения уровня сложности: {e}")
+            logger.error("Ошибка определения уровня сложности: {e}")
             return 'medium'
-
 
 class PersonalizedRecommendations:
     """Система персональных рекомендаций"""
@@ -340,7 +338,7 @@ class PersonalizedRecommendations:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка получения рекомендаций для {self.user.username}: {e}")
+            logger.error("Ошибка получения рекомендаций для {self.user.username}: {e}")
             return {}
 
     def _get_subject_recommendations(self, behavior_profile):
@@ -351,9 +349,6 @@ class PersonalizedRecommendations:
             if not subject_prefs:
                 # Если нет данных, рекомендуем базовые предметы
                 return [
-                    {'subject': 'Математика', 'reason': 'Базовый предмет для всех направлений'},
-                    {'subject': 'Русский язык', 'reason': 'Обязательный предмет для поступления'},
-                    {'subject': 'Физика', 'reason': 'Популярный предмет для технических специальностей'}
                 ]
 
             # Рекомендуем предметы с низкой точностью для улучшения
@@ -362,7 +357,7 @@ class PersonalizedRecommendations:
                 if stats['accuracy'] < 70:
                     improvement_recommendations.append({
                         'subject': subject,
-                        'reason': f'Точность {stats["accuracy"]}% - есть возможности для улучшения',
+                        'reason': 'Точность {stats["accuracy"]}% - есть возможности для улучшения',
                         'current_accuracy': stats['accuracy'],
                         'priority': 'high'
                     })
@@ -387,7 +382,7 @@ class PersonalizedRecommendations:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка получения рекомендаций по предметам: {e}")
+            logger.error("Ошибка получения рекомендаций по предметам: {e}")
             return {}
 
     def _get_task_recommendations(self, behavior_profile):
@@ -411,13 +406,13 @@ class PersonalizedRecommendations:
                     'title': task.title,
                     'subject': task.subject.name,
                     'difficulty': task.difficulty,
-                    'reason': f'Сложность {task.difficulty}/5 подходит вашему уровню'
+                    'reason': 'Сложность {task.difficulty}/5 подходит вашему уровню'
                 })
 
             return recommendations
 
         except Exception as e:
-            logger.error(f"Ошибка получения рекомендаций по заданиям: {e}")
+            logger.error("Ошибка получения рекомендаций по заданиям: {e}")
             return []
 
     def _get_topic_recommendations(self, behavior_profile):
@@ -429,9 +424,6 @@ class PersonalizedRecommendations:
             if not preferred_topics:
                 # Рекомендуем базовые темы
                 return [
-                    {'topic': 'Основы', 'reason': 'Базовые знания для начала изучения'},
-                    {'topic': 'Практика', 'reason': 'Применение знаний на практике'},
-                    {'topic': 'Теория', 'reason': 'Углубление теоретических знаний'}
                 ]
 
             # Рекомендуем темы для углубления
@@ -446,7 +438,7 @@ class PersonalizedRecommendations:
             return recommendations
 
         except Exception as e:
-            logger.error(f"Ошибка получения рекомендаций по темам: {e}")
+            logger.error("Ошибка получения рекомендаций по темам: {e}")
             return []
 
     def _generate_learning_plan(self, behavior_profile):
@@ -487,9 +479,8 @@ class PersonalizedRecommendations:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка генерации плана обучения: {e}")
+            logger.error("Ошибка генерации плана обучения: {e}")
             return {}
-
 
 def get_user_recommendations(user):
     """Получает рекомендации для пользователя"""
@@ -497,9 +488,8 @@ def get_user_recommendations(user):
         recommender = PersonalizedRecommendations(user)
         return recommender.get_recommendations()
     except Exception as e:
-        logger.error(f"Ошибка получения рекомендаций: {e}")
+        logger.error("Ошибка получения рекомендаций: {e}")
         return {}
-
 
 def analyze_user_behavior(user):
     """Анализирует поведение пользователя"""
@@ -507,5 +497,5 @@ def analyze_user_behavior(user):
         analyzer = UserBehaviorAnalyzer(user)
         return analyzer.analyze_behavior()
     except Exception as e:
-        logger.error(f"Ошибка анализа поведения: {e}")
+        logger.error("Ошибка анализа поведения: {e}")
         return {}

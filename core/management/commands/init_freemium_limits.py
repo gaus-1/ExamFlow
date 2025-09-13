@@ -5,7 +5,6 @@
 from django.core.management.base import BaseCommand
 from core.freemium.models import SubscriptionLimit
 
-
 class Command(BaseCommand):
     help = 'Инициализирует freemium лимиты для системы'
 
@@ -76,9 +75,9 @@ class Command(BaseCommand):
         # Показываем созданные лимиты
         self.stdout.write("\n📊 Созданные лимиты:")
         for limit in SubscriptionLimit.objects.all():  # type: ignore
-            self.stdout.write(f"   - {limit.name}: {limit.description}")
-            self.stdout.write(f"     AI запросов в день: {limit.daily_ai_requests}")
-            self.stdout.write(f"     Цена: {limit.price} ₽")
+            self.stdout.write("   - {limit.name}: {limit.description}")
+            self.stdout.write("     AI запросов в день: {limit.daily_ai_requests}")
+            self.stdout.write("     Цена: {limit.price} ₽")
 
         self.stdout.write(self.style.SUCCESS(
             "\n✅ Инициализация freemium лимитов завершена"))  # type: ignore

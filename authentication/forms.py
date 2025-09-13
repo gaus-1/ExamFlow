@@ -12,7 +12,6 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 # from .models import UserProfile  # UserProfile больше не существует
 
-
 class TechRegisterForm(UserCreationForm):
     """Упрощенная форма регистрации в Duolingo-стиле - только необходимые поля"""
     email = forms.EmailField(
@@ -67,7 +66,7 @@ class TechRegisterForm(UserCreationForm):
         # Если username уже существует, добавляем цифру
         counter = 1
         while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
+            username = "{base_username}{counter}"
             counter += 1
 
         user.username = username
@@ -76,7 +75,6 @@ class TechRegisterForm(UserCreationForm):
             user.save()
             # UserProfile больше не создается автоматически
         return user
-
 
 class TechLoginForm(AuthenticationForm):
     """Упрощенная форма входа в Duolingo-стиле - вход по email"""
@@ -95,7 +93,6 @@ class TechLoginForm(AuthenticationForm):
         # Русские подписи
         self.fields['username'].label = 'Email'
         self.fields['password'].label = 'Пароль'
-
 
 class ProfileUpdateForm(forms.Form):
     """Форма обновления профиля пользователя"""

@@ -1,6 +1,6 @@
 """
 Сервис еженедельных напоминаний: если пользователь не заходил в бота/сайт 7+ дней,
-отправляем ему полезное сообщение с призывом вернуться к занятиям.
+    отправляем ему полезное сообщение с призывом вернуться к занятиям.
 """
 
 import logging
@@ -17,27 +17,24 @@ from core.models import UserProfile, ReminderLog
 
 logger = logging.getLogger(__name__)
 
-
 REMINDER_TEXT = (
     "Привет! Напоминаем о ExamFlow — можно тренироваться по заданиям ЕГЭ/ОГЭ, смотреть прогресс и повторять сложные темы. "
     "Возвращайтесь, чтобы не терять темп!")
-
 
 def _send_tg_message(bot_token: str, chat_id: str, text: str) -> bool:
     if not (requests and bot_token and chat_id):
         return False
     try:
         resp = requests.post(
-            f"https://api.telegram.org/bot{bot_token}/sendMessage",
+            "https://api.telegram.org/bot{bot_token}/sendMessage",
             data={"chat_id": chat_id, "text": text},
             timeout=10,
         )
         resp.raise_for_status()
         return True
     except Exception as e:
-        logger.warning(f"Не удалось отправить напоминание: {e}")
+        logger.warning("Не удалось отправить напоминание: {e}")
         return False
-
 
 def send_weekly_inactive_reminders(limit: int = 200) -> int:
     """Отправляет напоминания тем, кто был неактивен >= 7 дней. Возвращает кол-во отправленных."""
@@ -78,5 +75,5 @@ def send_weekly_inactive_reminders(limit: int = 200) -> int:
         if sent >= limit:
             break
 
-    logger.info(f"Отправлено напоминаний: {sent}")
+    logger.info("Отправлено напоминаний: {sent}")
     return sent

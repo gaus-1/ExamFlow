@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 
 from core.data_ingestion.monitoring import get_monitoring_service, AlertLevel
 
-
 class Command(BaseCommand):
     help = 'Управляет системой мониторинга'
 
@@ -58,7 +57,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при запуске мониторинга: {e}')
+                self.style.ERROR('❌ Ошибка при запуске мониторинга: {e}')
             )
 
     def stop_monitoring(self):
@@ -76,7 +75,7 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при остановке мониторинга: {e}')
+                self.style.ERROR('❌ Ошибка при остановке мониторинга: {e}')
             )
 
     def show_status(self):
@@ -92,13 +91,13 @@ class Command(BaseCommand):
             # Статус сервиса
             status_icon = "🟢" if service.is_running else "🔴"
             self.stdout.write(
-                f'Сервис мониторинга: {status_icon} {"Запущен" if service.is_running else "Остановлен"}')  # type: ignore
+                'Сервис мониторинга: {status_icon} {"Запущен" if service.is_running else "Остановлен"}')  # type: ignore
 
             if service.is_running:
                 # Сводка уведомлений
                 alerts_summary = service.get_alerts_summary()
                 self.stdout.write('\n📋 Уведомления:')
-                self.stdout.write(f'  Активных: {alerts_summary["total_active"]}')
+                self.stdout.write('  Активных: {alerts_summary["total_active"]}')
 
                 for level, count in alerts_summary['by_level'].items():
                     if count > 0:
@@ -108,7 +107,7 @@ class Command(BaseCommand):
                             'error': '❌',
                             'critical': '🚨'
                         }.get(level, '📌')
-                        self.stdout.write(f'  {level_icon} {level.upper()}: {count}')
+                        self.stdout.write('  {level_icon} {level.upper()}: {count}')
 
                 # Последние уведомления
                 if alerts_summary['recent_alerts']:
@@ -122,11 +121,11 @@ class Command(BaseCommand):
                             'critical': '🚨'
                         }.get(alert['level'], '📌')
                         self.stdout.write(
-                            f'  {level_icon} [{timestamp}] {alert["title"]}')
+                            '  {level_icon} [{timestamp}] {alert["title"]}')
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при получении статуса: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при получении статуса: {e}')  # type: ignore
             )
 
     def show_health(self):
@@ -149,8 +148,8 @@ class Command(BaseCommand):
             }.get(overall_status, '⚪')
 
             self.stdout.write(
-                f'Общее состояние: {status_icon} {overall_status.upper()}')
-            self.stdout.write(f'Время проверки: {health["timestamp"]}')
+                'Общее состояние: {status_icon} {overall_status.upper()}')
+            self.stdout.write('Время проверки: {health["timestamp"]}')
 
             # Детали по компонентам
             self.stdout.write('\n🔧 Компоненты:')
@@ -164,7 +163,7 @@ class Command(BaseCommand):
                 }.get(status, '⚪')
 
                 self.stdout.write(
-                    f'  {status_icon} {check_name}: {check_result.get("message", "Нет информации")}')
+                    '  {status_icon} {check_name}: {check_result.get("message", "Нет информации")}')
 
                 # Показываем метрики если есть
                 if 'metrics' in check_result:
@@ -173,12 +172,12 @@ class Command(BaseCommand):
                         for metric_name, metric_value in metrics.items():
                             if isinstance(metric_value, (int, float)):
                                 self.stdout.write(
-                                    f'    • {metric_name}: {metric_value}')
+                                    '    • {metric_name}: {metric_value}')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при получении состояния здоровья: {e}')
+                self.style.ERROR('❌ Ошибка при получении состояния здоровья: {e}')
             )
 
     def show_alerts(self):
@@ -199,7 +198,7 @@ class Command(BaseCommand):
                 self.stdout.write('✅ Нет активных уведомлений')
                 return
 
-            self.stdout.write(f'📋 Активных уведомлений: {len(active_alerts)}')
+            self.stdout.write('📋 Активных уведомлений: {len(active_alerts)}')
             self.stdout.write('')
 
             for alert in active_alerts:
@@ -213,17 +212,17 @@ class Command(BaseCommand):
                 timestamp = alert.timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
                 self.stdout.write(
-                    f'{level_icon} [{alert.level.value.upper()}] {alert.title}')
-                self.stdout.write(f'   Время: {timestamp}')
-                self.stdout.write(f'   Источник: {alert.source}')
-                self.stdout.write(f'   Сообщение: {alert.message}')
-                self.stdout.write(f'   ID: {alert.id}')
+                    '{level_icon} [{alert.level.value.upper()}] {alert.title}')
+                self.stdout.write('   Время: {timestamp}')
+                self.stdout.write('   Источник: {alert.source}')
+                self.stdout.write('   Сообщение: {alert.message}')
+                self.stdout.write('   ID: {alert.id}')
                 self.stdout.write('')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при получении уведомлений: {e}')
+                self.style.ERROR('❌ Ошибка при получении уведомлений: {e}')
             )
 
     def test_alert(self, options):
@@ -235,13 +234,13 @@ class Command(BaseCommand):
         except ValueError:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Неверный уровень уведомления: {level_str}')
+                self.style.ERROR('❌ Неверный уровень уведомления: {level_str}')
             )
             return
 
         self.stdout.write(
             self.style.SUCCESS(
-                f'🧪 Создание тестового уведомления уровня {level.value}...')  # type: ignore
+                '🧪 Создание тестового уведомления уровня {level.value}...')  # type: ignore
         )
 
         try:
@@ -250,23 +249,23 @@ class Command(BaseCommand):
 
             alert = alert_manager.create_alert(
                 level=level,
-                title=f"Тестовое уведомление {level.value}",
-                message=f"Это тестовое уведомление для проверки системы мониторинга. Уровень: {level.value}",
+                title="Тестовое уведомление {level.value}",
+                message="Это тестовое уведомление для проверки системы мониторинга. Уровень: {level.value}",
                 source="test")
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'✅ Тестовое уведомление создано: {alert.id}')  # type: ignore
+                    '✅ Тестовое уведомление создано: {alert.id}')  # type: ignore
             )
 
             # Показываем детали
-            self.stdout.write(f'   Уровень: {alert.level.value}')
-            self.stdout.write(f'   Заголовок: {alert.title}')
+            self.stdout.write('   Уровень: {alert.level.value}')
+            self.stdout.write('   Заголовок: {alert.title}')
             self.stdout.write(
-                f'   Время: {alert.timestamp.strftime("%Y-%m-%d %H:%M:%S")}')
+                '   Время: {alert.timestamp.strftime("%Y-%m-%d %H:%M:%S")}')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при создании тестового уведомления: {e}')
+                self.style.ERROR('❌ Ошибка при создании тестового уведомления: {e}')
             )

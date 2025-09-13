@@ -17,11 +17,11 @@ urlpatterns = [
     path('usage/stats/', api.get_usage_stats, name='usage_stats'),
 
     # Премиум-функции
-    path('export/pdf/', api.export_to_pdf, name='export_pdf'),
+    path('export/pdf/', api.export_to_pdf, name='export_pd'),
     path('search/advanced/', api.advanced_search, name='advanced_search'),
     path(
         'recommendations/',
         api.get_personalized_recommendations,
         name='recommendations'),
     path('compare/versions/', api.compare_versions, name='compare_versions'),
-]
+        ]

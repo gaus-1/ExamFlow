@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 
 from core.data_ingestion.change_detector import get_cdc_service
 
-
 class Command(BaseCommand):
     help = 'Управляет системой мониторинга изменений'
 
@@ -65,7 +64,7 @@ class Command(BaseCommand):
             )
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при запуске: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при запуске: {e}')  # type: ignore
             )
 
     def stop_service(self):
@@ -84,7 +83,7 @@ class Command(BaseCommand):
             )
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при остановке: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при остановке: {e}')  # type: ignore
             )
 
     def show_status(self):
@@ -99,8 +98,8 @@ class Command(BaseCommand):
 
             status_icon = "🟢" if service.is_running else "🔴"
             self.stdout.write(
-                f'Сервис: {status_icon} {"Запущен" if service.is_running else "Остановлен"}')  # type: ignore
-            self.stdout.write(f'Интервал проверки: {service.check_interval} секунд')
+                'Сервис: {status_icon} {"Запущен" if service.is_running else "Остановлен"}')  # type: ignore
+            self.stdout.write('Интервал проверки: {service.check_interval} секунд')
 
             if service.is_running:
                 stats = service.get_statistics()
@@ -108,9 +107,9 @@ class Command(BaseCommand):
 
                 self.stdout.write('\n📈 Статистика:')
                 self.stdout.write(
-                    f'  Всего изменений: {detector_stats["total_changes"]}')
-                self.stdout.write(f'  Размер очереди: {detector_stats["queue_size"]}')
-                self.stdout.write(f'  Недавних изменений: {stats["recent_changes"]}')
+                    '  Всего изменений: {detector_stats["total_changes"]}')
+                self.stdout.write('  Размер очереди: {detector_stats["queue_size"]}')
+                self.stdout.write('  Недавних изменений: {stats["recent_changes"]}')
 
                 change_counts = detector_stats['change_counts']
                 if any(change_counts.values()):
@@ -122,11 +121,11 @@ class Command(BaseCommand):
                                 'updated': '🔄',
                                 'deleted': '🗑️'
                             }.get(change_type, '📌')
-                            self.stdout.write(f'  {icon} {change_type}: {count}')
+                            self.stdout.write('  {icon} {change_type}: {count}')
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при получении статуса: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при получении статуса: {e}')  # type: ignore
             )
 
     def check_changes(self, options):
@@ -148,7 +147,7 @@ class Command(BaseCommand):
                 return
 
             self.stdout.write(
-                self.style.SUCCESS(f'🔄 Обнаружено {len(changes)} изменений:')
+                self.style.SUCCESS('🔄 Обнаружено {len(changes)} изменений:')
             )
             self.stdout.write('')
 
@@ -159,19 +158,19 @@ class Command(BaseCommand):
                     'deleted': '🗑️'
                 }.get(change.change_type.value, '📌')
 
-                self.stdout.write(f'{icon} {change.source_id}')
-                self.stdout.write(f'   Тип: {change.change_type.value}')
-                self.stdout.write(f'   URL: {change.url}')
+                self.stdout.write('{icon} {change.source_id}')
+                self.stdout.write('   Тип: {change.change_type.value}')
+                self.stdout.write('   URL: {change.url}')
                 self.stdout.write(
-                    f'   Время: {change.timestamp.strftime("%Y-%m-%d %H:%M:%S")}')
+                    '   Время: {change.timestamp.strftime("%Y-%m-%d %H:%M:%S")}')
                 if change.metadata.get('subject'):
-                    self.stdout.write(f'   Предмет: {change.metadata["subject"]}')
+                    self.stdout.write('   Предмет: {change.metadata["subject"]}')
                 self.stdout.write('')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при проверке изменений: {e}')
+                self.style.ERROR('❌ Ошибка при проверке изменений: {e}')
             )
 
     def show_statistics(self):
@@ -189,14 +188,14 @@ class Command(BaseCommand):
             # Статус сервиса
             self.stdout.write('🔧 Сервис:')
             self.stdout.write(
-                f'  Статус: {"🟢 Запущен" if stats["is_running"] else "🔴 Остановлен"}')
-            self.stdout.write(f'  Интервал проверки: {stats["check_interval"]} сек')
+                '  Статус: {"🟢 Запущен" if stats["is_running"] else "🔴 Остановлен"}')
+            self.stdout.write('  Интервал проверки: {stats["check_interval"]} сек')
 
             # Статистика детектора
             detector_stats = stats['detector_stats']
             self.stdout.write('\n📊 Детектор изменений:')
-            self.stdout.write(f'  Всего изменений: {detector_stats["total_changes"]}')
-            self.stdout.write(f'  Размер очереди: {detector_stats["queue_size"]}')
+            self.stdout.write('  Всего изменений: {detector_stats["total_changes"]}')
+            self.stdout.write('  Размер очереди: {detector_stats["queue_size"]}')
 
             change_counts = detector_stats['change_counts']
             self.stdout.write('\n📋 Изменения по типам:')
@@ -206,15 +205,15 @@ class Command(BaseCommand):
                     'updated': '🔄',
                     'deleted': '🗑️'
                 }.get(change_type, '📌')
-                self.stdout.write(f'  {icon} {change_type}: {count}')
+                self.stdout.write('  {icon} {change_type}: {count}')
 
             # Недавние изменения
-            self.stdout.write(f'\n⏰ Недавние изменения: {stats["recent_changes"]}')
+            self.stdout.write('\n⏰ Недавние изменения: {stats["recent_changes"]}')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при получении статистики: {e}')
+                self.style.ERROR('❌ Ошибка при получении статистики: {e}')
             )
 
     def show_recent_changes(self, options):
@@ -223,7 +222,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f'⏰ Недавние изменения за последние {hours} часов')  # type: ignore
+                '⏰ Недавние изменения за последние {hours} часов')  # type: ignore
         )
         self.stdout.write('=' * 60)
 
@@ -237,7 +236,7 @@ class Command(BaseCommand):
                 )
                 return
 
-            self.stdout.write(f'📋 Найдено {len(recent_changes)} изменений:')
+            self.stdout.write('📋 Найдено {len(recent_changes)} изменений:')
             self.stdout.write('')
 
             for change in recent_changes:
@@ -247,19 +246,19 @@ class Command(BaseCommand):
                     'deleted': '🗑️'
                 }.get(change.change_type.value, '📌')
 
-                self.stdout.write(f'{icon} {change.source_id}')
-                self.stdout.write(f'   Тип: {change.change_type.value}')
-                self.stdout.write(f'   URL: {change.url}')
+                self.stdout.write('{icon} {change.source_id}')
+                self.stdout.write('   Тип: {change.change_type.value}')
+                self.stdout.write('   URL: {change.url}')
                 self.stdout.write(
-                    f'   Время: {change.timestamp.strftime("%Y-%m-%d %H:%M:%S")}')
+                    '   Время: {change.timestamp.strftime("%Y-%m-%d %H:%M:%S")}')
                 if change.metadata.get('subject'):
-                    self.stdout.write(f'   Предмет: {change.metadata["subject"]}')
+                    self.stdout.write('   Предмет: {change.metadata["subject"]}')
                 if change.metadata.get('data_type'):
-                    self.stdout.write(f'   Тип данных: {change.metadata["data_type"]}')
+                    self.stdout.write('   Тип данных: {change.metadata["data_type"]}')
                 self.stdout.write('')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'❌ Ошибка при получении недавних изменений: {e}')
+                self.style.ERROR('❌ Ошибка при получении недавних изменений: {e}')
             )

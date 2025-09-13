@@ -5,7 +5,6 @@ from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-
 class TelegramWebhookSignatureMiddleware(MiddlewareMixin):
     """Проверка подписи Telegram webhook по секрету (если задан TELEGRAM_WEBHOOK_SECRET).
     Обратимо: при пустом секрете пропускает запросы без валидации.
@@ -30,5 +29,3 @@ class TelegramWebhookSignatureMiddleware(MiddlewareMixin):
         if not ok:
             return HttpResponse('Forbidden', status=403)  # type: ignore
         return None
-
-

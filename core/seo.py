@@ -3,10 +3,8 @@ from __future__ import annotations
 from typing import Dict
 from django.conf import settings
 
-
 SITE_URL = getattr(settings, 'WEBSITE_URL', 'https://examflow.ru')
 DEFAULT_IMAGE = SITE_URL + '/static/images/logo-512.png'
-
 
 def build_canonical(path: str) -> str:
     if path.startswith('http'):  # already full
@@ -14,7 +12,6 @@ def build_canonical(path: str) -> str:
     if not path.startswith('/'):
         path = '/' + path
     return SITE_URL.rstrip('/') + path
-
 
 def seo_for_home() -> Dict[str, str]:
     title = 'Подготовка к ЕГЭ/ОГЭ по математике и русскому — ExamFlow'
@@ -34,10 +31,9 @@ def seo_for_home() -> Dict[str, str]:
         'jsonld': _jsonld_org(),
     }
 
-
 def seo_for_subject(subject_name: str, path: str) -> Dict[str, str]:
-    title = f'Подготовка к {subject_name} ЕГЭ/ОГЭ — задания и разборы — ExamFlow'
-    description = f'{subject_name}: задания, критерии ФИПИ, видеоразборы, тренажёры и типичные ошибки.'
+    title = 'Подготовка к {subject_name} ЕГЭ/ОГЭ — задания и разборы — ExamFlow'
+    description = '{subject_name}: задания, критерии ФИПИ, видеоразборы, тренажёры и типичные ошибки.'
     url = build_canonical(path)
     data = {
         'page_title': title,
@@ -55,10 +51,10 @@ def seo_for_subject(subject_name: str, path: str) -> Dict[str, str]:
     data['jsonld'] = _jsonld_course(subject_name, url)
     return data
 
-
-def seo_for_task(subject_name: str, exam: str, task_label: str, path: str) -> Dict[str, str]:
-    title = f'ЕГЭ/ОГЭ {subject_name} — задание {task_label} с разбором — ExamFlow'
-    description = f'Подробный разбор задания {task_label} по {subject_name}: критерии ФИПИ, типичные ошибки.'
+def seo_for_task(subject_name: str, exam: str,
+                 task_label: str, path: str) -> Dict[str, str]:
+    title = 'ЕГЭ/ОГЭ {subject_name} — задание {task_label} с разбором — ExamFlow'
+    description = 'Подробный разбор задания {task_label} по {subject_name}: критерии ФИПИ, типичные ошибки.'
     url = build_canonical(path)
     return {
         'page_title': title,
@@ -72,7 +68,6 @@ def seo_for_task(subject_name: str, exam: str, task_label: str, path: str) -> Di
         'twitter_description': description,
         'twitter_image': DEFAULT_IMAGE,
     }
-
 
 def _jsonld_org() -> str:
     data = {
@@ -89,13 +84,12 @@ def _jsonld_org() -> str:
     import json
     return json.dumps(data, ensure_ascii=False)
 
-
 def _jsonld_course(subject_name: str, url: str) -> str:
     data = {
         '@context': 'https://schema.org',
         '@type': 'Course',
         'name': subject_name,
-        'description': f'Курс подготовки к экзаменам по предмету {subject_name}.',
+        'description': 'Курс подготовки к экзаменам по предмету {subject_name}.',
         'provider': {
             '@type': 'EducationalOrganization',
             'name': 'ExamFlow',
@@ -105,7 +99,6 @@ def _jsonld_course(subject_name: str, url: str) -> str:
     }
     import json
     return json.dumps(data, ensure_ascii=False)
-
 
 def jsonld_faq(qa: Dict[str, str]) -> str:
     """Build FAQPage JSON-LD from dict of question->answer."""
@@ -124,7 +117,6 @@ def jsonld_faq(qa: Dict[str, str]) -> str:
     import json
     return json.dumps(data, ensure_ascii=False)
 
-
 def jsonld_video(title: str, page_url: str, thumb_url: str, content_url: str) -> str:
     data = {
         '@context': 'https://schema.org',
@@ -139,5 +131,3 @@ def jsonld_video(title: str, page_url: str, thumb_url: str, content_url: str) ->
     }
     import json
     return json.dumps(data, ensure_ascii=False)
-
-

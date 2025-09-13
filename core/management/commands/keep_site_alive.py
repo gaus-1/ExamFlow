@@ -10,7 +10,6 @@ from django.core.management.base import BaseCommand
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Поддерживает сайт активным, предотвращая "засыпание" на Render'
 
@@ -39,7 +38,7 @@ class Command(BaseCommand):
         site_url = options['url']
 
         self.stdout.write(
-            f'🔄 Запуск keep-alive для сайта {site_url} (интервал: {interval}с)'
+            '🔄 Запуск keep-alive для сайта {site_url} (интервал: {interval}с)'
         )
 
         while True:
@@ -56,29 +55,29 @@ class Command(BaseCommand):
                 timestamp = time.strftime('%H:%M:%S')
                 if response.status_code == 200:
                     self.stdout.write(
-                        f"✅ {timestamp} - Сайт активен (HTTP {response.status_code})")
+                        "✅ {timestamp} - Сайт активен (HTTP {response.status_code})")
                     logger.info(
-                        f"Сайт активен: {timestamp} - HTTP {response.status_code}")
+                        "Сайт активен: {timestamp} - HTTP {response.status_code}")
                 else:
                     self.stdout.write(
-                        f"⚠️ {timestamp} - Сайт отвечает, но статус {response.status_code}")
+                        "⚠️ {timestamp} - Сайт отвечает, но статус {response.status_code}")
                     logger.warning(
-                        f"Сайт отвечает со статусом {response.status_code}: {timestamp}")
+                        "Сайт отвечает со статусом {response.status_code}: {timestamp}")
 
             except requests.exceptions.Timeout:
                 timestamp = time.strftime('%H:%M:%S')
-                self.stdout.write(f"⏰ {timestamp} - Таймаут запроса к сайту")
-                logger.warning(f"Таймаут запроса к сайту: {timestamp}")
+                self.stdout.write("⏰ {timestamp} - Таймаут запроса к сайту")
+                logger.warning("Таймаут запроса к сайту: {timestamp}")
 
             except requests.exceptions.ConnectionError as e:
                 timestamp = time.strftime('%H:%M:%S')
-                self.stdout.write(f"🔌 {timestamp} - Ошибка соединения: {e}")
-                logger.error(f"Ошибка соединения с сайтом: {e}")
+                self.stdout.write("🔌 {timestamp} - Ошибка соединения: {e}")
+                logger.error("Ошибка соединения с сайтом: {e}")
 
             except Exception as e:
                 timestamp = time.strftime('%H:%M:%S')
-                self.stdout.write(f"❌ {timestamp} - Неожиданная ошибка: {e}")
-                logger.error(f"Неожиданная ошибка keep-alive сайта: {e}")
+                self.stdout.write("❌ {timestamp} - Неожиданная ошибка: {e}")
+                logger.error("Неожиданная ошибка keep-alive сайта: {e}")
 
             if not continuous:
                 break

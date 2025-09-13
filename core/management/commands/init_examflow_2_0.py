@@ -5,7 +5,6 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 
-
 class Command(BaseCommand):  # type: ignore
     help = "Полная инициализация ExamFlow 2.0: миграции, источники ФИПИ, настройка системы"
 
@@ -40,11 +39,13 @@ class Command(BaseCommand):  # type: ignore
             # 2. Инициализируем источники ФИПИ
             if not options['skip_sources']:
                 self.stdout.write(
-                    self.style.WARNING('🗺️ Инициализируем источники ФИПИ...')  # type: ignore
+                    self.style.WARNING(
+                        '🗺️ Инициализируем источники ФИПИ...')  # type: ignore
                 )
                 call_command('init_fipi_source_map', verbosity=0)
                 self.stdout.write(
-                    self.style.SUCCESS('✅ Источники ФИПИ инициализированы')  # type: ignore
+                    self.style.SUCCESS(
+                        '✅ Источники ФИПИ инициализированы')  # type: ignore
                 )
 
             # 3. Создаем суперпользователя если не существует
@@ -59,7 +60,8 @@ class Command(BaseCommand):  # type: ignore
                     password='admin123'
                 )
                 self.stdout.write(
-                    self.style.SUCCESS('✅ Суперпользователь создан (admin/admin123)')  # type: ignore
+                    self.style.SUCCESS(
+                        '✅ Суперпользователь создан (admin/admin123)')  # type: ignore
                 )
 
             # 4. Создаем тестовые предметы если не существуют
@@ -90,9 +92,9 @@ class Command(BaseCommand):  # type: ignore
             self.stdout.write(
                 self.style.WARNING('⚙️ Проверяем настройки системы...')  # type: ignore
             )
-            
+
             from django.conf import settings
-            
+
             # Проверяем GEMINI_API_KEY
             if not getattr(settings, 'GEMINI_API_KEY', None):
                 self.stdout.write(
@@ -106,7 +108,8 @@ class Command(BaseCommand):  # type: ignore
             # Проверяем TELEGRAM_BOT_TOKEN
             if not getattr(settings, 'TELEGRAM_BOT_TOKEN', None):
                 self.stdout.write(
-                    self.style.WARNING('⚠️ TELEGRAM_BOT_TOKEN не настроен (бот не будет работать)')  # type: ignore
+                    self.style.WARNING(
+                        '⚠️ TELEGRAM_BOT_TOKEN не настроен (бот не будет работать)')  # type: ignore
                 )
             else:
                 self.stdout.write(
@@ -116,31 +119,36 @@ class Command(BaseCommand):  # type: ignore
             # 6. Выводим информацию о доступных командах
             self.stdout.write('\n' + '=' * 60)
             self.stdout.write(
-                self.style.SUCCESS('🎉 ExamFlow 2.0 успешно инициализирован!')  # type: ignore
+                self.style.SUCCESS(
+                    '🎉 ExamFlow 2.0 успешно инициализирован!')  # type: ignore
             )
             self.stdout.write('\n📋 Доступные команды:')
             self.stdout.write('• python manage.py runserver - запуск сервера')
-            self.stdout.write('• python manage.py run_telegram_bot - запуск Telegram бота')
-            self.stdout.write('• python manage.py run_cdc_monitor --once - проверка обновлений ФИПИ')
-            self.stdout.write('• python manage.py init_fipi_source_map - инициализация источников')
-            
+            self.stdout.write(
+                '• python manage.py run_telegram_bot - запуск Telegram бота')
+            self.stdout.write(
+                '• python manage.py run_cdc_monitor --once - проверка обновлений ФИПИ')
+            self.stdout.write(
+                '• python manage.py init_fipi_source_map - инициализация источников')
+
             self.stdout.write('\n🌐 Доступные URL:')
             self.stdout.write('• http://localhost:8000/ - главная страница')
             self.stdout.write('• http://localhost:8000/docs/ - Swagger документация')
-            self.stdout.write('• http://localhost:8000/subscription/ - страница подписки')
+            self.stdout.write(
+                '• http://localhost:8000/subscription/ - страница подписки')
             self.stdout.write('• http://localhost:8000/api/ai/ask/ - AI API')
-            
+
             self.stdout.write('\n🔧 API эндпоинты:')
             self.stdout.write('• POST /api/ai/ask - AI-помощник')
             self.stdout.write('• GET /api/ai/subjects - список предметов')
             self.stdout.write('• GET /api/ai/user/profile - профиль пользователя')
             self.stdout.write('• POST /api/ai/problem/submit - отправка решения')
             self.stdout.write('• GET /api/fipi/search - поиск по ФИПИ')
-            
+
             self.stdout.write('\n' + '=' * 60)
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при инициализации: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при инициализации: {e}')  # type: ignore
             )
             raise

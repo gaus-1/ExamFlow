@@ -8,7 +8,6 @@ import signal
 import sys
 import time
 
-
 class Command(BaseCommand):
     help = 'Управление системой автоматических обновлений материалов ФИПИ'
 
@@ -85,7 +84,7 @@ class Command(BaseCommand):
             stop_auto_updater()
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка запуска: {str(e)}')
+                self.style.ERROR('❌ Ошибка запуска: {str(e)}')
             )
 
     def stop_service(self):
@@ -110,7 +109,7 @@ class Command(BaseCommand):
                 for job in jobs:
                     next_run = job.next_run.strftime(
                         '%d.%m.%Y %H:%M') if job.next_run else 'Не запланировано'
-                    self.stdout.write(f'  • {job.job_func.__name__}: {next_run}')
+                    self.stdout.write('  • {job.job_func.__name__}: {next_run}')
             else:
                 self.stdout.write('  Нет запланированных задач')
         else:
@@ -133,13 +132,13 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS('📊 Результаты:')
             )
-            self.stdout.write(f'  • Предметов создано: {result["subjects"]}')
-            self.stdout.write(f'  • Заданий загружено: {result["tasks"]}')
-            self.stdout.write(f'  • Примеров добавлено: {result["samples"]}')
+            self.stdout.write('  • Предметов создано: {result["subjects"]}')
+            self.stdout.write('  • Заданий загружено: {result["tasks"]}')
+            self.stdout.write('  • Примеров добавлено: {result["samples"]}')
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка ручного обновления: {str(e)}')
+                self.style.ERROR('❌ Ошибка ручного обновления: {str(e)}')
             )
 
     def run_interactive_mode(self):
@@ -153,7 +152,7 @@ class Command(BaseCommand):
 
                 import schedule
                 jobs = schedule.jobs
-                self.stdout.write(f'📅 Запланированных задач: {len(jobs)}')
+                self.stdout.write('📅 Запланированных задач: {len(jobs)}')
 
                 if jobs:
                     self.stdout.write('⏰ Следующие запуски:')
@@ -161,7 +160,7 @@ class Command(BaseCommand):
                         if job.next_run:
                             next_run = job.next_run.strftime('%d.%m %H:%M')
                             self.stdout.write(
-                                f'  • {job.job_func.__name__}: {next_run}')
+                                '  • {job.job_func.__name__}: {next_run}')
 
                 self.stdout.write('📝 Нажмите Ctrl+C для остановки')
                 self.stdout.write('=' * 60)

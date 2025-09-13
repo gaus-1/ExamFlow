@@ -16,16 +16,15 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
 class KeepaliveService:
     """Сервис для поддержания активности всех компонентов"""
 
     def __init__(self):
         self.website_url = getattr(settings, 'WEBSITE_URL', 'https://examflow.ru')
-        self.health_url = f"{self.website_url}/health/"
-        self.simple_health_url = f"{self.website_url}/health/simple/"
+        self.health_url = "{self.website_url}/health/"
+        self.simple_health_url = "{self.website_url}/health/simple/"
         self.bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
-        self.telegram_api_url = f"https://api.telegram.org/bot{self.bot_token}/getMe"
+        self.telegram_api_url = "https://api.telegram.org/bot{self.bot_token}/getMe"
 
         # Настройки для Render бесплатного тарифа
         self.check_interval = 300  # 5 минут
@@ -61,7 +60,7 @@ class KeepaliveService:
             else:
                 return {
                     'status': 'error',
-                    'error': f'HTTP {response.status_code}',
+                    'error': 'HTTP {response.status_code}',
                     'response_time': response.elapsed.total_seconds()
                 }
 
@@ -134,7 +133,7 @@ class KeepaliveService:
             else:
                 return {
                     'status': 'error',
-                    'error': f'HTTP {response.status_code}'
+                    'error': 'HTTP {response.status_code}'
                 }
 
         except Exception as e:
@@ -149,10 +148,10 @@ class KeepaliveService:
             # Список эндпоинтов для пробуждения
             endpoints = [
                 self.website_url,
-                f"{self.website_url}/",
+                "{self.website_url}/",
                 self.simple_health_url,
-                f"{self.website_url}/learning/",
-                f"{self.website_url}/ai/chat/"
+                "{self.website_url}/learning/",
+                "{self.website_url}/ai/chat/"
             ]
 
             success_count = 0
@@ -163,27 +162,27 @@ class KeepaliveService:
                     if response.status_code in [
                             200, 404, 500]:  # Любой ответ лучше чем таймаут
                         success_count += 1
-                        logger.info(f"✅ Пробуждение {endpoint}: {response.status_code}")
+                        logger.info("✅ Пробуждение {endpoint}: {response.status_code}")
                     else:
-                        logger.warning(f"⚠️ {endpoint}: {response.status_code}")
+                        logger.warning("⚠️ {endpoint}: {response.status_code}")
 
                 except Exception as e:
-                    logger.warning(f"❌ {endpoint}: {e}")
+                    logger.warning("❌ {endpoint}: {e}")
 
             # Считаем успешным, если хотя бы половина эндпоинтов ответила
             success = success_count >= len(endpoints) // 2
 
             if success:
                 logger.info(
-                    f"✅ Сайт разбужен успешно ({success_count}/{len(endpoints)} эндпоинтов)")
+                    "✅ Сайт разбужен успешно ({success_count}/{len(endpoints)} эндпоинтов)")
             else:
                 logger.warning(
-                    f"⚠️ Сайт частично разбужен ({success_count}/{len(endpoints)} эндпоинтов)")
+                    "⚠️ Сайт частично разбужен ({success_count}/{len(endpoints)} эндпоинтов)")
 
             return success
 
         except Exception as e:
-            logger.error(f"❌ Ошибка пробуждения сайта: {e}")
+            logger.error("❌ Ошибка пробуждения сайта: {e}")
             return False
 
     def wake_up_database(self) -> bool:
@@ -205,20 +204,20 @@ class KeepaliveService:
                         result = cursor.fetchone()
                         if result:
                             success_count += 1
-                            logger.info(f"✅ DB query successful: {query}")
+                            logger.info("✅ DB query successful: {query}")
                         else:
-                            logger.warning(f"⚠️ DB query returned no result: {query}")
+                            logger.warning("⚠️ DB query returned no result: {query}")
 
                 except Exception as e:
-                    logger.warning(f"❌ DB query failed: {query} - {e}")
+                    logger.warning("❌ DB query failed: {query} - {e}")
 
             success = success_count >= len(queries) // 2
-            logger.info(f"База данных: {success_count}/{len(queries)} запросов успешны")
+            logger.info("База данных: {success_count}/{len(queries)} запросов успешны")
 
             return success
 
         except Exception as e:
-            logger.error(f"❌ Ошибка пробуждения базы данных: {e}")
+            logger.error("❌ Ошибка пробуждения базы данных: {e}")
             return False
 
     def perform_health_check(self) -> Dict[str, Any]:
@@ -266,7 +265,7 @@ class KeepaliveService:
 
                 # Логируем результаты
                 overall_status = health_results['overall_status']
-                logger.info(f"📊 Статус системы: {overall_status}")
+                logger.info("📊 Статус системы: {overall_status}")
 
                 # Если система нездорова, пытаемся разбудить
                 if overall_status != 'healthy':
@@ -292,14 +291,14 @@ class KeepaliveService:
                 time.sleep(self.check_interval)
 
             except Exception as e:
-                logger.error(f"❌ Ошибка в keepalive цикле: {e}")
+                logger.error("❌ Ошибка в keepalive цикле: {e}")
                 time.sleep(60)  # Пауза при ошибке
 
     def _send_alert(self, health_results: Dict[str, Any]):
         """Отправляет уведомление о проблемах (заглушка)"""
         logger.error(
-            f"🚨 КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ: {self.stats['consecutive_failures']} последовательных неудач")
-        logger.error(f"📊 Результаты проверки: {json.dumps(health_results, indent=2)}")
+            "🚨 КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ: {self.stats['consecutive_failures']} последовательных неудач")
+        logger.error("📊 Результаты проверки: {json.dumps(health_results, indent=2)}")
 
         # Здесь можно добавить отправку уведомлений в Telegram
         # или другие системы мониторинга
@@ -334,7 +333,6 @@ class KeepaliveService:
                 'timeout': self.timeout
             }
         }
-
 
 # Глобальный экземпляр сервиса
 keepalive_service = KeepaliveService()

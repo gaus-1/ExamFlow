@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from .models import UserThemePreference, ThemeUsage, ThemeCustomization
 
-
 class ThemesModelsTest(TestCase):
     """Тесты для моделей модуля themes"""
 
@@ -56,7 +55,6 @@ class ThemesModelsTest(TestCase):
         self.assertEqual(customization.custom_colors['primary'], '#FF0000')
         self.assertEqual(customization.custom_fonts['main'], 'Arial')
 
-
 class ThemesViewsTest(TestCase):
     """Тесты для представлений модуля themes"""
 
@@ -102,7 +100,6 @@ class ThemesViewsTest(TestCase):
         data = response.json()
         self.assertIn('success', data)
         self.assertTrue(data['success'])
-
 
 class ThemesIntegrationTest(TestCase):
     """Интеграционные тесты для модуля themes"""
@@ -174,7 +171,6 @@ class ThemesIntegrationTest(TestCase):
         # Проверяем, что создались записи об использовании
         usage_count = ThemeUsage.objects.filter(user=self.user).count()
         self.assertGreater(usage_count, 0)
-
 
 class ThemesAdminTest(TestCase):
     """Тесты для административной панели модуля themes"""

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-
 class UserThemePreference(models.Model):
     """
     Модель для хранения предпочтений пользователя по дизайну
@@ -16,8 +15,6 @@ class UserThemePreference(models.Model):
     """
 
     THEME_CHOICES = [
-        ('school', 'Школьник'),
-        ('adult', 'Взрослый'),
     ]
 
     user = models.OneToOneField(
@@ -56,7 +53,7 @@ class UserThemePreference(models.Model):
         ordering = ['-updated_at']
 
     def __str__(self):
-        return f"Тема пользователя {self.user.username}: {self.get_theme_display()}"
+        return "Тема пользователя {self.user.username}: {self.get_theme_display()}"
 
     def get_theme_display_name(self):
         """Получение читаемого названия темы"""
@@ -69,7 +66,6 @@ class UserThemePreference(models.Model):
             self.save()
             return True
         return False
-
 
 class ThemeUsage(models.Model):
     """
@@ -119,7 +115,7 @@ class ThemeUsage(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Использование темы {self.theme} пользователем {self.user.username}"
+        return "Использование темы {self.theme} пользователем {self.user.username}"
 
     def get_session_duration_minutes(self):
         """Получение продолжительности сессии в минутах"""
@@ -128,7 +124,6 @@ class ThemeUsage(models.Model):
     def get_session_duration_hours(self):
         """Получение продолжительности сессии в часах"""
         return round(self.session_duration / 3600, 2)
-
 
 class ThemeCustomization(models.Model):
     """
@@ -190,7 +185,7 @@ class ThemeCustomization(models.Model):
         unique_together = ['user', 'theme']
 
     def __str__(self):
-        return f"Пользовательские настройки темы {self.theme} для {self.user.username}"
+        return "Пользовательские настройки темы {self.theme} для {self.user.username}"
 
     def get_custom_color(self, color_name, default_color):
         """Получение пользовательского цвета или значения по умолчанию"""

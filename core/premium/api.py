@@ -15,7 +15,6 @@ from core.rag_system.orchestrator import get_ai_orchestrator
 
 logger = logging.getLogger(__name__)
 
-
 @require_http_methods(["GET"])
 @login_required
 def get_premium_status(request):
@@ -36,12 +35,11 @@ def get_premium_status(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка получения премиум статуса: {e}")
+        logger.error("Ошибка получения премиум статуса: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка получения статуса подписки'
         }, status=500)
-
 
 @require_http_methods(["POST"])
 @csrf_exempt
@@ -76,12 +74,11 @@ def track_usage(request):
             }, status=429)
 
     except Exception as e:
-        logger.error(f"Ошибка отслеживания использования: {e}")
+        logger.error("Ошибка отслеживания использования: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка отслеживания использования'
         }, status=500)
-
 
 @require_http_methods(["GET"])
 @login_required
@@ -105,12 +102,11 @@ def get_usage_stats(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка получения статистики использования: {e}")
+        logger.error("Ошибка получения статистики использования: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка получения статистики'
         }, status=500)
-
 
 @require_http_methods(["POST"])
 @csrf_exempt
@@ -158,7 +154,7 @@ def export_to_pdf(request):
 
         # Здесь должна быть логика генерации PDF
         # Пока возвращаем заглушку
-        pdf_url = f"/api/premium/pdf/{content_id}/download/"
+        pdf_url = "/api/premium/pdf/{content_id}/download/"
 
         return JsonResponse({
             'success': True,
@@ -167,12 +163,11 @@ def export_to_pdf(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка экспорта в PDF: {e}")
+        logger.error("Ошибка экспорта в PDF: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка генерации PDF'
         }, status=500)
-
 
 @require_http_methods(["POST"])
 @csrf_exempt
@@ -218,12 +213,11 @@ def advanced_search(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка расширенного поиска: {e}")
+        logger.error("Ошибка расширенного поиска: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка выполнения поиска'
         }, status=500)
-
 
 @require_http_methods(["GET"])
 @login_required
@@ -255,12 +249,11 @@ def get_personalized_recommendations(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка получения рекомендаций: {e}")
+        logger.error("Ошибка получения рекомендаций: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка получения рекомендаций'
         }, status=500)
-
 
 @require_http_methods(["POST"])
 @csrf_exempt
@@ -308,12 +301,11 @@ def compare_versions(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка сравнения версий: {e}")
+        logger.error("Ошибка сравнения версий: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка сравнения версий'
         }, status=500)
-
 
 @require_http_methods(["GET"])
 @login_required
@@ -373,7 +365,7 @@ def get_premium_features(request):
         })
 
     except Exception as e:
-        logger.error(f"Ошибка получения премиум-функций: {e}")
+        logger.error("Ошибка получения премиум-функций: {e}")
         return JsonResponse({
             'success': False,
             'error': 'Ошибка получения функций'

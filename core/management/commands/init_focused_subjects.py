@@ -11,7 +11,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Инициализация фокусированных предметов (математика и русский язык)'
 
@@ -37,7 +36,7 @@ class Command(BaseCommand):
             self.load_fipi_data()
 
         self.stdout.write(
-            self.style.SUCCESS( # type: ignore
+            self.style.SUCCESS(  # type: ignore
                 'Фокусированные предметы успешно инициализированы!')  # type: ignore
         )
 
@@ -64,9 +63,8 @@ class Command(BaseCommand):
 
         subjects_data = [
             # Математика
-            {
                 'name': 'Математика (профильная)',
-                'code': 'math_prof',
+                'code': 'math_pro',
                 'exam_type': 'ЕГЭ',
                 'description': 'Профильная математика ЕГЭ - задания 1-19 с полными решениями',
                 'icon': '📐',
@@ -84,7 +82,6 @@ class Command(BaseCommand):
                     'Логарифмы и степени'
                 ]
             },
-            {
                 'name': 'Математика (непрофильная)',
                 'code': 'math_base',
                 'exam_type': 'ЕГЭ',
@@ -101,7 +98,6 @@ class Command(BaseCommand):
                     'Практические задачи'
                 ]
             },
-            {
                 'name': 'Математика (ОГЭ)',
                 'code': 'math_oge',
                 'exam_type': 'ОГЭ',
@@ -119,7 +115,6 @@ class Command(BaseCommand):
                 ]
             },
             # Русский язык
-            {
                 'name': 'Русский язык (ЕГЭ)',
                 'code': 'russian_ege',
                 'exam_type': 'ЕГЭ',
@@ -139,7 +134,6 @@ class Command(BaseCommand):
                     'Стили речи'
                 ]
             },
-            {
                 'name': 'Русский язык (ОГЭ)',
                 'code': 'russian_oge',
                 'exam_type': 'ОГЭ',
@@ -177,9 +171,9 @@ class Command(BaseCommand):
                 )
 
                 if created:
-                    self.stdout.write(f'  ✓ Создан предмет: {subject.name}')
+                    self.stdout.write('  ✓ Создан предмет: {subject.name}')
                 else:
-                    self.stdout.write(f'  - Предмет уже существует: {subject.name}')
+                    self.stdout.write('  - Предмет уже существует: {subject.name}')
 
                 # Создаем темы для предмета
                 self.create_topics_for_subject(subject, subject_data['topics'])
@@ -192,7 +186,7 @@ class Command(BaseCommand):
         """Создает темы для предмета"""
         for i, topic_name in enumerate(topics_data):
             # Создаем короткий код для темы
-            topic_code = f"topic_{i+1:02d}"
+            topic_code = "topic_{i+1:02d}"
 
             topic, created = Topic.objects.get_or_create(  # type: ignore
                 name=topic_name,
@@ -203,7 +197,7 @@ class Command(BaseCommand):
             )
 
             if created:
-                self.stdout.write(f'    ✓ Создана тема: {topic_name}')
+                self.stdout.write('    ✓ Создана тема: {topic_name}')
 
     def load_fipi_data(self):
         """Загружает данные с ФИПИ"""
@@ -216,7 +210,7 @@ class Command(BaseCommand):
             subjects = Subject.objects.filter(is_primary=True)  # type: ignore
 
             for subject in subjects:
-                self.stdout.write(f'  Загружаем данные для {subject.name}...')
+                self.stdout.write('  Загружаем данные для {subject.name}...')
 
                 # Определяем тип экзамена для парсера
                 exam_type = 'ЕГЭ' if subject.exam_type == 'ЕГЭ' else 'ОГЭ'
@@ -245,31 +239,32 @@ class Command(BaseCommand):
                     if created:
                         created_tasks += 1
 
-                self.stdout.write(f'    ✓ Создано заданий: {created_tasks}')
+                self.stdout.write('    ✓ Создано заданий: {created_tasks}')
 
         except Exception as e:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'Ошибка при загрузке данных с ФИПИ: {e}') # type: ignore
+                # type: ignore
+                self.style.ERROR('Ошибка при загрузке данных с ФИПИ: {e}')
             )
-            logger.error(f'Ошибка при загрузке данных с ФИПИ: {e}')
+            logger.error('Ошибка при загрузке данных с ФИПИ: {e}')
 
     def show_statistics(self):
         """Показывает статистику созданных данных"""
         self.stdout.write('\nСтатистика:')
 
         subjects = Subject.objects.filter(is_primary=True)  # type: ignore
-        self.stdout.write(f'  Предметов: {subjects.count()}')
+        self.stdout.write('  Предметов: {subjects.count()}')
 
         topics = Topic.objects.filter(subject__in=subjects)  # type: ignore
-        self.stdout.write(f'  Тем: {topics.count()}')
+        self.stdout.write('  Тем: {topics.count()}')
 
         tasks = Task.objects.filter(subject__in=subjects)  # type: ignore
-        self.stdout.write(f'  Заданий: {tasks.count()}')
+        self.stdout.write('  Заданий: {tasks.count()}')
 
         # Статистика по предметам
         for subject in subjects:
             subject_topics = topics.filter(subject=subject).count()  # type: ignore
             subject_tasks = tasks.filter(subject=subject).count()  # type: ignore
             self.stdout.write(
-                f'    {subject.name}: {subject_topics} тем, {subject_tasks} заданий')
+                '    {subject.name}: {subject_topics} тем, {subject_tasks} заданий')

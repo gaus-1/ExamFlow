@@ -51,4 +51,4 @@ urlpatterns = [
         'api/subject-stats/',
         focused_views.get_subject_statistics,
         name='subject_statistics'),
-]
+        ]

@@ -14,7 +14,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-
 class ExamType(models.Model):
     """Тип экзамена (ЕГЭ/ОГЭ)"""
     name = models.CharField(max_length=50, verbose_name="Тип экзамена")
@@ -27,12 +26,9 @@ class ExamType(models.Model):
         verbose_name = "Тип экзамена"
         verbose_name_plural = "Типы экзаменов"
 
-
 class Subject(models.Model):
     """Предмет для изучения"""
     EXAM_TYPES = [
-        ('ЕГЭ', 'Единый государственный экзамен'),
-        ('ОГЭ', 'Основной государственный экзамен'),
     ]
 
     name = models.CharField(max_length=100, verbose_name="Название предмета")
@@ -47,9 +43,15 @@ class Subject(models.Model):
         default='ЕГЭ',
         verbose_name="Тип экзамена")
     description = models.TextField(blank=True, default='', verbose_name="Описание")
-    icon = models.CharField(max_length=100, blank=True, default='', verbose_name="Иконка")
-    is_archived = models.BooleanField(default=False, verbose_name="Архивирован")  # type: ignore
-    is_primary = models.BooleanField(default=False, verbose_name="Основной предмет")  # type: ignore
+    icon = models.CharField(
+        max_length=100,
+        blank=True,
+        default='',
+        verbose_name="Иконка")
+    is_archived = models.BooleanField(
+        default=False, verbose_name="Архивирован")  # type: ignore
+    is_primary = models.BooleanField(default=False,
+                                     verbose_name="Основной предмет")  # type: ignore
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
@@ -59,13 +61,12 @@ class Subject(models.Model):
         ordering = ['is_primary', 'name']
 
     def __str__(self):
-        return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
+        return "{self.name} ({self.get_exam_type_display()})"  # type: ignore
 
     @property
     def task_count(self):
         """Количество задач по предмету"""
         return self.task_set.count()  # type: ignore
-
 
 class Topic(models.Model):
     """Тема предмета"""
@@ -77,12 +78,11 @@ class Topic(models.Model):
     code = models.CharField(max_length=20, verbose_name="Код темы")
 
     def __str__(self):
-        return f"{self.subject.name} - {self.name}"
+        return "{self.subject.name} - {self.name}"
 
     class Meta:
         verbose_name = "Тема"
         verbose_name_plural = "Темы"
-
 
 class Task(models.Model):
     """Задание по предмету"""
@@ -110,7 +110,6 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
-
 class UserProgress(models.Model):
     """Прогресс пользователя по заданиям"""
     user = models.ForeignKey(
@@ -126,12 +125,11 @@ class UserProgress(models.Model):
     last_attempt = models.DateTimeField(auto_now=True, verbose_name="Последняя попытка")
 
     def __str__(self):
-        return f"{self.user.username} - {self.task.subject.name}"  # type: ignore
+        return "{self.user.username} - {self.task.subject.name}"  # type: ignore
 
     class Meta:
         verbose_name = "Прогресс пользователя"
         verbose_name_plural = "Прогресс пользователей"
-
 
 class UserRating(models.Model):
     """Рейтинг пользователя"""
@@ -152,12 +150,12 @@ class UserRating(models.Model):
 
     def __str__(self):
         # type: ignore
-        return f"Рейтинг {self.user.username}: {self.total_points} очков"  # type: ignore
+        # type: ignore
+        return "Рейтинг {self.user.username}: {self.total_points} очков"
 
     class Meta:
         verbose_name = "Рейтинг пользователя"
         verbose_name_plural = "Рейтинги пользователей"
-
 
 class Achievement(models.Model):
     """Достижения пользователей"""
@@ -178,7 +176,6 @@ class Achievement(models.Model):
         verbose_name = "Достижение"
         verbose_name_plural = "Достижения"
 
-
 class UserAchievement(models.Model):
     """Связь пользователя с достижением"""
     user = models.ForeignKey(
@@ -192,7 +189,7 @@ class UserAchievement(models.Model):
     earned_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата получения")
 
     def __str__(self):
-        return f"{self.user.username} - {self.achievement.name}"  # type: ignore
+        return "{self.user.username} - {self.achievement.name}"  # type: ignore
 
     class Meta:
         verbose_name = "Достижение пользователя"

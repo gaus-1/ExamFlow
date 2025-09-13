@@ -8,7 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Запускает Telegram бота в режиме polling'
 
@@ -50,5 +49,5 @@ class Command(BaseCommand):
         except KeyboardInterrupt:
             self.stdout.write('\n⚠️  Остановка по запросу пользователя...')
         except Exception as e:
-            self.stdout.write(f'❌ Ошибка запуска бота: {e}')
-            logger.error(f'Ошибка запуска бота: {e}')
+            self.stdout.write('❌ Ошибка запуска бота: {e}')
+            logger.error('Ошибка запуска бота: {e}')

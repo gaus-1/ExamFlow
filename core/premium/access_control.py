@@ -18,7 +18,6 @@ from core.models import UnifiedProfile
 
 logger = logging.getLogger(__name__)
 
-
 class PremiumAccessControl:
     """Основной класс контроля премиум-доступа"""
 
@@ -33,7 +32,7 @@ class PremiumAccessControl:
 
         try:
             # Проверяем кэш
-            cache_key = f"premium_user_{user.id}"  # type: ignore
+            cache_key = "premium_user_{user.id}"  # type: ignore
             cached_result = cache.get(cache_key)
             if cached_result is not None:
                 return cached_result
@@ -56,7 +55,7 @@ class PremiumAccessControl:
         except Exception as e:
             # type: ignore
             logger.error(
-                f"Ошибка проверки премиум статуса для пользователя {user.id}: {e}")
+                "Ошибка проверки премиум статуса для пользователя {user.id}: {e}")
             return False
 
     def has_active_subscription(self, user: User) -> bool:
@@ -65,7 +64,7 @@ class PremiumAccessControl:
             return False
 
         try:
-            cache_key = f"active_subscription_{user.id}"  # type: ignore
+            cache_key = "active_subscription_{user.id}"  # type: ignore
             cached_result = cache.get(cache_key)
             if cached_result is not None:
                 return cached_result
@@ -84,7 +83,7 @@ class PremiumAccessControl:
 
         except Exception as e:
             # type: ignore
-            logger.error(f"Ошибка проверки подписки для пользователя {user.id}: {e}")
+            logger.error("Ошибка проверки подписки для пользователя {user.id}: {e}")
             return False
 
     def get_user_features(self, user: User) -> List[str]:
@@ -93,7 +92,7 @@ class PremiumAccessControl:
             return ['basic']
 
         try:
-            cache_key = f"user_features_{user.id}"  # type: ignore
+            cache_key = "user_features_{user.id}"  # type: ignore
             cached_features = cache.get(cache_key)
             if cached_features is not None:
                 return cached_features
@@ -119,7 +118,7 @@ class PremiumAccessControl:
 
         except Exception as e:
             # type: ignore
-            logger.error(f"Ошибка получения функций для пользователя {user.id}: {e}")
+            logger.error("Ошибка получения функций для пользователя {user.id}: {e}")
             return ['basic']
 
     def can_access_feature(self, user: User, feature: str) -> bool:
@@ -152,7 +151,6 @@ class PremiumAccessControl:
                 'advanced_searches': 0
             }
 
-
 class PremiumMiddleware:
     """Middleware для проверки премиум-доступа"""
 
@@ -174,7 +172,6 @@ class PremiumMiddleware:
 
         response = self.get_response(request)
         return response
-
 
 def premium_required(feature: str = 'premium_content'):
     """Декоратор для проверки премиум-доступа"""
@@ -201,7 +198,6 @@ def premium_required(feature: str = 'premium_content'):
         return wrapper
     return decorator
 
-
 def subscription_required(view_func):
     """Декоратор для проверки активной подписки"""
     @wraps(view_func)
@@ -223,7 +219,6 @@ def subscription_required(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
-
 class UsageTracker:
     """Трекер использования для контроля лимитов"""
 
@@ -237,7 +232,7 @@ class UsageTracker:
 
         try:
             today = datetime.now().date()
-            cache_key = f"usage_{user.id}_{action}_{today}"  # type: ignore
+            cache_key = "usage_{user.id}_{action}_{today}"  # type: ignore
 
             current_usage = cache.get(cache_key, 0)
             new_usage = current_usage + count
@@ -247,7 +242,7 @@ class UsageTracker:
             limits = access_control.get_usage_limits(user)
 
             # Проверяем лимит
-            limit_key = f"{action}_limit"
+            limit_key = "{action}_limit"
             if limit_key in limits:
                 if new_usage > limits[limit_key]:
                     return False
@@ -257,7 +252,7 @@ class UsageTracker:
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка отслеживания использования: {e}")
+            logger.error("Ошибка отслеживания использования: {e}")
             return False
 
     def get_usage_stats(self, user: User, action: str) -> Dict[str, Any]:
@@ -267,14 +262,14 @@ class UsageTracker:
 
         try:
             today = datetime.now().date()
-            cache_key = f"usage_{user.id}_{action}_{today}"  # type: ignore
+            cache_key = "usage_{user.id}_{action}_{today}"  # type: ignore
 
             current_usage = cache.get(cache_key, 0)
 
             access_control = PremiumAccessControl()
             limits = access_control.get_usage_limits(user)
 
-            limit_key = f"{action}_limit"
+            limit_key = "{action}_limit"
             limit = limits.get(limit_key, 0)
             remaining = max(0, limit - current_usage)
 
@@ -286,9 +281,8 @@ class UsageTracker:
             }
 
         except Exception as e:
-            logger.error(f"Ошибка получения статистики использования: {e}")
+            logger.error("Ошибка получения статистики использования: {e}")
             return {'current': 0, 'limit': 0, 'remaining': 0}
-
 
 class PremiumContentWrapper:
     """Обертка для премиум-контента"""
@@ -324,11 +318,9 @@ class PremiumContentWrapper:
         else:
             return str(content)[:preview_length] + '...'
 
-
 # Глобальные экземпляры
 _access_control: Optional[PremiumAccessControl] = None
 _usage_tracker: Optional[UsageTracker] = None
-
 
 def get_access_control() -> PremiumAccessControl:
     """Получает глобальный экземпляр контроля доступа"""
@@ -336,7 +328,6 @@ def get_access_control() -> PremiumAccessControl:
     if _access_control is None:
         _access_control = PremiumAccessControl()
     return _access_control
-
 
 def get_usage_tracker() -> UsageTracker:
     """Получает глобальный экземпляр трекера использования"""

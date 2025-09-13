@@ -11,7 +11,6 @@ from django.db import connection
 
 logger = logging.getLogger(__name__)
 
-
 class VectorStore:
     """
     Класс для работы с векторными представлениями
@@ -44,7 +43,7 @@ class VectorStore:
             return result['embedding']
 
         except Exception as e:
-            logger.error(f"Ошибка при создании эмбеддинга: {e}")
+            logger.error("Ошибка при создании эмбеддинга: {e}")
             # Возвращаем нулевой вектор в случае ошибки
             return [0.0] * self.embedding_dim
 
@@ -68,7 +67,7 @@ class VectorStore:
             return result['embedding']
 
         except Exception as e:
-            logger.error(f"Ошибка при создании эмбеддинга запроса: {e}")
+            logger.error("Ошибка при создании эмбеддинга запроса: {e}")
             return [0.0] * self.embedding_dim
 
     def cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
@@ -91,7 +90,7 @@ class VectorStore:
             return float(similarity)
 
         except Exception as e:
-            logger.error(f"Ошибка при вычислении сходства: {e}")
+            logger.error("Ошибка при вычислении сходства: {e}")
             return 0.0
 
     def find_similar_chunks(
@@ -131,7 +130,7 @@ class VectorStore:
             return similarities[:limit]
 
         except Exception as e:
-            logger.error(f"Ошибка при поиске похожих чанков: {e}")
+            logger.error("Ошибка при поиске похожих чанков: {e}")
             return []
 
     def add_chunk(
@@ -169,18 +168,18 @@ class VectorStore:
                 metadata=metadata or {}
             )
 
-            logger.info(f"Добавлен чанк {chunk_index} для {source_data.title}")
+            logger.info("Добавлен чанк {chunk_index} для {source_data.title}")
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при добавлении чанка: {e}")
+            logger.error("Ошибка при добавлении чанка: {e}")
             return False
 
     def _convert_to_pgvector(self, embedding: List[float]) -> str:
         """
         Конвертирует embedding в формат pgvector
         """
-        return '[' + ','.join(map(str, embedding)) + ']'
+        return '[' + ', '.join(map(str, embedding)) + ']'
 
     def semantic_search(
             self,
@@ -198,7 +197,7 @@ class VectorStore:
 
             # Строим SQL запрос с pgvector
             sql = """
-                SELECT 
+                SELECT
                     dc.id,
                     dc.chunk_text,
                     dc.subject,
@@ -218,7 +217,7 @@ class VectorStore:
             if subject_filter:
                 sql += " AND dc.subject = %s"
                 params.append(subject_filter)
-            
+
             if document_type_filter:
                 sql += " AND dc.document_type = %s"
                 params.append(document_type_filter)
@@ -247,11 +246,12 @@ class VectorStore:
                     'similarity': float(row[8])
                 })
 
-            logger.info(f"Найдено {len(formatted_results)} релевантных результатов для запроса: {query[:50]}...")
+            logger.info(
+                "Найдено {len(formatted_results)} релевантных результатов для запроса: {query[:50]}...")
             return formatted_results
 
         except Exception as e:
-            logger.error(f"Ошибка при семантическом поиске: {e}")
+            logger.error("Ошибка при семантическом поиске: {e}")
             return []
 
     def search(self, query: str, limit: int = 5) -> List[Dict]:
@@ -279,11 +279,11 @@ class VectorStore:
                 })
 
             logger.info(
-                f"Найдено {len(formatted_results)} релевантных результатов для запроса: {query[:50]}...")
+                "Найдено {len(formatted_results)} релевантных результатов для запроса: {query[:50]}...")
             return formatted_results
 
         except Exception as e:
-            logger.error(f"Ошибка при поиске: {e}")
+            logger.error("Ошибка при поиске: {e}")
             return []
 
     def get_statistics(self) -> Dict:
@@ -295,7 +295,8 @@ class VectorStore:
 
             total_chunks = DataChunk.objects.count()  # type: ignore
             total_sources = FIPIData.objects.count()  # type: ignore
-            processed_sources = FIPIData.objects.filter(is_processed=True).count()  # type: ignore      
+            processed_sources = FIPIData.objects.filter(
+                is_processed=True).count()  # type: ignore
 
             return {
                 'total_chunks': total_chunks,
@@ -307,5 +308,5 @@ class VectorStore:
                     100) if total_sources > 0 else 0}
 
         except Exception as e:
-            logger.error(f"Ошибка при получении статистики: {e}")
+            logger.error("Ошибка при получении статистики: {e}")
             return {}

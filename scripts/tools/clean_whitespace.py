@@ -8,7 +8,6 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-
 def ensure_two_blank_lines_before_toplevel(code: str) -> str:
     lines = code.splitlines()
     output: list[str] = []
@@ -26,12 +25,11 @@ def ensure_two_blank_lines_before_toplevel(code: str) -> str:
 
     text = "\n".join(output)
     # Нормализуем более 2 пустых строк подряд до 2
-    text = re.sub(r"\n{3,}", "\n\n", text)
+    text = re.sub(r"\n{3, }", "\n\n", text)
     # Гарантируем финальный перевод строки
     if not text.endswith("\n"):
         text += "\n"
     return text
-
 
 def main() -> None:
     base = Path(__file__).resolve().parents[1] / "scripts"
@@ -52,8 +50,5 @@ def main() -> None:
     else:
         print("no changes")
 
-
 if __name__ == "__main__":
     main()
-
-

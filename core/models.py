@@ -7,14 +7,11 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
-
 class Subject(models.Model):
     """Модель предмета"""
     name = models.CharField(max_length=100, verbose_name="Название")
     code = models.CharField(max_length=10, unique=True, verbose_name="Код предмета")
     exam_type = models.CharField(max_length=20, choices=[
-        ('ege', 'ЕГЭ'),
-        ('oge', 'ОГЭ'),
     ], verbose_name="Тип экзамена")
     description = models.TextField(blank=True, verbose_name="Описание")
     icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
@@ -27,13 +24,12 @@ class Subject(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
+        return "{self.name} ({self.get_exam_type_display()})"  # type: ignore
 
     @property
     def task_count(self):
         """Количество задач по предмету"""
         return self.task_set.count()  # type: ignore
-
 
 class Task(models.Model):
     """Модель задачи"""
@@ -63,14 +59,13 @@ class Task(models.Model):
         ordering = ['subject', 'difficulty', 'title']
 
     def __str__(self):
-        return f"{self.subject.name}: {self.title}"
+        return "{self.subject.name}: {self.title}"
 
     def check_answer(self, user_answer):
         """Проверяет правильность ответа пользователя"""
         if not self.answer:
             return False
         return str(user_answer).strip().lower() == str(self.answer).strip().lower()
-
 
 class UserProgress(models.Model):
     """Модель прогресса пользователя по задаче"""
@@ -100,8 +95,7 @@ class UserProgress(models.Model):
         ordering = ['-last_attempt']
 
     def __str__(self):
-        return f"{self.user.username} - {self.task.title}"  # type: ignore
-
+        return "{self.user.username} - {self.task.title}"  # type: ignore
 
 class UnifiedProfile(models.Model):
     """Унифицированный профиль пользователя для сайта и бота"""
@@ -153,13 +147,12 @@ class UnifiedProfile(models.Model):
         ordering = ['-last_activity']
 
     def __str__(self):
-        return f"{self.display_name} (TG: {self.telegram_id})"
+        return "{self.display_name} (TG: {self.telegram_id})"
 
     @property
     def experience_to_next_level(self):
         """Опыт, необходимый для следующего уровня"""
         return (self.level * 100) - (self.experience_points %  # type: ignore
-                                     (self.level * 100))  # type: ignore
 
     def add_experience(self, points):
         """Добавляет опыт и проверяет повышение уровня"""
@@ -178,15 +171,10 @@ class UnifiedProfile(models.Model):
             return True
         return False
 
-
 class DailyChallenge(models.Model):
     """Ежедневные вызовы"""
 
     CHALLENGE_TYPES = [
-        ('solve_tasks', 'Решить задачи'),
-        ('streak', 'Серия решений'),
-        ('subject_focus', 'Фокус на предмете'),
-        ('time_limit', 'На время'),
     ]
 
     title = models.CharField(max_length=200, verbose_name="Название")
@@ -206,8 +194,7 @@ class DailyChallenge(models.Model):
         unique_together = ['challenge_type', 'date']
 
     def __str__(self):
-        return f"{self.title} ({self.date})"
-
+        return "{self.title} ({self.date})"
 
 class UserChallenge(models.Model):
     """Прогресс пользователя по ежедневным вызовам"""
@@ -233,7 +220,7 @@ class UserChallenge(models.Model):
         unique_together = ['profile', 'challenge']
 
     def __str__(self):
-        return f"{self.profile.display_name} - {self.challenge.title}"  # type: ignore
+        return "{self.profile.display_name} - {self.challenge.title}"  # type: ignore
 
     @property
     def progress_percentage(self):
@@ -242,10 +229,8 @@ class UserChallenge(models.Model):
             return 0
         return min(
             100,
-            (self.current_progress /  # type: ignore
              self.challenge.target_value) *  # type: ignore
             100)  # type: ignore
-
 
 class ChatSession(models.Model):
     """Сессия чата пользователя с ботом для сохранения контекста"""
@@ -271,7 +256,7 @@ class ChatSession(models.Model):
         ]
 
     def __str__(self):
-        return f"Сессия {self.session_id} для {self.user.username}"  # type: ignore
+        return "Сессия {self.session_id} для {self.user.username}"  # type: ignore
 
     def add_message(self, role: str, content: str):
         """Добавляет сообщение в контекст сессии"""
@@ -301,7 +286,7 @@ class ChatSession(models.Model):
         for msg in self.context_messages[-self.max_context_length:]:  # type: ignore
             # type: ignore
             role = "Пользователь" if msg['role'] == 'user' else "Ассистент"
-            context_parts.append(f"{role}: {msg['content']}")  # type: ignore
+            context_parts.append("{role}: {msg['content']}")  # type: ignore
 
         return "\n".join(context_parts)
 
@@ -310,15 +295,10 @@ class ChatSession(models.Model):
         self.context_messages = []  # type: ignore
         self.save()
 
-
 class FIPIData(models.Model):
     """Модель для хранения данных с ФИПИ"""
 
     DATA_TYPES = [
-        ('demo_variant', 'Демонстрационный вариант'),
-        ('open_bank_task', 'Задание из открытого банка'),
-        ('specification', 'Спецификация'),
-        ('codifier', 'Кодификатор'),
     ]
 
     title = models.CharField(max_length=500, verbose_name="Название")
@@ -333,9 +313,6 @@ class FIPIData(models.Model):
         null=True,
         verbose_name="Предмет")
     exam_type = models.CharField(max_length=20, choices=[
-        ('ege', 'ЕГЭ'),
-        ('oge', 'ОГЭ'),
-        ('vpr', 'ВПР'),
     ], default='ege', verbose_name="Тип экзамена")
     content_hash = models.CharField(
         max_length=64,
@@ -362,14 +339,13 @@ class FIPIData(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.title} ({self.get_data_type_display()})"  # type: ignore
+        return "{self.title} ({self.get_data_type_display()})"  # type: ignore
 
     def mark_as_processed(self):
         """Отмечает запись как обработанную"""
         self.is_processed = True
         self.processed_at = timezone.now()
         self.save()
-
 
 class DataChunk(models.Model):
     """Модель для хранения чанков текста с векторными представлениями"""
@@ -382,9 +358,15 @@ class DataChunk(models.Model):
     chunk_index = models.IntegerField(verbose_name="Индекс чанка")
     embedding = models.JSONField(verbose_name="Векторное представление (JSON)")
     # pgvector поле для быстрого поиска
-    embedding_vector = models.TextField(blank=True, null=True, help_text='Vector embedding for semantic search (pgvector)')
+    embedding_vector = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Vector embedding for semantic search (pgvector)')
     subject = models.CharField(max_length=50, blank=True, verbose_name="Предмет")
-    document_type = models.CharField(max_length=50, blank=True, verbose_name="Тип документа")
+    document_type = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="Тип документа")
     metadata = models.JSONField(default=dict, blank=True, verbose_name="Метаданные")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
@@ -399,8 +381,8 @@ class DataChunk(models.Model):
         ]
 
     def __str__(self):
-        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..."  # type: ignore
-
+        # type: ignore
+        return "Чанк {self.chunk_index} из {self.source_data.title[:50]}..."
 
 class UserProfile(models.Model):
     """Модель профиля пользователя для персонализации"""
@@ -409,23 +391,25 @@ class UserProfile(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name="Пользователь")  # type: ignore
-    query_stats = models.JSONField(default=dict, blank=True, verbose_name="Статистика запросов")
-    recent_queries = models.JSONField(default=list, blank=True, verbose_name="Последние запросы")
-    preferred_subjects = models.JSONField(default=list, blank=True, verbose_name="Предпочитаемые предметы")
+    query_stats = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Статистика запросов")
+    recent_queries = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Последние запросы")
+    preferred_subjects = models.JSONField(
+        default=list, blank=True, verbose_name="Предпочитаемые предметы")
     difficulty_preference = models.CharField(
         max_length=20,
         choices=[
-            ('easy', 'Легкий'),
-            ('medium', 'Средний'),
-            ('hard', 'Сложный'),
         ],
         default='medium',
         verbose_name="Предпочитаемая сложность")
     subscription_type = models.CharField(
         max_length=20,
         choices=[
-            ('free', 'Бесплатный'),
-            ('premium', 'Премиум'),
         ],
         default='free',
         verbose_name="Тип подписки")
@@ -437,7 +421,7 @@ class UserProfile(models.Model):
         verbose_name_plural = "Профили пользователей"
 
     def __str__(self):
-        return f"Профиль {self.user.username}"  # type: ignore
+        return "Профиль {self.user.username}"  # type: ignore
 
     @property
     def total_queries(self):
@@ -449,50 +433,22 @@ class UserProfile(models.Model):
         """Проверяет, является ли пользователь премиум"""
         return self.subscription_type == 'premium'
 
-
 class FIPISourceMap(models.Model):
     """Модель для хранения карты источников данных fipi.ru"""
 
     DATA_TYPES = [
-        ('demo_variant', 'Демонстрационный вариант'),
-        ('specification', 'Спецификация КИМ'),
-        ('codefier', 'Кодификатор'),
-        ('open_bank_task', 'Задание из открытого банка'),
-        ('methodical_material', 'Методический материал'),
-        ('news', 'Новости и анонсы'),
-        ('document', 'Официальные документы'),
     ]
 
     EXAM_TYPES = [
-        ('ege', 'ЕГЭ'),
-        ('oge', 'ОГЭ'),
-        ('gve_11', 'ГВЭ-11'),
-        ('gve_9', 'ГВЭ-9'),
-        ('essay', 'Итоговое сочинение'),
-        ('interview', 'Итоговое собеседование'),
     ]
 
     PRIORITIES = [
-        (1, 'Критически важные'),
-        (2, 'Высокий приоритет'),
-        (3, 'Средний приоритет'),
-        (4, 'Низкий приоритет'),
     ]
 
     UPDATE_FREQUENCIES = [
-        ('annually', 'Ежегодно'),
-        ('monthly', 'Ежемесячно'),
-        ('weekly', 'Еженедельно'),
-        ('daily', 'Ежедневно'),
-        ('on_demand', 'По требованию'),
     ]
 
     FILE_FORMATS = [
-        ('HTML', 'HTML'),
-        ('PDF', 'PDF'),
-        ('DOC', 'DOC'),
-        ('XLS', 'XLS'),
-        ('XLSX', 'XLSX'),
     ]
 
     # Основные поля
@@ -566,7 +522,7 @@ class FIPISourceMap(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.name} ({self.get_data_type_display()})"  # type: ignore
+        return "{self.name} ({self.get_data_type_display()})"  # type: ignore
 
     @property
     def is_critical(self) -> bool:

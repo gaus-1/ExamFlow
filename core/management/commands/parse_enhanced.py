@@ -8,7 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Запускает улучшенный парсер для обновления базы данных'
 
@@ -48,7 +47,7 @@ class Command(BaseCommand):
                 )
 
         except Exception as e:
-            logger.error(f"Критическая ошибка: {e}")
+            logger.error("Критическая ошибка: {e}")
             self.stdout.write(
-                self.style.ERROR(f"❌ Критическая ошибка: {e}")  # type: ignore
+                self.style.ERROR("❌ Критическая ошибка: {e}")  # type: ignore
             )

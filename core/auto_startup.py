@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 _startup_executed = False
 _startup_lock = threading.Lock()
 
-
 def should_run_startup():
     """Проверяет, нужно ли запускать автозапуск"""
     # Проверяем переменную окружения
@@ -30,7 +29,7 @@ def should_run_startup():
         tasks_count = Task.objects.count()
 
         logger.info(
-            f"Текущее состояние: {subjects_count} предметов, {tasks_count} заданий")
+            "Текущее состояние: {subjects_count} предметов, {tasks_count} заданий")
 
         # Если данных мало, запускаем парсинг
         if subjects_count < 3 or tasks_count < 10:
@@ -41,9 +40,8 @@ def should_run_startup():
             return False
 
     except Exception as e:
-        logger.error(f"Ошибка проверки данных: {str(e)}")
+        logger.error("Ошибка проверки данных: {str(e)}")
         return True  # В случае ошибки пытаемся загрузить
-
 
 def run_startup_tasks():
     """Выполняет задачи автозапуска"""
@@ -76,17 +74,17 @@ def run_startup_tasks():
                 call_command(
                     'setup_webhook',
                     'set',
-                    url=f"{dj_settings.SITE_URL}/bot/webhook/",
+                    url="{dj_settings.SITE_URL}/bot/webhook/",
                     verbosity=0)
             except Exception as e:
-                logger.warning(f"Ошибка настройки webhook: {str(e)}")
+                logger.warning("Ошибка настройки webhook: {str(e)}")
 
             # 5. Генерация голосовых подсказок (ограниченно)
             logger.info("🎤 Генерация голосовых подсказок...")
             try:
                 call_command('generate_voices', limit=20, verbosity=0)
             except Exception as e:
-                logger.warning(f"Ошибка генерации голоса: {str(e)}")
+                logger.warning("Ошибка генерации голоса: {str(e)}")
 
             # 6. Запуск keep-alive (поддержание активности и еженедельные напоминания)
             try:
@@ -95,7 +93,7 @@ def run_startup_tasks():
                 logger.info(
                     "🌐 Keep-alive запущен (пинги каждые 10 минут, напоминания по воскресеньям)")
             except Exception as e:
-                logger.warning(f"Не удалось запустить keep-alive: {str(e)}")
+                logger.warning("Не удалось запустить keep-alive: {str(e)}")
 
             _startup_executed = True
             logger.info("✅ Автозапуск завершен успешно!")
@@ -103,12 +101,11 @@ def run_startup_tasks():
             # Логируем финальную статистику
             subjects_count = Subject.objects.count()
             tasks_count = Task.objects.count()
-            logger.info(f"📊 Итого: {subjects_count} предметов, {tasks_count} заданий")
+            logger.info("📊 Итого: {subjects_count} предметов, {tasks_count} заданий")
 
         except Exception as e:
-            logger.error(f"❌ Ошибка автозапуска: {str(e)}")
+            logger.error("❌ Ошибка автозапуска: {str(e)}")
             _startup_executed = True  # Помечаем как выполненное, чтобы не повторять
-
 
 def run_startup_in_background():
     """Запускает автозапуск в фоновом потоке"""
@@ -125,7 +122,6 @@ def run_startup_in_background():
     thread = threading.Thread(target=background_task, daemon=True)
     thread.start()
     logger.info("🔄 Автозапуск запущен в фоновом режиме...")
-
 
 def trigger_startup_on_first_request(get_response):
     """Middleware для запуска автозадач при первом запросе"""

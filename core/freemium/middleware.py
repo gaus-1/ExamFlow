@@ -5,7 +5,6 @@ Middleware для проверки лимитов FREEMIUM
 from django.http import JsonResponse
 from .models import UserSubscription, DailyUsage, SubscriptionLimit
 
-
 class FreemiumMiddleware:
     """Middleware для проверки лимитов подписки"""
 

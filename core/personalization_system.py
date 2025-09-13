@@ -13,7 +13,6 @@ from authentication.models import UserProfile
 
 logger = logging.getLogger(__name__)
 
-
 class UserBehaviorAnalyzer:
     """Анализатор поведения пользователей"""
 
@@ -86,7 +85,7 @@ class UserBehaviorAnalyzer:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при анализе предпочтений пользователя {self.user_id}: {e}")
+                "Ошибка при анализе предпочтений пользователя {self.user_id}: {e}")
             return {
                 'favorite_subjects': [],
                 'difficulty_preference': 3,
@@ -168,14 +167,13 @@ class UserBehaviorAnalyzer:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при анализе паттернов обучения пользователя {self.user_id}: {e}")
+                "Ошибка при анализе паттернов обучения пользователя {self.user_id}: {e}")
             return {
                 'study_frequency': 'regular',
                 'preferred_days': [],
                 'preferred_hours': [],
                 'session_duration': 'medium'
             }
-
 
 class PersonalizedRecommendations:
     """Система персонализированных рекомендаций"""
@@ -223,7 +221,7 @@ class PersonalizedRecommendations:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при получении рекомендаций для пользователя {self.user_id}: {e}")
+                "Ошибка при получении рекомендаций для пользователя {self.user_id}: {e}")
             return []
 
     def get_study_plan(self) -> Dict:
@@ -242,40 +240,29 @@ class PersonalizedRecommendations:
             # Определяем ежедневные цели
             if patterns['study_frequency'] == 'intensive':
                 plan['daily_goals'] = [
-                    {'type': 'new', 'count': 3, 'description': 'Решить 3 новых задания'},
-                    {'type': 'review', 'count': 2, 'description': 'Повторить 2 задания'}
                 ]
             elif patterns['study_frequency'] == 'regular':
                 plan['daily_goals'] = [
-                    {'type': 'new', 'count': 2, 'description': 'Решить 2 новых задания'},
-                    {'type': 'review', 'count': 1, 'description': 'Повторить 1 задание'}
                 ]
             else:
                 plan['daily_goals'] = [
-                    {'type': 'new', 'count': 1, 'description': 'Решить 1 новое задание'},
-                    {'type': 'review', 'count': 1, 'description': 'Повторить 1 задание'}
                 ]
 
             # Определяем еженедельный фокус
             if preferences['favorite_subjects']:
                 plan['weekly_focus'] = [
-                    {'subject': subject, 'tasks_count': 5, 'difficulty': 'adaptive'}
                     for subject in preferences['favorite_subjects'][:2]
                 ]
 
             # План прогрессии по сложности
             current_difficulty = preferences['difficulty_preference']
             plan['difficulty_progression'] = [
-                {'week': 1, 'target_difficulty': min(5, current_difficulty + 0.5)},
-                {'week': 2, 'target_difficulty': min(5, current_difficulty + 1.0)},
-                {'week': 3, 'target_difficulty': min(5, current_difficulty + 1.5)},
-                {'week': 4, 'target_difficulty': min(5, current_difficulty + 2.0)}
             ]
 
             # Рекомендации по времени
             if patterns['preferred_hours']:
                 plan['time_recommendations'] = [
-                    f"Лучшее время для занятий: {hour}:00"
+                    "Лучшее время для занятий: {hour}:00"
                     for hour in patterns['preferred_hours']
                 ]
 
@@ -283,7 +270,7 @@ class PersonalizedRecommendations:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при создании плана обучения для пользователя {self.user_id}: {e}")
+                "Ошибка при создании плана обучения для пользователя {self.user_id}: {e}")
             return {
                 'daily_goals': [],
                 'weekly_focus': [],
@@ -344,7 +331,6 @@ class PersonalizedRecommendations:
             )
 
             return [
-                {
                     'subject': subject,
                     'failed_tasks': data['failed_tasks'],
                     'total_attempts': data['total_attempts'],
@@ -356,9 +342,8 @@ class PersonalizedRecommendations:
 
         except Exception as e:
             logger.error(
-                f"Ошибка при определении слабых тем пользователя {self.user_id}: {e}")
+                "Ошибка при определении слабых тем пользователя {self.user_id}: {e}")
             return []
-
 
 def get_user_insights(user_id: int) -> Dict:
     """Получает комплексные инсайты о пользователе"""
@@ -380,9 +365,8 @@ def get_user_insights(user_id: int) -> Dict:
         return insights
 
     except Exception as e:
-        logger.error(f"Ошибка при получении инсайтов для пользователя {user_id}: {e}")
+        logger.error("Ошибка при получении инсайтов для пользователя {user_id}: {e}")
         return {}
-
 
 def _get_progress_summary(user_id: int) -> Dict:
     """Получает сводку прогресса пользователя"""
@@ -414,7 +398,7 @@ def _get_progress_summary(user_id: int) -> Dict:
 
     except Exception as e:
         logger.error(
-            f"Ошибка при получении сводки прогресса для пользователя {user_id}: {e}")
+            "Ошибка при получении сводки прогресса для пользователя {user_id}: {e}")
         return {
             'total_tasks': 0,
             'solved_tasks': 0,

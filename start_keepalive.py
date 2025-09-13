@@ -30,25 +30,24 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
 class KeepaliveManager:
     """Менеджер для управления keepalive процессами"""
-    
+
     def __init__(self):
         self.processes = {}
         self.running = False
-        
+
     def start_keepalive(self, interval=300):
         """Запускает keepalive сервис"""
         try:
             logger.info("🚀 Запуск keepalive сервиса ExamFlow 2.0...")
-            
+
             # Запускаем Django команду keepalive
             cmd = [
                 sys.executable, 'manage.py', 'keepalive',
                 '--interval', str(interval)
             ]
-            
+
             process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
@@ -57,19 +56,19 @@ class KeepaliveManager:
                 bufsize=1,
                 universal_newlines=True
             )
-            
+
             self.processes['keepalive'] = process
             self.running = True
-            
-            logger.info(f"✅ Keepalive сервис запущен (PID: {process.pid})")
-            logger.info(f"⏰ Интервал проверки: {interval} секунд")
-            
+
+            logger.info("✅ Keepalive сервис запущен (PID: {process.pid})")
+            logger.info("⏰ Интервал проверки: {interval} секунд")
+
             return process
-            
+
         except Exception as e:
-            logger.error(f"❌ Ошибка запуска keepalive: {e}")
+            logger.error("❌ Ошибка запуска keepalive: {e}")
             return None
-    
+
     def stop_keepalive(self):
         """Останавливает keepalive сервис"""
         if 'keepalive' in self.processes:
@@ -82,17 +81,17 @@ class KeepaliveManager:
                 process.kill()
                 logger.warning("⚠️ Keepalive сервис принудительно остановлен")
             except Exception as e:
-                logger.error(f"❌ Ошибка остановки keepalive: {e}")
-            
+                logger.error("❌ Ошибка остановки keepalive: {e}")
+
             del self.processes['keepalive']
             self.running = False
-    
+
     def check_status(self):
         """Проверяет статус keepalive сервиса"""
         if 'keepalive' in self.processes:
             process = self.processes['keepalive']
             if process.poll() is None:
-                logger.info(f"🟢 Keepalive сервис активен (PID: {process.pid})")
+                logger.info("🟢 Keepalive сервис активен (PID: {process.pid})")
                 return True
             else:
                 logger.warning("🔴 Keepalive сервис не запущен")
@@ -100,46 +99,45 @@ class KeepaliveManager:
         else:
             logger.warning("🔴 Keepalive сервис не запущен")
             return False
-    
+
     def run_foreground(self, interval=300):
         """Запускает keepalive в foreground режиме"""
         try:
             logger.info("🚀 Запуск keepalive в foreground режиме...")
             logger.info("Нажмите Ctrl+C для остановки")
-            
+
             # Настраиваем обработчик сигналов
             def signal_handler(signum, frame):
                 logger.info("🛑 Получен сигнал остановки...")
                 self.stop_keepalive()
                 sys.exit(0)
-            
+
             signal.signal(signal.SIGINT, signal_handler)
             signal.signal(signal.SIGTERM, signal_handler)
-            
+
             # Запускаем keepalive
             process = self.start_keepalive(interval)
             if not process:
                 return
-            
+
             # Ждем завершения процесса
             while self.running:
                 if process.poll() is not None:
                     logger.error("❌ Keepalive процесс завершился неожиданно")
                     break
                 time.sleep(1)
-                
+
         except KeyboardInterrupt:
             logger.info("🛑 Остановка по запросу пользователя...")
             self.stop_keepalive()
         except Exception as e:
-            logger.error(f"❌ Ошибка в foreground режиме: {e}")
+            logger.error("❌ Ошибка в foreground режиме: {e}")
             self.stop_keepalive()
-
 
 def main():
     """Главная функция"""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='Keepalive сервис ExamFlow 2.0')
     parser.add_argument(
         '--interval',
@@ -162,11 +160,11 @@ def main():
         action='store_true',
         help='Остановить keepalive сервис'
     )
-    
+
     args = parser.parse_args()
-    
+
     manager = KeepaliveManager()
-    
+
     if args.status:
         manager.check_status()
     elif args.stop:
@@ -179,7 +177,6 @@ def main():
         logger.info("✅ Keepalive сервис запущен в background режиме")
         logger.info("Используйте --status для проверки статуса")
         logger.info("Используйте --stop для остановки")
-
 
 if __name__ == '__main__':
     main()

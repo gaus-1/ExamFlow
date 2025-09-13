@@ -29,7 +29,6 @@ logger = logging.getLogger(__name__)
 # Инициализация системы геймификации
 gamification = TelegramGamification()
 
-
 def clean_markdown_text(text: str) -> str:
     """
     Очищает текст от проблемных символов Markdown для безопасной отправки в Telegram
@@ -46,7 +45,6 @@ def clean_markdown_text(text: str) -> str:
                     '__',
         '')
 
-
 def create_standard_button(text: str, callback_data: str) -> InlineKeyboardButton:
     """
     Создает стандартную кнопку бота в стиле 2025
@@ -56,22 +54,19 @@ def create_standard_button(text: str, callback_data: str) -> InlineKeyboardButto
         callback_data=callback_data
     )
 
-
 def create_main_message(text: str) -> str:
     """
     Создает основное сообщение бота в стиле 2025
     """
-    return f"**{text}**"
-
+    return "**{text}**"
 
 def create_warning_message(text: str) -> str:
     """
     Создает предупреждающее сообщение бота в стиле 2025
     """
-    return f"⚠️ {text}"
+    return "⚠️ {text}"
 
 # Синхронные функции БД, обёрнутые для безопасного вызова в async-контексте
-
 
 @sync_to_async
 def db_check_connection() -> bool:
@@ -83,7 +78,6 @@ def db_check_connection() -> bool:
 
 # Новые функции для работы с Unified Profile
 
-
 @sync_to_async
 def db_get_or_create_unified_profile(telegram_user):
     """Получает или создает UnifiedProfile для пользователя Telegram"""
@@ -93,13 +87,11 @@ def db_get_or_create_unified_profile(telegram_user):
         user=None  # Django User будет создан позже при необходимости
     )
 
-
 @sync_to_async
 def db_update_profile_activity(profile):
     """Обновляет время последней активности профиля"""
     profile.last_activity = timezone.now()
     profile.save()
-
 
 @sync_to_async
 def db_get_profile_progress(profile):
@@ -113,7 +105,6 @@ def db_get_profile_progress(profile):
         'achievements_count': len(profile.achievements) if profile.achievements else 0
     }
 
-
 @sync_to_async
 def db_get_or_create_chat_session(telegram_user, django_user=None):
     """Получает или создает сессию чата для пользователя"""
@@ -122,24 +113,20 @@ def db_get_or_create_chat_session(telegram_user, django_user=None):
         user=django_user
     )
 
-
 @sync_to_async
 def db_add_user_message_to_session(session, message):
     """Добавляет сообщение пользователя в сессию"""
     ChatSessionService.add_user_message(session, message)
-
 
 @sync_to_async
 def db_add_assistant_message_to_session(session, message):
     """Добавляет ответ ассистента в сессию"""
     ChatSessionService.add_assistant_message(session, message)
 
-
 @sync_to_async
 def db_create_enhanced_prompt(user_message, session):
     """Создает расширенный промпт с контекстом"""
     return ChatSessionService.create_enhanced_prompt(user_message, session)
-
 
 @sync_to_async
 def db_clear_chat_session_context(telegram_user):
@@ -148,7 +135,6 @@ def db_clear_chat_session_context(telegram_user):
     ChatSessionService.clear_session_context(session)
 
 # ИИ сервис для асинхронного использования
-
 
 @sync_to_async
 def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
@@ -166,7 +152,7 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
             prompt, user, task, task_type)
 
         if not result.get('success', False):
-            return f"❌ Ошибка: {result.get('error', 'Неизвестная ошибка')}"
+            return "❌ Ошибка: {result.get('error', 'Неизвестная ошибка')}"
 
         response = result['response']
 
@@ -182,7 +168,7 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
                 for topic in weak_topics[:2]:
                     subject = topic.get('subject', 'Неизвестно')
                     failed_tasks = topic.get('failed_tasks', 0)
-                    response += f"\n• {subject}: {failed_tasks} проваленных заданий"
+                    response += "\n• {subject}: {failed_tasks} проваленных заданий"
 
             # Добавляем рекомендации
             recommendations = personalization_data.get('recommendations', [])
@@ -191,16 +177,15 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
                 for rec in recommendations[:2]:
                     title = rec.get('title', 'Рекомендация')
                     action = rec.get('action', '')
-                    response += f"\n• {title}"
+                    response += "\n• {title}"
                     if action:
-                        response += f" - {action}"
+                        response += " - {action}"
 
         return response
 
     except Exception as e:
-        logger.error(f"Ошибка при получении персонализированного ответа от ИИ: {e}")
-        return f"❌ Ошибка ИИ-ассистента: {str(e)}"
-
+        logger.error("Ошибка при получении персонализированного ответа от ИИ: {e}")
+        return "❌ Ошибка ИИ-ассистента: {str(e)}"
 
 @sync_to_async
 def db_get_all_subjects_with_tasks():
@@ -211,7 +196,6 @@ def db_get_all_subjects_with_tasks():
     ).filter(tasks_count__gt=0).values('id', 'name', 'exam_type', 'tasks_count')
     return list(subjects)
 
-
 @sync_to_async
 def db_get_subject_ids():
     return list(
@@ -219,32 +203,26 @@ def db_get_subject_ids():
             'subject_id',
             flat=True).distinct())  # type: ignore
 
-
 @sync_to_async
 def db_get_subjects_by_ids(ids):
     return list(Subject.objects.filter(id__in=ids))  # type: ignore
-
 
 @sync_to_async
 def db_count_tasks_for_subject(subject_id: int) -> int:
     return Task.objects.filter(subject_id=subject_id).count()  # type: ignore
 
-
 @sync_to_async
 def db_get_tasks_by_subject(subject_id: int):
     return list(Task.objects.filter(subject_id=subject_id))  # type: ignore
-
 
 @sync_to_async
 def db_get_all_tasks():
     return list(Task.objects.all())  # type: ignore
 
-
 @sync_to_async
 def db_get_subject_name_for_task(task):
     """Получает название предмета для задания"""
     return task.subject.name if task.subject else "Неизвестный предмет"
-
 
 @sync_to_async
 def db_get_subject_by_id(subject_id: int):
@@ -254,7 +232,6 @@ def db_get_subject_by_id(subject_id: int):
     except Subject.DoesNotExist:  # type: ignore
         return None
 
-
 @sync_to_async
 def db_get_subject_name(subject_id: int) -> str:
     name = Subject.objects.filter(
@@ -262,21 +239,17 @@ def db_get_subject_name(subject_id: int) -> str:
         'name', flat=True).first()  # type: ignore
     return name or "Предмет"
 
-
 @sync_to_async
 def db_set_current_task_id(user, task_id: int):
     set_current_task_id(user, task_id)
-
 
 @sync_to_async
 def db_get_or_create_user(telegram_user):
     return get_or_create_user(telegram_user)
 
-
 @sync_to_async
 def db_get_task_by_id(task_id: int):
     return Task.objects.get(id=task_id)  # type: ignore
-
 
 @sync_to_async
 def db_save_progress(user, task, user_answer: str, is_correct: bool):
@@ -294,7 +267,6 @@ def db_save_progress(user, task, user_answer: str, is_correct: bool):
         progress.save()
     return progress
 
-
 @sync_to_async
 def db_update_rating_points(user, is_correct: bool):
     rating, _ = UserRating.objects.get_or_create(user=user)  # type: ignore
@@ -309,7 +281,6 @@ def db_update_rating_points(user, is_correct: bool):
 
 # Функция для получения текущего задания пользователя из профиля
 
-
 def get_current_task_id(user):
     """Получает ID текущего задания из профиля пользователя"""
     try:
@@ -318,7 +289,6 @@ def get_current_task_id(user):
     except UserProfile.DoesNotExist:  # type: ignore
         return None
 
-
 def set_current_task_id(user, task_id):
     """Устанавливает ID текущего задания в профиле пользователя"""
     try:
@@ -326,10 +296,9 @@ def set_current_task_id(user, task_id):
         profile.current_task_id = task_id
         profile.save()
         logger.info(
-            f"Установлен current_task_id: {task_id} для пользователя {user.username}")
+            "Установлен current_task_id: {task_id} для пользователя {user.username}")
     except Exception as e:
-        logger.error(f"Профиль не найден для пользователя {user.username}: {e}")
-
+        logger.error("Профиль не найден для пользователя {user.username}: {e}")
 
 def get_or_create_user(telegram_user):
     """
@@ -338,7 +307,7 @@ def get_or_create_user(telegram_user):
     Создает пользователя с username = tg_{telegram_id}
     Автоматически создает профиль и рейтинг
     """
-    username = f"tg_{telegram_user.id}"
+    username = "tg_{telegram_user.id}"
     user, created = User.objects.get_or_create(
         username=username,
         defaults={
@@ -364,7 +333,6 @@ def get_or_create_user(telegram_user):
 # ОСНОВНЫЕ ОБРАБОТЧИКИ КОМАНД
 # ============================================================================
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Команда /start - приветствие и главное меню
@@ -383,8 +351,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             from telegram import ReplyKeyboardMarkup, KeyboardButton
             keyboard = [
-                [KeyboardButton("🤖 ИИ"), KeyboardButton("📚 Практика")],
-                [KeyboardButton("🏆 Прогресс"), KeyboardButton("🎯 Главная")]
             ]
             reply_markup = ReplyKeyboardMarkup(
                 keyboard, resize_keyboard=True, one_time_keyboard=False)
@@ -396,29 +362,28 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode='Markdown'
             )
         except Exception as e:
-            logger.error(f"Ошибка создания нижнего меню: {e}")
+            logger.error("Ошибка создания нижнего меню: {e}")
 
     # Получаем или создаем UnifiedProfile
     try:
         profile = await db_get_or_create_unified_profile(user)
         await db_update_profile_activity(profile)
-        logger.info(f"UnifiedProfile получен/создан для пользователя {user.id}")
+        logger.info("UnifiedProfile получен/создан для пользователя {user.id}")
 
         # Получаем прогресс пользователя для персонализации
         progress = await db_get_profile_progress(profile)
 
         # Формируем персонализированное приветствие
-        level_info = f"Уровень {progress['level']}" if progress.get(
+        level_info = "Уровень {progress['level']}" if progress.get(
             'level', 1) > 1 else "Новичок"
-        xp_info = f"• {progress['experience_points']} XP" if progress.get(
+        xp_info = "• {progress['experience_points']} XP" if progress.get(
             'experience_points', 0) > 0 else ""
-        solved_info = f"• Решено: {progress['total_solved']}" if progress.get(
+        solved_info = "• Решено: {progress['total_solved']}" if progress.get(
             'total_solved', 0) > 0 else ""
 
-        stats_line = f"\n{level_info} {xp_info} {solved_info}".strip() if any(
-            [xp_info, solved_info]) else ""
+        stats_line = "\n{level_info} {xp_info} {solved_info}".strip() if any(
 
-        welcome_text = f"""
+        welcome_text = """
 🎯 **ExamFlow 2.0**
 
 Привет, {profile.display_name}!{stats_line}
@@ -433,7 +398,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
         keyboard = [
-            [
                 create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
                 create_standard_button("📚 ПРАКТИКА", "subjects"),
                 create_standard_button("🏆 ПРОГРЕСС", "stats")], [
@@ -455,10 +419,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode='Markdown'
             )
 
-        logger.info(f"Пользователь {user.id} запустил бота")
+        logger.info("Пользователь {user.id} запустил бота")
 
     except Exception as e:
-        logger.error(f"Ошибка в команде start: {e}")
+        logger.error("Ошибка в команде start: {e}")
         error_text = "❌ Произошла ошибка. Попробуйте позже."
         if is_callback:
             await update.callback_query.answer()
@@ -472,7 +436,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Импортируем обработчики персонализации
 
-
 async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Возвращает пользователя в главное меню
@@ -480,7 +443,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    welcome_text = f"""
+    welcome_text = """
 🎯 **ExamFlow 2.0**
 
 Привет, {update.effective_user.first_name}!
@@ -495,7 +458,6 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
     keyboard = [
-        [
             create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")], [
             create_standard_button("📚 ПРАКТИКА", "subjects"),
             create_standard_button("🏆 ПРОГРЕСС", "stats")], [
@@ -511,7 +473,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as edit_err:
         logger.warning(
-            f"main_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
+            "main_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,  # type: ignore
@@ -520,8 +482,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode=None
             )
         except Exception as send_err:
-            logger.error(f"main_menu: send_message тоже не удался: {send_err}")
-
+            logger.error("main_menu: send_message тоже не удался: {send_err}")
 
 async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -540,7 +501,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await query.edit_message_text("📚 Предметы пока загружаются... Попробуйте позже.")
                 return
         except Exception as e:
-            logger.error(f"subjects_menu: ошибка получения предметов: {e}")
+            logger.error("subjects_menu: ошибка получения предметов: {e}")
             await query.edit_message_text("❌ Ошибка загрузки предметов. Попробуйте позже.")
             return
 
@@ -553,9 +514,9 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = []
         for subject in subjects_sorted[:15]:  # Показываем топ-15 предметов
-            button_text = f"{subject['name']} ({subject['tasks_count']} заданий)"
+            button_text = "{subject['name']} ({subject['tasks_count']} заданий)"
             keyboard.append([InlineKeyboardButton(
-                button_text, callback_data=f"subject_{subject['id']}")])
+                button_text, callback_data="subject_{subject['id']}")])
 
         # Добавляем кнопки навигации
         keyboard.append([
@@ -566,34 +527,33 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             await query.edit_message_text(
-                f"📚 **Практика по предметам**\n\n"
-                f"**{len(subjects)}** предметов • **{sum(s['tasks_count'] for s in subjects)}** заданий\n\n"
+                "📚 **Практика по предметам**\n\n"
+                "**{len(subjects)}** предметов • **{sum(s['tasks_count'] for s in subjects)}** заданий\n\n"
                 "Выбери предмет для изучения:",
                 reply_markup=reply_markup,
                 parse_mode='Markdown'
             )
         except Exception as edit_err:
             logger.warning(
-                f"subjects_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
+                "subjects_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
             try:
                 await context.bot.send_message(
                     chat_id=update.effective_chat.id,  # type: ignore
                     text="📚 **ВЫБЕРИТЕ ПРЕДМЕТ ДЛЯ ИЗУЧЕНИЯ**\n\n"
-                         f"Доступно **{len(subjects)} предметов** с **{sum(s['tasks_count'] for s in subjects)} заданиями**\n\n"
+                         "Доступно **{len(subjects)} предметов** с **{sum(s['tasks_count'] for s in subjects)} заданиями**\n\n"
                          "Предметы отсортированы по количеству заданий:",
                     reply_markup=reply_markup,
                     parse_mode='Markdown'
                 )
             except Exception as send_err:
-                logger.error(f"subjects_menu: send_message тоже не удался: {send_err}")
+                logger.error("subjects_menu: send_message тоже не удался: {send_err}")
 
     except Exception as e:
-        logger.error(f"Ошибка в subjects_menu: {e}")
+        logger.error("Ошибка в subjects_menu: {e}")
         try:
             await query.edit_message_text("❌ Не удалось загрузить предметы. Попробуйте позже.")
         except Exception:
             pass
-
 
 async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -614,7 +574,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     tasks = await db_get_tasks_by_subject(subject_id)
     if not tasks:
         await query.edit_message_text(
-            f"❌ В предмете **{subject.name}** пока нет заданий",
+            "❌ В предмете **{subject.name}** пока нет заданий",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")
             ]]),
@@ -629,17 +589,16 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Устанавливаем текущее задание в профиле пользователя
     user, _ = await db_get_or_create_user(update.effective_user)
     await db_set_current_task_id(user, task.id)
-    logger.info(f"show_subject_topics: установлен current_task_id: {task.id}")
+    logger.info("show_subject_topics: установлен current_task_id: {task.id}")
 
     # Формируем текст задания
-    task_text = f"""
+    task_text = """
 📝 **ЗАДАНИЕ №{task.id}**
 📚 **Предмет:** {subject.name} ({subject.exam_type})
 
 **{task.title}**
 
 **Условие:**
-{task.description or 'Описание задания отсутствует'}
 
 **Сложность:** {'⭐' * task.difficulty} ({task.difficulty}/5)
 **Источник:** {task.source or 'Не указан'}
@@ -648,7 +607,6 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
 """
 
     keyboard = [
-        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
 
     try:
@@ -659,7 +617,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
     except Exception as edit_err:
         logger.warning(
-            f"show_subject_topics: edit_message_text не удался: {edit_err}. Пробуем send_message")
+            "show_subject_topics: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,  # type: ignore
@@ -669,8 +627,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
             )
         except Exception as send_err:
             logger.error(
-                f"show_subject_topics: send_message тоже не удался: {send_err}")
-
+                "show_subject_topics: send_message тоже не удался: {send_err}")
 
 async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -693,28 +650,26 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user, _ = await db_get_or_create_user(update.effective_user)
         await db_set_current_task_id(user, task.id)
         logger.info(
-            f"random_task: установлен current_task_id: {task.id} для пользователя {user.username}")
+            "random_task: установлен current_task_id: {task.id} для пользователя {user.username}")
     except Exception as prof_err:
-        logger.warning(f"Не удалось сохранить current_task_id в профиль: {prof_err}")
+        logger.warning("Не удалось сохранить current_task_id в профиль: {prof_err}")
 
     # Получаем название предмета безопасно
     subject_name = await db_get_subject_name_for_task(task)
 
     # Формируем текст задания
-    task_text = f"""
+    task_text = """
 📝 **Задание №{task.id}**
 **Предмет:** {subject_name}
 
 **Заголовок:** {task.title}
 
 **Условие:**
-{task.description or 'Описание задания отсутствует'}
 
 Введите ваш ответ:
 """
 
     keyboard = [
-        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
 
     try:
@@ -724,7 +679,7 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as edit_err:
         logger.warning(
-            f"random_task: edit_message_text не удался: {edit_err}. Пробуем send_message")
+            "random_task: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,  # type: ignore
@@ -732,8 +687,7 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
         except Exception as send_err:
-            logger.error(f"random_task: send_message тоже не удался: {send_err}")
-
+            logger.error("random_task: send_message тоже не удался: {send_err}")
 
 async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -755,7 +709,7 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем название предмета безопасно
     subject_name = await db_get_subject_name_for_task(task)
 
-    answer_text = f"""
+    answer_text = """
 💡 **Ответ на задание №{task.id}**
 
 **Предмет:** {subject_name}
@@ -764,13 +718,11 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ✅ **Правильный ответ:** {task.answer or 'Ответ не указан'}
 
 **Условие:**
-{task.description or 'Описание задания отсутствует'}
 
 **Источник:** {task.source or 'Не указан'}
 """
 
     keyboard = [
-        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
 
     try:
@@ -780,7 +732,7 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as edit_err:
         logger.warning(
-            f"show_answer: edit_message_text не удался: {edit_err}. Пробуем send_message")
+            "show_answer: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,  # type: ignore
@@ -788,8 +740,7 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
         except Exception as send_err:
-            logger.error(f"show_answer: send_message тоже не удался: {send_err}")
-
+            logger.error("show_answer: send_message тоже не удался: {send_err}")
 
 async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -812,7 +763,7 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         profile.achievements) if profile.achievements else 0  # type: ignore
 
     # Формируем красивую статистику в стиле ExamFlow 2.0
-    stats_text = f"""
+    stats_text = """
 🏆 **Твой прогресс в ExamFlow**
 
 👤 **{profile.display_name}**
@@ -829,7 +780,6 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 💡 **Продолжай решать задания для роста!**
 """
     keyboard = [
-        [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -839,7 +789,6 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup,
         parse_mode='Markdown'
     )
-
 
 async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -862,11 +811,11 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         learning_plan = await sync_to_async(ai_service.get_personalized_learning_plan)(user)
 
         if 'error' in learning_plan:
-            await query.edit_message_text(f"❌ Ошибка: {learning_plan['error']}")
+            await query.edit_message_text("❌ Ошибка: {learning_plan['error']}")
             return
 
         # Формируем текст плана
-        plan_text = f"""
+        plan_text = """
 🎓 **ТВОЙ ПЕРСОНАЛЬНЫЙ ПЛАН ОБУЧЕНИЯ**
 
 📊 **Текущий уровень:** {learning_plan.get('current_level', 1)}/5
@@ -879,7 +828,7 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         weak_topics = learning_plan.get('weak_topics', [])
         if weak_topics:
             for topic in weak_topics[:3]:
-                plan_text += f"• {topic}\n"
+                plan_text += "• {topic}\n"
         else:
             plan_text += "• Нет данных\n"
 
@@ -887,7 +836,7 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         strong_topics = learning_plan.get('strong_topics', [])
         if strong_topics:
             for topic in strong_topics[:3]:
-                plan_text += f"• {topic}\n"
+                plan_text += "• {topic}\n"
         else:
             plan_text += "• Нет данных\n"
 
@@ -895,11 +844,11 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         recommendations = learning_plan.get('recommendations', [])
         if recommendations:
             for rec in recommendations[:3]:
-                plan_text += f"• {rec['title']}\n"
+                plan_text += "• {rec['title']}\n"
         else:
             plan_text += "• Начните с базовых заданий\n"
 
-        plan_text += f"""
+        plan_text += """
 
 📅 **Цели:**
 • Ежедневно: {learning_plan.get('daily_goal', 3)} заданий
@@ -910,14 +859,12 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
         next_steps = learning_plan.get('next_steps', [])
         if next_steps:
             for step in next_steps[:3]:
-                plan_text += f"• {step['description']}\n"
+                plan_text += "• {step['description']}\n"
         else:
             plan_text += "• Продолжайте решать задания\n"
 
         # Кнопки для навигации
         keyboard = [
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -927,10 +874,10 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
             parse_mode='Markdown'
         )
 
-        logger.info(f"Пользователь {user.id} получил план обучения")
+        logger.info("Пользователь {user.id} получил план обучения")
 
     except Exception as e:
-        logger.error(f"Ошибка в learning_plan_menu: {e}")
+        logger.error("Ошибка в learning_plan_menu: {e}")
         await query.edit_message_text(
             "❌ Произошла ошибка при получении плана обучения. Попробуйте позже."
         )
@@ -938,7 +885,6 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
 # ============================================================================
 # ИИ ОБРАБОТЧИКИ
 # ============================================================================
-
 
 async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -994,18 +940,14 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
 
                 # Формируем ответ с кнопками
-                response_text = f"""
+                response_text = """
 🤖 **AI ПОМОЩЬ ДЛЯ ЗАДАНИЯ №{task.id}**
-
-{ai_response}
 
 ---
 💡 **Дополнительные возможности:**
 """
 
                 keyboard = [
-                    [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-                    [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
                 ]
                 reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -1019,10 +961,10 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
 
                 logger.info(
-                    f"Пользователь {profile.telegram_id} получил персонализированную AI помощь для задания {task.id}")
+                    "Пользователь {profile.telegram_id} получил персонализированную AI помощь для задания {task.id}")
 
             except (IndexError, ValueError) as e:
-                logger.error(f"Ошибка парсинга task_id в ai_help_handler: {e}")
+                logger.error("Ошибка парсинга task_id в ai_help_handler: {e}")
                 await query.edit_message_text("❌ Ошибка формата данных. Попробуйте еще раз.")
                 return
         else:
@@ -1044,7 +986,6 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
             keyboard = [
-                [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -1062,12 +1003,11 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_help_handler: {e}")
+        logger.error("Ошибка в ai_help_handler: {e}")
         if is_callback and query:
             await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
         else:
             await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")
-
 
 async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1096,18 +1036,14 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
         # Формируем ответ с кнопками
-        response_text = f"""
+        response_text = """
 📚 **ОБЪЯСНЕНИЕ ТЕМ ОТ ИИ**
-
-{ai_response}
 
 ---
 💡 **Хотите получить подсказку к конкретному заданию?**
 """
 
         keyboard = [
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         InlineKeyboardMarkup(keyboard)
 
@@ -1120,12 +1056,11 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
 
-        logger.info(f"Пользователь {user.id} получил объяснение темы от ИИ")
+        logger.info("Пользователь {user.id} получил объяснение темы от ИИ")
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_explain_handler: {e}")
+        logger.error("Ошибка в ai_explain_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
-
 
 async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1154,18 +1089,14 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
 
         # Формируем ответ с кнопками
-        response_text = f"""
+        response_text = """
 **ПЕРСОНАЛЬНЫЕ СОВЕТЫ ОТ ИИ**
-
-{ai_response}
 
 ---
 📚 **Хотите получить объяснение конкретной темы?**
 """
 
         keyboard = [
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         InlineKeyboardMarkup(keyboard)
 
@@ -1178,12 +1109,11 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
 
-        logger.info(f"Пользователь {user.id} получил персональные советы от ИИ")
+        logger.info("Пользователь {user.id} получил персональные советы от ИИ")
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_personal_handler: {e}")
+        logger.error("Ошибка в ai_personal_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
-
 
 async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1212,18 +1142,14 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
         )
 
         # Формируем ответ с кнопками
-        response_text = f"""
+        response_text = """
 💡 **ОБЩИЕ ПОДСКАЗКИ ПО РЕШЕНИЮ ЗАДАЧ**
-
-{ai_response}
 
 ---
 🎯 **Хотите получить персональные советы?**
 """
 
         keyboard = [
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
         InlineKeyboardMarkup(keyboard)
 
@@ -1236,16 +1162,15 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
 
-        logger.info(f"Пользователь {user.id} получил общую подсказку от ИИ")
+        logger.info("Пользователь {user.id} получил общую подсказку от ИИ")
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_hint_general_handler: {e}")
+        logger.error("Ошибка в ai_hint_general_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
 
 # ============================================================================
 # ОБРАБОТЧИКИ ТЕКСТОВЫХ СООБЩЕНИЙ
 # ============================================================================
-
 
 async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1271,7 +1196,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         await handle_ai_message(update, context)
 
     except Exception as e:
-        logger.error(f"Ошибка в handle_text_message: {e}")
+        logger.error("Ошибка в handle_text_message: {e}")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
@@ -1279,8 +1204,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
                 reply_to_message_id=update.message.message_id
             )
         except Exception as send_err:
-            logger.error(f"Не удалось отправить сообщение об ошибке: {send_err}")
-
+            logger.error("Не удалось отправить сообщение об ошибке: {send_err}")
 
 async def handle_menu_button(
         update: Update,
@@ -1299,9 +1223,8 @@ async def handle_menu_button(
         elif button_text == "🏆 Прогресс":
             await show_stats(update, context)
     except Exception as e:
-        logger.error(f"Ошибка в handle_menu_button: {e}")
+        logger.error("Ошибка в handle_menu_button: {e}")
         await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")
-
 
 async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1351,18 +1274,14 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         clean_response = clean_markdown_text(ai_response)
 
         # Формируем ответ с кнопками
-        response_text = f"""
+        response_text = """
 **ОТВЕТ ИИ**
-
-{clean_response}
 
 ---
 💡 **Дополнительные возможности:**
 """
 
         keyboard = [
-            [InlineKeyboardButton("🏠 Главная", callback_data="main_menu")],
-            [InlineKeyboardButton("🧹 Очистить контекст", callback_data="clear_context")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -1375,12 +1294,12 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Очищаем сообщение от эмодзи для логов
         import re  # type: ignore
-        clean_message = re.sub(r'[^\w\s\-.,!?]', '', user_message[:50])
+        clean_message = re.sub(r'[^\w\s\-., !?]', '', user_message[:50])
         logger.info(
-            f"Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}...")
+            "Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}...")
 
     except Exception as e:  # type: ignore
-        logger.error(f"Ошибка в handle_ai_message: {e}")
+        logger.error("Ошибка в handle_ai_message: {e}")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
@@ -1388,12 +1307,11 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_to_message_id=update.message.message_id
             )
         except Exception as send_err:
-            logger.error(f"Не удалось отправить сообщение об ошибке: {send_err}")
+            logger.error("Не удалось отправить сообщение об ошибке: {send_err}")
 
 # ============================================================================
 # ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 # ============================================================================
-
 
 async def search_subject_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1410,7 +1328,6 @@ async def search_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
         ]]),
         parse_mode='Markdown'
     )
-
 
 async def random_subject_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1431,22 +1348,19 @@ async def random_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
 
         # Показываем случайный предмет
         await query.edit_message_text(
-            f"🎯 **СЛУЧАЙНЫЙ ПРЕДМЕТ**\n\n"
-            f"📚 **{random_subject['name']}**\n"
-            f"📝 **Заданий:** {random_subject['tasks_count']}\n"
-            f"🎓 **Тип:** {random_subject['exam_type']}\n\n"
-            f"Хотите решить задание по этому предмету?",
+            "🎯 **СЛУЧАЙНЫЙ ПРЕДМЕТ**\n\n"
+            "📚 **{random_subject['name']}**\n"
+            "📝 **Заданий:** {random_subject['tasks_count']}\n"
+            "🎓 **Тип:** {random_subject['exam_type']}\n\n"
+            "Хотите решить задание по этому предмету?",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-                [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
             ]),
             parse_mode='Markdown'
         )
 
     except Exception as e:
-        logger.error(f"Ошибка в random_subject_handler: {e}")
+        logger.error("Ошибка в random_subject_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
-
 
 async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1468,14 +1382,13 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         subject_name = subject.name if subject else "Неизвестный предмет"
 
         # Формируем текст задания
-        task_text = f"""
+        task_text = """
 📝 **ЗАДАНИЕ №{task.id}**
 📚 **Предмет:** {subject_name}
 
 **{task.title}**
 
 **Условие:**
-{task.description or 'Описание задания отсутствует'}
 
 **Сложность:** {'⭐' * task.difficulty} ({task.difficulty}/5)
 **Источник:** {task.source or 'Не указан'}
@@ -1484,8 +1397,6 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
         keyboard = [
-            [InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")],
-            [InlineKeyboardButton("🔄 Начать заново", callback_data="start")]
         ]
 
         await query.edit_message_text(
@@ -1495,9 +1406,8 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except Exception as e:
-        logger.error(f"Ошибка в show_task_handler: {e}")
+        logger.error("Ошибка в show_task_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
-
 
 async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1521,17 +1431,16 @@ async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TY
             parse_mode='Markdown'
         )
 
-        logger.info(f"Пользователь {user.id} очистил контекст чата")
+        logger.info("Пользователь {user.id} очистил контекст чата")
 
     except Exception as e:
-        logger.error(f"Ошибка при очистке контекста: {e}")
+        logger.error("Ошибка при очистке контекста: {e}")
         await query.edit_message_text(
             "❌ Произошла ошибка при очистке контекста. Попробуйте позже.",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("🏠 Главная", callback_data="main_menu")
             ]])
         )
-
 
 async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1542,7 +1451,7 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
     query = update.callback_query
     await query.answer()
 
-    logger.warning(f"Неизвестный callback: {query.data}")
+    logger.warning("Неизвестный callback: {query.data}")
 
     await query.edit_message_text(
         "❌ Неизвестная команда. Возвращаемся в главное меню.",
@@ -1552,7 +1461,6 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
     )
 
 # 🎮 ОБРАБОТЧИКИ ГЕЙМИФИКАЦИИ
-
 
 async def gamification_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает меню геймификации"""
@@ -1569,7 +1477,6 @@ async def gamification_menu_handler(update: Update, context: ContextTypes.DEFAUL
         parse_mode='Markdown'
     )
 
-
 async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает статистику пользователя"""
     query = update.callback_query
@@ -1580,15 +1487,15 @@ async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if not stats.get('success'):
         await query.edit_message_text(
-            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")
+                InlineKeyboardButton("🔙 Назад", callback_data="gamification_{user_id}")
             ]])
         )
         return
 
     # Формируем текст статистики
-    stats_text = f"""
+    stats_text = """
 📊 **ВАША СТАТИСТИКА**
 
 🏆 **Уровень:** {stats['level']}
@@ -1605,17 +1512,16 @@ async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         total = progress.get('total_tasks', 0)
         percentage = (solved / total * 100) if total > 0 else 0
 
-        stats_text += f"• {subject_name}: {solved}/{total} ({percentage:.1f}%)\n"
+        stats_text += "• {subject_name}: {solved}/{total} ({percentage:.1f}%)\n"
 
     if stats['achievements']:
         stats_text += "\n🏅 **Последние достижения:**\n"
         for achievement in stats['achievements'][:3]:
             title = achievement.get('title', 'Достижение')
             icon = achievement.get('icon', '🏆')
-            stats_text += f"{icon} {title}\n"
+            stats_text += "{icon} {title}\n"
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
     ])
 
     await query.edit_message_text(
@@ -1623,7 +1529,6 @@ async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
         reply_markup=keyboard,
         parse_mode='Markdown'
     )
-
 
 async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает достижения пользователя"""
@@ -1635,9 +1540,9 @@ async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if not stats.get('success'):
         await query.edit_message_text(
-            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")
+                InlineKeyboardButton("🔙 Назад", callback_data="gamification_{user_id}")
             ]])
         )
         return
@@ -1658,15 +1563,14 @@ async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYP
             icon = achievement.get('icon', '🏆')
             date = achievement.get('date_earned', '')
 
-            achievements_text += f"{icon} **{title}**\n"
+            achievements_text += "{icon} **{title}**\n"
             if description:
-                achievements_text += f"   {description}\n"
+                achievements_text += "   {description}\n"
             if date:
-                achievements_text += f"   📅 {date.strftime('%d.%m.%Y')}\n"
+                achievements_text += "   📅 {date.strftime('%d.%m.%Y')}\n"
             achievements_text += "\n"
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
     ])
 
     await query.edit_message_text(
@@ -1674,7 +1578,6 @@ async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         reply_markup=keyboard,
         parse_mode='Markdown'
     )
-
 
 async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает прогресс пользователя"""
@@ -1691,7 +1594,6 @@ async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-
 async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает общий прогресс пользователя"""
     query = update.callback_query
@@ -1702,9 +1604,9 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
 
     if not stats.get('success'):
         await query.edit_message_text(
-            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")
+                InlineKeyboardButton("🔙 Назад", callback_data="progress_{user_id}")
             ]])
         )
         return
@@ -1716,16 +1618,13 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
     progress_percentage = (points % 100) / 100 * 100
 
     progress_bar = "█" * int(progress_percentage / 10) + "░" * \
-        (10 - int(progress_percentage / 10))
 
-    progress_text = f"""
+    progress_text = """
 📈 **ОБЩИЙ ПРОГРЕСС**
 
 🏆 **Текущий уровень:** {level}
 💎 **Очки:** {points}
 🎯 **До следующего уровня:** {next_level_points - points} очков
-
-{progress_bar} {progress_percentage:.1f}%
 
 📊 **Детализация:**
 • Уровень 1: 0-99 очков ✅
@@ -1733,14 +1632,13 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
 
     for i in range(2, min(level + 3, 11)):
         if i <= level:
-            progress_text += f"• Уровень {i}: {(i-1)*100}-{i*100-1} очков ✅\n"
+            progress_text += "• Уровень {i}: {(i-1)*100}-{i*100-1} очков ✅\n"
         elif i == level + 1:
-            progress_text += f"• Уровень {i}: {(i-1)*100}-{i*100-1} очков 🔄\n"
+            progress_text += "• Уровень {i}: {(i-1)*100}-{i*100-1} очков 🔄\n"
         else:
-            progress_text += f"• Уровень {i}: {(i-1)*100}-{i*100-1} очков ⏳\n"
+            progress_text += "• Уровень {i}: {(i-1)*100}-{i*100-1} очков ⏳\n"
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")]
     ])
 
     await query.edit_message_text(
@@ -1748,7 +1646,6 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
         reply_markup=keyboard,
         parse_mode='Markdown'
     )
-
 
 async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает прогресс по предметам"""
@@ -1760,9 +1657,9 @@ async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAUL
 
     if not stats.get('success'):
         await query.edit_message_text(
-            f"❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
+            "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
             reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")
+                InlineKeyboardButton("🔙 Назад", callback_data="progress_{user_id}")
             ]])
         )
         return
@@ -1788,12 +1685,11 @@ async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAUL
             progress_bars = int(percentage / 10)
             progress_bar = "█" * progress_bars + "░" * (10 - progress_bars)
 
-            progress_text += f"**{subject_name}**\n"
-            progress_text += f"{progress_bar} {percentage:.1f}%\n"
-            progress_text += f"Решено: {solved}/{total}\n\n"
+            progress_text += "**{subject_name}**\n"
+            progress_text += "{progress_bar} {percentage:.1f}%\n"
+            progress_text += "Решено: {solved}/{total}\n\n"
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"progress_{user_id}")]
     ])
 
     await query.edit_message_text(
@@ -1801,7 +1697,6 @@ async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAUL
         reply_markup=keyboard,
         parse_mode='Markdown'
     )
-
 
 async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает ежедневные задания"""
@@ -1829,14 +1724,13 @@ async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT
             progress = challenge.get('progress', 0)
             target = challenge.get('target', 1)
 
-            challenges_text += f"{icon} **{title}**\n"
+            challenges_text += "{icon} **{title}**\n"
             if description:
-                challenges_text += f"   {description}\n"
-            challenges_text += f"   💎 Награда: {reward} очков\n"
-            challenges_text += f"   📊 Прогресс: {progress}/{target}\n\n"
+                challenges_text += "   {description}\n"
+            challenges_text += "   💎 Награда: {reward} очков\n"
+            challenges_text += "   📊 Прогресс: {progress}/{target}\n\n"
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
     ])
 
     await query.edit_message_text(
@@ -1844,7 +1738,6 @@ async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT
         reply_markup=keyboard,
         parse_mode='Markdown'
     )
-
 
 async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает таблицу лидеров"""
@@ -1870,14 +1763,13 @@ async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             level = user.get('level', 1)
             points = user.get('points', 0)
 
-            leaderboard_text += f"{emoji} **#{rank}** {username}\n"
-            leaderboard_text += f"   🏆 Уровень: {level} | 💎 Очки: {points}\n\n"
+            leaderboard_text += "{emoji} **#{rank}** {username}\n"
+            leaderboard_text += "   🏆 Уровень: {level} | 💎 Очки: {points}\n\n"
 
     # Получаем user_id для кнопки "Назад"
     user_id = update.effective_user.id
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
     ])
 
     await query.edit_message_text(
@@ -1885,7 +1777,6 @@ async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         reply_markup=keyboard,
         parse_mode='Markdown'
     )
-
 
 async def bonus_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает доступные бонусы"""
@@ -1911,7 +1802,6 @@ async def bonus_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Назад", callback_data=f"gamification_{user_id}")]
     ])
 
     await query.edit_message_text(

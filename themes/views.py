@@ -4,7 +4,6 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def switch_theme(request):
@@ -12,12 +11,10 @@ def switch_theme(request):
     API для переключения дизайна пользователя
 
     Принимает POST запрос с JSON:
-    {
         "theme": "school" или "adult"
     }
 
     Возвращает:
-    {
         "success": true/false,
         "theme": "school" или "adult",
         "message": "Описание результата"
@@ -33,7 +30,7 @@ def switch_theme(request):
         if theme not in valid_themes:
             return JsonResponse({
                 'success': False,
-                'message': f'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
+                'message': 'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
             }, status=400)
 
         # Если пользователь авторизован, сохраняем выбор в профиле
@@ -59,15 +56,15 @@ def switch_theme(request):
                 )
 
                 print(
-                    f"Пользователь {request.user.username} переключился на тему: {theme}")
+                    "Пользователь {request.user.username} переключился на тему: {theme}")
             except Exception as e:
-                print(f"Ошибка сохранения темы в профиль: {e}")
+                print("Ошибка сохранения темы в профиль: {e}")
 
         # Возвращаем успешный ответ
         return JsonResponse({
             'success': True,
             'theme': theme,
-            'message': f'Дизайн успешно переключен на "{theme}"'
+            'message': 'Дизайн успешно переключен на "{theme}"'
         })
 
     except json.JSONDecodeError:
@@ -78,9 +75,8 @@ def switch_theme(request):
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': f'Внутренняя ошибка сервера: {str(e)}'
+            'message': 'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)
-
 
 @require_http_methods(["GET"])
 def get_current_theme(request):
@@ -88,7 +84,6 @@ def get_current_theme(request):
     API для получения текущей темы пользователя
 
     Возвращает:
-    {
         "success": true,
         "theme": "school" или "adult",
         "user_authenticated": true/false
@@ -115,7 +110,7 @@ def get_current_theme(request):
                     )
                     theme = preference.theme
             except Exception as e:
-                print(f"Ошибка получения темы из профиля: {e}")
+                print("Ошибка получения темы из профиля: {e}")
                 theme = 'school'
 
         return JsonResponse({
@@ -127,9 +122,8 @@ def get_current_theme(request):
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': f'Внутренняя ошибка сервера: {str(e)}'
+            'message': 'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)
-
 
 @require_http_methods(["GET"])
 def preview_theme(request, theme):
@@ -139,7 +133,6 @@ def preview_theme(request, theme):
     Принимает theme в URL: /themes/api/preview/school/ или /themes/api/preview/adult/
 
     Возвращает:
-    {
         "success": true,
         "theme": "school" или "adult",
         "preview_data": {
@@ -154,7 +147,7 @@ def preview_theme(request, theme):
         if theme not in valid_themes:
             return JsonResponse({
                 'success': False,
-                'message': f'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
+                'message': 'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
             }, status=400)
 
         # Данные для предварительного просмотра
@@ -167,8 +160,8 @@ def preview_theme(request, theme):
                     'background': '#F8FAFC'
                 },
                 'fonts': {
-                    'heading': 'Inter, sans-serif',
-                    'body': 'Inter, sans-serif'
+                    'heading': 'Inter, sans-seri',
+                    'body': 'Inter, sans-seri'
                 },
                 'style': 'Яркий и энергичный дизайн для школьников'
             },
@@ -180,8 +173,8 @@ def preview_theme(request, theme):
                     'background': '#F8FAFC'
                 },
                 'fonts': {
-                    'heading': 'Inter, sans-serif',
-                    'body': 'Inter, sans-serif'
+                    'heading': 'Inter, sans-seri',
+                    'body': 'Inter, sans-seri'
                 },
                 'style': 'Сдержанный профессиональный дизайн для взрослых'
             }
@@ -196,9 +189,8 @@ def preview_theme(request, theme):
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': f'Внутренняя ошибка сервера: {str(e)}'
+            'message': 'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)
-
 
 def test_themes(request):
     """

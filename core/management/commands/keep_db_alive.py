@@ -11,7 +11,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Поддерживает соединение с базой данных активным'
 
@@ -33,7 +32,7 @@ class Command(BaseCommand):
         continuous = options['continuous']
 
         self.stdout.write(
-            f'🔄 Запуск keep-alive для базы данных (интервал: {interval}с)'
+            '🔄 Запуск keep-alive для базы данных (интервал: {interval}с)'
         )
 
         while True:
@@ -43,14 +42,14 @@ class Command(BaseCommand):
                     cursor.fetchone()
 
                 timestamp = timezone.now().strftime('%H:%M:%S')
-                self.stdout.write(f"✅ {timestamp} - База активна")
-                logger.info(f"База данных активна: {timestamp}")
+                self.stdout.write("✅ {timestamp} - База активна")
+                logger.info("База данных активна: {timestamp}")
 
             except Exception as e:
                 timestamp = timezone.now().strftime('%H:%M:%S')
-                error_msg = f"❌ {timestamp} - Ошибка базы: {e}"
-                self.stdout.write(f"❌ {error_msg}")
-                logger.error(f"Ошибка соединения с базой: {e}")
+                error_msg = "❌ {timestamp} - Ошибка базы: {e}"
+                self.stdout.write("❌ {error_msg}")
+                logger.error("Ошибка соединения с базой: {e}")
 
                 # Пытаемся переподключиться
                 try:
@@ -59,7 +58,7 @@ class Command(BaseCommand):
                     self.stdout.write("🔄 Переподключение к базе...")
                 except Exception as reconnect_error:
                     self.stdout.write(
-                        f"❌ Не удалось переподключиться: {reconnect_error}"
+                        "❌ Не удалось переподключиться: {reconnect_error}"
                     )
 
             if not continuous:

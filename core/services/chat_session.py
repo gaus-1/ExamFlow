@@ -7,7 +7,6 @@ from django.utils import timezone
 from datetime import timedelta
 from core.models import ChatSession
 
-
 class ChatSessionService:
     """Сервис для управления сессиями чата"""
 
@@ -29,7 +28,7 @@ class ChatSessionService:
             return session
 
         # Создаем новую сессию
-        session_id = f"session_{telegram_id}_{uuid.uuid4().hex[:8]}"
+        session_id = "session_{telegram_id}_{uuid.uuid4().hex[:8]}"
 
         session = ChatSession.objects.create(  # type: ignore
             user=user,
@@ -67,8 +66,7 @@ class ChatSessionService:
         context = session.get_context_for_ai()
 
         if context:
-            enhanced_prompt = f"""Контекст предыдущего разговора:
-{context}
+            enhanced_prompt = """Контекст предыдущего разговора:
 
 Текущий вопрос пользователя: {user_message}
 

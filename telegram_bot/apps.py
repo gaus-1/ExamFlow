@@ -1,6 +1,5 @@
 from django.apps import AppConfig
 
-
 class TelegramBotConfig(AppConfig):
     """
     Конфигурация модуля Telegram бота

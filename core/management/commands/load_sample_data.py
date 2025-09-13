@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from learning.models import Subject, Topic, Task
 from django.db import transaction
 
-
 class Command(BaseCommand):
     help = 'Загружает образцы данных для ExamFlow'
 
@@ -17,14 +16,6 @@ class Command(BaseCommand):
                     self.stdout.write('📖 Создаем предметы...')
 
                     subjects_data = [
-                        {'name': 'Математика'},
-                        {'name': 'Физика'},
-                        {'name': 'Химия'},
-                        {'name': 'Биология'},
-                        {'name': 'История'},
-                        {'name': 'География'},
-                        {'name': 'Литература'},
-                        {'name': 'Информатика'}
                     ]
 
                     subjects = []
@@ -33,15 +24,12 @@ class Command(BaseCommand):
                         subjects.append(subject)
                     Subject.objects.bulk_create(subjects)  # type: ignore
                     self.stdout.write(
-                        self.style.SUCCESS(f'✅ Создано {len(subjects)} предметов'))  # type: ignore
+                        self.style.SUCCESS('✅ Создано {len(subjects)} предметов'))  # type: ignore
 
                     # Создаем темы для математики
                     math_subject = Subject.objects.get(
                         name='Математика')  # type: ignore
                     topics_data = [
-                        {'name': 'Алгебра', 'subject': math_subject, 'code': 'ALG001'},
-                        {'name': 'Геометрия', 'subject': math_subject, 'code': 'GEO001'},
-                        {'name': 'Тригонометрия', 'subject': math_subject, 'code': 'TRIG001'}
                     ]
 
                     topics = []
@@ -50,7 +38,7 @@ class Command(BaseCommand):
                         topics.append(topic)
                     Topic.objects.bulk_create(topics)  # type: ignore
                     self.stdout.write(
-                        self.style.SUCCESS(f'✅ Создано {len(topics)} тем для математики'))  # type: ignore
+                        self.style.SUCCESS('✅ Создано {len(topics)} тем для математики'))  # type: ignore
 
                     # Создаем образцы заданий
                     self.stdout.write('📝 Создаем образцы заданий...')
@@ -59,7 +47,6 @@ class Command(BaseCommand):
                                    'answer': 'x₁ = -2, x₂ = -3',
                                    'difficulty': 2,
                                    'subject': math_subject},
-                                  {'title': 'Найдите площадь прямоугольника со сторонами 5 и 8',
                                    'description': 'Вычислите площадь прямоугольника, если его стороны равны 5 и 8 единиц',
                                    'answer': '40 квадратных единиц',
                                    'difficulty': 1,
@@ -72,7 +59,7 @@ class Command(BaseCommand):
 
                     Task.objects.bulk_create(tasks)  # type: ignore
                     self.stdout.write(
-                        self.style.SUCCESS(f'✅ Создано {len(tasks)} образцов заданий'))  # type: ignore
+                        self.style.SUCCESS('✅ Создано {len(tasks)} образцов заданий'))  # type: ignore
 
                 else:
                     self.stdout.write('ℹ️ Данные уже существуют, пропускаем создание')
@@ -80,13 +67,13 @@ class Command(BaseCommand):
                 # Показываем статистику
                 self.stdout.write('📊 СТАТИСТИКА БАЗЫ ДАННЫХ:')
                 self.stdout.write(
-                    f'   Предметы: {Subject.objects.count()}')  # type: ignore
-                self.stdout.write(f'   Темы: {Topic.objects.count()}')  # type: ignore
-                self.stdout.write(f'   Задания: {Task.objects.count()}')  # type: ignore
+                    '   Предметы: {Subject.objects.count()}')  # type: ignore
+                self.stdout.write('   Темы: {Topic.objects.count()}')  # type: ignore
+                self.stdout.write('   Задания: {Task.objects.count()}')  # type: ignore
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(
-                f'❌ Ошибка при загрузке данных: {e}'))  # type: ignore
+                '❌ Ошибка при загрузке данных: {e}'))  # type: ignore
             return
 
         self.stdout.write('=' * 50)

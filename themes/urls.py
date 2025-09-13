@@ -11,4 +11,4 @@ urlpatterns = [
     path('api/switch/', views.switch_theme, name='switch_theme'),
     path('api/current/', views.get_current_theme, name='get_current_theme'),
     path('api/preview/<str:theme>/', views.preview_theme, name='preview_theme'),
-]
+        ]

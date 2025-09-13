@@ -23,7 +23,6 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-
 class SystemHealthChecker:
     """Проверка состояния всех компонентов системы"""
 
@@ -91,14 +90,14 @@ class SystemHealthChecker:
 
             # Проверяем API бота
             response = requests.get(
-                f"https://api.telegram.org/bot{token}/getMe",
+                "https://api.telegram.org/bot{token}/getMe",
                 timeout=10
             )
 
             if response.status_code != 200:
                 return {
                     'status': 'unhealthy',
-                    'error': f'Telegram API returned {response.status_code}',
+                    'error': 'Telegram API returned {response.status_code}',
                     'response_time': time.time() - start_time
                 }
 
@@ -143,7 +142,7 @@ class SystemHealthChecker:
             # Проверяем доступность Gemini API
             response = requests.post(
                 "https://generativelanguage.googleapis.com/v1beta/models",
-                headers={'Authorization': f'Bearer {gemini_key}'},
+                headers={'Authorization': 'Bearer {gemini_key}'},
                 timeout=10
             )
 
@@ -156,7 +155,7 @@ class SystemHealthChecker:
             else:
                 return {
                     'status': 'degraded',
-                    'warning': f'Gemini API returned {response.status_code}',
+                    'warning': 'Gemini API returned {response.status_code}',
                     'response_time': time.time() - start_time
                 }
 
@@ -203,7 +202,7 @@ class SystemHealthChecker:
         except Exception as e:
             return {
                 'status': 'degraded',
-                'warning': f'Could not check memory: {str(e)}'
+                'warning': 'Could not check memory: {str(e)}'
             }
 
     def check_cache(self) -> Dict[str, Any]:
@@ -213,7 +212,7 @@ class SystemHealthChecker:
 
             # Тестируем запись и чтение из кэша
             test_key = 'health_check_test'
-            test_value = f'test_{int(time.time())}'
+            test_value = 'test_{int(time.time())}'
 
             cache.set(test_key, test_value, 60)
             cached_value = cache.get(test_key)
@@ -268,7 +267,7 @@ class SystemHealthChecker:
             return info
         except Exception as e:
             return {
-                'error': f'Could not get system info: {str(e)}'
+                'error': 'Could not get system info: {str(e)}'
             }
 
     def run_all_checks(self) -> Dict[str, Any]:
@@ -315,7 +314,6 @@ class SystemHealthChecker:
             }
         }
 
-
 def health_check_view(request):
     """Health check endpoint для Render и мониторинга"""
     try:
@@ -333,13 +331,12 @@ def health_check_view(request):
         return JsonResponse(health_data, status=status_code)
 
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
+        logger.error("Health check failed: {e}")
         return JsonResponse({
             'status': 'unhealthy',
             'error': str(e),
             'timestamp': timezone.now().isoformat()
         }, status=500)
-
 
 def simple_health_check(request):
     """Простой health check для быстрых проверок"""

@@ -1,7 +1,6 @@
 import time
 from django.core.management.base import BaseCommand
 
-
 class Command(BaseCommand):
     help = "Запускает легкий CDC-мониторинг (poll каждые 24 часа или по флагу --once)"
 
@@ -17,9 +16,10 @@ class Command(BaseCommand):
         def cycle():
             try:
                 monitor.run_monitoring_cycle()
-                self.stdout.write(self.style.SUCCESS("CDC цикл завершен"))  # type: ignore
+                self.stdout.write(self.style.SUCCESS(
+                    "CDC цикл завершен"))  # type: ignore
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f"CDC ошибка: {e}"))  # type: ignore 
+                self.stdout.write(self.style.ERROR("CDC ошибка: {e}"))  # type: ignore
 
         if options.get("once"):
             cycle()
@@ -28,5 +28,3 @@ class Command(BaseCommand):
         while True:
             cycle()
             time.sleep(60 * 60 * 24)
-
-

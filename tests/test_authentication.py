@@ -6,7 +6,6 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from authentication.forms import TechRegisterForm, TechLoginForm
 
-
 class TestAuthentication(TestCase):
     """Тесты аутентификации пользователей"""
 
@@ -43,12 +42,12 @@ class TestAuthentication(TestCase):
         """Тест создания пользователя с профилем"""
         form = TechRegisterForm(data=self.test_user_data)
         self.assertTrue(form.is_valid())
-        
+
         user = form.save()
         self.assertEqual(user.first_name, 'Тест')
         self.assertEqual(user.email, 'test@example.com')
         self.assertTrue(user.username.startswith('test'))
-        
+
         # Проверяем создание пользователя (профиль не создается автоматически)
         self.assertTrue(User.objects.filter(username=user.username).exists())
 
@@ -56,7 +55,7 @@ class TestAuthentication(TestCase):
         """Тест автогенерации username из email"""
         form = TechRegisterForm(data=self.test_user_data)
         self.assertTrue(form.is_valid())
-        
+
         user = form.save()
         self.assertEqual(user.username, 'test')
 
@@ -64,11 +63,11 @@ class TestAuthentication(TestCase):
         """Тест уникальности username при конфликтах"""
         # Создаем первого пользователя
         User.objects.create_user(username='test', email='existing@example.com')
-        
+
         # Пытаемся создать второго с тем же базовым username
         form = TechRegisterForm(data=self.test_user_data)
         self.assertTrue(form.is_valid())
-        
+
         user = form.save()
         self.assertEqual(user.username, 'test1')
 
@@ -80,7 +79,7 @@ class TestAuthentication(TestCase):
             email='test@example.com',
             password='testpassword123'
         )
-        
+
         form_data = {
             'username': 'test@example.com',
             'password': 'testpassword123'
@@ -118,7 +117,7 @@ class TestAuthentication(TestCase):
             email='test@example.com',
             password='testpassword123'
         )
-        
+
         form_data = {
             'username': 'test@example.com',
             'password': 'testpassword123'
@@ -147,10 +146,10 @@ class TestAuthentication(TestCase):
             password='testpassword123'
         )
         self.client.login(username='testuser', password='testpassword123')
-        
+
         # Проверяем, что пользователь залогинен
         self.assertTrue(_user.is_authenticated)  # type: ignore
-        
+
         # Выходим из системы
         response = self.client.get('/logout/')  # Используем legacy URL
         # После выхода должен быть редирект на главную страницу
@@ -166,11 +165,11 @@ class TestAuthentication(TestCase):
             password='testpassword123'
         )
         self.client.login(username='testuser', password='testpassword123')
-        
+
         # Тестируем GET запрос к dashboard (существующий URL)
         response = self.client.get('/auth/dashboard/')
         self.assertEqual(response.status_code, 200)  # type: ignore
-        
+
         # Тестируем POST запрос к dashboard
         response = self.client.post('/auth/dashboard/', {})
         self.assertEqual(response.status_code, 200)  # type: ignore  # Dashboard обрабатывает только GET
@@ -184,11 +183,11 @@ class TestAuthentication(TestCase):
             password='testpassword123'
         )
         self.client.login(username='testuser', password='testpassword123')
-        
+
         # Тестируем GET запрос к profile (существующий URL)
         response = self.client.get('/auth/profile/update/')
         self.assertEqual(response.status_code, 200)  # type: ignore
-        
+
         # Тестируем POST запрос к profile
         form_data = {
             'first_name': 'Updated Name',

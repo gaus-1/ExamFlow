@@ -13,7 +13,6 @@ from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-
 class FIPIScraper:
     """
     Класс для сбора данных с сайта ФИПИ
@@ -48,7 +47,7 @@ class FIPIScraper:
             response.raise_for_status()
             return BeautifulSoup(response.content, 'html.parser')
         except Exception as e:
-            logger.error(f"Ошибка при получении страницы {url}: {e}")
+            logger.error("Ошибка при получении страницы {url}: {e}")
             return None
 
     def extract_demo_variants(self) -> List[Dict]:
@@ -68,7 +67,7 @@ class FIPIScraper:
         links = soup.find_all('a', href=True)
 
         for link in links:
-            href = link.get('href')
+            href = link.get('hre')
             text = link.get_text(strip=True)
 
             # Фильтруем ссылки на демонстрационные варианты
@@ -86,7 +85,7 @@ class FIPIScraper:
                 }
 
                 variants.append(variant_data)
-                logger.info(f"Найден демонстрационный вариант: {text}")
+                logger.info("Найден демонстрационный вариант: {text}")
 
         return variants
 
@@ -107,7 +106,7 @@ class FIPIScraper:
         subject_links = soup.find_all('a', href=True)
 
         for link in subject_links:
-            href = link.get('href')
+            href = link.get('hre')
             text = link.get_text(strip=True)
 
             # Проверяем, является ли ссылка предметом фокуса
@@ -132,7 +131,7 @@ class FIPIScraper:
         topic_links = soup.find_all('a', href=True)
 
         for link in topic_links:
-            href = link.get('href')
+            href = link.get('hre')
             text = link.get_text(strip=True)
 
             if 'задание' in text.lower() or 'тема' in text.lower():
@@ -166,7 +165,7 @@ class FIPIScraper:
         links = soup.find_all('a', href=True)
 
         for link in links:
-            href = link.get('href')
+            href = link.get('hre')
             text = link.get_text(strip=True)
 
             if 'спецификация' in text.lower():
@@ -182,7 +181,7 @@ class FIPIScraper:
                 }
 
                 specs.append(spec_data)
-                logger.info(f"Найдена спецификация: {text}")
+                logger.info("Найдена спецификация: {text}")
 
         return specs
 
@@ -224,13 +223,13 @@ class FIPIScraper:
 
             logger.info("Сбор данных завершен. Найдено:")
             logger.info(
-                f"- Демонстрационных вариантов: {len(all_data['demo_variants'])}")
+                "- Демонстрационных вариантов: {len(all_data['demo_variants'])}")
             logger.info(
-                f"- Заданий из открытого банка: {len(all_data['open_bank_tasks'])}")
-            logger.info(f"- Спецификаций: {len(all_data['specifications'])}")
+                "- Заданий из открытого банка: {len(all_data['open_bank_tasks'])}")
+            logger.info("- Спецификаций: {len(all_data['specifications'])}")
 
         except Exception as e:
-            logger.error(f"Ошибка при сборе данных: {e}")
+            logger.error("Ошибка при сборе данных: {e}")
 
         return all_data
 
@@ -261,9 +260,9 @@ class FIPIScraper:
                         )
                         saved_count += 1
 
-            logger.info(f"Сохранено {saved_count} новых записей в базу данных")
+            logger.info("Сохранено {saved_count} новых записей в базу данных")
             return True
 
         except Exception as e:
-            logger.error(f"Ошибка при сохранении в базу данных: {e}")
+            logger.error("Ошибка при сохранении в базу данных: {e}")
             return False

@@ -11,7 +11,6 @@ from core.data_ingestion.monitor import DataMonitor
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Собирает данные с сайта ФИПИ'
 
@@ -54,15 +53,15 @@ class Command(BaseCommand):
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'Сбор данных завершен за {duration.total_seconds():.2f} секунд'
+                    'Сбор данных завершен за {duration.total_seconds():.2f} секунд'
                 )
             )
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'Ошибка при сборе данных: {e}')
+                self.style.ERROR('Ошибка при сборе данных: {e}')
             )
-            logger.error(f'Ошибка при сборе данных: {e}')
+            logger.error('Ошибка при сборе данных: {e}')
 
     def run_data_collection(self, options):
         """Запускает сбор данных"""
@@ -86,7 +85,7 @@ class Command(BaseCommand):
         if success:
             total_items = sum(len(items) for items in data.values())
             self.stdout.write(
-                self.style.SUCCESS(f'Сохранено {total_items} записей')
+                self.style.SUCCESS('Сохранено {total_items} записей')
             )
         else:
             self.stdout.write(
@@ -100,12 +99,12 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f'Мониторинг завершен. Найдено обновлений: {results["updates_found"]}'
+                'Мониторинг завершен. Найдено обновлений: {results["updates_found"]}'
             )
         )
 
         if results['errors']:
             for error in results['errors']:
                 self.stdout.write(
-                    self.style.WARNING(f'Предупреждение: {error}')
+                    self.style.WARNING('Предупреждение: {error}')
                 )

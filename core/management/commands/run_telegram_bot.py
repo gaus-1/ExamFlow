@@ -8,7 +8,6 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):  # type: ignore
     help = "Запускает Telegram бота с базовыми командами"
 
@@ -35,7 +34,8 @@ class Command(BaseCommand):  # type: ignore
             bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
             if not bot_token:
                 self.stdout.write(
-                    self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен в settings')  # type: ignore
+                    # type: ignore
+                    self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен в settings')
                 )
                 return
 
@@ -66,7 +66,9 @@ class Command(BaseCommand):  # type: ignore
                     "Также можете просто написать вопрос в чат!"
                 )
 
-            async def search_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            async def search_command(
+                    update: Update,
+                    context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик команды /search"""
                 query = ' '.join(context.args) if context.args else ''
                 if not query:
@@ -80,16 +82,17 @@ class Command(BaseCommand):  # type: ignore
 
                 try:
                     result = await bot_service.process_query(query)
-                    
+
                     if result.get('answer'):
-                        await update.message.reply_text(format_answer("🤖", result, 3))  # type: ignore
+                        # type: ignore
+                        await update.message.reply_text(format_answer("🤖", result, 3))
                     else:
                         await update.message.reply_text(  # type: ignore
                             "😔 Не удалось найти релевантную информацию по вашему запросу."
                         )
-                        
+
                 except Exception as e:
-                    logger.error(f"Ошибка в search_command: {e}")
+                    logger.error("Ошибка в search_command: {e}")
                     await update.message.reply_text(  # type: ignore
                         "❌ Произошла ошибка при поиске. Попробуйте позже."
                     )
@@ -105,7 +108,7 @@ class Command(BaseCommand):  # type: ignore
 
                 subject = context.args[0].lower()  # type: ignore
                 doc_type = context.args[1].lower()  # type: ignore
-                
+
                 # Маппинг предметов
                 subject_map = {
                     'математика': 'Математика',
@@ -115,52 +118,58 @@ class Command(BaseCommand):  # type: ignore
                     'русский язык': 'Русский язык',
                     'russian': 'Русский язык'
                 }
-                
+
                 mapped_subject = subject_map.get(subject, subject.title())
-                
-                await update.message.reply_text(f"🔍 Ищу по предмету: {mapped_subject}, тип: {doc_type}")  # type: ignore
-                
+
+                # type: ignore
+                await update.message.reply_text("🔍 Ищу по предмету: {mapped_subject}, тип: {doc_type}")
+
                 try:
                     result = await bot_service.process_query(
                         "материалы для подготовки",
                         mapped_subject,
                         doc_type
                     )
-                    
+
                     if result.get('answer'):
-                        await update.message.reply_text(format_answer("📖", result, 3))  # type: ignore
+                        # type: ignore
+                        await update.message.reply_text(format_answer("📖", result, 3))
                     else:
                         await update.message.reply_text(  # type: ignore
-                            f"😔 Материалы по предмету '{mapped_subject}' и типу '{doc_type}' не найдены."
+                            "😔 Материалы по предмету '{mapped_subject}' и типу '{doc_type}' не найдены."
                         )
-                        
+
                 except Exception as e:
-                    logger.error(f"Ошибка в fipi_command: {e}")
+                    logger.error("Ошибка в fipi_command: {e}")
                     await update.message.reply_text(  # type: ignore
                         "❌ Произошла ошибка при поиске. Попробуйте позже."
                     )
 
-            async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+            async def handle_message(
+                    update: Update,
+                    context: ContextTypes.DEFAULT_TYPE):
                 """Обработчик обычных сообщений"""
                 query = update.message.text  # type: ignore
                 if not query:
                     return
 
-                await update.message.reply_text("🤔 Обрабатываю ваш вопрос...")  # type: ignore
-                
+                # type: ignore
+                await update.message.reply_text("🤔 Обрабатываю ваш вопрос...")
+
                 try:
                     result = await bot_service.process_query(query)
-                    
+
                     if result.get('answer'):
-                        await update.message.reply_text(format_answer("💡", result, 2))  # type: ignore
+                        # type: ignore
+                        await update.message.reply_text(format_answer("💡", result, 2))
                     else:
                         await update.message.reply_text(  # type: ignore
                             "😔 Не удалось найти релевантную информацию. "
                             "Попробуйте переформулировать вопрос или используйте команду /search"
                         )
-                        
+
                 except Exception as e:
-                    logger.error(f"Ошибка в handle_message: {e}")
+                    logger.error("Ошибка в handle_message: {e}")
                     await update.message.reply_text(  # type: ignore
                         "❌ Произошла ошибка при обработке запроса. Попробуйте позже."
                     )
@@ -174,16 +183,21 @@ class Command(BaseCommand):  # type: ignore
             application.add_handler(CommandHandler("help", help_command))
             application.add_handler(CommandHandler("search", search_command))
             application.add_handler(CommandHandler("fipi", fipi_command))
-            application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+            application.add_handler(
+                MessageHandler(
+                    filters.TEXT & ~filters.COMMAND,
+                    handle_message))
 
             # Запускаем бота
             if options['webhook']:
                 self.stdout.write(
-                    self.style.WARNING('⚠️ Webhook режим не реализован, используем polling')  # type: ignore
+                    self.style.WARNING(
+                        '⚠️ Webhook режим не реализован, используем polling')  # type: ignore
                 )
 
             self.stdout.write(
-                self.style.SUCCESS('✅ Бот запущен! Нажмите Ctrl+C для остановки.')  # type: ignore
+                self.style.SUCCESS(
+                    '✅ Бот запущен! Нажмите Ctrl+C для остановки.')  # type: ignore
             )
 
             # Блокирующий polling (внутри PTB корректно управляет asyncio)
@@ -191,9 +205,10 @@ class Command(BaseCommand):  # type: ignore
 
         except ImportError:
             self.stdout.write(
-                self.style.ERROR('❌ python-telegram-bot не установлен. Выполните: pip install python-telegram-bot')  # type: ignore
+                self.style.ERROR(
+                    '❌ python-telegram-bot не установлен. Выполните: pip install python-telegram-bot')  # type: ignore
             )
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'❌ Ошибка при запуске бота: {e}')  # type: ignore
+                self.style.ERROR('❌ Ошибка при запуске бота: {e}')  # type: ignore
             )

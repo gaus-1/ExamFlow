@@ -16,9 +16,7 @@ from django.contrib.auth.models import User
 from learning.models import Task, Subject, UserProgress
 from authentication.models import UserProfile
 
-
 logger = logging.getLogger(__name__)
-
 
 class RAGService:
     """Сервис для RAG функциональности в ExamFlow"""
@@ -62,7 +60,7 @@ class RAGService:
             return sorted_tasks[:limit]
 
         except Exception as e:
-            self.logger.error(f"Ошибка при поиске похожих заданий: {e}")
+            self.logger.error("Ошибка при поиске похожих заданий: {e}")
             return []
 
     def analyze_student_progress(
@@ -157,7 +155,7 @@ class RAGService:
             }
 
         except Exception as e:
-            self.logger.error(f"Ошибка при анализе прогресса: {e}")
+            self.logger.error("Ошибка при анализе прогресса: {e}")
             return {}
 
     def generate_personalized_prompt(
@@ -181,7 +179,7 @@ class RAGService:
             progress_analysis = self.analyze_student_progress(user, task.subject)
 
             # Формируем контекст о задании
-            task_context = f"""
+            task_context = """
 ЗАДАНИЕ:
 Предмет: {task.subject.name}
 Темы: {', '.join([t.name for t in task.topics.all()])}
@@ -190,7 +188,7 @@ class RAGService:
 """
 
             # Формируем контекст о прогрессе ученика
-            progress_context = f"""
+            progress_context = """
 ПРОГРЕСС УЧЕНИКА:
 Общая точность: {progress_analysis.get('accuracy', 0)}%
 Решено заданий: {progress_analysis.get('total_tasks', 0)}
@@ -202,10 +200,7 @@ class RAGService:
 
             # Формируем персонализированный промпт
             if task_type == 'task_explanation':
-                prompt = f"""
-{task_context}
-
-{progress_context}
+                prompt = """
 
 ИНСТРУКЦИЯ:
 Объясни решение этого задания, учитывая уровень ученика.
@@ -213,10 +208,7 @@ class RAGService:
 Если ученик силен в этой теме - можешь дать более продвинутые советы.
 """
             elif task_type == 'hint_generation':
-                prompt = f"""
-{task_context}
-
-{progress_context}
+                prompt = """
 
 ИНСТРУКЦИЯ:
 Дай подсказку для решения, учитывая уровень ученика.
@@ -224,10 +216,7 @@ class RAGService:
 Если тема сильная - можешь дать более тонкую подсказку.
 """
             elif task_type == 'personalized_learning':
-                prompt = f"""
-{task_context}
-
-{progress_context}
+                prompt = """
 
 ИНСТРУКЦИЯ:
 Дай персональные рекомендации для этого ученика:
@@ -237,13 +226,13 @@ class RAGService:
 4. План дальнейшего изучения
 """
             else:
-                prompt = f"{task_context}\n\n{progress_context}\n\nОбъясни это задание."
+                prompt = "{task_context}\n\n{progress_context}\n\nОбъясни это задание."
 
             return prompt.strip()
 
         except Exception as e:
-            self.logger.error(f"Ошибка при генерации персонализированного промпта: {e}")
-            return f"Объясни это задание: {task.text[:300]}..."
+            self.logger.error("Ошибка при генерации персонализированного промпта: {e}")
+            return "Объясни это задание: {task.text[:300]}..."
 
     def get_learning_recommendations(
             self, user: User, subject: Optional[Subject] = None) -> List[Dict[str, Any]]:
@@ -267,8 +256,8 @@ class RAGService:
             for weak_topic in progress.get('weak_topics', [])[:3]:
                 recommendations.append({
                     'type': 'weak_topic',
-                    'title': f'Повторить тему: {weak_topic}',
-                    'description': f'Ваша точность в теме "{weak_topic}" ниже 60%. Рекомендуем повторить материал.',
+                    'title': 'Повторить тему: {weak_topic}',
+                    'description': 'Ваша точность в теме "{weak_topic}" ниже 60%. Рекомендуем повторить материал.',
                     'priority': 'high',
                     'action': 'review_topic'
                 })
@@ -278,8 +267,8 @@ class RAGService:
             if current_diff < 5:
                 recommendations.append({
                     'type': 'difficulty',
-                    'title': f'Попробовать сложность {current_diff}',
-                    'description': f'Вы готовы к заданиям сложности {current_diff}/5. Попробуйте более сложные задачи!',
+                    'title': 'Попробовать сложность {current_diff}',
+                    'description': 'Вы готовы к заданиям сложности {current_diff}/5. Попробуйте более сложные задачи!',
                     'priority': 'medium',
                     'action': 'increase_difficulty'
                 })
@@ -298,8 +287,8 @@ class RAGService:
             for strong_topic in progress.get('strong_topics', [])[:2]:
                 recommendations.append({
                     'type': 'strong_topic',
-                    'title': f'Отлично в теме: {strong_topic}',
-                    'description': f'Вы отлично знаете "{strong_topic}"! Можете помогать другим ученикам.',
+                    'title': 'Отлично в теме: {strong_topic}',
+                    'description': 'Вы отлично знаете "{strong_topic}"! Можете помогать другим ученикам.',
                     'priority': 'low',
                     'action': 'help_others'
                 })
@@ -307,7 +296,7 @@ class RAGService:
             return recommendations
 
         except Exception as e:
-            self.logger.error(f"Ошибка при получении рекомендаций: {e}")
+            self.logger.error("Ошибка при получении рекомендаций: {e}")
             return []
 
     def search_tasks_by_query(self, query: str, subject: Optional[Subject] = None,
@@ -364,9 +353,8 @@ class RAGService:
             return sorted_tasks[:limit]
 
         except Exception as e:
-            self.logger.error(f"Ошибка при поиске заданий: {e}")
+            self.logger.error("Ошибка при поиске заданий: {e}")
             return []
-
 
 # Создаем глобальный экземпляр сервиса
 rag_service = RAGService()

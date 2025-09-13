@@ -17,7 +17,6 @@ from core.models import FIPISourceMap
 
 logger = logging.getLogger(__name__)
 
-
 class DataIngestionScheduler:
     """Планировщик для автоматического сбора данных"""
 
@@ -127,36 +126,36 @@ class DataIngestionScheduler:
         logger.info("Начинаем сбор критически важных источников")
         try:
             count = self.engine.add_source_tasks(priority_filter=TaskPriority.CRITICAL)
-            logger.info(f"Добавлено {count} задач для критически важных источников")
+            logger.info("Добавлено {count} задач для критически важных источников")
         except Exception as e:
-            logger.error(f"Ошибка при сборе критически важных источников: {e}")
+            logger.error("Ошибка при сборе критически важных источников: {e}")
 
     def _collect_high_priority_sources(self):
         """Собирает высокоприоритетные источники"""
         logger.info("Начинаем сбор высокоприоритетных источников")
         try:
             count = self.engine.add_source_tasks(priority_filter=TaskPriority.HIGH)
-            logger.info(f"Добавлено {count} задач для высокоприоритетных источников")
+            logger.info("Добавлено {count} задач для высокоприоритетных источников")
         except Exception as e:
-            logger.error(f"Ошибка при сборе высокоприоритетных источников: {e}")
+            logger.error("Ошибка при сборе высокоприоритетных источников: {e}")
 
     def _collect_medium_priority_sources(self):
         """Собирает среднеприоритетные источники"""
         logger.info("Начинаем сбор среднеприоритетных источников")
         try:
             count = self.engine.add_source_tasks(priority_filter=TaskPriority.MEDIUM)
-            logger.info(f"Добавлено {count} задач для среднеприоритетных источников")
+            logger.info("Добавлено {count} задач для среднеприоритетных источников")
         except Exception as e:
-            logger.error(f"Ошибка при сборе среднеприоритетных источников: {e}")
+            logger.error("Ошибка при сборе среднеприоритетных источников: {e}")
 
     def _collect_low_priority_sources(self):
         """Собирает низкоприоритетные источники"""
         logger.info("Начинаем сбор низкоприоритетных источников")
         try:
             count = self.engine.add_source_tasks(priority_filter=TaskPriority.LOW)
-            logger.info(f"Добавлено {count} задач для низкоприоритетных источников")
+            logger.info("Добавлено {count} задач для низкоприоритетных источников")
         except Exception as e:
-            logger.error(f"Ошибка при сборе низкоприоритетных источников: {e}")
+            logger.error("Ошибка при сборе низкоприоритетных источников: {e}")
 
     def _monitor_updates(self):
         """Мониторит обновления источников"""
@@ -175,12 +174,12 @@ class DataIngestionScheduler:
                     update_count += 1
 
             if update_count > 0:
-                logger.info(f"Найдено {update_count} источников, требующих обновления")
+                logger.info("Найдено {update_count} источников, требующих обновления")
                 # Добавляем задачи для обновления
                 self.engine.add_source_tasks()
 
         except Exception as e:
-            logger.error(f"Ошибка при мониторинге обновлений: {e}")
+            logger.error("Ошибка при мониторинге обновлений: {e}")
 
     def _cleanup_old_data(self):
         """Очищает старые данные"""
@@ -198,10 +197,10 @@ class DataIngestionScheduler:
             count = old_data.count()
             old_data.delete()
 
-            logger.info(f"Удалено {count} старых записей данных")
+            logger.info("Удалено {count} старых записей данных")
 
         except Exception as e:
-            logger.error(f"Ошибка при очистке старых данных: {e}")
+            logger.error("Ошибка при очистке старых данных: {e}")
 
     def _generate_daily_report(self):
         """Генерирует ежедневный отчет"""
@@ -229,19 +228,19 @@ class DataIngestionScheduler:
                 'engine_stats': self.engine.get_statistics()
             }
 
-            logger.info(f"Ежедневный отчет: {stats}")
+            logger.info("Ежедневный отчет: {stats}")
 
             # Здесь можно добавить отправку отчета по email или в систему мониторинга
 
         except Exception as e:
-            logger.error(f"Ошибка при генерации ежедневного отчета: {e}")
+            logger.error("Ошибка при генерации ежедневного отчета: {e}")
 
     def _job_executed_listener(self, event):
         """Обработчик событий выполнения задач"""
         if event.exception:
-            logger.error(f"Ошибка в задаче {event.job_id}: {event.exception}")
+            logger.error("Ошибка в задаче {event.job_id}: {event.exception}")
         else:
-            logger.info(f"Задача {event.job_id} выполнена успешно")
+            logger.info("Задача {event.job_id} выполнена успешно")
 
     def get_job_status(self) -> Dict:
         """Получает статус всех задач"""
@@ -266,19 +265,17 @@ class DataIngestionScheduler:
             job = self.scheduler.get_job(job_id)
             if job:
                 job.modify(next_run_time=timezone.now())
-                logger.info(f"Задача {job_id} запланирована на немедленное выполнение")
+                logger.info("Задача {job_id} запланирована на немедленное выполнение")
                 return True
             else:
-                logger.error(f"Задача {job_id} не найдена")
+                logger.error("Задача {job_id} не найдена")
                 return False
         except Exception as e:
-            logger.error(f"Ошибка при запуске задачи {job_id}: {e}")
+            logger.error("Ошибка при запуске задачи {job_id}: {e}")
             return False
-
 
 # Глобальный экземпляр планировщика
 _scheduler: Optional[DataIngestionScheduler] = None
-
 
 def get_scheduler() -> DataIngestionScheduler:
     """Получает глобальный экземпляр планировщика"""
@@ -287,13 +284,11 @@ def get_scheduler() -> DataIngestionScheduler:
         _scheduler = DataIngestionScheduler()
     return _scheduler
 
-
 def start_scheduler():
     """Запускает планировщик"""
     scheduler = get_scheduler()
     scheduler.start()
     return scheduler
-
 
 def stop_scheduler():
     """Останавливает планировщик"""

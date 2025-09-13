@@ -1,8 +1,6 @@
-CSP_DEFAULT_SRC = ("'self'",)
+CSP_DEFAULT_SRC = ("'self'", )
 CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",)
-CSP_IMG_SRC = ("'self'", 'data:',)
-CSP_CONNECT_SRC = ("'self'",)
-CSP_FRAME_ANCESTORS = ("'none'",)
-
-
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", )
+CSP_IMG_SRC = ("'self'", 'data:', )
+CSP_CONNECT_SRC = ("'self'", )
+CSP_FRAME_ANCESTORS = ("'none'", )

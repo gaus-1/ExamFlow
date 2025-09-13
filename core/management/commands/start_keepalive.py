@@ -11,7 +11,6 @@ from django.core.management import call_command
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Запускает все keep-alive процессы для предотвращения "засыпания"'
 
@@ -42,9 +41,9 @@ class Command(BaseCommand):
         self.stdout.write('🚀 Запуск системы keep-alive для ExamFlow')
         self.stdout.write('=' * 50)
         self.stdout.write(
-            f'🗄️ База данных: каждые {db_interval} секунд ({db_interval//60} минут)')
+            '🗄️ База данных: каждые {db_interval} секунд ({db_interval//60} минут)')
         self.stdout.write(
-            f'🌐 Сайт: каждые {site_interval} секунд ({site_interval//60} минут)')
+            '🌐 Сайт: каждые {site_interval} секунд ({site_interval//60} минут)')
         self.stdout.write('=' * 50)
 
         if daemon:
@@ -63,13 +62,13 @@ class Command(BaseCommand):
             ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
             self.stdout.write('✅ Keep-alive запущены в фоне:')
-            self.stdout.write(f'   База данных: PID {db_process.pid}')
-            self.stdout.write(f'   Сайт: PID {site_process.pid}')
+            self.stdout.write('   База данных: PID {db_process.pid}')
+            self.stdout.write('   Сайт: PID {site_process.pid}')
             self.stdout.write('')
             self.stdout.write('💡 Для остановки используйте:')
-            self.stdout.write(f'   kill {db_process.pid}  # Остановить keep-alive базы')
+            self.stdout.write('   kill {db_process.pid}  # Остановить keep-alive базы')
             self.stdout.write(
-                f'   kill {site_process.pid}  # Остановить keep-alive сайта')
+                '   kill {site_process.pid}  # Остановить keep-alive сайта')
 
         else:
             self.stdout.write('🔄 Запуск в интерактивном режиме...')
@@ -88,7 +87,7 @@ class Command(BaseCommand):
                     # Ждем до следующей проверки
                     wait_time = min(db_interval, site_interval)
                     self.stdout.write(
-                        f'⏰ Следующая проверка через {wait_time} секунд...')
+                        '⏰ Следующая проверка через {wait_time} секунд...')
                     time.sleep(wait_time)
 
             except KeyboardInterrupt:

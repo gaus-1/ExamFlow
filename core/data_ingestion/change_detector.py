@@ -20,14 +20,12 @@ from core.data_ingestion.advanced_fipi_scraper import AdvancedFIPIScraper
 
 logger = logging.getLogger(__name__)
 
-
 class ChangeType(Enum):
     """Типы изменений"""
     NEW = "new"
     UPDATED = "updated"
     DELETED = "deleted"
     NO_CHANGE = "no_change"
-
 
 @dataclass
 class ChangeEvent:
@@ -39,7 +37,6 @@ class ChangeEvent:
     timestamp: datetime
     url: str
     metadata: Dict[str, Any]
-
 
 class ContentHasher:
     """Генератор хешей для контента"""
@@ -55,7 +52,7 @@ class ContentHasher:
                 return self.scraper.get_content_hash(str(content))
             return None
         except Exception as e:
-            logger.error(f"Ошибка получения хеша для {url}: {e}")
+            logger.error("Ошибка получения хеша для {url}: {e}")
             return None
 
     def get_metadata_hash(self, source: FIPISourceMap) -> str:
@@ -72,7 +69,6 @@ class ContentHasher:
 
         metadata_str = str(sorted(metadata.items()))
         return hashlib.sha256(metadata_str.encode()).hexdigest()
-
 
 class ChangeDetector:
     """Детектор изменений в источниках данных"""
@@ -92,7 +88,7 @@ class ChangeDetector:
             # Получаем источники для проверки
             sources = self._get_sources_to_check(source_ids)
 
-            logger.info(f"Проверяем изменения в {len(sources)} источниках")
+            logger.info("Проверяем изменения в {len(sources)} источниках")
 
             for source in sources:
                 try:
@@ -102,13 +98,13 @@ class ChangeDetector:
                         self._store_change_event(change_event)
 
                 except Exception as e:
-                    logger.error(f"Ошибка проверки источника {source.source_id}: {e}")
+                    logger.error("Ошибка проверки источника {source.source_id}: {e}")
 
-            logger.info(f"Обнаружено {len(changes)} изменений")
+            logger.info("Обнаружено {len(changes)} изменений")
             return changes
 
         except Exception as e:
-            logger.error(f"Ошибка обнаружения изменений: {e}")
+            logger.error("Ошибка обнаружения изменений: {e}")
             return []
 
     def _get_sources_to_check(self, source_ids: Optional[List[str]] = None):
@@ -156,7 +152,7 @@ class ChangeDetector:
             current_hash = self.hasher.get_content_hash(str(source.url))
 
             if current_hash is None:
-                logger.warning(f"Не удалось получить хеш для {source.source_id}")
+                logger.warning("Не удалось получить хеш для {source.source_id}")
                 return None
 
             # Определяем тип изменения
@@ -187,7 +183,7 @@ class ChangeDetector:
             return change_event
 
         except Exception as e:
-            logger.error(f"Ошибка проверки источника {source.source_id}: {e}")
+            logger.error("Ошибка проверки источника {source.source_id}: {e}")
             return None
 
     def _determine_change_type(
@@ -240,7 +236,6 @@ class ChangeDetector:
                 'queue_size': self.change_queue.qsize()
             }
 
-
 class ChangeNotificationService:
     """Сервис уведомлений об изменениях"""
 
@@ -283,10 +278,10 @@ class ChangeNotificationService:
 
             # Логирование
             logger.info(
-                f"Уведомление отправлено: {change_type} - {len(changes)} изменений")
+                "Уведомление отправлено: {change_type} - {len(changes)} изменений")
 
         except Exception as e:
-            logger.error(f"Ошибка отправки уведомления: {e}")
+            logger.error("Ошибка отправки уведомления: {e}")
 
     def _send_email_notification(self, change_type: str, changes: List[ChangeEvent]):
         """Отправляет email уведомление"""
@@ -294,7 +289,7 @@ class ChangeNotificationService:
             from django.core.mail import send_mail
             from django.template.loader import render_to_string
 
-            subject = f"[ExamFlow] Изменения в источниках данных: {change_type}"
+            subject = "[ExamFlow] Изменения в источниках данных: {change_type}"
 
             context = {
                 'change_type': change_type,
@@ -308,7 +303,7 @@ class ChangeNotificationService:
 
             send_mail(
                 subject=subject,
-                message=f"Обнаружено {len(changes)} изменений типа {change_type}",
+                message="Обнаружено {len(changes)} изменений типа {change_type}",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=getattr(settings, 'CHANGE_NOTIFICATION_EMAILS', []),
                 html_message=html_message,
@@ -316,7 +311,7 @@ class ChangeNotificationService:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка отправки email уведомления: {e}")
+            logger.error("Ошибка отправки email уведомления: {e}")
 
     def _send_webhook_notification(self, change_type: str, changes: List[ChangeEvent]):
         """Отправляет webhook уведомление"""
@@ -330,7 +325,6 @@ class ChangeNotificationService:
             payload = {
                 'change_type': change_type,
                 'changes': [
-                    {
                         'source_id': change.source_id,
                         'url': change.url,
                         'timestamp': change.timestamp.isoformat(),
@@ -349,13 +343,12 @@ class ChangeNotificationService:
             )
 
             if response.status_code == 200:
-                logger.info(f"Webhook уведомление отправлено: {change_type}")
+                logger.info("Webhook уведомление отправлено: {change_type}")
             else:
-                logger.warning(f"Webhook вернул статус {response.status_code}")
+                logger.warning("Webhook вернул статус {response.status_code}")
 
         except Exception as e:
-            logger.error(f"Ошибка отправки webhook уведомления: {e}")
-
+            logger.error("Ошибка отправки webhook уведомления: {e}")
 
 class ChangeDataCaptureService:
     """Основной сервис Change Data Capture"""
@@ -400,7 +393,7 @@ class ChangeDataCaptureService:
                 time.sleep(self.check_interval)
 
             except Exception as e:
-                logger.error(f"Ошибка в цикле мониторинга изменений: {e}")
+                logger.error("Ошибка в цикле мониторинга изменений: {e}")
                 time.sleep(300)  # Пауза при ошибке
 
     def force_check(self, source_ids: Optional[List[str]] = None) -> List[ChangeEvent]:
@@ -416,10 +409,8 @@ class ChangeDataCaptureService:
             'recent_changes': len(self.detector.get_recent_changes())
         }
 
-
 # Глобальный экземпляр сервиса
 _cdc_service: Optional[ChangeDataCaptureService] = None
-
 
 def get_cdc_service() -> ChangeDataCaptureService:
     """Получает глобальный экземпляр сервиса CDC"""
@@ -428,13 +419,11 @@ def get_cdc_service() -> ChangeDataCaptureService:
         _cdc_service = ChangeDataCaptureService()
     return _cdc_service
 
-
 def start_change_monitoring():
     """Запускает мониторинг изменений"""
     service = get_cdc_service()
     service.start()
     return service
-
 
 def stop_change_monitoring():
     """Останавливает мониторинг изменений"""

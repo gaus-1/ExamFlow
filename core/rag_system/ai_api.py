@@ -13,51 +13,35 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
 @csrf_exempt
 @require_http_methods(["POST"])
 @free_tier_allowed
-@extend_schema(
-    tags=['AI'],
-    summary='AI-помощник',
-    description='Основной эндпоинт для AI запросов через RAG систему',
-    request={
-        'application/json': {
-            'type': 'object',
-            'properties': {
-                'query': {'type': 'string', 'description': 'Вопрос пользователя'},
-                'subject': {'type': 'string', 'description': 'Предмет (Математика, Русский язык)'},
-                'document_type': {'type': 'string', 'description': 'Тип документа ФИПИ'}
-            },
-            'required': ['query']
-        }
-    },
-    responses={
-        200: {
-            'description': 'Успешный ответ',
-            'content': {
-                'application/json': {
-                    'example': {
-                        'answer': 'Ответ AI-помощника',
-                        'sources': [{'title': 'Источник', 'url': 'https://...'}],
-                        'context_chunks': 3,
-                        'processing_time': 1.5,
-                        'cached': False
-                    }
-                }
-            }
-        },
-        400: {'description': 'Неверный запрос'},
-        429: {'description': 'Превышен лимит запросов'},
-        500: {'description': 'Внутренняя ошибка сервера'}
-    }
-)
+@extend_schema(tags=['AI'],
+               summary='AI-помощник',
+               description='Основной эндпоинт для AI запросов через RAG систему',
+               request={'application/json': {'type': 'object',
+                                             'properties': {'query': {'type': 'string',
+                                                                      'description': 'Вопрос пользователя'},
+                                                            'subject': {'type': 'string',
+                                                                        'description': 'Предмет (Математика, Русский язык)'},
+                                                            'document_type': {'type': 'string',
+                                                                              'description': 'Тип документа ФИПИ'}},
+                                             'required': ['query']}},
+               responses={200: {'description': 'Успешный ответ',
+                                'content': {'application/json': {'example': {'answer': 'Ответ AI-помощника',
+                                                                             'sources': [{'title': 'Источник',
+                                                                                          'url': 'https://...'}],
+                                                                             'context_chunks': 3,
+                                                                             'processing_time': 1.5,
+                                                                             'cached': False}}}},
+               400: {'description': 'Неверный запрос'},
+               429: {'description': 'Превышен лимит запросов'},
+               500: {'description': 'Внутренняя ошибка сервера'}})
 def ai_ask(request: HttpRequest) -> JsonResponse:
     """
     Основной эндпоинт для AI запросов через RAG систему
-    
+
     POST /api/ai/ask
-    {
         "query": "Как решать квадратные уравнения?",
         "subject": "Математика",
         "document_type": "demo_variant"
@@ -94,9 +78,8 @@ def ai_ask(request: HttpRequest) -> JsonResponse:
         return JsonResponse(result)
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_ask: {e}")
+        logger.error("Ошибка в ai_ask: {e}")
         return JsonResponse({"error": "Internal server error"}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -104,23 +87,23 @@ def ai_ask(request: HttpRequest) -> JsonResponse:
 def ai_subjects(request: HttpRequest) -> JsonResponse:
     """
     Возвращает список доступных предметов
-    
+
     GET /api/ai/subjects
     """
     try:
         from core.models import Subject
-        
-        subjects = Subject.objects.all().values('id', 'name', 'code', 'exam_type')  # type: ignore
-        
+
+        subjects = Subject.objects.all().values(
+            'id', 'name', 'code', 'exam_type')  # type: ignore
+
         return JsonResponse({
             "subjects": list(subjects),
             "count": len(subjects)
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_subjects: {e}")
+        logger.error("Ошибка в ai_subjects: {e}")
         return JsonResponse({"error": "Internal server error"}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -129,7 +112,7 @@ def ai_subjects(request: HttpRequest) -> JsonResponse:
 def ai_user_profile(request: HttpRequest) -> JsonResponse:
     """
     Возвращает профиль пользователя
-    
+
     GET /api/ai/user/profile
     """
     try:
@@ -137,8 +120,9 @@ def ai_user_profile(request: HttpRequest) -> JsonResponse:
             return JsonResponse({"error": "Authentication required"}, status=401)
 
         from core.models import UserProfile
-        profile, created = UserProfile.objects.get_or_create(user=request.user)  # type: ignore
-        
+        profile, created = UserProfile.objects.get_or_create(
+            user=request.user)  # type: ignore
+
         return JsonResponse({
             "profile": {
                 "id": profile.id,
@@ -157,9 +141,8 @@ def ai_user_profile(request: HttpRequest) -> JsonResponse:
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_user_profile: {e}")
+        logger.error("Ошибка в ai_user_profile: {e}")
         return JsonResponse({"error": "Internal server error"}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -168,9 +151,8 @@ def ai_user_profile(request: HttpRequest) -> JsonResponse:
 def ai_problem_submit(request: HttpRequest) -> JsonResponse:
     """
     Отправляет решение задачи для проверки
-    
+
     POST /api/ai/problem/submit
-    {
         "task_id": 123,
         "solution": "Мое решение...",
         "answer": "42"
@@ -191,17 +173,18 @@ def ai_problem_submit(request: HttpRequest) -> JsonResponse:
         answer = data.get("answer", "").strip()
 
         if not task_id or not solution:
-            return JsonResponse({"error": "task_id and solution are required"}, status=400)
+            return JsonResponse(
 
         from core.models import Task, UserProfile
-        
+
         try:
             task = Task.objects.get(id=task_id)  # type: ignore
         except Task.DoesNotExist:  # type: ignore
             return JsonResponse({"error": "Task not found"}, status=404)
 
         # Получаем профиль пользователя
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)  # type: ignore
+        profile, _ = UserProfile.objects.get_or_create(
+            user=request.user)  # type: ignore
 
         # Простая проверка ответа (в будущем можно добавить AI проверку)
         is_correct = False
@@ -225,9 +208,8 @@ def ai_problem_submit(request: HttpRequest) -> JsonResponse:
         })
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_problem_submit: {e}")
+        logger.error("Ошибка в ai_problem_submit: {e}")
         return JsonResponse({"error": "Internal server error"}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -235,17 +217,17 @@ def ai_problem_submit(request: HttpRequest) -> JsonResponse:
 def ai_statistics(request: HttpRequest) -> JsonResponse:
     """
     Возвращает статистику RAG системы
-    
+
     GET /api/ai/statistics
     """
     try:
         from core.rag_system.orchestrator import RAGOrchestrator
-        
+
         orchestrator = RAGOrchestrator()
         stats = orchestrator.get_statistics()
-        
+
         return JsonResponse(stats)
 
     except Exception as e:
-        logger.error(f"Ошибка в ai_statistics: {e}")
+        logger.error("Ошибка в ai_statistics: {e}")
         return JsonResponse({"error": "Internal server error"}, status=500)

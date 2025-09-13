@@ -19,4 +19,4 @@ urlpatterns = [
 
     # Профиль пользователя
     path('api/user/profile/', api.user_profile_api, name='user_profile_api'),
-]
+        ]

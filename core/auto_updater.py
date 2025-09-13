@@ -15,7 +15,6 @@ from learning.models import Task, Subject
 
 logger = logging.getLogger(__name__)
 
-
 class AutoUpdater:
     """Автоматическое обновление материалов"""
 
@@ -59,7 +58,7 @@ class AutoUpdater:
                 schedule.run_pending()
                 time.sleep(60)  # Проверяем каждую минуту
             except Exception as e:
-                logger.error(f"Ошибка в планировщике: {str(e)}")
+                logger.error("Ошибка в планировщике: {str(e)}")
                 time.sleep(300)  # При ошибке ждем 5 минут
 
     def daily_update(self):
@@ -71,23 +70,23 @@ class AutoUpdater:
             subjects_count, tasks_count = self.fipi_loader.load_subjects()
 
             if tasks_count > 0:
-                logger.info(f"✅ Загружено новых заданий: {tasks_count}")
+                logger.info("✅ Загружено новых заданий: {tasks_count}")
 
                 # Отправляем уведомление админу
                 self._send_admin_notification(
-                    f"📚 Ежедневное обновление ExamFlow\n"
-                    f"Новых заданий: {tasks_count}\n"
-                    f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+                    "📚 Ежедневное обновление ExamFlow\n"
+                    "Новых заданий: {tasks_count}\n"
+                    "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
                 )
             else:
                 logger.info("ℹ️ Новых материалов не найдено")
 
         except Exception as e:
-            logger.error(f"❌ Ошибка ежедневного обновления: {str(e)}")
+            logger.error("❌ Ошибка ежедневного обновления: {str(e)}")
             self._send_admin_notification(
-                f"❌ Ошибка обновления ExamFlow\n"
-                f"Ошибка: {str(e)}\n"
-                f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+                "❌ Ошибка обновления ExamFlow\n"
+                "Ошибка: {str(e)}\n"
+                "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
             )
 
     def weekly_update(self):
@@ -111,18 +110,18 @@ class AutoUpdater:
             logger.info("✅ Еженедельное обновление завершено")
 
             self._send_admin_notification(
-                f"📊 Еженедельное обновление ExamFlow\n"
-                f"Всего предметов: {total_subjects}\n"
-                f"Всего заданий: {total_tasks}\n"
-                f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+                "📊 Еженедельное обновление ExamFlow\n"
+                "Всего предметов: {total_subjects}\n"
+                "Всего заданий: {total_tasks}\n"
+                "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
             )
 
         except Exception as e:
-            logger.error(f"❌ Ошибка еженедельного обновления: {str(e)}")
+            logger.error("❌ Ошибка еженедельного обновления: {str(e)}")
             self._send_admin_notification(
-                f"❌ Ошибка еженедельного обновления\n"
-                f"Ошибка: {str(e)}\n"
-                f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+                "❌ Ошибка еженедельного обновления\n"
+                "Ошибка: {str(e)}\n"
+                "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
             )
 
     def generate_voices_batch(self):
@@ -149,26 +148,26 @@ class AutoUpdater:
 
                     if result and result['task_audio']:
                         generated_count += 1
-                        logger.info(f"🎤 Создан голос для: {task.title}")
+                        logger.info("🎤 Создан голос для: {task.title}")
 
                     # Пауза между генерациями
                     time.sleep(2)
 
                 except Exception as e:
-                    logger.error(f"Ошибка генерации голоса для {task.id}: {str(e)}")
+                    logger.error("Ошибка генерации голоса для {task.id}: {str(e)}")
                     continue
 
-            logger.info(f"✅ Сгенерировано голосовых файлов: {generated_count}")
+            logger.info("✅ Сгенерировано голосовых файлов: {generated_count}")
 
             if generated_count > 0:
                 self._send_admin_notification(
-                    f"🎤 Генерация голосов ExamFlow\n"
-                    f"Создано файлов: {generated_count}\n"
-                    f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+                    "🎤 Генерация голосов ExamFlow\n"
+                    "Создано файлов: {generated_count}\n"
+                    "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
                 )
 
         except Exception as e:
-            logger.error(f"❌ Ошибка генерации голосов: {str(e)}")
+            logger.error("❌ Ошибка генерации голосов: {str(e)}")
 
     def cleanup_old_data(self):
         """Очищает старые данные"""
@@ -187,14 +186,14 @@ class AutoUpdater:
             deactivated_count = old_tasks.count()
             if deactivated_count > 0:
                 old_tasks.update(is_active=False)
-                logger.info(f"🗑️ Деактивировано старых заданий: {deactivated_count}")
+                logger.info("🗑️ Деактивировано старых заданий: {deactivated_count}")
 
             if deleted_audio > 0 or deactivated_count > 0:
                 logger.info(
-                    f"🧹 Очистка: удалено аудио {deleted_audio}, деактивировано заданий {deactivated_count}")
+                    "🧹 Очистка: удалено аудио {deleted_audio}, деактивировано заданий {deactivated_count}")
 
         except Exception as e:
-            logger.error(f"❌ Ошибка очистки данных: {str(e)}")
+            logger.error("❌ Ошибка очистки данных: {str(e)}")
 
     def _send_admin_notification(self, message):
         """Отправляет уведомление админу"""
@@ -208,10 +207,10 @@ class AutoUpdater:
 
             import requests
 
-            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            url = "https://api.telegram.org/bot{bot_token}/sendMessage"
             data = {
                 'chat_id': admin_chat_id,
-                'text': f"🤖 ExamFlow AutoUpdater\n\n{message}",
+                'text': "🤖 ExamFlow AutoUpdater\n\n{message}",
                 'parse_mode': 'HTML'
             }
 
@@ -221,10 +220,10 @@ class AutoUpdater:
                 logger.info("✅ Уведомление админу отправлено")
             else:
                 logger.warning(
-                    f"⚠️ Ошибка отправки уведомления: {response.status_code}")
+                    "⚠️ Ошибка отправки уведомления: {response.status_code}")
 
         except Exception as e:
-            logger.error(f"❌ Ошибка отправки уведомления: {str(e)}")
+            logger.error("❌ Ошибка отправки уведомления: {str(e)}")
 
     def manual_update(self):
         """Ручное обновление материалов"""
@@ -238,7 +237,7 @@ class AutoUpdater:
 
             logger.info("✅ Ручное обновление завершено")
             logger.info(
-                f"📊 Предметов: {subjects_count}, Заданий: {tasks_count}, Примеров: {sample_tasks}")
+                "📊 Предметов: {subjects_count}, Заданий: {tasks_count}, Примеров: {sample_tasks}")
 
             return {
                 'subjects': subjects_count,
@@ -247,20 +246,17 @@ class AutoUpdater:
             }
 
         except Exception as e:
-            logger.error(f"❌ Ошибка ручного обновления: {str(e)}")
+            logger.error("❌ Ошибка ручного обновления: {str(e)}")
             raise
-
 
 # Глобальный экземпляр обновлятора
 auto_updater = AutoUpdater()
-
 
 def start_auto_updater():
     """Запускает автообновления"""
     logger.info("🚀 Инициализация системы автообновлений...")
     auto_updater.start_scheduler()
     logger.info("✅ Система автообновлений запущена")
-
 
 def stop_auto_updater():
     """Останавливает автообновления"""

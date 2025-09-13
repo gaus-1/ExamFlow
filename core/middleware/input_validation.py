@@ -3,7 +3,6 @@ from __future__ import annotations
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpRequest
 
-
 class InputValidationMiddleware(MiddlewareMixin):
     """Простейшая безопасная нормализация входа (обратима, без блокировок)."""
 
@@ -43,5 +42,3 @@ class InputValidationMiddleware(MiddlewareMixin):
             finally:
                 if hasattr(source, '_mutable'):
                     source._mutable = original_mutable  # type: ignore[attr-defined]
-
-

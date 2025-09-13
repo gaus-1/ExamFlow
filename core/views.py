@@ -19,7 +19,6 @@ from .personalization_system import (
 
 logger = logging.getLogger(__name__)
 
-
 @login_required
 def personalization_dashboard(request):
     """Дашборд персонализации с аналитикой и рекомендациями"""
@@ -44,10 +43,9 @@ def personalization_dashboard(request):
         return render(request, 'core/personalization_dashboard.html', context)
 
     except Exception as e:
-        logger.error(f"Ошибка в personalization_dashboard: {e}")
+        logger.error("Ошибка в personalization_dashboard: {e}")
         messages.error(request, "Произошла ошибка при загрузке персонализации")
         return redirect('home')
-
 
 @login_required
 def my_analytics(request):
@@ -72,10 +70,9 @@ def my_analytics(request):
         return render(request, 'core/my_analytics.html', context)
 
     except Exception as e:
-        logger.error(f"Ошибка в my_analytics: {e}")
+        logger.error("Ошибка в my_analytics: {e}")
         messages.error(request, "Произошла ошибка при загрузке аналитики")
         return redirect('home')
-
 
 @login_required
 def my_recommendations(request):
@@ -95,10 +92,9 @@ def my_recommendations(request):
         return render(request, 'core/my_recommendations.html', context)
 
     except Exception as e:
-        logger.error(f"Ошибка в my_recommendations: {e}")
+        logger.error("Ошибка в my_recommendations: {e}")
         messages.error(request, "Произошла ошибка при загрузке рекомендаций")
         return redirect('home')
-
 
 @login_required
 def study_plan_view(request):
@@ -116,10 +112,9 @@ def study_plan_view(request):
         return render(request, 'core/study_plan.html', context)
 
     except Exception as e:
-        logger.error(f"Ошибка в study_plan_view: {e}")
+        logger.error("Ошибка в study_plan_view: {e}")
         messages.error(request, "Произошла ошибка при загрузке плана обучения")
         return redirect('home')
-
 
 @login_required
 def weak_topics_view(request):
@@ -137,10 +132,9 @@ def weak_topics_view(request):
         return render(request, 'core/weak_topics.html', context)
 
     except Exception as e:
-        logger.error(f"Ошибка в weak_topics_view: {e}")
+        logger.error("Ошибка в weak_topics_view: {e}")
         messages.error(request, "Произошла ошибка при загрузке слабых тем")
         return redirect('home')
-
 
 # API endpoints для AJAX запросов
 @login_required
@@ -152,9 +146,8 @@ def api_user_insights(request):
         user_insights = get_user_insights(request.user.id)
         return JsonResponse(user_insights)
     except Exception as e:
-        logger.error(f"Ошибка в api_user_insights: {e}")
+        logger.error("Ошибка в api_user_insights: {e}")
         return JsonResponse({'error': 'Ошибка загрузки данных'}, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -167,9 +160,8 @@ def api_recommended_tasks(request):
         tasks = recommender.get_recommended_tasks(limit)
         return JsonResponse({'tasks': tasks})
     except Exception as e:
-        logger.error(f"Ошибка в api_recommended_tasks: {e}")
+        logger.error("Ошибка в api_recommended_tasks: {e}")
         return JsonResponse({'error': 'Ошибка загрузки рекомендаций'}, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -181,9 +173,8 @@ def api_study_plan(request):
         plan = recommender.get_study_plan()
         return JsonResponse({'plan': plan})
     except Exception as e:
-        logger.error(f"Ошибка в api_study_plan: {e}")
+        logger.error("Ошибка в api_study_plan: {e}")
         return JsonResponse({'error': 'Ошибка загрузки плана'}, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -195,9 +186,8 @@ def api_weak_topics(request):
         topics = recommender.get_weak_topics()
         return JsonResponse({'topics': topics})
     except Exception as e:
-        logger.error(f"Ошибка в api_weak_topics: {e}")
+        logger.error("Ошибка в api_weak_topics: {e}")
         return JsonResponse({'error': 'Ошибка загрузки слабых тем'}, status=500)
-
 
 @login_required
 @require_http_methods(["GET"])
@@ -209,9 +199,8 @@ def api_user_preferences(request):
         preferences = analyzer.get_user_preferences()
         return JsonResponse({'preferences': preferences})
     except Exception as e:
-        logger.error(f"Ошибка в api_user_preferences: {e}")
+        logger.error("Ошибка в api_user_preferences: {e}")
         return JsonResponse({'error': 'Ошибка загрузки предпочтений'}, status=500)
-
 
 @csrf_exempt
 @require_http_methods(["GET"])

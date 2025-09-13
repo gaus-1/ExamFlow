@@ -14,7 +14,6 @@ from .models import FIPIData
 
 logger = logging.getLogger(__name__)
 
-
 class FIPIMonitor:
     """Монитор изменений на сайте ФИПИ"""
 
@@ -30,10 +29,10 @@ class FIPIMonitor:
 
         # URL для мониторинга
         self.monitor_urls = {
-            'demo_variants': f"{self.base_url}/ege/demoversii-specifikacii-kodifikatory",
-            'open_bank': f"{self.base_url}/ege/otkrytyy-bank-zadaniy-ege",
-            'oge_demo': f"{self.base_url}/oge/demoversii-specifikacii-kodifikatory",
-            'oge_bank': f"{self.base_url}/oge/otkrytyy-bank-zadaniy-oge"}
+            'demo_variants': "{self.base_url}/ege/demoversii-specifikacii-kodifikatory",
+            'open_bank': "{self.base_url}/ege/otkrytyy-bank-zadaniy-ege",
+            'oge_demo': "{self.base_url}/oge/demoversii-specifikacii-kodifikatory",
+            'oge_bank': "{self.base_url}/oge/otkrytyy-bank-zadaniy-oge"}
 
     def check_for_updates(self) -> Dict[str, Any]:
         """Проверяет обновления на ФИПИ"""
@@ -70,10 +69,10 @@ class FIPIMonitor:
                 self._save_updates_to_db(updates)
 
             logger.info(
-                f"Проверка завершена. Найдено обновлений: {updates['total_updates']}")
+                "Проверка завершена. Найдено обновлений: {updates['total_updates']}")
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке обновлений ФИПИ: {e}")
+            logger.error("Ошибка при проверке обновлений ФИПИ: {e}")
             updates['error'] = str(e)
 
         return updates
@@ -111,7 +110,7 @@ class FIPIMonitor:
                 self._save_content_hash('demo_variants', content_hash)
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке демо-вариантов: {e}")
+            logger.error("Ошибка при проверке демо-вариантов: {e}")
 
         return updates
 
@@ -172,7 +171,7 @@ class FIPIMonitor:
                 self._save_content_hash('open_bank_oge', oge_hash)
 
         except Exception as e:
-            logger.error(f"Ошибка при проверке открытого банка: {e}")
+            logger.error("Ошибка при проверке открытого банка: {e}")
 
         return updates
 
@@ -200,8 +199,8 @@ class FIPIMonitor:
                         updates.append({
                             'type': 'demo_variant',
                             'subject': subject,
-                            'url': f"{self.base_url}{link}",
-                            'title': f"Новый демо-вариант {subject}",
+                            'url': "{self.base_url}{link}",
+                            'title': "Новый демо-вариант {subject}",
                             'timestamp': timezone.now().isoformat()
                         })
 
@@ -235,8 +234,8 @@ class FIPIMonitor:
                             'type': 'open_bank_task',
                             'subject': subject,
                             'exam_type': exam_type,
-                            'url': f"{self.base_url}{link}",
-                            'title': f"Новое задание {subject} ({exam_type})",
+                            'url': "{self.base_url}{link}",
+                            'title': "Новое задание {subject} ({exam_type})",
                             'timestamp': timezone.now().isoformat()
                         })
 
@@ -254,7 +253,7 @@ class FIPIMonitor:
             return fipi_data.content_hash if fipi_data else None
 
         except Exception as e:
-            logger.error(f"Ошибка при получении хеша: {e}")
+            logger.error("Ошибка при получении хеша: {e}")
             return None
 
     def _save_content_hash(self, content_type: str, content_hash: str):
@@ -262,8 +261,8 @@ class FIPIMonitor:
 
         try:
             FIPIData.objects.create(
-                title=f"Content hash for {content_type}",
-                url=f"{self.base_url}/{content_type}",
+                title="Content hash for {content_type}",
+                url="{self.base_url}/{content_type}",
                 data_type='content_hash',
                 subject=content_type,
                 content_hash=content_hash,
@@ -273,7 +272,7 @@ class FIPIMonitor:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка при сохранении хеша: {e}")
+            logger.error("Ошибка при сохранении хеша: {e}")
 
     def _save_updates_to_db(self, updates: Dict[str, Any]):
         """Сохраняет обновления в базу данных"""
@@ -295,7 +294,7 @@ class FIPIMonitor:
                     )
 
         except Exception as e:
-            logger.error(f"Ошибка при сохранении обновлений: {e}")
+            logger.error("Ошибка при сохранении обновлений: {e}")
 
     def _notify_admin(self, updates: Dict[str, Any]):
         """Уведомляет администратора об обновлениях"""
@@ -313,12 +312,12 @@ class FIPIMonitor:
             logger.info("Администратор уведомлен об обновлениях")
 
         except Exception as e:
-            logger.error(f"Ошибка при уведомлении администратора: {e}")
+            logger.error("Ошибка при уведомлении администратора: {e}")
 
     def _prepare_notification_message(self, updates: Dict[str, Any]) -> str:
         """Подготавливает сообщение для уведомления"""
 
-        message = f"""
+        message = """
 🔄 ОБНОВЛЕНИЯ ФИПИ
 
 Время: {updates['timestamp']}
@@ -328,14 +327,14 @@ class FIPIMonitor:
 """
 
         for update in updates['math_updates']:
-            message += f"• {update['title']}\n"
-            message += f"  URL: {update['url']}\n"
+            message += "• {update['title']}\n"
+            message += "  URL: {update['url']}\n"
 
         message += "\n📝 РУССКИЙ ЯЗЫК:\n"
 
         for update in updates['russian_updates']:
-            message += f"• {update['title']}\n"
-            message += f"  URL: {update['url']}\n"
+            message += "• {update['title']}\n"
+            message += "  URL: {update['url']}\n"
 
         message += "\nПроверьте обновления на сайте ФИПИ."
 
@@ -354,7 +353,7 @@ class FIPIMonitor:
             )
 
         except Exception as e:
-            logger.error(f"Ошибка при отправке email: {e}")
+            logger.error("Ошибка при отправке email: {e}")
 
     def _send_telegram_notification(self, message: str):
         """Отправляет уведомление в Telegram"""
@@ -365,7 +364,7 @@ class FIPIMonitor:
             pass
 
         except Exception as e:
-            logger.error(f"Ошибка при отправке в Telegram: {e}")
+            logger.error("Ошибка при отправке в Telegram: {e}")
 
     def get_update_statistics(self) -> Dict[str, Any]:
         """Возвращает статистику обновлений"""
@@ -387,9 +386,8 @@ class FIPIMonitor:
             return stats
 
         except Exception as e:
-            logger.error(f"Ошибка при получении статистики: {e}")
+            logger.error("Ошибка при получении статистики: {e}")
             return {}
-
 
 # Глобальный экземпляр монитора
 fipi_monitor = FIPIMonitor()

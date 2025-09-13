@@ -3,7 +3,6 @@ from django.db import connection
 from django.db.utils import OperationalError
 from learning.models import Subject, Task
 
-
 class Command(BaseCommand):
     help = 'Автоматический деплой ExamFlow на Render с применением миграций'
 
@@ -43,7 +42,7 @@ class Command(BaseCommand):
                 return True
         except OperationalError as e:
             self.stdout.write(self.style.ERROR(
-                f'❌ Ошибка подключения к базе данных: {e}'))  # type: ignore
+                '❌ Ошибка подключения к базе данных: {e}'))  # type: ignore
             return False
 
     def check_tables(self):
@@ -54,14 +53,14 @@ class Command(BaseCommand):
             task_count = Task.objects.count()  # type: ignore
 
             self.stdout.write(self.style.SUCCESS(
-                f'✅ Таблица Subject: {subject_count} записей'))  # type: ignore
+                '✅ Таблица Subject: {subject_count} записей'))  # type: ignore
             self.stdout.write(self.style.SUCCESS(
-                f'✅ Таблица Task: {task_count} записей'))  # type: ignore
+                '✅ Таблица Task: {task_count} записей'))  # type: ignore
 
             return True
         except Exception as e:
             self.stdout.write(self.style.ERROR(
-                f'❌ Ошибка при проверке таблиц: {e}'))  # type: ignore
+                '❌ Ошибка при проверке таблиц: {e}'))  # type: ignore
             return False
 
     def create_sample_data(self):
@@ -84,10 +83,10 @@ class Command(BaseCommand):
 
                 Subject.objects.bulk_create(subjects)  # type: ignore
                 self.stdout.write(self.style.SUCCESS(
-                    f'✅ Создано {len(subjects)} предметов'))  # type: ignore
+                    '✅ Создано {len(subjects)} предметов'))  # type: ignore
 
             return True
         except Exception as e:
             self.stdout.write(self.style.ERROR(
-                f'❌ Ошибка при создании образцов данных: {e}'))  # type: ignore
+                '❌ Ошибка при создании образцов данных: {e}'))  # type: ignore
             return False

@@ -11,7 +11,6 @@ from core.rag_system.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
 
-
 class Command(BaseCommand):
     help = 'Обрабатывает данные ФИПИ и создает векторные представления'
 
@@ -81,15 +80,15 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(  # type: ignore
                     # type: ignore
-                    f'Обработка завершена за {duration.total_seconds():.2f} секунд'
+                    'Обработка завершена за {duration.total_seconds():.2f} секунд'
                 )
             )
 
         except Exception as e:
             self.stdout.write(
-                self.style.ERROR(f'Ошибка при обработке: {e}')  # type: ignore
+                self.style.ERROR('Ошибка при обработке: {e}')  # type: ignore
             )
-            logger.error(f'Ошибка при обработке: {e}')
+            logger.error('Ошибка при обработке: {e}')
 
     def process_all_data(self, processor):
         """Обрабатывает все необработанные данные"""
@@ -97,19 +96,19 @@ class Command(BaseCommand):
 
         if 'error' in results:
             self.stdout.write(
-                self.style.ERROR(f'Ошибка: {results["error"]}')  # type: ignore
+                self.style.ERROR('Ошибка: {results["error"]}')  # type: ignore
             )
             return
 
         self.stdout.write(
             self.style.SUCCESS(  # type: ignore
-                f'Обработано: {results["processed"]}/{results["total"]} записей'
+                'Обработано: {results["processed"]}/{results["total"]} записей'
             )
         )
 
         if results['errors'] > 0:
             self.stdout.write(
-                self.style.WARNING(f'Ошибок: {results["errors"]}')  # type: ignore
+                self.style.WARNING('Ошибок: {results["errors"]}')  # type: ignore
             )
 
     def process_single_data(self, processor, data_id):
@@ -119,12 +118,12 @@ class Command(BaseCommand):
         if success:
             self.stdout.write(
                 self.style.SUCCESS(
-                    f'Запись {data_id} обработана успешно')  # type: ignore
+                    'Запись {data_id} обработана успешно')  # type: ignore
             )
         else:
             self.stdout.write(
                 # type: ignore
-                self.style.ERROR(f'Ошибка при обработке записи {data_id}')
+                self.style.ERROR('Ошибка при обработке записи {data_id}')
             )
 
     def show_statistics(self):
@@ -135,8 +134,8 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS('Статистика векторного хранилища:')  # type: ignore
         )
-        self.stdout.write(f'Всего чанков: {stats.get("total_chunks", 0)}')
-        self.stdout.write(f'Всего источников: {stats.get("total_sources", 0)}')
-        self.stdout.write(f'Обработано источников: {stats.get("processed_sources", 0)}')
+        self.stdout.write('Всего чанков: {stats.get("total_chunks", 0)}')
+        self.stdout.write('Всего источников: {stats.get("total_sources", 0)}')
+        self.stdout.write('Обработано источников: {stats.get("processed_sources", 0)}')
         self.stdout.write(
-            f'Процент обработки: {stats.get("processing_percentage", 0):.1f}%')
+            'Процент обработки: {stats.get("processing_percentage", 0):.1f}%')

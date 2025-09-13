@@ -16,7 +16,6 @@ from core.personalization.recommendation_engine import RecommendationEngine
 
 logger = logging.getLogger(__name__)
 
-
 class PersonalizationAPI(View):
     """
     API для персонализации и рекомендаций
@@ -51,9 +50,9 @@ class PersonalizationAPI(View):
             })
 
         except Exception as e:
-            logger.error(f"Ошибка PersonalizationAPI: {e}")
+            logger.error("Ошибка PersonalizationAPI: {e}")
             return JsonResponse({
-                'error': f'Внутренняя ошибка сервера: {str(e)}'
+                'error': 'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
 
     def post(self, request):
@@ -87,9 +86,9 @@ class PersonalizationAPI(View):
                 'error': 'Неверный JSON'
             }, status=400)
         except Exception as e:
-            logger.error(f"Ошибка PersonalizationAPI POST: {e}")
+            logger.error("Ошибка PersonalizationAPI POST: {e}")
             return JsonResponse({
-                'error': f'Внутренняя ошибка сервера: {str(e)}'
+                'error': 'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
 
     def update_user_preferences(self, user_id: int, data: dict) -> JsonResponse:
@@ -129,9 +128,9 @@ class PersonalizationAPI(View):
             })
 
         except Exception as e:
-            logger.error(f"Ошибка при обновлении предпочтений: {e}")
+            logger.error("Ошибка при обновлении предпочтений: {e}")
             return JsonResponse({
-                'error': f'Ошибка обновления: {str(e)}'
+                'error': 'Ошибка обновления: {str(e)}'
             }, status=500)
 
     def mark_topic_completed(self, user_id: int, data: dict) -> JsonResponse:
@@ -150,13 +149,13 @@ class PersonalizationAPI(View):
 
             return JsonResponse({
                 'status': 'success',
-                'message': f'Тема "{topic}" отмечена как завершенная'
+                'message': 'Тема "{topic}" отмечена как завершенная'
             })
 
         except Exception as e:
-            logger.error(f"Ошибка при отметке темы: {e}")
+            logger.error("Ошибка при отметке темы: {e}")
             return JsonResponse({
-                'error': f'Ошибка отметки: {str(e)}'
+                'error': 'Ошибка отметки: {str(e)}'
             }, status=500)
 
     def update_learning_style(self, user_id: int, data: dict) -> JsonResponse:
@@ -173,7 +172,7 @@ class PersonalizationAPI(View):
             valid_styles = ['visual', 'auditory', 'kinesthetic', 'reading']
             if learning_style not in valid_styles:
                 return JsonResponse({
-                    'error': f'Неверный стиль обучения. Доступные: {valid_styles}'
+                    'error': 'Неверный стиль обучения. Доступные: {valid_styles}'
                 }, status=400)
 
             from core.models import UnifiedProfile  # type: ignore
@@ -190,13 +189,13 @@ class PersonalizationAPI(View):
 
             return JsonResponse({
                 'status': 'success',
-                'message': f'Стиль обучения обновлен на {learning_style}'
+                'message': 'Стиль обучения обновлен на {learning_style}'
             })
 
         except Exception as e:
-            logger.error(f"Ошибка при обновлении стиля обучения: {e}")
+            logger.error("Ошибка при обновлении стиля обучения: {e}")
             return JsonResponse({
-                'error': f'Ошибка обновления: {str(e)}'
+                'error': 'Ошибка обновления: {str(e)}'
             }, status=500)
 
     def get_current_timestamp(self) -> str:
@@ -205,7 +204,6 @@ class PersonalizationAPI(View):
         """
         from django.utils import timezone
         return timezone.now().isoformat()
-
 
 @method_decorator(login_required, name='dispatch')
 class LearningPathAPI(View):
@@ -240,11 +238,10 @@ class LearningPathAPI(View):
             })
 
         except Exception as e:
-            logger.error(f"Ошибка LearningPathAPI: {e}")
+            logger.error("Ошибка LearningPathAPI: {e}")
             return JsonResponse({
-                'error': f'Внутренняя ошибка сервера: {str(e)}'
+                'error': 'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
-
 
 # URL маршруты
 @csrf_exempt
@@ -258,7 +255,6 @@ def personalization_api(request):
         return view.get(request)
     else:
         return view.post(request)
-
 
 @require_http_methods(["GET"])
 def learning_path_api(request):
