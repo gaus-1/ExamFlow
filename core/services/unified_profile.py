@@ -272,12 +272,14 @@ class DailyChallengeService:
             DailyChallenge.objects.filter(date=date).delete()
 
             challenges = [
+                {
                     'title': 'Решить 5 задач',
                     'description': 'Решите правильно 5 задач любой сложности',
                     'challenge_type': 'solve_tasks',
                     'target_value': 5,
                     'reward_xp': 50
                 },
+                {
                     'title': 'Серия из 3 задач',
                     'description': 'Решите подряд 3 задачи без ошибок',
                     'challenge_type': 'streak',
