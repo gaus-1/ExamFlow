@@ -152,7 +152,7 @@ class UnifiedProfile(models.Model):
     @property
     def experience_to_next_level(self):
         """Опыт, необходимый для следующего уровня"""
-        return (self.level * 100) - (self.experience_points %  # type: ignore
+        return (self.level * 100) - (self.experience_points % 100)  # type: ignore
 
     def add_experience(self, points):
         """Добавляет опыт и проверяет повышение уровня"""
