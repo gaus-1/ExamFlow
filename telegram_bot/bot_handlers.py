@@ -381,7 +381,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         solved_info = "• Решено: {progress['total_solved']}" if progress.get(
             'total_solved', 0) > 0 else ""
 
-        stats_line = "\n{level_info} {xp_info} {solved_info}".strip() if any(
+        stats_line = "\n{level_info} {xp_info} {solved_info}".strip() if any([
+            progress.get('level', 1) > 1,
+            progress.get('experience_points', 0) > 0,
+            progress.get('total_solved', 0) > 0
+        ]) else ""
 
         welcome_text = """
 🎯 **ExamFlow 2.0**
