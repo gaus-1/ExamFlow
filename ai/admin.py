@@ -17,8 +17,10 @@ class AiRequestAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
     fieldsets = (
+        ('Основная информация', {
             'fields': ('user', 'session_id', 'request_type', 'prompt', 'response')
         }),
+        ('Статистика', {
             'fields': ('tokens_used', 'cost', 'ip_address', 'created_at')
         }),
     )
@@ -45,10 +47,13 @@ class AiLimitAdmin(admin.ModelAdmin):
     is_exceeded_display.short_description = 'Статус лимита'
 
     fieldsets = (
+        ('Основная информация', {
             'fields': ('user', 'session_id', 'limit_type', 'max_limit')
         }),
+        ('Использование', {
             'fields': ('current_usage', 'reset_date')
         }),
+        ('Системная информация', {
             'fields': ('created_at', 'updated_at')
         }),
     )
@@ -74,14 +79,19 @@ class AiProviderAdmin(admin.ModelAdmin):
         'success_rate']
 
     fieldsets = (
+        ('Основная информация', {
             'fields': ('name', 'provider_type', 'is_active', 'priority')
         }),
+        ('API настройки', {
             'fields': ('api_key', 'api_url', 'max_tokens_per_request')
         }),
+        ('Лимиты и стоимость', {
             'fields': ('daily_limit', 'daily_usage', 'cost_per_token')
         }),
+        ('Статистика', {
             'fields': ('response_time_avg', 'success_rate', 'last_used')
         }),
+        ('Системная информация', {
             'fields': ('created_at', 'updated_at')
         }),
     )
@@ -95,10 +105,13 @@ class AiPromptTemplateAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
     fieldsets = (
+        ('Основная информация', {
             'fields': ('name', 'template_type', 'is_active', 'priority')
         }),
+        ('Шаблон', {
             'fields': ('prompt_template', 'variables')
         }),
+        ('Системная информация', {
             'fields': ('created_at', 'updated_at')
         }),
     )
@@ -118,10 +131,13 @@ class AiResponseAdmin(admin.ModelAdmin):
     readonly_fields = ['prompt_hash', 'created_at', 'last_used', 'usage_count']
 
     fieldsets = (
+        ('Основная информация', {
             'fields': ('prompt_hash', 'provider')
         }),
+        ('Контент', {
             'fields': ('prompt', 'response')
         }),
+        ('Статистика', {
             'fields': ('tokens_used', 'usage_count', 'created_at', 'last_used')
         }),
     )
