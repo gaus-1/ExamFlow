@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'analytics',
     'themes',
     'telegram_bot',
-    ]
+]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -57,11 +57,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.premium.middleware.PremiumAccessMiddleware',
-    ]
+]
 
 ROOT_URLCONF = 'examflow_project.urls'
 
 TEMPLATES = [
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
@@ -75,7 +76,7 @@ TEMPLATES = [
             ],
         },
     },
-    ]
+]
 
 WSGI_APPLICATION = 'examflow_project.wsgi.application'
 
@@ -97,15 +98,19 @@ DATABASES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
+    {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
+    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
+    {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
+    {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-    ]
+]
 
 # Internationalization
 LANGUAGE_CODE = 'ru-ru'
@@ -118,7 +123,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-    ]
+]
 
 # Media files
 MEDIA_URL = '/media/'
@@ -151,7 +156,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.examflow.ru",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    ]
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
