@@ -140,19 +140,17 @@ def db_clear_chat_session_context(telegram_user):
 def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
     """Получает персонализированный ответ от ИИ с использованием RAG системы"""
     try:
-        from ai.personalized_ai_service import PersonalizedAiService
+        # Используем базовый AI-сервис
+        from ai.services import AiService
+        ai_service = AiService()
 
-        # Используем персонализированный AI-сервис
-        personalized_ai = PersonalizedAiService()
-
-        # Получаем персонализированный ответ
+        # Получаем ответ от AI
         if user is None:
             return "❌ Ошибка: пользователь не определен"
-        result = personalized_ai.get_personalized_response(
-            prompt, user, task, task_type)
+        result = ai_service.ask(prompt, user)
 
-        if not result.get('success', False):
-            return "❌ Ошибка: {result.get('error', 'Неизвестная ошибка')}"
+        if 'error' in result:
+            return f"❌ Ошибка: {result['error']}"
 
         response = result['response']
 

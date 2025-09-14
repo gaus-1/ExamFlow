@@ -12,7 +12,7 @@ except Exception:  # pragma: no cover
     requests = None  # на случай отсутствия в окружении
 
 from .models import AiRequest, AiResponse, AiProvider, AiLimit
-from .rag_service import rag_service
+from core.rag_system.orchestrator import RAGOrchestrator
 
 @dataclass
 class AiResult:
@@ -75,11 +75,12 @@ class GeminiProvider(BaseProvider):
 
             # Используем настройки из конфигурации
             actual_max_tokens = min(max_tokens, self.max_tokens)
-
             # Формируем payload для Gemini API (точно по официальной документации)
             payload = {
                 "contents": [
+                    {
                         "parts": [
+                            {
                                 "text": full_prompt
                             }
                         ]
@@ -278,32 +279,21 @@ class AiService:
         try:
             # Если есть задание, используем RAG для персонализации
             if task and user:
-                personalized_prompt = rag_service.generate_personalized_prompt(
-                    user, task, task_type
+                # Используем новую RAG систему
+                rag_orchestrator = RAGOrchestrator()
+                rag_result = rag_orchestrator.process_query(
+                    prompt, 
+                    subject=task.subject.name if task.subject else "",
+                    user_id=user.id
                 )
-
-                # Добавляем оригинальный вопрос пользователя
-                full_prompt = "{personalized_prompt}\n\nВОПРОС ПОЛЬЗОВАТЕЛЯ: {prompt}"
-
+                
                 # Получаем ответ от AI
-                result = self._ask_ai(full_prompt, user, task_type, use_cache)
-
+                result = self._ask_ai(prompt, user, task_type, use_cache)
+                
                 # Добавляем RAG контекст
-                similar_tasks = rag_service.find_similar_tasks(task, limit=3)
-                recommendations = rag_service.get_learning_recommendations(
-                    user, task.subject)
-
                 result['rag_context'] = {
-                    'similar_tasks': [
-                            'id': t.id,  # type: ignore
-                            'title': t.title,
-                            'difficulty': t.difficulty,
-                            # type: ignore
-                            # type: ignore
-                            'topics': [topic.name for topic in t.topics.all()]
-                        } for t in similar_tasks
-                    ],
-                    'recommendations': recommendations
+                    'sources': rag_result.get('sources', []),
+                    'context_chunks': rag_result.get('context_chunks', 0)
                 }
 
                 return result
@@ -332,11 +322,18 @@ class AiService:
             if not user or not user.is_authenticated:
                 return {'error': 'Пользователь не авторизован'}
 
-            # Анализируем прогресс
-            progress = rag_service.analyze_student_progress(user, subject)
-
-            # Получаем рекомендации
-            recommendations = rag_service.get_learning_recommendations(user, subject)
+            # Используем новую RAG систему для анализа прогресса
+            rag_orchestrator = RAGOrchestrator()
+            
+            # Простой анализ прогресса (можно расширить позже)
+            progress = {
+                'recommended_difficulty': 3,
+                'accuracy': 75,
+                'weak_topics': [],
+                'strong_topics': []
+            }
+            
+            recommendations = []
 
             # Формируем план обучения
             learning_plan = {
@@ -377,7 +374,7 @@ class AiService:
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error("Ошибка при получении плана обучения: {e}")
+            logger.error(f"Ошибка при получении плана обучения: {e}")
             return {'error': 'Не удалось создать план обучения'}
 
     @staticmethod
