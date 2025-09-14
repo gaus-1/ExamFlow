@@ -9,6 +9,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b=8q90=se^7twm97htmj$v2n-(b@8!0(%h48n=tnb=t^%ja!ta')
 
+# Настройка модели пользователя
+AUTH_USER_MODEL = 'telegram_auth.TelegramUser'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
@@ -37,16 +40,17 @@ INSTALLED_APPS = [
 
     # Новые модульные приложения
     'learning',
-    'authentication',
     'ai',
     'analytics',
     'themes',
     'telegram_bot',
+    'telegram_auth',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'csp.middleware.CSPMiddleware',
+    'telegram_auth.middleware.TelegramAuthMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'examflow_project.middleware.DatabaseErrorMiddleware',  # Добавляем обработку ошибок БД

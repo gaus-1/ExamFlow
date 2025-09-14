@@ -5,10 +5,6 @@ from django.conf.urls.static import static
 from django.shortcuts import render
 
 # Импорты из legacy модулей (для обратной совместимости)
-from core.auth_views import (
-    register_view, login_view, logout_view, dashboard_view,
-    profile_view, subscribe_view, achievements_view, telegram_auth
-)
 from core.admin_views import trigger_parsing, start_parsing, parsing_status
 from core.api import (
     get_random_task,
@@ -30,14 +26,15 @@ urlpatterns = [
     # НОВЫЕ МОДУЛЬНЫЕ ПРИЛОЖЕНИЯ
     # ==========================================
 
-    # Модуль аутентификации
-    path('auth/', include('authentication.urls')),
 
     # Модуль обучения
     path('', include('learning.urls')),  # Основные маршруты для обучения
 
     # Модуль Telegram бота
     path('bot/', include('telegram_bot.urls')),
+
+    # Модуль Telegram аутентификации
+    path('auth/', include('telegram_auth.urls')),
 
     # Модуль аналитики
     path('analytics/', include('analytics.urls')),
@@ -61,14 +58,6 @@ urlpatterns = [
     # LEGACY МАРШРУТЫ (для обратной совместимости)
     # ==========================================
 
-    # Аутентификация (legacy)
-    path('register/', register_view, name='register'),
-    path('login/', login_view, name='login'),
-    path('logout/', logout_view, name='logout'),
-    path('dashboard/', dashboard_view, name='dashboard'),
-    path('profile/', profile_view, name='profile'),
-    path('achievements/', achievements_view, name='achievements'),
-    path('subscribe/', subscribe_view, name='subscribe'),
 
     # API
     path('api/tasks/random/', get_random_task, name='api_random_task'),
@@ -79,7 +68,6 @@ urlpatterns = [
     path('api/topics/', get_topics, name='api_topics'),
     path('api/statistics/', get_statistics, name='api_statistics'),
     path('api/billing/create-subscription/', create_subscription, name='api_create_subscription'),
-    path('api/auth/telegram/', telegram_auth, name='api_telegram_auth'),
 
     # Административные функции (БЕСПЛАТНЫЙ способ запуска парсинга)
     path('admin/parsing/', trigger_parsing, name='admin_trigger_parsing'),

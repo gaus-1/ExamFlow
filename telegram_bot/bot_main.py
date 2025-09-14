@@ -13,7 +13,8 @@ from .bot_handlers import (
     random_subject_handler, show_task_handler, gamification_menu_handler,
     user_stats_handler, achievements_handler, progress_handler,
     overall_progress_handler, subjects_progress_handler, daily_challenges_handler,
-    leaderboard_handler, bonus_handler, clear_context_handler
+    leaderboard_handler, bonus_handler, clear_context_handler,
+    telegram_auth_handler, auth_success_handler
 )
 from django.conf import settings
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
@@ -139,6 +140,10 @@ def setup_bot_application():
             random_subject_handler,
             pattern="random_subject"))
 
+    # 🔐 Обработчики аутентификации
+    application.add_handler(CallbackQueryHandler(telegram_auth_handler, pattern="telegram_auth"))
+    application.add_handler(CallbackQueryHandler(auth_success_handler, pattern="auth_success"))
+
     # Обработчики для ИИ
     application.add_handler(CallbackQueryHandler(ai_help_handler, pattern=r"ai_help"))
     application.add_handler(
@@ -221,7 +226,7 @@ def main():
     # Явно удаляем webhook, если активен, чтобы избежать 409 Conflict
     try:
         import asyncio
-        asyncio.run(application.bot.delete_webhook(
+        asyncio.run(application.bot.delete_webhook( # type: ignore
             drop_pending_updates=True))  # type: ignore
     except Exception:
         pass
@@ -236,7 +241,7 @@ if __name__ == '__main__':
     # Явно удаляем webhook, если активен, чтобы избежать 409 Conflict
     try:
         import asyncio
-        asyncio.run(application.bot.delete_webhook(
+        asyncio.run(application.bot.delete_webhook( # type: ignore
             drop_pending_updates=True))  # type: ignore
     except Exception:
         pass

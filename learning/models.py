@@ -11,7 +11,7 @@
 """
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 
 class ExamType(models.Model):
@@ -50,7 +50,7 @@ class Subject(models.Model):
         verbose_name="Иконка")
     is_archived = models.BooleanField(
         default=False, verbose_name="Архивирован")  # type: ignore
-    is_primary = models.BooleanField(default=False,
+    is_primary = models.BooleanField(default=False,  # type: ignore
                                      verbose_name="Основной предмет")  # type: ignore
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
@@ -61,7 +61,7 @@ class Subject(models.Model):
         ordering = ['is_primary', 'name']
 
     def __str__(self):
-        return "{self.name} ({self.get_exam_type_display()})"  # type: ignore
+        return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
 
     @property
     def task_count(self):
@@ -78,7 +78,7 @@ class Topic(models.Model):
     code = models.CharField(max_length=20, verbose_name="Код темы")
 
     def __str__(self):
-        return "{self.subject.name} - {self.name}"
+        return f"{self.subject.name} - {self.name}"
 
     class Meta:
         verbose_name = "Тема"
@@ -113,7 +113,7 @@ class Task(models.Model):
 class UserProgress(models.Model):
     """Прогресс пользователя по заданиям"""
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
         related_name='learning_userprogress_set')
@@ -125,7 +125,7 @@ class UserProgress(models.Model):
     last_attempt = models.DateTimeField(auto_now=True, verbose_name="Последняя попытка")
 
     def __str__(self):
-        return "{self.user.username} - {self.task.subject.name}"  # type: ignore
+        return f"{self.user.username} - {self.task.subject.name}"  # type: ignore
 
     class Meta:
         verbose_name = "Прогресс пользователя"
@@ -134,7 +134,7 @@ class UserProgress(models.Model):
 class UserRating(models.Model):
     """Рейтинг пользователя"""
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь")  # type: ignore
     total_points = models.IntegerField(
@@ -151,7 +151,7 @@ class UserRating(models.Model):
     def __str__(self):
         # type: ignore
         # type: ignore
-        return "Рейтинг {self.user.username}: {self.total_points} очков"
+        return f"Рейтинг {self.user.username}: {self.total_points} очков"  # type: ignore
 
     class Meta:
         verbose_name = "Рейтинг пользователя"
@@ -165,7 +165,7 @@ class Achievement(models.Model):
     points_required = models.IntegerField(
         default=0, verbose_name="Требуемые очки")  # type: ignore
     users = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         through='UserAchievement',
         verbose_name="Пользователи")
 
@@ -179,7 +179,7 @@ class Achievement(models.Model):
 class UserAchievement(models.Model):
     """Связь пользователя с достижением"""
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь")
     achievement = models.ForeignKey(
@@ -189,7 +189,7 @@ class UserAchievement(models.Model):
     earned_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата получения")
 
     def __str__(self):
-        return "{self.user.username} - {self.achievement.name}"  # type: ignore
+        return f"{self.user.username} - {self.achievement.name}"  # type: ignore
 
     class Meta:
         verbose_name = "Достижение пользователя"

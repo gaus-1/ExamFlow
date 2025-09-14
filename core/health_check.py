@@ -90,14 +90,14 @@ class SystemHealthChecker:
 
             # Проверяем API бота
             response = requests.get(
-                "https://api.telegram.org/bot{token}/getMe",
+                f"https://api.telegram.org/bot{token}/getMe",
                 timeout=10
             )
 
             if response.status_code != 200:
                 return {
                     'status': 'unhealthy',
-                    'error': 'Telegram API returned {response.status_code}',
+                    'error': f'Telegram API returned {response.status_code}',
                     'response_time': time.time() - start_time
                 }
 
@@ -142,7 +142,7 @@ class SystemHealthChecker:
             # Проверяем доступность Gemini API
             response = requests.post(
                 "https://generativelanguage.googleapis.com/v1beta/models",
-                headers={'Authorization': 'Bearer {gemini_key}'},
+                headers={'Authorization': f'Bearer {gemini_key}'},
                 timeout=10
             )
 
@@ -155,7 +155,7 @@ class SystemHealthChecker:
             else:
                 return {
                     'status': 'degraded',
-                    'warning': 'Gemini API returned {response.status_code}',
+                    'warning': f'Gemini API returned {response.status_code}',
                     'response_time': time.time() - start_time
                 }
 
@@ -212,7 +212,7 @@ class SystemHealthChecker:
 
             # Тестируем запись и чтение из кэша
             test_key = 'health_check_test'
-            test_value = 'test_{int(time.time())}'
+            test_value = f'test_{int(time.time())}'
 
             cache.set(test_key, test_value, 60)
             cached_value = cache.get(test_key)
@@ -267,7 +267,7 @@ class SystemHealthChecker:
             return info
         except Exception as e:
             return {
-                'error': 'Could not get system info: {str(e)}'
+                'error': f'Could not get system info: {str(e)}'
             }
 
     def run_all_checks(self) -> Dict[str, Any]:
@@ -331,7 +331,7 @@ def health_check_view(request):
         return JsonResponse(health_data, status=status_code)
 
     except Exception as e:
-        logger.error("Health check failed: {e}")
+        logger.error(f"Health check failed: {e}")
         return JsonResponse({
             'status': 'unhealthy',
             'error': str(e),

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход через Telegram - ExamFlow</title>
+    <script src="https://telegram.org/js/telegram-widget.js?22" 
+            data-telegram-login="{{ bot_username }}" 
+            data-size="large" 
+            data-auth-url="{{ callback_url }}"
+            data-request-access="write"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .features {
+            text-align: left;
+            margin: 30px 0;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            color: #333;
+        }
+        .feature-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎯 ExamFlow</div>
+        <div class="subtitle">
+            Войдите через Telegram для доступа ко всем функциям
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">🤖</span>
+                <span>Персональный ИИ-ассистент</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📊</span>
+                <span>Отслеживание прогресса</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🏆</span>
+                <span>Система достижений</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">💎</span>
+                <span>Премиум функции</span>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Авторизация...</p>
+        </div>
+    </div>
+
+    <script>
+        // Показываем загрузку при клике на виджет
+        document.addEventListener('DOMContentLoaded', function() {
+            const widget = document.querySelector('iframe[src*="telegram.org"]');
+            if (widget) {
+                widget.addEventListener('load', function() {
+                    // Виджет загружен, можно добавить дополнительную логику
+                });
+            }
+
+            // Обработка успешной авторизации
+            window.addEventListener('message', function(event) {
+                if (event.origin === 'https://oauth.telegram.org') {
+                    if (event.data.type === 'auth_success') {
+                        document.getElementById('loading').style.display = 'block';
+                        
+                        // Перенаправляем в бота с токеном
+                        setTimeout(() => {
+                            window.location.href = 'https://t.me/{{ bot_username }}?start=auth_success_' + event.data.token;
+                        }, 2000);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

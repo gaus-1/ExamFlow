@@ -15,7 +15,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 from django.utils import timezone
 from learning.models import UserProgress, Achievement
-from authentication.models import UserProfile
+from core.models import UnifiedProfile
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +33,8 @@ class TelegramGamification:
     def add_points(self, user_id: int, points: int, reason: str = "Задание") -> Dict:
         """Добавляет очки пользователю"""
         try:
-            profile, created = UserProfile.objects.get_or_create(  # type: ignore
-                user_id=user_id,
+            profile, created = UnifiedProfile.objects.get_or_create(  # type: ignore
+                telegram_id=user_id,
                 defaults={'telegram_id': user_id}
             )
 
@@ -47,7 +48,7 @@ class TelegramGamification:
 
             if new_level > old_level:
                 profile.level = new_level
-                level_up_message = "🎉 **Поздравляем! Вы достигли {new_level} уровня!**"
+                level_up_message = f"🎉 **Поздравляем! Вы достигли {new_level} уровня!**"
             else:
                 level_up_message = ""
 
@@ -63,26 +64,32 @@ class TelegramGamification:
             }
 
         except Exception as e:
-            logger.error("Ошибка при добавлении очков: {e}")
+            logger.error(f"Ошибка при добавлении очков: {e}")
             return {'success': False, 'error': str(e)}
 
     @sync_to_async
     def get_user_stats(self, user_id: int) -> Dict:
         """Получает статистику пользователя"""
         try:
-            profile = UserProfile.objects.filter(
+            profile = UnifiedProfile.objects.filter( # type: ignore
                 telegram_id=user_id).first()  # type: ignore
             if not profile:
                 return {'success': False, 'error': 'Профиль не найден'}
 
+            # Получаем или создаем Django User
+            django_user, _ = User.objects.get_or_create(  # type: ignore
+                username=f"tg_{user_id}",
+                defaults={'first_name': f'User {user_id}'}
+            )
+            
             # Получаем прогресс по предметам
             subjects_progress = UserProgress.objects.filter(  # type: ignore
-                user_id=profile.user.id
+                user_id=django_user.id
             ).select_related('subject')
 
             # Получаем достижения
             achievements = Achievement.objects.filter(  # type: ignore
-                user_id=profile.user.id
+                user_id=django_user.id
             ).order_by('-date_earned')[:5]
 
             return {
@@ -96,24 +103,30 @@ class TelegramGamification:
             }
 
         except Exception as e:
-            logger.error("Ошибка при получении статистики: {e}")
+            logger.error(f"Ошибка при получении статистики: {e}")
             return {'success': False, 'error': str(e)}
 
     @sync_to_async
     def check_achievements(self, user_id: int, action: str, **kwargs) -> List[Dict]:
         """Проверяет и выдаёт достижения"""
         try:
-            profile = UserProfile.objects.filter(
+            profile = UnifiedProfile.objects.filter( # type: ignore
                 telegram_id=user_id).first()  # type: ignore
             if not profile:
                 return []
 
             new_achievements = []
 
+            # Получаем или создаем Django User
+            django_user, _ = User.objects.get_or_create(  # type: ignore
+                username=f"tg_{user_id}",
+                defaults={'first_name': f'User {user_id}'}
+            )
+            
             # Достижение за первый правильный ответ
             if action == "correct_answer" and kwargs.get('first_correct'):
                 achievement = self._create_achievement(
-                    profile.user,
+                    django_user,
                     "Первый шаг",
                     "Решили первое задание правильно",
                     "🥇"
@@ -124,9 +137,9 @@ class TelegramGamification:
             # Достижение за серию правильных ответов
             if action == "correct_answer" and kwargs.get('streak', 0) >= 5:
                 achievement = self._create_achievement(
-                    profile.user,
+                    django_user,
                     "Серия побед",
-                    "Решили {kwargs['streak']} заданий подряд правильно",
+                    f"Решили {kwargs['streak']} заданий подряд правильно",
                     "🔥"
                 )
                 if achievement:
@@ -136,9 +149,9 @@ class TelegramGamification:
             if action == "level_up":
                 level = kwargs.get('level', 1)
                 achievement = self._create_achievement(
-                    profile.user,
-                    "Уровень {level}",
-                    "Достигли {level} уровня",
+                    django_user,
+                    f"Уровень {level}",
+                    f"Достигли {level} уровня",
                     "⭐"
                 )
                 if achievement:
@@ -147,14 +160,14 @@ class TelegramGamification:
             return new_achievements
 
         except Exception as e:
-            logger.error("Ошибка при проверке достижений: {e}")
+            logger.error(f"Ошибка при проверке достижений: {e}")
             return []
 
     @sync_to_async
     def get_daily_challenges(self, user_id: int) -> List[Dict]:
         """Получает ежедневные задания для пользователя"""
         try:
-            profile = UserProfile.objects.filter(
+            profile = UnifiedProfile.objects.filter( # type: ignore
                 telegram_id=user_id).first()  # type: ignore
             if not profile:
                 return []
@@ -167,8 +180,8 @@ class TelegramGamification:
             target_tasks = min(level * 2, 20)
             challenges.append({
                 'id': 'daily_tasks',
-                'title': 'Решить {target_tasks} заданий',
-                'description': 'Решите {target_tasks} заданий сегодня',
+                'title': f'Решить {target_tasks} заданий',
+                'description': f'Решите {target_tasks} заданий сегодня',
                 'reward': 25,
                 'progress': 0,
                 'target': target_tasks,
@@ -202,22 +215,28 @@ class TelegramGamification:
             return challenges
 
         except Exception as e:
-            logger.error("Ошибка при получении ежедневных заданий: {e}")
+            logger.error(f"Ошибка при получении ежедневных заданий: {e}")
             return []
 
     @sync_to_async
     def get_leaderboard(self, limit: int = 10) -> List[Dict]:
         """Получает таблицу лидеров"""
         try:
-            top_users = UserProfile.objects.filter(  # type: ignore
+            top_users = UnifiedProfile.objects.filter(  # type: ignore
                 points__gt=0
             ).order_by('-points')[:limit]
 
             leaderboard = []
             for i, profile in enumerate(top_users, 1):
+                # Получаем или создаем Django User для отображения имени
+                django_user, _ = User.objects.get_or_create(  # type: ignore
+                    username=f"tg_{profile.telegram_id}",
+                    defaults={'first_name': f'User {profile.telegram_id}'}
+                )
+                
                 leaderboard.append({
                     'rank': i,
-                    'username': profile.user.username or "Пользователь {profile.user.id}",
+                    'username': django_user.username or f"Пользователь {profile.telegram_id}",
                     'level': profile.level or 1,
                     'points': profile.points or 0,
                     'emoji': self._get_rank_emoji(i)
@@ -226,20 +245,23 @@ class TelegramGamification:
             return leaderboard
 
         except Exception as e:
-            logger.error("Ошибка при получении таблицы лидеров: {e}")
+            logger.error(f"Ошибка при получении таблицы лидеров: {e}")
             return []
 
     def create_gamification_keyboard(self, user_id: int) -> InlineKeyboardMarkup:
         """Создаёт клавиатуру для геймификации"""
         keyboard = [
-                InlineKeyboardButton("🏆 Статистика", callback_data="stats_{user_id}"),
-                InlineKeyboardButton("🎯 Достижения", callback_data="achievements_{user_id}")
+            [
+                InlineKeyboardButton("🏆 Статистика", callback_data=f"stats_{user_id}"),
+                InlineKeyboardButton("🎯 Достижения", callback_data=f"achievements_{user_id}")
             ],
-                InlineKeyboardButton("📊 Прогресс", callback_data="progress_{user_id}"),
+            [
+                InlineKeyboardButton("📊 Прогресс", callback_data=f"progress_{user_id}"),
                 InlineKeyboardButton("🏅 Лидеры", callback_data="leaderboard")
             ],
-                InlineKeyboardButton("📅 Ежедневные задания", callback_data="daily_{user_id}"),
-                InlineKeyboardButton("🎁 Бонусы", callback_data="bonus_{user_id}")
+            [
+                InlineKeyboardButton("📅 Ежедневные задания", callback_data=f"daily_{user_id}"),
+                InlineKeyboardButton("🎁 Бонусы", callback_data=f"bonus_{user_id}")
             ]
         ]
         return InlineKeyboardMarkup(keyboard)
@@ -247,11 +269,17 @@ class TelegramGamification:
     def create_progress_keyboard(self, user_id: int) -> InlineKeyboardMarkup:
         """Создаёт клавиатуру для прогресса"""
         keyboard = [
+            [
                 InlineKeyboardButton(
-                    "📈 Общий прогресс", callback_data="overall_progress_{user_id}"), InlineKeyboardButton(
-                    "📚 По предметам", callback_data="subjects_progress_{user_id}")], [
+                    "📈 Общий прогресс", callback_data=f"overall_progress_{user_id}"),
                 InlineKeyboardButton(
-                    "🔙 Назад", callback_data="gamification_{user_id}")]]
+                    "📚 По предметам", callback_data=f"subjects_progress_{user_id}")
+            ],
+            [
+                InlineKeyboardButton(
+                    "🔙 Назад", callback_data=f"gamification_{user_id}")
+            ]
+        ]
         return InlineKeyboardMarkup(keyboard)
 
     def _calculate_level(self, points: int) -> int:
@@ -318,5 +346,5 @@ class TelegramGamification:
             }
 
         except Exception as e:
-            logger.error("Ошибка при создании достижения: {e}")
+            logger.error(f"Ошибка при создании достижения: {e}")
             return None
