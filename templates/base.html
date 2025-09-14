@@ -84,12 +84,13 @@
     <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша -->
     <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" type="text/css">
     
-    <!-- JavaScript функции для core приложения (минифицированные для продакшена) -->
-    {% if debug %}
-        <script src="{% static 'js/core-functions.js' %}"></script>
-    {% else %}
-        <script src="{% static 'js/core-functions.min.js' %}"></script>
-    {% endif %}
+    <!-- Основной JavaScript модуль ExamFlow 2.0 -->
+    <script src="{% static 'js/main.js' %}?v={{ STATIC_VERSION }}"></script>
+    
+    <!-- Дополнительные модули -->
+    <script src="{% static 'js/modules/ai-learning.js' %}?v={{ STATIC_VERSION }}"></script>
+    <script src="{% static 'js/modules/gamification.js' %}?v={{ STATIC_VERSION }}"></script>
+    <script src="{% static 'js/modules/theme-manager.js' %}?v={{ STATIC_VERSION }}"></script>
     
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
