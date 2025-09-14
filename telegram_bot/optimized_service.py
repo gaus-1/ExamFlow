@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from learning.models import Subject, Task, UserProgress
-from authentication.models import UserProfile
+from core.models import UnifiedProfile
 from core.services.unified_profile import UnifiedProfileService
 from core.services.chat_session import ChatSessionService
 from ai.optimized_service import ai_service

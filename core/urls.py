@@ -18,14 +18,14 @@ class SubjectSitemap(Sitemap):
 
     def items(self):
         try:
-            return Subject.objects.filter(
+            return Subject.objects.filter( # type: ignore
                 is_archived=False,
                 is_primary=True).order_by('id')  # type: ignore
         except Exception:
             return Subject.objects.all().order_by('id')  # type: ignore
 
     def location(self, obj):  # type: ignore
-        return "/subject/{obj.id}/"
+        return f"/subject/{obj.id}/"
 
 class StaticSitemap(Sitemap):
     changefreq = "weekly"
@@ -54,7 +54,7 @@ def robots_txt(_request):
             'WEBSITE_URL',
             'https://examflow.ru'),
     ]
-    return HttpResponse("\n".join(lines), content_type="text/plain")  # type: ignore
+    return HttpResponse("\n".join(lines).encode('utf-8'), content_type="text/plain")  # type: ignore
 
 def faq_view(request):
     qa = {
@@ -98,15 +98,9 @@ def faq_view(request):
     return render(request, 'faq.html', context)
 
 from . import api  # noqa: E402
-from .ultra_simple_health import ultra_simple_health, minimal_health_check  # noqa: E402
+from .health_check import health_check_view, simple_health_check  # noqa: E402
 from core.rag_system.search_api import fipi_semantic_search  # noqa: E402
-from core.rag_system.ai_api import (  # noqa: E402
-    ai_ask,
-    ai_subjects,
-    ai_user_profile,
-    ai_problem_submit,
-    ai_statistics,
-    )
+from core.rag_system import ai_api  # noqa: E402
 
 urlpatterns = [
     # API для RAG-системы
@@ -116,9 +110,9 @@ urlpatterns = [
     path('api/health/', api.HealthCheckView.as_view(), name='health_check'),
 
     # Health check endpoints (ультра-простые для Render)
-    path('health/', ultra_simple_health, name='health_check_basic'),
-    path('health/simple/', minimal_health_check, name='health_check_simple'),
-    path('health/minimal/', minimal_health_check, name='health_check_minimal'),
+    path('health/', health_check_view, name='health_check_basic'),
+    path('health/simple/', simple_health_check, name='health_check_simple'),
+    path('health/minimal/', simple_health_check, name='health_check_minimal'),
     path('robots.txt', robots_txt, name='robots_txt'),
     path(
         'sitemap.xml', sitemap_views.sitemap, {
@@ -128,11 +122,11 @@ urlpatterns = [
     path('api/fipi/search/', fipi_semantic_search, name='fipi_semantic_search'),
 
     # Новые AI API эндпоинты
-    path('api/ai/ask/', ai_ask, name='ai_ask'),
-    path('api/ai/subjects/', ai_subjects, name='ai_subjects'),
-    path('api/ai/user/profile/', ai_user_profile, name='ai_user_profile'),
-    path('api/ai/problem/submit/', ai_problem_submit, name='ai_problem_submit'),
-    path('api/ai/statistics/', ai_statistics, name='ai_statistics'),
+    path('api/ai/ask/', ai_api.ai_ask, name='ai_ask'),
+    path('api/ai/subjects/', ai_api.ai_subjects, name='ai_subjects'),
+    path('api/ai/user/profile/', ai_api.ai_user_profile, name='ai_user_profile'),
+    path('api/ai/problem/submit/', ai_api.ai_problem_submit, name='ai_problem_submit'),
+    path('api/ai/statistics/', getattr(ai_api, 'ai_statistics'), name='ai_statistics'),
 
     # Страница подписки
     path(

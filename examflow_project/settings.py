@@ -93,6 +93,8 @@ if not DEBUG:
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')
+DATABASE_URL = os.getenv('DATABASE_URL', '')
+SITE_URL = os.getenv('SITE_URL', 'https://examflow.ru')
 
 # Настройки RAG системы
 RAG_CONFIG = {

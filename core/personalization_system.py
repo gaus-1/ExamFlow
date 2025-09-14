@@ -9,7 +9,7 @@ from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta
 from learning.models import Task, UserProgress
-from authentication.models import UserProfile
+from core.models import UnifiedProfile
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +18,9 @@ class UserBehaviorAnalyzer:
 
     def __init__(self, user_id: int):
         self.user_id = user_id
-        self.user = UserProfile.objects.get(
-            user_id=user_id) if UserProfile.objects.filter(
-            user_id=user_id).exists() else None  # type: ignore
+        self.user = UnifiedProfile.objects.get( # type: ignore
+            telegram_id=user_id) if UnifiedProfile.objects.filter( # type: ignore
+            telegram_id=user_id).exists() else None  # type: ignore
 
     def get_user_preferences(self) -> Dict:
         """Получает предпочтения пользователя на основе его активности"""
@@ -251,7 +251,8 @@ class PersonalizedRecommendations:
             # Определяем еженедельный фокус
             if preferences['favorite_subjects']:
                 plan['weekly_focus'] = [
-                    for subject in preferences['favorite_subjects'][:2]
+                    f"Фокус на предмете: {subject}"
+                    for subject in preferences['favorite_subjects'][:2]  # type: ignore
                 ]
 
             # План прогрессии по сложности
@@ -331,11 +332,12 @@ class PersonalizedRecommendations:
             )
 
             return [
-                    'subject': subject,
+                {
+                    'subject': subject, # type: ignore
                     'failed_tasks': data['failed_tasks'],
                     'total_attempts': data['total_attempts'],
-                    'avg_difficulty': data.get('avg_difficulty', 0),
-                    'success_rate': data.get('success_rate', 0)
+                    'avg_difficulty': data.get('avg_difficulty', 0), # type: ignore
+                    'success_rate': data.get('success_rate', 0)  # type: ignore
                 }
                 for subject, data in sorted_weak_topics[:5]  # Топ-5 слабых тем
             ]

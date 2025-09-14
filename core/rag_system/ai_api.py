@@ -173,7 +173,9 @@ def ai_problem_submit(request: HttpRequest) -> JsonResponse:
         answer = data.get("answer", "").strip()
 
         if not task_id or not solution:
-            return JsonResponse(
+            return JsonResponse({
+                "error": "Task ID and solution are required"
+            }, status=400)
 
         from core.models import Task, UserProfile
 

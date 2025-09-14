@@ -21,7 +21,8 @@ from django.contrib.auth.models import User
 from learning.models import (
     Subject, Task, UserProgress, UserRating
 )
-from authentication.models import Subscription
+from core.models import UnifiedProfile
+# Subscription model removed - using UnifiedProfile.is_premium instead
 
 def is_staff_or_superuser(user):
     """Проверяет, является ли пользователь администратором"""
@@ -66,17 +67,14 @@ def dashboard(request):
         })
 
     # Топ пользователи
-    top_users = UserRating.objects.select_related(
+    top_users = UserRating.objects.select_related( # type: ignore
         'user').order_by('-total_points')[:10]  # type: ignore
 
-    # Статистика подписок
+    # Статистика подписок (используем UnifiedProfile.is_premium)
     subscriptions_stats = {
-        'total': Subscription.objects.count(),  # type: ignore
-        'active': Subscription.objects.filter(is_active=True).count(),  # type: ignore
-        'expired': Subscription.objects.filter(  # type: ignore
-            is_active=False,
-            end_date__lt=timezone.now()
-        ).count()
+        'total': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+        'active': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+        'expired': 0  # Пока не отслеживаем истечение подписок
     }
 
     context = {
@@ -256,9 +254,8 @@ def api_stats(request):
             ).filter(tasks_count__gt=0).count(),
         },
         'subscriptions': {
-            'total': Subscription.objects.count(),  # type: ignore
-            # type: ignore
-            'active': Subscription.objects.filter(is_active=True).count(),
+            'total': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+            'active': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
         }
     }
 
@@ -276,7 +273,7 @@ def update_user_profile(request):
         data = json.loads(request.body)
 
         # Логируем данные для отладки
-        print("📊 Получены данные профиля: {data}")
+        print(f"📊 Получены данные профиля: {data}")
 
         # Здесь можно добавить логику сохранения данных в базу
         # Пока просто возвращаем успех
@@ -298,5 +295,5 @@ def update_user_profile(request):
     except Exception as e:
         return JsonResponse({
             'status': 'error',
-            'message': 'Ошибка сервера: {str(e)}'
+            'message': f'Ошибка сервера: {str(e)}'
         }, status=500)

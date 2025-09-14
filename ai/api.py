@@ -371,6 +371,7 @@ class ProblemsAPI(View):
                                                           'x₁ = -1, x₂ = -6'],
                                               'correct_answer': 0,
                                               'hint': 'Используйте формулу дискриминанта: D = b² - 4ac'},
+                                             {'id': 2,
                                               'text': 'Найдите площадь круга с радиусом 5 см',
                                               'options': ['25π см²',
                                                           '50π см²',
@@ -482,7 +483,7 @@ class UserProfileAPI(View):
                 'total_problems_solved': total_problems_solved,
                 'streak': streak,
                 'achievements': [
-                        'name': a.name,
+                        {'name': a.name,
                         'description': a.description} for a in achievements] if achievements else [],
                 'subjects_progress': subjects_progress}
 

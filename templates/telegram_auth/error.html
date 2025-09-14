@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка входа - ExamFlow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.5;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .retry-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+        
+        .home-button {
+            background: #f8f9fa;
+            color: #666;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+            font-size: 16px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .home-button:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .help-text {
+            margin-top: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">❌</div>
+        <h1>Ошибка входа</h1>
+        <div class="error-message">
+            {{ error_message|default:"Произошла ошибка при входе через Telegram. Попробуйте еще раз." }}
+        </div>
+        
+        <a href="/auth/telegram/login/" class="retry-button">
+            Попробовать снова
+        </a>
+        
+        <a href="/" class="home-button">
+            На главную
+        </a>
+        
+        <p class="help-text">
+            Если проблема повторяется, обратитесь в поддержку
+        </p>
+    </div>
+</body>
+</html>

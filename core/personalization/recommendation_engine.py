@@ -67,8 +67,8 @@ class RecommendationEngine:
             from core.models import UserProgress  # type: ignore
 
             # Получаем прогресс по предметам
-            progress_entries = UserProgress.objects.filter(
-                user_id=user_id)  # type: ignore
+            progress_entries = UserProgress.objects.filter( # type: ignore
+                user__id=user_id)  # type: ignore
 
             analysis = {
                 'total_problems_solved': 0,
@@ -84,16 +84,19 @@ class RecommendationEngine:
             subject_count = 0
 
             for progress in progress_entries:
-                subject_name = progress.subject.name
-                accuracy = progress.accuracy or 0
+                subject_name = progress.task.subject.name if progress.task and progress.task.subject else "Unknown"
+                accuracy = 100 if progress.is_correct else 0
 
-                analysis['subject_performance'][subject_name] = {
-                    'problems_solved': progress.problems_solved,
-                    'accuracy': accuracy,
-                    'last_activity': progress.last_activity
-                }
+                if subject_name not in analysis['subject_performance']:
+                    analysis['subject_performance'][subject_name] = {
+                        'problems_solved': 0,
+                        'accuracy': 0,
+                        'last_activity': progress.created_at if hasattr(progress, 'created_at') else None
+                    }
 
-                analysis['total_problems_solved'] += progress.problems_solved
+                analysis['subject_performance'][subject_name]['problems_solved'] += 1
+                analysis['subject_performance'][subject_name]['accuracy'] = accuracy
+                analysis['total_problems_solved'] += 1
                 total_accuracy += accuracy
                 subject_count += 1
 
@@ -193,18 +196,21 @@ class RecommendationEngine:
         # Базовый путь для новичков
         if user_analysis.get('total_problems_solved', 0) < 10:
             learning_path = [
+                {
                     'step': 1,
                     'title': 'Изучение основ',
                     'description': 'Начните с базовых понятий и теории',
                     'estimated_time': '1-2 недели',
                     'priority': 'high'
                 },
+                {
                     'step': 2,
                     'title': 'Практические задания',
                     'description': 'Решайте простые задачи для закрепления',
                     'estimated_time': '2-3 недели',
                     'priority': 'high'
                 },
+                {
                     'step': 3,
                     'title': 'Сложные задачи',
                     'description': 'Переходите к более сложным заданиям',
@@ -309,11 +315,11 @@ class RecommendationEngine:
             # Получаем прогресс за последние 30 дней
             thirty_days_ago = timezone.now() - timedelta(days=30)
             recent_progress = UserProgress.objects.filter(  # type: ignore
-                user_id=user_id,
-                last_activity__gte=thirty_days_ago
+                user__id=user_id,
+                created_at__gte=thirty_days_ago
             )
 
-            total_problems = sum(p.problems_solved for p in recent_progress)
+            total_problems = recent_progress.count()
             return total_problems / 30  # Задач в день
 
         except Exception as e:
@@ -326,6 +332,7 @@ class RecommendationEngine:
         """
         return {
             'topics_to_focus': [
+                {
                     'subject': 'Математика',
                     'priority': 'high',
                     'reason': 'Базовый предмет для ЕГЭ',
@@ -338,6 +345,7 @@ class RecommendationEngine:
             ],
             'practice_tasks': [],
             'learning_path': [
+                {
                     'step': 1,
                     'title': 'Начало обучения',
                     'description': 'Изучите основы выбранного предмета',
@@ -348,6 +356,7 @@ class RecommendationEngine:
             'weak_areas': [],
             'strengths': [],
             'next_goals': [
+                {
                     'type': 'general',
                     'title': 'Начать обучение',
                     'description': 'Выберите предмет и начните решать задачи',

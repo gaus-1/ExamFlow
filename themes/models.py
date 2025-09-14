@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class UserThemePreference(models.Model):
@@ -18,7 +18,7 @@ class UserThemePreference(models.Model):
     ]
 
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='theme_preference',
         verbose_name='Пользователь'
@@ -80,7 +80,7 @@ class ThemeUsage(models.Model):
     """
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='theme_usage',
         verbose_name='Пользователь'
@@ -138,7 +138,7 @@ class ThemeCustomization(models.Model):
     """
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='theme_customizations',
         verbose_name='Пользователь'

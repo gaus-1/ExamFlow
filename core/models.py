@@ -3,7 +3,7 @@
 """
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
@@ -24,7 +24,7 @@ class Subject(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return "{self.name} ({self.get_exam_type_display()})"  # type: ignore
+        return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
 
     @property
     def task_count(self):
@@ -59,7 +59,7 @@ class Task(models.Model):
         ordering = ['subject', 'difficulty', 'title']
 
     def __str__(self):
-        return "{self.subject.name}: {self.title}"
+        return f"{self.subject.name}: {self.title}"
 
     def check_answer(self, user_answer):
         """Проверяет правильность ответа пользователя"""
@@ -70,7 +70,7 @@ class Task(models.Model):
 class UserProgress(models.Model):
     """Модель прогресса пользователя по задаче"""
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
         related_name='core_userprogress_set')
@@ -95,14 +95,14 @@ class UserProgress(models.Model):
         ordering = ['-last_attempt']
 
     def __str__(self):
-        return "{self.user.username} - {self.task.title}"  # type: ignore
+        return f"{self.user.username} - {self.task.title}"  # type: ignore
 
 class UnifiedProfile(models.Model):
     """Унифицированный профиль пользователя для сайта и бота"""
 
     # Основная информация
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь Django",
         null=True,
@@ -147,7 +147,7 @@ class UnifiedProfile(models.Model):
         ordering = ['-last_activity']
 
     def __str__(self):
-        return "{self.display_name} (TG: {self.telegram_id})"
+        return f"{self.display_name} (TG: {self.telegram_id})"
 
     @property
     def experience_to_next_level(self):
@@ -194,7 +194,7 @@ class DailyChallenge(models.Model):
         unique_together = ['challenge_type', 'date']
 
     def __str__(self):
-        return "{self.title} ({self.date})"
+        return f"{self.title} ({self.date})"
 
 class UserChallenge(models.Model):
     """Прогресс пользователя по ежедневным вызовам"""
@@ -220,7 +220,7 @@ class UserChallenge(models.Model):
         unique_together = ['profile', 'challenge']
 
     def __str__(self):
-        return "{self.profile.display_name} - {self.challenge.title}"  # type: ignore
+        return f"{self.profile.display_name} - {self.challenge.title}"  # type: ignore
 
     @property
     def progress_percentage(self):
@@ -235,7 +235,7 @@ class UserChallenge(models.Model):
 class ChatSession(models.Model):
     """Сессия чата пользователя с ботом для сохранения контекста"""
     user = models.ForeignKey(
-        'auth.User',  # type: ignore
+        settings.AUTH_USER_MODEL,  # type: ignore
         on_delete=models.CASCADE,
         verbose_name="Пользователь")  # type: ignore
     telegram_id = models.BigIntegerField(verbose_name="Telegram ID")
@@ -256,7 +256,7 @@ class ChatSession(models.Model):
         ]
 
     def __str__(self):
-        return "Сессия {self.session_id} для {self.user.username}"  # type: ignore
+        return f"Сессия {self.session_id} для {self.user.username}"  # type: ignore
 
     def add_message(self, role: str, content: str):
         """Добавляет сообщение в контекст сессии"""
@@ -339,7 +339,7 @@ class FIPIData(models.Model):
         ]
 
     def __str__(self):
-        return "{self.title} ({self.get_data_type_display()})"  # type: ignore
+        return f"{self.title} ({self.get_data_type_display()})"  # type: ignore
 
     def mark_as_processed(self):
         """Отмечает запись как обработанную"""
@@ -382,13 +382,13 @@ class DataChunk(models.Model):
 
     def __str__(self):
         # type: ignore
-        return "Чанк {self.chunk_index} из {self.source_data.title[:50]}..."
+        return f"Чанк {self.chunk_index} из {self.source_data.title[:50]}..."  # type: ignore
 
 class UserProfile(models.Model):
     """Модель профиля пользователя для персонализации"""
 
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь")  # type: ignore
     query_stats = models.JSONField(
@@ -421,7 +421,7 @@ class UserProfile(models.Model):
         verbose_name_plural = "Профили пользователей"
 
     def __str__(self):
-        return "Профиль {self.user.username}"  # type: ignore
+        return f"Профиль {self.user.username}"  # type: ignore
 
     @property
     def total_queries(self):
@@ -522,7 +522,7 @@ class FIPISourceMap(models.Model):
         ]
 
     def __str__(self):
-        return "{self.name} ({self.get_data_type_display()})"  # type: ignore
+        return f"{self.name} ({self.get_data_type_display()})"  # type: ignore
 
     @property
     def is_critical(self) -> bool:

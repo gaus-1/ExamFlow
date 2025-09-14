@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from learning.models import (
     Subject, Task, UserProgress, UserRating
 )
-from authentication.models import UserProfile
+from core.models import UnifiedProfile
 from core.services.unified_profile import UnifiedProfileService
 from core.services.chat_session import ChatSessionService
 from django.utils import timezone
@@ -468,6 +468,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 """
 
     keyboard = [
+        [create_standard_button("🔐 ВОЙТИ ЧЕРЕЗ TELEGRAM", "telegram_auth")],
         [create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")],
         [create_standard_button("📚 ПРАКТИКА", "subjects"),
          create_standard_button("🏆 ПРОГРЕСС", "stats")],
@@ -1491,6 +1492,106 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
             InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")
         ]])
     )
+
+# 🔐 ОБРАБОТЧИКИ АУТЕНТИФИКАЦИИ
+
+async def telegram_auth_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обрабатывает нажатие кнопки "Войти через Telegram"
+    """
+    query = update.callback_query
+    if not query:  # type: ignore
+        return
+    await query.answer()
+
+    user_id = update.effective_user.id  # type: ignore
+    username = update.effective_user.username or "User"  # type: ignore
+    first_name = update.effective_user.first_name or "User"  # type: ignore
+    
+    # Получаем настройки сайта
+    from django.conf import settings
+    site_url = getattr(settings, 'SITE_URL', 'https://examflow.ru')
+    
+    auth_text = f"""
+🔐 **ВХОД ЧЕРЕЗ TELEGRAM**
+
+Привет, {first_name}! 👋
+
+Для полного доступа к функционалу ExamFlow необходимо авторизоваться через Telegram.
+
+✨ **Что это даёт:**
+• 🎯 Персональные рекомендации ИИ
+• 📊 Отслеживание прогресса
+• 🏆 Достижения и рейтинги
+• 💎 Премиум функции
+
+**Нажмите кнопку ниже для входа:**
+"""
+
+    keyboard = [
+        [InlineKeyboardButton(
+            "🚀 ВОЙТИ ЧЕРЕЗ TELEGRAM", 
+            url=f"{site_url}/auth/telegram/login/?user_id={user_id}&username={username}&first_name={first_name}"
+        )],
+        [create_standard_button("🏠 Главное меню", "main_menu")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    try:
+        await query.edit_message_text(
+            auth_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    except Exception as e:
+        logger.error(f"Ошибка в telegram_auth_handler: {e}")
+        await query.edit_message_text(
+            "❌ Произошла ошибка. Попробуйте позже.",
+            reply_markup=InlineKeyboardMarkup([[create_standard_button("🏠 Главное меню", "main_menu")]])
+        )
+
+async def auth_success_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Обрабатывает успешную аутентификацию пользователя
+    """
+    query = update.callback_query
+    if not query:  # type: ignore
+        return
+    await query.answer()
+
+    user_id = update.effective_user.id  # type: ignore
+    
+    success_text = f"""
+✅ **АВТОРИЗАЦИЯ УСПЕШНА!**
+
+Добро пожаловать в ExamFlow! 🎉
+
+🎯 **Теперь вам доступно:**
+• 🤖 Персональный ИИ-ассистент
+• 📚 Тысячи заданий для практики
+• 📊 Детальная статистика прогресса
+• 🏆 Система достижений
+• 💎 Премиум функции
+
+Начните обучение прямо сейчас!
+"""
+
+    keyboard = [
+        [create_standard_button("🤖 СПРОСИТЬ ИИ", "ai_chat")],
+        [create_standard_button("📚 ПРАКТИКА", "subjects"),
+         create_standard_button("🏆 ПРОГРЕСС", "stats")],
+        [create_standard_button("🏠 Главное меню", "main_menu")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    try:
+        await query.edit_message_text(
+            success_text,
+            reply_markup=reply_markup,
+            parse_mode='Markdown'
+        )
+    except Exception as e:
+        logger.error(f"Ошибка в auth_success_handler: {e}")
 
 # 🎮 ОБРАБОТЧИКИ ГЕЙМИФИКАЦИИ
 

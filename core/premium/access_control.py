@@ -13,7 +13,6 @@ from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from authentication.models import UserProfile, Subscription
 from core.models import UnifiedProfile
 
 logger = logging.getLogger(__name__)
@@ -41,12 +40,7 @@ class PremiumAccessControl:
                 profile = UnifiedProfile.objects.get(user=user)  # type: ignore
                 is_premium = profile.is_premium
             except UnifiedProfile.DoesNotExist:  # type: ignore
-                # Fallback на старую модель
-                try:
-                    profile = UserProfile.objects.get(user=user)  # type: ignore
-                    is_premium = profile.is_premium
-                except UserProfile.DoesNotExist:  # type: ignore
-                    is_premium = False
+                is_premium = False
 
             # Кэшируем результат
             cache.set(cache_key, is_premium, self.cache_timeout)
@@ -69,14 +63,12 @@ class PremiumAccessControl:
             if cached_result is not None:
                 return cached_result
 
-            # Проверяем активную подписку
-            now = datetime.now()
-            active_subscription = Subscription.objects.filter(  # type: ignore
-                user=user,
-                is_active=True,
-                start_date__lte=now,
-                end_date__gte=now
-            ).exists()
+            # Проверяем активную подписку через UnifiedProfile
+            try:
+                profile = UnifiedProfile.objects.get(user=user)  # type: ignore
+                active_subscription = profile.is_premium
+            except UnifiedProfile.DoesNotExist:  # type: ignore
+                active_subscription = False
 
             cache.set(cache_key, active_subscription, self.cache_timeout)
             return active_subscription
