@@ -17,7 +17,7 @@ class UnifiedProfileService:
     def get_or_create_profile(telegram_id: int, **kwargs) -> UnifiedProfile:
         """Получает или создает унифицированный профиль"""
         try:
-            profile, created = UnifiedProfile.objects.get_or_create(
+            profile, created = UnifiedProfile.objects.get_or_create(  # type: ignore
                 telegram_id=telegram_id,
                 defaults={
                     'display_name': kwargs.get('display_name', 'Пользователь {telegram_id}'),
@@ -50,7 +50,7 @@ class UnifiedProfileService:
     def link_django_user(profile: UnifiedProfile, user: User) -> bool:
         """Связывает профиль с Django пользователем"""
         try:
-            profile.user = user
+            profile.user = user  # type: ignore
             profile.save()
             logger.info(
                 "Профиль {profile.telegram_id} связан с Django пользователем {user.username}")
@@ -67,8 +67,8 @@ class UnifiedProfileService:
             result = {'level_up': False, 'achievements': []}
 
             if solved_correctly:
-                profile.total_solved += 1
-                profile.current_streak += 1
+                profile.total_solved += 1  # type: ignore
+                profile.current_streak += 1  # type: ignore
 
                 # Обновляем лучшую серию
                 if profile.current_streak > profile.best_streak:
@@ -86,7 +86,7 @@ class UnifiedProfileService:
 
             else:
                 # Сбрасываем серию при неправильном ответе
-                profile.current_streak = 0
+                profile.current_streak = 0  # type: ignore
 
             profile.save()
 
@@ -154,10 +154,10 @@ class UnifiedProfileService:
         """Обновляет прогресс по ежедневным вызовам"""
         try:
             today = timezone.now().date()
-            daily_challenges = DailyChallenge.objects.filter(date=today)
+            daily_challenges = DailyChallenge.objects.filter(date=today)  # type: ignore
 
             for challenge in daily_challenges:
-                user_challenge, created = UserChallenge.objects.get_or_create(
+                user_challenge, created = UserChallenge.objects.get_or_create(  # type: ignore
                     profile=profile,
                     challenge=challenge,
                     defaults={'current_progress': 0}
@@ -192,7 +192,7 @@ class UnifiedProfileService:
         """Получает ежедневные вызовы для пользователя"""
         try:
             today = timezone.now().date()
-            daily_challenges = DailyChallenge.objects.filter(date=today)
+            daily_challenges = DailyChallenge.objects.filter(date=today)  # type: ignore
 
             result = {
                 'challenges': [],
@@ -201,7 +201,7 @@ class UnifiedProfileService:
             }
 
             for challenge in daily_challenges:
-                user_challenge, _ = UserChallenge.objects.get_or_create(
+                user_challenge, _ = UserChallenge.objects.get_or_create(  # type: ignore
                     profile=profile,
                     challenge=challenge,
                     defaults={'current_progress': 0}
@@ -246,11 +246,11 @@ class UnifiedProfileService:
                     'total_solved': profile.total_solved,
                     'current_streak': profile.current_streak,
                     'best_streak': profile.best_streak,
-                    'achievements_count': len(profile.achievements),
+                    'achievements_count': len(profile.achievements) if profile.achievements else 0,  # type: ignore
                     'avatar_url': profile.avatar_url
                 },
                 'daily_challenges': daily_challenges,
-                'recent_achievements': profile.achievements[-5:] if profile.achievements else []
+                'recent_achievements': list(profile.achievements)[-5:] if profile.achievements else []  # type: ignore
             }
 
         except Exception as e:
@@ -269,7 +269,7 @@ class DailyChallengeService:
 
         try:
             # Удаляем существующие вызовы на эту дату
-            DailyChallenge.objects.filter(date=date).delete()
+            DailyChallenge.objects.filter(date=date).delete()  # type: ignore
 
             challenges = [
                 {
@@ -290,7 +290,7 @@ class DailyChallengeService:
 
             created_challenges = []
             for challenge_data in challenges:
-                challenge = DailyChallenge.objects.create(
+                challenge = DailyChallenge.objects.create(  # type: ignore
                     date=date,
                     **challenge_data
                 )

@@ -193,13 +193,13 @@ def db_get_all_subjects_with_tasks():
     from django.db.models import Count
     subjects = Subject.objects.annotate(  # type: ignore
         tasks_count=Count('task')
-    ).filter(tasks_count__gt=0).values('id', 'name', 'exam_type', 'tasks_count')
+    ).filter(tasks_count__gt=0).values('id', 'name', 'exam_type', 'tasks_count')  # type: ignore
     return list(subjects)
 
 @sync_to_async
 def db_get_subject_ids():
     return list(
-        Task.objects.values_list(
+        Task.objects.values_list(  # type: ignore
             'subject_id',
             flat=True).distinct())  # type: ignore
 
@@ -209,7 +209,7 @@ def db_get_subjects_by_ids(ids):
 
 @sync_to_async
 def db_count_tasks_for_subject(subject_id: int) -> int:
-    return Task.objects.filter(subject_id=subject_id).count()  # type: ignore
+    return Task.objects.filter(subject_id=subject_id).count()  # type: ignore  # type: ignore
 
 @sync_to_async
 def db_get_tasks_by_subject(subject_id: int):
@@ -234,7 +234,7 @@ def db_get_subject_by_id(subject_id: int):
 
 @sync_to_async
 def db_get_subject_name(subject_id: int) -> str:
-    name = Subject.objects.filter(
+    name = Subject.objects.filter(  # type: ignore
         id=subject_id).values_list(
         'name', flat=True).first()  # type: ignore
     return name or "Предмет"
@@ -355,12 +355,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup = ReplyKeyboardMarkup(
                 keyboard, resize_keyboard=True, one_time_keyboard=False)
 
-            await update.message.reply_text(
-                "🎯 **Нижнее меню настроено!**\n\n"
-                "Теперь у вас есть быстрый доступ к основным функциям:",
-                reply_markup=reply_markup,
-                parse_mode='Markdown'
-            )
+            if update.message:  # type: ignore
+                await update.message.reply_text(
+                    "🎯 **Нижнее меню настроено!**\n\n"
+                    "Теперь у вас есть быстрый доступ к основным функциям:",
+                    reply_markup=reply_markup,
+                    parse_mode='Markdown'
+                )
         except Exception as e:
             logger.error("Ошибка создания нижнего меню: {e}")
 
@@ -411,18 +412,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         if is_callback:
-            await update.callback_query.answer()
-            await update.callback_query.edit_message_text(
-                welcome_text,
-                reply_markup=reply_markup,
-                parse_mode='Markdown'
-            )
+            if update.callback_query:  # type: ignore
+                await update.callback_query.answer()
+                await update.callback_query.edit_message_text(
+                    welcome_text,
+                    reply_markup=reply_markup,
+                    parse_mode='Markdown'
+                )
         else:
-            await update.message.reply_text(
-                welcome_text,
-                reply_markup=reply_markup,
-                parse_mode='Markdown'
-            )
+            if update.message:  # type: ignore
+                await update.message.reply_text(
+                    welcome_text,
+                    reply_markup=reply_markup,
+                    parse_mode='Markdown'
+                )
 
         logger.info("Пользователь {user.id} запустил бота")
 
@@ -430,10 +433,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error("Ошибка в команде start: {e}")
         error_text = "❌ Произошла ошибка. Попробуйте позже."
         if is_callback:
-            await update.callback_query.answer()
-            await update.callback_query.edit_message_text(error_text)
+            if update.callback_query:  # type: ignore
+                await update.callback_query.answer()
+                await update.callback_query.edit_message_text(error_text)
         else:
-            await update.message.reply_text(error_text)
+            if update.message:  # type: ignore
+                await update.message.reply_text(error_text)
 
 # ============================================================================
 # ОБРАБОТЧИКИ CALLBACK-ЗАПРОСОВ
@@ -446,6 +451,8 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Возвращает пользователя в главное меню
     """
     query = update.callback_query
+    if not query:  # type: ignore
+        return
     await query.answer()
 
     welcome_text = """
@@ -498,6 +505,8 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     try:
         query = update.callback_query
+        if not query:  # type: ignore
+            return
         await query.answer()
 
         # Получаем все предметы с количеством заданий
@@ -557,7 +566,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error("Ошибка в subjects_menu: {e}")
         try:
-            await query.edit_message_text("❌ Не удалось загрузить предметы. Попробуйте позже.")
+            await query.edit_message_text("❌ Не удалось загрузить предметы. Попробуйте позже.")  # type: ignore
         except Exception:
             pass
 
@@ -566,20 +575,22 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     Показывает случайное задание выбранного предмета
     """
     query = update.callback_query
+    if not query:  # type: ignore
+        return
     await query.answer()
 
-    subject_id = int(query.data.split('_')[1])
+    subject_id = int(query.data.split('_')[1])  # type: ignore
 
     # Получаем информацию о предмете
     subject = await db_get_subject_by_id(subject_id)
     if not subject:
-        await query.edit_message_text("❌ Предмет не найден")
+        await query.edit_message_text("❌ Предмет не найден")  # type: ignore
         return
 
     # Получаем список заданий для предмета
     tasks = await db_get_tasks_by_subject(subject_id)
     if not tasks:
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ В предмете **{subject.name}** пока нет заданий",
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")
@@ -616,7 +627,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
     ]
 
     try:
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             task_text,
             reply_markup=InlineKeyboardMarkup(keyboard),
             parse_mode='Markdown'
@@ -640,6 +651,8 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Показывает случайное задание из всех доступных
     """
     query = update.callback_query
+    if not query:  # type: ignore
+        return
     await query.answer()
 
     # Получаем все задания
@@ -700,10 +713,12 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Показывает правильный ответ на задание
     """
     query = update.callback_query
+    if not query:  # type: ignore
+        return
     await query.answer()
 
     # Извлекаем ID задания из callback_data
-    task_id = int(query.data.split('_')[1])
+    task_id = int(query.data.split('_')[1])  # type: ignore
 
     # Получаем задание
     try:
@@ -755,6 +770,8 @@ async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Отображает уровень, опыт, решенные задания, серии, достижения
     """
     query = update.callback_query
+    if not query:  # type: ignore
+        return
     await query.answer()
 
     # Получаем UnifiedProfile пользователя
@@ -804,6 +821,8 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
     """
     try:
         query = update.callback_query
+        if not query:  # type: ignore
+            return
         await query.answer()
 
         # Получаем пользователя
@@ -884,7 +903,7 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     except Exception as e:
         logger.error("Ошибка в learning_plan_menu: {e}")
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ Произошла ошибка при получении плана обучения. Попробуйте позже."
         )
 
@@ -905,6 +924,8 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if is_callback:
             query = update.callback_query
+            if not query:  # type: ignore
+                return
             await query.answer()
             user = update.effective_user
         else:
@@ -916,19 +937,19 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await db_update_profile_activity(profile)
 
         # Проверяем формат callback_data (только для callback-запросов)
-        if is_callback and query.data and query.data.startswith(
-                'ai_help_') and '_' in query.data:
+        if is_callback and query.data and query.data.startswith(  # type: ignore
+                'ai_help_') and '_' in query.data:  # type: ignore
             # Помощь с конкретным заданием
             try:
-                task_id = int(query.data.split('_')[2])
+                task_id = int(query.data.split('_')[2])  # type: ignore
                 task = await db_get_task_by_id(task_id)
 
                 if not task:
-                    await query.edit_message_text("❌ Задание не найдено.")
+                    await query.edit_message_text("❌ Задание не найдено.")  # type: ignore
                     return
 
                 # Показываем сообщение о том, что AI думает
-                thinking_message = await query.edit_message_text(
+                thinking_message = await query.edit_message_text(  # type: ignore
                     "🤔 AI анализирует задание и ваш прогресс...\n\n"
                     "Это может занять несколько секунд.",
                     parse_mode=None
@@ -971,7 +992,7 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             except (IndexError, ValueError) as e:
                 logger.error("Ошибка парсинга task_id в ai_help_handler: {e}")
-                await query.edit_message_text("❌ Ошибка формата данных. Попробуйте еще раз.")
+                await query.edit_message_text("❌ Ошибка формата данных. Попробуйте еще раз.")  # type: ignore
                 return
         else:
             # Общее меню ИИ с персонализацией
@@ -996,24 +1017,26 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             if is_callback:
-                await query.edit_message_text(
+                await query.edit_message_text(  # type: ignore
                     ai_menu_text,
                     reply_markup=reply_markup,
                     parse_mode=None
                 )
             else:
-                await update.message.reply_text(
-                    ai_menu_text,
-                    reply_markup=reply_markup,
-                    parse_mode=None
-                )
+                if update.message:  # type: ignore
+                    await update.message.reply_text(
+                        ai_menu_text,
+                        reply_markup=reply_markup,
+                        parse_mode=None
+                    )
 
     except Exception as e:
         logger.error("Ошибка в ai_help_handler: {e}")
         if is_callback and query:
-            await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+            await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
         else:
-            await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")
+            if update.message:  # type: ignore
+                await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")
 
 async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1021,13 +1044,13 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     """
     try:
         query = update.callback_query
-        await query.answer()
+        await query.answer()  # type: ignore
 
         # Получаем пользователя
         user, created = await db_get_or_create_user(update.effective_user)
 
         # Показываем сообщение о том, что AI думает
-        thinking_message = await query.edit_message_text(
+        thinking_message = await query.edit_message_text(  # type: ignore
             "🤔 AI анализирует ваш прогресс и готовит объяснение...\n\n"
             "Это может занять несколько секунд.",
             parse_mode=None
@@ -1066,7 +1089,7 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     except Exception as e:
         logger.error("Ошибка в ai_explain_handler: {e}")
-        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1074,13 +1097,13 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     """
     try:
         query = update.callback_query
-        await query.answer()
+        await query.answer()  # type: ignore    
 
         # Получаем пользователя
         user, created = await db_get_or_create_user(update.effective_user)
 
         # Показываем сообщение о том, что AI думает
-        thinking_message = await query.edit_message_text(
+        thinking_message = await query.edit_message_text(  # type: ignore
             "🎯 AI анализирует ваш прогресс и готовит персональные советы...\n\n"
             "Это может занять несколько секунд.",
             parse_mode=None
@@ -1119,7 +1142,7 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     except Exception as e:
         logger.error("Ошибка в ai_personal_handler: {e}")
-        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -1127,13 +1150,13 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
     """
     try:
         query = update.callback_query
-        await query.answer()
+        await query.answer()  # type: ignore
 
         # Получаем пользователя
         user, created = await db_get_or_create_user(update.effective_user)
 
         # Показываем сообщение о том, что AI думает
-        thinking_message = await query.edit_message_text(
+        thinking_message = await query.edit_message_text(  # type: ignore
             "💡 AI готовит общую подсказку...\n\n"
             "Это может занять несколько секунд.",
             parse_mode=None
@@ -1172,7 +1195,7 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
 
     except Exception as e:
         logger.error("Ошибка в ai_hint_general_handler: {e}")
-        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 # ============================================================================
 # ОБРАБОТЧИКИ ТЕКСТОВЫХ СООБЩЕНИЙ
@@ -1183,6 +1206,8 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     Обрабатывает текстовые сообщения для прямого общения с ИИ и нижнего меню
     """
     try:
+        if not update.message:  # type: ignore
+            return
         user_message = update.message.text
         if not user_message:
             return
@@ -1205,9 +1230,9 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         logger.error("Ошибка в handle_text_message: {e}")
         try:
             await context.bot.send_message(
-                chat_id=update.effective_chat.id,
+                chat_id=update.effective_chat.id,  # type: ignore       
                 text="❌ Произошла ошибка. Попробуйте позже.",
-                reply_to_message_id=update.message.message_id
+                reply_to_message_id=update.message.message_id  # type: ignore
             )
         except Exception as send_err:
             logger.error("Не удалось отправить сообщение об ошибке: {send_err}")
@@ -1230,13 +1255,16 @@ async def handle_menu_button(
             await show_stats(update, context)
     except Exception as e:
         logger.error("Ошибка в handle_menu_button: {e}")
-        await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")
+        if update.message:  # type: ignore
+            await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Обрабатывает текстовые сообщения для прямого общения с ИИ
     """
     try:
+        if not update.message:  # type: ignore
+            return
         user_message = update.message.text
         if not user_message:
             return
@@ -1255,7 +1283,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Показываем сообщение о том, что AI думает
         thinking_message = await context.bot.send_message(
-            chat_id=update.effective_chat.id,
+            chat_id=update.effective_chat.id,  # type: ignore
             text="🤔 AI анализирует ваш вопрос...\n\nЭто может занять несколько секунд.",
             reply_to_message_id=update.message.message_id
         )
@@ -1292,7 +1320,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(keyboard)
 
         # Обновляем сообщение с ответом
-        await thinking_message.edit_text(
+        await thinking_message.edit_text(  # type: ignore
             response_text,
             reply_markup=reply_markup,
             parse_mode=None
@@ -1300,7 +1328,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Очищаем сообщение от эмодзи для логов
         import re  # type: ignore
-        clean_message = re.sub(r'[^\w\s\-., !?]', '', user_message[:50])
+        clean_message = re.sub(r'[^\w\s\-., !?]', '', user_message[:50])  # type: ignore
         logger.info(
             "Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}...")
 
@@ -1308,9 +1336,9 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error("Ошибка в handle_ai_message: {e}")
         try:
             await context.bot.send_message(
-                chat_id=update.effective_chat.id,
+                chat_id=update.effective_chat.id,  # type: ignore
                 text="❌ Произошла ошибка при обработке вашего вопроса. Попробуйте позже или используйте кнопку '🤖 Спросить ИИ'.",
-                reply_to_message_id=update.message.message_id
+                reply_to_message_id=update.message.message_id  # type: ignore
             )
         except Exception as send_err:
             logger.error("Не удалось отправить сообщение об ошибке: {send_err}")
@@ -1324,12 +1352,12 @@ async def search_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
     Обработчик поиска по предмету
     """
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         "🔍 **ПОИСК ПО ПРЕДМЕТУ**\n\n"
         "Введите название предмета или его часть:",
-        reply_markup=InlineKeyboardMarkup([[
+        reply_markup=InlineKeyboardMarkup([[  # type: ignore
             InlineKeyboardButton("🔙 Назад", callback_data="subjects")
         ]]),
         parse_mode='Markdown'
@@ -1340,47 +1368,47 @@ async def random_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
     Обработчик случайного предмета
     """
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
     try:
         # Получаем случайный предмет с заданиями
         subjects = await db_get_all_subjects_with_tasks()
         if not subjects:
-            await query.edit_message_text("❌ Нет доступных предметов")
+            await query.edit_message_text("❌ Нет доступных предметов")  # type: ignore 
             return
 
         import random
         random_subject = random.choice(subjects)
 
         # Показываем случайный предмет
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "🎯 **СЛУЧАЙНЫЙ ПРЕДМЕТ**\n\n"
             "📚 **{random_subject['name']}**\n"
             "📝 **Заданий:** {random_subject['tasks_count']}\n"
             "🎓 **Тип:** {random_subject['exam_type']}\n\n"
             "Хотите решить задание по этому предмету?",
-            reply_markup=InlineKeyboardMarkup([
+            reply_markup=InlineKeyboardMarkup([  # type: ignore
             ]),
             parse_mode='Markdown'
         )
 
     except Exception as e:
         logger.error("Ошибка в random_subject_handler: {e}")
-        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Показывает задание по ID
     """
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
     try:
-        task_id = int(query.data.split('_')[1])
+        task_id = int(query.data.split('_')[1])  # type: ignore
         task = await db_get_task_by_id(task_id)
 
         if not task:
-            await query.edit_message_text("❌ Задание не найдено")
+            await query.edit_message_text("❌ Задание не найдено")  # type: ignore
             return
 
         # Получаем информацию о предмете
@@ -1405,22 +1433,22 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = [
         ]
 
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             task_text,
-            reply_markup=InlineKeyboardMarkup(keyboard),
+            reply_markup=InlineKeyboardMarkup(keyboard),  # type: ignore
             parse_mode='Markdown'
         )
 
     except Exception as e:
         logger.error("Ошибка в show_task_handler: {e}")
-        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")
+        await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Обработчик для очистки контекста чата
     """
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
     try:
         user = update.effective_user
@@ -1428,10 +1456,10 @@ async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TY
         # Очищаем контекст сессии
         await db_clear_chat_session_context(user)
 
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "🧹 **Контекст очищен!**\n\n"
             "Теперь ИИ будет отвечать на ваши вопросы без учета предыдущего разговора.",
-            reply_markup=InlineKeyboardMarkup([[
+            reply_markup=InlineKeyboardMarkup([[  # type: ignore
                 InlineKeyboardButton("🏠 Главная", callback_data="main_menu")
             ]]),
             parse_mode='Markdown'
@@ -1441,9 +1469,9 @@ async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
     except Exception as e:
         logger.error("Ошибка при очистке контекста: {e}")
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ Произошла ошибка при очистке контекста. Попробуйте позже.",
-            reply_markup=InlineKeyboardMarkup([[
+            reply_markup=InlineKeyboardMarkup([[  # type: ignore
                 InlineKeyboardButton("🏠 Главная", callback_data="main_menu")
             ]])
         )
@@ -1455,13 +1483,13 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
     Логирует ошибку и показывает главное меню
     """
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
     logger.warning("Неизвестный callback: {query.data}")
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         "❌ Неизвестная команда. Возвращаемся в главное меню.",
-        reply_markup=InlineKeyboardMarkup([[
+        reply_markup=InlineKeyboardMarkup([[  # type: ignore
             InlineKeyboardButton("🏠 Главное меню", callback_data="main_menu")
         ]])
     )
@@ -1471,12 +1499,12 @@ async def handle_unknown_callback(update: Update, context: ContextTypes.DEFAULT_
 async def gamification_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает меню геймификации"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     keyboard = gamification.create_gamification_keyboard(user_id)
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         "🎮 **ГЕЙМИФИКАЦИЯ**\n\n"
         "Выберите, что хотите посмотреть:",
         reply_markup=keyboard,
@@ -1486,15 +1514,15 @@ async def gamification_menu_handler(update: Update, context: ContextTypes.DEFAUL
 async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает статистику пользователя"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     stats = await gamification.get_user_stats(user_id)
 
     if not stats.get('success'):
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
-            reply_markup=InlineKeyboardMarkup([[
+            reply_markup=InlineKeyboardMarkup([[  # type: ignore
                 InlineKeyboardButton("🔙 Назад", callback_data="gamification_{user_id}")
             ]])
         )
@@ -1530,7 +1558,7 @@ async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         stats_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1539,15 +1567,15 @@ async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает достижения пользователя"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     stats = await gamification.get_user_stats(user_id)
 
     if not stats.get('success'):
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
-            reply_markup=InlineKeyboardMarkup([[
+            reply_markup=InlineKeyboardMarkup([[  # type: ignore
                 InlineKeyboardButton("🔙 Назад", callback_data="gamification_{user_id}")
             ]])
         )
@@ -1579,7 +1607,7 @@ async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         achievements_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1588,12 +1616,12 @@ async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает прогресс пользователя"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     keyboard = gamification.create_progress_keyboard(user_id)
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore  
         "📊 **ПРОГРЕСС ОБУЧЕНИЯ**\n\n"
         "Выберите тип прогресса для просмотра:",
         reply_markup=keyboard,
@@ -1603,15 +1631,15 @@ async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает общий прогресс пользователя"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     stats = await gamification.get_user_stats(user_id)
 
     if not stats.get('success'):
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
-            reply_markup=InlineKeyboardMarkup([[
+            reply_markup=InlineKeyboardMarkup([[  # type: ignore
                 InlineKeyboardButton("🔙 Назад", callback_data="progress_{user_id}")
             ]])
         )
@@ -1647,7 +1675,7 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         progress_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1656,15 +1684,15 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
 async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает прогресс по предметам"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     stats = await gamification.get_user_stats(user_id)
 
     if not stats.get('success'):
-        await query.edit_message_text(
+        await query.edit_message_text(  # type: ignore
             "❌ Ошибка: {stats.get('error', 'Неизвестная ошибка')}",
-            reply_markup=InlineKeyboardMarkup([[
+            reply_markup=InlineKeyboardMarkup([[  # type: ignore
                 InlineKeyboardButton("🔙 Назад", callback_data="progress_{user_id}")
             ]])
         )
@@ -1698,7 +1726,7 @@ async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAUL
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         progress_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1707,9 +1735,9 @@ async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAUL
 async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает ежедневные задания"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
     challenges = await gamification.get_daily_challenges(user_id)
 
     if not challenges:
@@ -1739,7 +1767,7 @@ async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         challenges_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1748,7 +1776,7 @@ async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT
 async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает таблицу лидеров"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
     leaderboard = await gamification.get_leaderboard(10)
 
@@ -1773,12 +1801,12 @@ async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             leaderboard_text += "   🏆 Уровень: {level} | 💎 Очки: {points}\n\n"
 
     # Получаем user_id для кнопки "Назад"
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
 
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore
         leaderboard_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1787,9 +1815,9 @@ async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def bonus_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показывает доступные бонусы"""
     query = update.callback_query
-    await query.answer()
+    await query.answer()  # type: ignore
 
-    user_id = update.effective_user.id
+    user_id = update.effective_user.id  # type: ignore
 
     bonus_text = """
 🎁 **ДОСТУПНЫЕ БОНУСЫ**
@@ -1810,7 +1838,7 @@ async def bonus_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(
+    await query.edit_message_text(  # type: ignore  
         bonus_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
