@@ -232,116 +232,6 @@ class AILearningSystem {
     }
     
     /**
-     * Запись клика по предмету
-     */
-    recordSubjectClick(subjectElement) {
-        const subjectName = subjectElement.querySelector('.subject-name')?.textContent || 'Неизвестный предмет';
-        const examType = subjectElement.querySelector('.exam-type')?.textContent || 'ЕГЭ';
-        
-        this.recordBehavior('subject_click', {
-            subject: subjectName,
-            exam_type: examType,
-            timestamp: Date.now(),
-            element_id: subjectElement.id || 'unknown'
-        });
-    }
-    
-    /**
-     * Запись клика по заданию
-     */
-    recordTaskClick(taskElement) {
-        const taskTitle = taskElement.querySelector('.task-title')?.textContent || 'Неизвестное задание';
-        const difficulty = taskElement.querySelector('.difficulty')?.textContent || 'Неизвестно';
-        
-        this.recordBehavior('task_click', {
-            task_title: taskTitle,
-            difficulty: difficulty,
-            timestamp: Date.now(),
-            element_id: taskElement.id || 'unknown'
-        });
-    }
-    
-    /**
-     * Запись клика по кнопке
-     */
-    recordButtonClick(buttonElement) {
-        const buttonText = buttonElement.textContent || 'Неизвестная кнопка';
-        const buttonType = buttonElement.className || 'unknown';
-        
-        this.recordBehavior('button_click', {
-            button_text: buttonText,
-            button_type: buttonType,
-            timestamp: Date.now(),
-            element_id: buttonElement.id || 'unknown'
-        });
-    }
-    
-    /**
-     * Запись клика по навигации
-     */
-    recordNavigationClick(navElement) {
-        const navText = navElement.textContent || 'Неизвестная ссылка';
-        const navUrl = navElement.href || 'unknown';
-        
-        this.recordBehavior('navigation_click', {
-            nav_text: navText,
-            nav_url: navUrl,
-            timestamp: Date.now(),
-            element_id: navElement.id || 'unknown'
-        });
-    }
-    
-    /**
-     * Запись времени на странице
-     */
-    recordPageTime(startTime, endTime) {
-        const duration = endTime - startTime;
-        
-        this.recordBehavior('page_time', {
-            duration: duration,
-            page_url: window.location.href,
-            page_title: document.title,
-            timestamp: Date.now()
-        });
-    }
-    
-    /**
-     * Запись глубины скроллинга
-     */
-    recordScrollDepth(depth, isFinal = false) {
-        this.recordBehavior('scroll_depth', {
-            depth: depth,
-            is_final: isFinal,
-            page_url: window.location.href,
-            timestamp: Date.now()
-        });
-    }
-    
-    /**
-     * Запись взаимодействия с формой
-     */
-    recordFormInteraction(action, element) {
-        this.recordBehavior('form_interaction', {
-            action: action,
-            element_type: element.type || 'unknown',
-            element_name: element.name || 'unknown',
-            element_id: element.id || 'unknown',
-            timestamp: Date.now()
-        });
-    }
-    
-    /**
-     * Запись навигации по страницам
-     */
-    recordPageNavigation(fromUrl, toUrl) {
-        this.recordBehavior('page_navigation', {
-            from_url: fromUrl,
-            to_url: toUrl,
-            timestamp: Date.now()
-        });
-    }
-    
-    /**
      * Запись поведения пользователя
      */
     recordBehavior(type, data) {
@@ -362,6 +252,32 @@ class AILearningSystem {
         // Анализируем поведение каждые 10 записей
         if (this.userBehavior[type].length % 10 === 0) {
             this.analyzeBehavior();
+        }
+    }
+    
+    /**
+     * Сохранение поведения пользователя
+     */
+    saveUserBehavior() {
+        try {
+            localStorage.setItem('examflow_user_behavior', JSON.stringify(this.userBehavior));
+        } catch (error) {
+            console.error('❌ Ошибка сохранения поведения:', error);
+        }
+    }
+    
+    /**
+     * Загрузка поведения пользователя
+     */
+    loadUserBehavior() {
+        try {
+            const saved = localStorage.getItem('examflow_user_behavior');
+            if (saved) {
+                this.userBehavior = JSON.parse(saved);
+            }
+        } catch (error) {
+            console.error('❌ Ошибка загрузки поведения:', error);
+            this.userBehavior = {};
         }
     }
     
@@ -787,32 +703,6 @@ class AILearningSystem {
                 notification.remove();
             }
         }, 5000);
-    }
-    
-    /**
-     * Сохранение поведения пользователя
-     */
-    saveUserBehavior() {
-        try {
-            localStorage.setItem('examflow_user_behavior', JSON.stringify(this.userBehavior));
-        } catch (error) {
-            console.error('❌ Ошибка сохранения поведения:', error);
-        }
-    }
-    
-    /**
-     * Загрузка поведения пользователя
-     */
-    loadUserBehavior() {
-        try {
-            const saved = localStorage.getItem('examflow_user_behavior');
-            if (saved) {
-                this.userBehavior = JSON.parse(saved);
-            }
-        } catch (error) {
-            console.error('❌ Ошибка загрузки поведения:', error);
-            this.userBehavior = {};
-        }
     }
     
     /**
