@@ -62,8 +62,6 @@
     <meta name="x-static-version" content="{{ STATIC_VERSION }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- PWA мета-теги -->
-    <meta name="theme-color" content="#333333">
-    <meta name="msapplication-TileColor" content="#333333">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -129,16 +127,7 @@
     <!-- Bootstrap JS -->
     <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
     
-    <!-- Менеджер тем и анимаций -->
-    <!-- <script src="{% static 'js/theme-manager.js' %}"></script> -->
-    
-    <!-- AI Learning System -->
-    <!-- <script src="{% static 'js/ai-learning.js' %}"></script> -->
-    
-    <!-- Новые скрипты брендинга -->
-    
-    <!-- Гостевой доступ -->
-    <script src="{% static 'js/guest-access.js' %}"></script>
+    <!-- Дополнительные скрипты загружаются через модули выше -->
     
     <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}
