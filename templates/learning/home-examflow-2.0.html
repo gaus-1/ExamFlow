@@ -68,7 +68,7 @@
             
             <div class="mobile-menu-actions">
               <button class="btn btn-ghost w-full mb-3" onclick="focusAI(); toggleMobileMenu()">Задать вопрос</button>
-              <a href="{% url 'telegram_auth:login_widget' %}" class="btn btn-primary w-full" onclick="toggleMobileMenu()">Войти</a>
+              <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-primary w-full" onclick="toggleMobileMenu()">Войти</a>
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
       <!-- Действия -->
       <div class="header-actions flex items-center gap-2">
         <button class="btn btn-ghost btn-sm" onclick="focusAI()">Задать вопрос</button>
-        <a href="{% url 'telegram_auth:login_widget' %}" class="btn btn-primary btn-sm">Войти</a>
+        <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-primary btn-sm">Войти</a>
       </div>
     </div>
   </div>
@@ -511,7 +511,7 @@
           </li>
         </ul>
         
-        <a href="{% url 'telegram_auth:login_widget' %}" class="btn btn-secondary w-full">Начать бесплатно</a>
+        <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-secondary w-full">Начать бесплатно</a>
       </div>
       
       <!-- Подписка (полный доступ) -->
