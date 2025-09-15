@@ -12,7 +12,7 @@ class TestTelegramBot(TestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         # Создаем тестового пользователя
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_user( # type: ignore
             username='testuser',
             email='test@example.com',
             password='testpassword123'
@@ -94,7 +94,7 @@ class TestTelegramBot(TestCase):
     def test_user_session_management(self):
         """Тест управления сессиями пользователей"""
         # Проверяем, что пользователь может быть создан и найден
-        found_user = User.objects.filter(username='testuser').first()
+        found_user = User.objects.filter(username='testuser').first() # type: ignore    
         self.assertIsNotNone(found_user)
         self.assertEqual(found_user, self.user)
 

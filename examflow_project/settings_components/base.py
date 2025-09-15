@@ -16,6 +16,10 @@ AUTH_USER_MODEL = 'telegram_auth.TelegramUser'
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru, www.examflow.ru, localhost, 127.0.0.1, testserver, examflow.onrender.com').split(', ') if h.strip()]
+# Доп. подстраховка для прод окружений, где Render делает health-пинги от имени домена
+for host in ['examflow.ru', 'www.examflow.ru']:
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
 
 # Добавим хост Render автоматически, если предоставлен платформой
 RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')

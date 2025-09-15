@@ -14,7 +14,7 @@ class TestLearning(TestCase):
         self.client = Client()
 
         # Создаем тестового пользователя
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_user( # type: ignore
             username='testuser',
             email='test@example.com',
             password='testpassword123'
