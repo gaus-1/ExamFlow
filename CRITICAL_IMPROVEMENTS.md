@@ -144,8 +144,8 @@ window.guestAccess.saveCurrentFormData();
 
 2. **Переменные окружения:**
    ```env
-   TELEGRAM_BOT_TOKEN=8314335876:AAGzzX6US0xx5PGJ5pVnNJFh7KYeqdSOwLg
-   GEMINI_API_KEY=AIzaSyCvi8Mm5paqqV-bakd2N897MgUEvJyWw44
+   TELEGRAM_BOT_TOKEN=<set-in-env>
+   GEMINI_API_KEY=<set-in-env>
    GOOGLE_OAUTH_CLIENT_ID=your_google_client_id
    YANDEX_OAUTH_CLIENT_ID=your_yandex_client_id
    ```
