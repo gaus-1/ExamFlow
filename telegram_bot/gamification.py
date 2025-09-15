@@ -16,7 +16,7 @@ from asgiref.sync import sync_to_async
 from django.utils import timezone
 from learning.models import UserProgress, Achievement
 from core.models import UnifiedProfile
-from django.contrib.auth.models import User
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 

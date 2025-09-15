@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from .models import AiRequest, AiLimit, AiProvider
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 # СИГНАЛЫ ДЛЯ АВТОМАТИЧЕСКОГО СОЗДАНИЯ ЛИМИТОВ
 # ========================================
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=User) # type: ignore
 def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
     """Автоматически создает лимиты ИИ для нового пользователя"""
     if created:

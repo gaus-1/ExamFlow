@@ -3,7 +3,7 @@
 """
 
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
+from django.conf import settings
 from core.models import Subject, Task, UserProgress
 
 class TestLearning(TestCase):

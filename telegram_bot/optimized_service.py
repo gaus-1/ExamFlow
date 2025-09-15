@@ -13,7 +13,7 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from asgiref.sync import sync_to_async
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 
 from learning.models import Subject, Task, UserProgress
@@ -187,10 +187,10 @@ class OptimizedBotService:
             self.logger.error(f"Ошибка получения профиля: {e}")
             return None
     
-    async def _get_django_user(self, user_id: int) -> Optional[User]:
+    async def _get_django_user(self, user_id: int) -> Optional[User]: # type: ignore    
         """Получает Django пользователя"""
         try:
-            user_tuple = await sync_to_async(User.objects.get_or_create)(
+            user_tuple = await sync_to_async(User.objects.get_or_create)( # type: ignore
                 username=f"tg_{user_id}",
                 defaults={'first_name': f'User {user_id}'}
             )

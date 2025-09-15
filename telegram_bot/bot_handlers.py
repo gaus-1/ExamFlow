@@ -12,7 +12,7 @@ import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 from telegram.ext import ContextTypes
-from django.contrib.auth.models import User
+from django.conf import settings
 from learning.models import (
     Subject, Task, UserProgress, UserRating
 )

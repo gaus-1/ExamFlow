@@ -4,7 +4,7 @@ Unit тесты для AI API
 
 import json
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
+from django.conf import settings
 from unittest.mock import patch, MagicMock
 
 class TestAIAssistantAPI(TestCase):

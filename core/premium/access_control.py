@@ -11,7 +11,7 @@ from datetime import datetime
 from django.http import HttpRequest, JsonResponse
 from django.core.cache import cache
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.conf import settings
 
 from core.models import UnifiedProfile
 

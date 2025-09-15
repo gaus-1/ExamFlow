@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 from datetime import timedelta
-from django.contrib.auth.models import User
+from django.conf import settings
 from learning.models import (
     Subject, Task, UserProgress, UserRating
 )
@@ -40,10 +40,10 @@ def dashboard(request):
     - Конверсия подписок
     """
     # Общая статистика
-    total_users = User.objects.count()
+    total_users = User.objects.count() # type: ignore
     total_tasks = Task.objects.count()  # type: ignore
     total_attempts = UserProgress.objects.count()  # type: ignore
-    active_users_today = User.objects.filter(
+    active_users_today = User.objects.filter( # type: ignore
         last_login__date=timezone.now().date()
     ).count()
 
@@ -106,7 +106,7 @@ def users_analytics(request):
     registrations = []
     for i in range(30):
         date = month_ago + timedelta(days=i)
-        count = User.objects.filter(
+        count = User.objects.filter( # type: ignore
             date_joined__date=date.date()
         ).count()
         registrations.append({
@@ -115,7 +115,7 @@ def users_analytics(request):
         })
 
     # Активность пользователей
-    users_activity = User.objects.annotate(
+    users_activity = User.objects.annotate( # type: ignore
         attempts_count=Count('userprogress'),
         correct_count=Count('userprogress', filter=Q(userprogress__is_correct=True)),
     ).filter(attempts_count__gt=0)
@@ -144,8 +144,8 @@ def users_analytics(request):
                 accuracy_distribution['81-100%'] += 1
 
     # Telegram vs Web пользователи
-    telegram_users = User.objects.filter(username__startswith='tg_').count()
-    web_users = User.objects.exclude(username__startswith='tg_').count()
+    telegram_users = User.objects.filter(username__startswith='tg_').count() # type: ignore
+    web_users = User.objects.exclude(username__startswith='tg_').count() # type: ignore
 
     context = {
         'registrations': registrations,
@@ -233,12 +233,12 @@ def api_stats(request):
     """
     stats = {
         'users': {
-            'total': User.objects.count(),
-            'active_today': User.objects.filter(
+            'total': User.objects.count(), # type: ignore
+            'active_today': User.objects.filter( # type: ignore
                 last_login__date=timezone.now().date()
             ).count(),
-            'telegram': User.objects.filter(username__startswith='tg_').count(),
-            'web': User.objects.exclude(username__startswith='tg_').count(),
+            'telegram': User.objects.filter(username__startswith='tg_').count(), # type: ignore
+            'web': User.objects.exclude(username__startswith='tg_').count(), # type: ignore         
         },
         'tasks': {
             'total': Task.objects.count(),  # type: ignore
