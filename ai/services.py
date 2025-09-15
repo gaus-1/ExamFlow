@@ -465,7 +465,7 @@ class AiService:
 
     def ask(self,
             prompt: str,
-            user: Optional[User] = None, # type: ignore
+            user: Optional[object] = None,
             session_id: Optional[str] = None,
             use_cache: bool = True) -> Dict[str, Any]:
         """Главный метод: проверяет лимиты, кэш, выбирает провайдера и возвращает ответ."""
