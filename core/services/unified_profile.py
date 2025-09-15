@@ -47,13 +47,13 @@ class UnifiedProfileService:
             raise
 
     @staticmethod
-    def link_django_user(profile: UnifiedProfile, user: User) -> bool:
+    def link_django_user(profile: UnifiedProfile, user: Any) -> bool:
         """Связывает профиль с Django пользователем"""
         try:
             profile.user = user  # type: ignore
             profile.save()
             logger.info(
-                "Профиль {profile.telegram_id} связан с Django пользователем {user.username}")
+                f"Профиль {profile.telegram_id} связан с Django пользователем {getattr(user, 'username', 'unknown')}")
             return True
         except Exception as e:
             logger.error("Ошибка при связывании профиля с пользователем: {e}")
