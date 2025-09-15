@@ -21,7 +21,7 @@ def demo_theme_management():
     print("=" * 60)
 
     # Создаем тестового пользователя
-    user, created = User.objects.get_or_create(
+    user, created = User.objects.get_or_create( # type: ignore
         username='demo_user',
         defaults={
             'email': 'demo@examflow.ru',
@@ -44,7 +44,7 @@ def demo_theme_management():
     print("-" * 40)
 
     # Создаем предпочтение темы
-    preference, created = UserThemePreference.objects.get_or_create(
+    preference, created = UserThemePreference.objects.get_or_create( # type: ignore
         user=user,
         defaults={'theme': 'school'}
     )
@@ -75,7 +75,7 @@ def demo_theme_management():
     ]
 
     for data in usage_data:
-        usage = ThemeUsage.objects.create(
+        usage = ThemeUsage.objects.create( # type: ignore
             user=user,
             **data
         )
@@ -102,7 +102,7 @@ def demo_theme_management():
         'mono': 'JetBrains Mono'
     }
 
-    customization, created = ThemeCustomization.objects.get_or_create(
+    customization, created = ThemeCustomization.objects.get_or_create( # type: ignore
         user=user,
         theme='school',
         defaults={
@@ -128,7 +128,7 @@ def demo_theme_management():
     print("4️⃣ СТАТИСТИКА ИСПОЛЬЗОВАНИЯ ТЕМ")
     print("-" * 40)
 
-    total_usage = ThemeUsage.objects.filter(user=user)
+    total_usage = ThemeUsage.objects.filter(user=user) # type: ignore
     school_usage = total_usage.filter(theme='school')
     adult_usage = total_usage.filter(theme='adult')
 
@@ -163,7 +163,7 @@ def demo_theme_management():
     print("   Можно переключить: {preference.can_switch_theme()}")
 
     # Методы ThemeUsage
-    latest_usage = ThemeUsage.objects.filter(user=user).latest('created_at')
+    latest_usage = ThemeUsage.objects.filter(user=user).latest('created_at') # type: ignore
     print("📈 Методы ThemeUsage:")
     print("   Последнее использование: {latest_usage.get_theme_display()}")
     print("   Время сессии: {latest_usage.get_session_duration_minutes()} мин")

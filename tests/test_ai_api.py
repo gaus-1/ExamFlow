@@ -13,7 +13,7 @@ class TestAIAssistantAPI(TestCase):
     def setUp(self):
         """Настройка тестов"""
         self.client = Client()
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_user( # type: ignore
             username='testuser',
             password='testpass123'
         )
@@ -33,8 +33,8 @@ class TestAIAssistantAPI(TestCase):
         )
 
         # Проверяем ответ
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('answer', data)
         self.assertIn('sources', data)
         self.assertIn('practice', data)
@@ -46,8 +46,8 @@ class TestAIAssistantAPI(TestCase):
             content_type='application/json'
         )
 
-        self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 400) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('error', data)
 
     def test_ai_chat_long_prompt(self):
@@ -59,8 +59,8 @@ class TestAIAssistantAPI(TestCase):
             content_type='application/json'
         )
 
-        self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 400) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('error', data)
 
     def test_ai_chat_large_request(self):
@@ -72,8 +72,8 @@ class TestAIAssistantAPI(TestCase):
             content_type='application/json'
         )
 
-        self.assertEqual(response.status_code, 413)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 413) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('error', data)
 
 class TestProblemsAPI(TestCase):
@@ -87,8 +87,8 @@ class TestProblemsAPI(TestCase):
         """Тест получения задач"""
         response = self.client.get('/api/problems/?topic=mathematics&limit=5')
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('topic', data)
         self.assertIn('problems', data)
         self.assertIn('total', data)
@@ -97,8 +97,8 @@ class TestProblemsAPI(TestCase):
         """Тест без указания темы"""
         response = self.client.get('/api/problems/')
 
-        self.assertEqual(response.status_code, 400)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 400) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('error', data)
 
     def test_check_answer_success(self):
@@ -111,8 +111,8 @@ class TestProblemsAPI(TestCase):
             content_type='application/json'
         )
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('problem_id', data)
         self.assertIn('is_correct', data)
         self.assertIn('feedback', data)
@@ -123,7 +123,7 @@ class TestUserProfileAPI(TestCase):
     def setUp(self):
         """Настройка тестов"""
         self.client = Client()
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_user( # type: ignore
             username='testuser',
             password='testpass123'
         )
@@ -133,8 +133,8 @@ class TestUserProfileAPI(TestCase):
         """Тест получения профиля"""
         response = self.client.get('/api/user/profile/')
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200) # type: ignore
+        data = json.loads(response.content) # type: ignore
         self.assertIn('id', data)
         self.assertIn('username', data)
         self.assertIn('level', data)
@@ -152,8 +152,8 @@ class TestUserProfileAPI(TestCase):
             content_type='application/json'
         )
 
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200) # type: ignore
+        data = json.loads(response.content) # type: ignore  
         self.assertIn('status', data)
         self.assertEqual(data['status'], 'success')
 
@@ -179,7 +179,7 @@ class TestSecurity(TestCase):
             )
 
             # Проверяем, что скрипт был экранирован
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 200) # type: ignore
             # В реальном коде здесь должна быть проверка на экранирование
 
     def test_sql_injection_protection(self):
@@ -189,7 +189,7 @@ class TestSecurity(TestCase):
         response = self.client.get('/api/problems/?topic={malicious_topic}')
 
         # Запрос должен обработаться безопасно
-        self.assertIn(response.status_code, [200, 400])
+        self.assertIn(response.status_code, [200, 400]) # type: ignore
 
 class TestPerformance(TestCase):
     """Тесты производительности"""
@@ -228,6 +228,6 @@ class TestPerformance(TestCase):
             )
 
             # Проверяем, что кэш был использован
-            self.assertEqual(response1.status_code, 200)
-            self.assertEqual(response2.status_code, 200)
+            self.assertEqual(response1.status_code, 200) # type: ignore
+            self.assertEqual(response2.status_code, 200) # type: ignore
             mock_cache.get.assert_called()
