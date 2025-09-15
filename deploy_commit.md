@@ -44,7 +44,7 @@
 
 ### Переменные окружения:
 ```env
-GEMINI_API_KEY=AIzaSyCvi8Mm5paqqV-bakd2N897MgUEvJyWw44
+GEMINI_API_KEY=<set-in-env>
 ```
 
 ## 🚀 Готово к деплою!
