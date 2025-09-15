@@ -6,10 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
     <title>{% block title %}ExamFlow — Эффективная подготовка к ЕГЭ и ОГЭ{% endblock %}</title>
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo-180.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/logo-512.png' %}">
+    
     <!-- SEO мета-теги -->
-    <meta name="description" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ. Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
-    <meta name="keywords" content="ЕГЭ, ОГЭ, подготовка, искусственный интеллект, ИИ, экзамены, образование, математика, русский язык, физика, химия, биология, история">
+    <meta name="description" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ. Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам по математике и русскому языку.">
+    <meta name="keywords" content="ЕГЭ, ОГЭ, подготовка, искусственный интеллект, ИИ, экзамены, образование, математика, русский язык, профильная математика, базовая математика, сочинение ЕГЭ, тесты ЕГЭ, онлайн подготовка">
     <meta name="author" content="ExamFlow">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="yandex" content="index, follow">
+    <link rel="canonical" href="https://examflow.ru{% block canonical %}{% endblock %}">
+    
+    <!-- Дополнительные SEO теги -->
+    <meta name="language" content="ru">
+    <meta name="geo.region" content="RU">
+    <meta name="geo.placename" content="Россия">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="1 days">
+    
+    <!-- Cache control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <!-- Open Graph -->
     <meta property="og:title" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ">
@@ -26,124 +54,95 @@
     <meta name="twitter:description" content="Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
     <meta name="twitter:image" content="{% static 'images/logo-180.png' %}">
     
-    <!-- Favicon full set -->
-    <link rel="icon" type="image/x-icon" href="{% static 'images/logo-new.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo-32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo-16.png' %}">
-    <link rel="apple-touch-icon" href="{% static 'images/logo-180.png' %}">
+    <!-- end favicon -->
     
     <!-- Modern Meta Tags -->
     <meta name="theme-color" content="#333333">
     <meta name="msapplication-TileColor" content="#333333">
+    <meta name="x-static-version" content="{{ STATIC_VERSION }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- PWA мета-теги -->
-    <meta name="theme-color" content="#333333">
-    <meta name="msapplication-TileColor" content="#333333">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
     
     <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    {# Локальная копия иконок вместо CDN (для CSP и стабильности) #}
+    <link href="{% static 'vendor/fontawesome/css/all.min.css' %}" rel="stylesheet">
     
     <!-- Основные стили -->
-    <!-- Старые стили (закомментированы для отката) -->
-    <!-- <link rel="stylesheet" href="{% static 'css/aesop-styles.css' %}" type="text/css"> -->
+    <!-- CSS-переменные и современные стили -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}?v={{ STATIC_VERSION }}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v={{ STATIC_VERSION }}" type="text/css">
     
-    <!-- Новые стили брендинга -->
-    <link rel="stylesheet" href="{% static 'new-branding/examflow-new-branding.css' %}" type="text/css">
-    <link rel="stylesheet" href="{% static 'new-branding/examflow-components.css' %}" type="text/css">
+    <!-- Старые стили (удалены). Если потребуется откат, восстановите файл и подключение ниже:
+         <link rel="stylesheet" href="/static/css/aesop-styles.css" type="text/css"> -->
     
-    <!-- JavaScript функции для core приложения -->
-    <script src="{% static 'js/core-functions.js' %}"></script>
+    <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша -->
+    <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" type="text/css">
+    
+    <!-- Основной JavaScript модуль ExamFlow 2.0 -->
+    <script src="{% static 'js/main.js' %}?v={{ STATIC_VERSION }}"></script>
+    
+    <!-- Дополнительные модули -->
+    <script src="{% static 'js/modules/ai-learning.js' %}?v={{ STATIC_VERSION }}"></script>
+    <script src="{% static 'js/modules/gamification.js' %}?v={{ STATIC_VERSION }}"></script>
+    <script src="{% static 'js/modules/theme-manager.js' %}?v={{ STATIC_VERSION }}"></script>
     
     {% block extra_css %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+
+    
+    {# Аналитика и пиксели по env (без заглушек, но с безопасной проверкой) #}
+    {% if GA4_ID %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ GA4_ID }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
+      gtag('config', '{{ GA4_ID }}');
+    </script>
+    {% endif %}
+
+    {% if YM_ID %}
+    <script type="text/javascript" >
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+      ym('{{ YM_ID }}', "init", {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/{{ YM_ID }}" style="position:absolute; left:-9999px;" alt=""/></div></noscript>
+    {% endif %}
 </head>
 <body>
-    <!-- Старая навигация (закомментирована для отката) -->
-    <!-- <nav class="navbar-aesop">
-        <div class="navbar-container">
-            <div class="navbar-left">
-                <a class="navbar-brand" href="{% url 'learning:home' %}">
-                    <img class="brand-logo" src="{% static 'images/logo-180.png' %}" alt="ExamFlow">
-                    ExamFlow
-                </a>
-            </div>
-            
-            <ul class="navbar-nav navbar-center">
-                <li class="nav-item">
-                    <a class="nav-link-aesop active" href="{% url 'learning:home' %}">Главная</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">Задания ФИПИ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link-aesop" href="{% url 'ai:chat' %}">О сервисе</a>
-                </li>
-            </ul>
-            
-            <div class="navbar-right navbar-user">
-                <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">Перейти в бота</a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop"><i class="fas fa-user"></i> Профиль</a>
-                {% else %}
-                    <a href="{% url 'authentication:login' %}" class="nav-link-aesop"><i class="fas fa-sign-in-alt"></i> Войти</a>
-                {% endif %}
-                <button class="navbar-burger" id="navbar-burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-menu">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
-        </div>
-        
-        <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
-            <div class="mobile-menu__header">
-                <span>Меню</span>
-                <button class="mobile-menu__close" id="mobile-menu-close" aria-label="Закрыть меню">×</button>
-            </div>
-            <div class="mobile-menu__content">
-                <a class="nav-link-aesop" href="{% url 'learning:home' %}">Главная</a>
-                <a class="nav-link-aesop" href="{% url 'learning:subjects_list' %}">Задания ФИПИ</a>
-                <a class="nav-link-aesop" href="{% url 'ai:chat' %}">О сервисе</a>
-                <div class="mobile-menu__actions">
-                    <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-bot">Перейти в бота</a>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'authentication:dashboard' %}" class="nav-link-aesop"><i class="fas fa-user"></i> Профиль</a>
-                    {% else %}
-                        <a href="{% url 'authentication:login' %}" class="nav-link-aesop"><i class="fas fa-sign-in-alt"></i> Войти</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav> -->
+    
     
     <!-- Основной контент -->
     <main>
         {% block content %}{% endblock %}
     </main>
     
-    <!-- Footer -->
-    <!-- <footer class="footer-modern">
-        <div class="footer-container">
-            <div class="footer-text">
-                &copy; 2024 ExamFlow. Все права защищены.
-            </div>
-        </div>
-    </footer> -->
+    
     
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
     
-    <!-- Менеджер тем и анимаций -->
-    <!-- <script src="{% static 'js/theme-manager.js' %}"></script> -->
-    
-    <!-- AI Learning System -->
-    <!-- <script src="{% static 'js/ai-learning.js' %}"></script> -->
-    
-    <!-- Новые скрипты брендинга -->
-    <script src="{% static 'new-branding/examflow-components.js' %}"></script>
+    <!-- Дополнительные скрипты загружаются через модули выше -->
     
     <!-- Дополнительные скрипты -->
     {% block extra_js %}{% endblock %}
+    <script>
+    // Простой трекинг кликов по data-analytics
+    window.trackEvent = function(name, params){
+      try { if (window.gtag) gtag('event', name, params || {}); } catch(e){}
+      try { if (window.ym && '{{ YM_ID }}') ym('{{ YM_ID }}', 'reachGoal', name); } catch(e){}
+    };
+    document.addEventListener('click', function(e){
+      var el = e.target.closest('[data-analytics]');
+      if (!el) return;
+      var name = el.getAttribute('data-analytics');
+      if (name) trackEvent(name, {href: el.href || '', text: (el.textContent||'').trim()});
+    });
+    </script>
 </body>
 </html>

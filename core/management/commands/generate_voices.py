@@ -3,12 +3,11 @@
 """
 
 from django.core.management.base import BaseCommand, CommandError
-from core.voice_service import voice_service, generate_task_voices
+from core.voice_service import voice_service
 from core.models import Task  # type: ignore
 import logging
 
 logger = logging.getLogger(__name__)
-
 
 class Command(BaseCommand):
     help = 'Генерирует голосовые файлы для заданий'
@@ -50,106 +49,111 @@ class Command(BaseCommand):
         """Генерирует аудио для одного задания"""
         try:
             task = Task.objects.get(id=task_id)
-            self.stdout.write(f'🎤 Генерация аудио для задания: {task.title}')
-            
+            self.stdout.write('🎤 Генерация аудио для задания: {task.title}')
+
             result = voice_service.generate_task_audio(task)
-            
+
             if result and result['task_audio']:
                 self.stdout.write(
-                    self.style.SUCCESS(f'✅ Аудио создано: {result["task_audio"]}')  # type: ignore
+                    self.style.SUCCESS(
+                        '✅ Аудио создано: {result["task_audio"]}')  # type: ignore
                 )
                 if result['solution_audio']:
                     self.stdout.write(
-                        self.style.SUCCESS(f'✅ Аудио решения: {result["solution_audio"]}')  # type: ignore
+                        self.style.SUCCESS(
+                            '✅ Аудио решения: {result["solution_audio"]}')  # type: ignore
                     )
             else:
                 self.stdout.write(
                     self.style.ERROR('❌ Ошибка создания аудио')  # type: ignore
                 )
-                
+
         except Task.DoesNotExist:
-            raise CommandError(f'❌ Задание с ID {task_id} не найдено')
+            raise CommandError('❌ Задание с ID {task_id} не найдено')
         except Exception as e:
-            raise CommandError(f'❌ Ошибка: {str(e)}')
+            raise CommandError('❌ Ошибка: {str(e)}')
 
     def generate_multiple_tasks(self, limit, force):
         """Генерирует аудио для множества заданий"""
         self.stdout.write(
-            self.style.SUCCESS(f'🎤 Начинаем генерацию голосовых файлов...')  # type: ignore
+            self.style.SUCCESS(
+                '🎤 Начинаем генерацию голосовых файлов...')  # type: ignore
         )
-        
+
         # Выбираем задания
         if force:
             tasks = Task.objects.filter(is_active=True)[:limit]
-            self.stdout.write(f'📋 Принудительная генерация для {tasks.count()} заданий')
+            self.stdout.write('📋 Принудительная генерация для {tasks.count()} заданий')
         else:
             tasks = Task.objects.filter(is_active=True, audio_file__isnull=True)[:limit]
-            self.stdout.write(f'📋 Генерация для {tasks.count()} заданий без аудио')
-        
+            self.stdout.write('📋 Генерация для {tasks.count()} заданий без аудио')
+
         if not tasks:
             self.stdout.write(
                 self.style.WARNING('⚠️  Нет заданий для обработки')  # type: ignore
             )
             return
-        
+
         generated_count = 0
         error_count = 0
-        
+
         for i, task in enumerate(tasks, 1):
             try:
-                self.stdout.write(f'[{i}/{len(tasks)}] Обработка: {task.title[:50]}...')
-                
+                self.stdout.write('[{i}/{len(tasks)}] Обработка: {task.title[:50]}...')
+
                 result = voice_service.generate_task_audio(task)
-                
+
                 if result and result['task_audio']:
                     generated_count += 1
                     self.stdout.write(
-                        self.style.SUCCESS(f'  ✅ Создано: {result["task_audio"]}')  # type: ignore
+                        self.style.SUCCESS(
+                            '  ✅ Создано: {result["task_audio"]}')  # type: ignore
                     )
                 else:
                     error_count += 1
                     self.stdout.write(
                         self.style.ERROR('  ❌ Ошибка создания аудио')  # type: ignore
                     )
-                
+
                 # Показываем прогресс каждые 10 заданий
                 if i % 10 == 0:
                     self.stdout.write(
-                        self.style.WARNING(f'📊 Прогресс: {i}/{len(tasks)} | Создано: {generated_count} | Ошибок: {error_count}')  # type: ignore
+                        self.style.WARNING(
+                            '📊 Прогресс: {i}/{len(tasks)} | Создано: {generated_count} | Ошибок: {error_count}')  # type: ignore
                     )
-                
+
             except Exception as e:
                 error_count += 1
                 self.stdout.write(
-                    self.style.ERROR(f'  ❌ Ошибка: {str(e)}')  # type: ignore
+                    self.style.ERROR('  ❌ Ошибка: {str(e)}')  # type: ignore
                 )
                 continue
-        
+
         self.stdout.write(
             self.style.SUCCESS(  # type: ignore
-                f'🎉 Генерация завершена!'  # type: ignore
+                '🎉 Генерация завершена!'  # type: ignore
             )
         )
         self.stdout.write(
             self.style.SUCCESS(  # type: ignore
-                f'📊 Создано файлов: {generated_count}'  # type: ignore
+                '📊 Создано файлов: {generated_count}'  # type: ignore
             )
         )
         if error_count > 0:
             self.stdout.write(
                 self.style.WARNING(  # type: ignore
-                    f'⚠️  Ошибок: {error_count}'  # type: ignore
+                    '⚠️  Ошибок: {error_count}'  # type: ignore
                 )
             )
 
     def cleanup_old_files(self):
         """Очищает старые аудиофайлы"""
         self.stdout.write('🧹 Очистка старых аудиофайлов...')
-        
+
         deleted_count = voice_service.cleanup_old_audio(days=30)
-        
+
         self.stdout.write(
-            self.style.SUCCESS(  # type: ignore 
-                f'✅ Удалено файлов: {deleted_count}'  # type: ignore
+            self.style.SUCCESS(  # type: ignore
+                '✅ Удалено файлов: {deleted_count}'  # type: ignore
             )
         )

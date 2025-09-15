@@ -1,0 +1,35 @@
+{# Универсальные SEO-мета. Использует значения из контекста, с безопасными значениями по умолчанию #}
+{# Title #}
+{% if page_title %}
+  <title>{{ page_title }}</title>
+{% endif %}
+
+{# Description #}
+{% if page_description %}
+  <meta name="description" content="{{ page_description }}">
+{% endif %}
+
+{# Canonical #}
+{% if canonical_url %}
+  <link rel="canonical" href="{{ canonical_url }}">
+{% endif %}
+
+{# Open Graph #}
+<meta property="og:type" content="website">
+{% if og_title %}<meta property="og:title" content="{{ og_title }}">{% endif %}
+{% if og_description %}<meta property="og:description" content="{{ og_description }}">{% endif %}
+{% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+{% if og_url %}<meta property="og:url" content="{{ og_url }}">{% endif %}
+
+{# Twitter #}
+<meta name="twitter:card" content="summary_large_image">
+{% if twitter_title %}<meta name="twitter:title" content="{{ twitter_title }}">{% endif %}
+{% if twitter_description %}<meta name="twitter:description" content="{{ twitter_description }}">{% endif %}
+{% if twitter_image %}<meta name="twitter:image" content="{{ twitter_image }}">{% endif %}
+
+{# JSON-LD: вставляется страницами через переменную jsonld #}
+{% if jsonld %}
+  <script type="application/ld+json">{{ jsonld|safe }}</script>
+{% endif %}
+
+

@@ -2,11 +2,9 @@
 Тесты для Telegram бота
 """
 
-import pytest
 from django.test import TestCase
-from django.contrib.auth.models import User
+from django.conf import settings
 from core.models import Subject, Task
-
 
 class TestTelegramBot(TestCase):
     """Тесты для Telegram бота"""
@@ -14,19 +12,19 @@ class TestTelegramBot(TestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         # Создаем тестового пользователя
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_user( # type: ignore
             username='testuser',
             email='test@example.com',
             password='testpassword123'
         )
-        
+
         # Создаем тестовые данные
         self.subject = Subject.objects.create(  # type: ignore
             name='Математика',
             code='MATH',
             exam_type='ege'
         )
-        
+
         self.task = Task.objects.create(  # type: ignore
             title='Тестовое задание',
             text='Решите уравнение: x + 2 = 5',
@@ -81,7 +79,7 @@ class TestTelegramBot(TestCase):
         """Тест связи между предметом и заданиями"""
         # Проверяем, что задание связано с предметом
         self.assertEqual(self.task.subject, self.subject)
-        
+
         # Проверяем количество заданий по предмету
         tasks_count = Task.objects.filter(subject=self.subject).count()  # type: ignore
         self.assertEqual(tasks_count, 1)
@@ -96,7 +94,7 @@ class TestTelegramBot(TestCase):
     def test_user_session_management(self):
         """Тест управления сессиями пользователей"""
         # Проверяем, что пользователь может быть создан и найден
-        found_user = User.objects.filter(username='testuser').first()
+        found_user = User.objects.filter(username='testuser').first() # type: ignore    
         self.assertIsNotNone(found_user)
         self.assertEqual(found_user, self.user)
 
@@ -110,7 +108,7 @@ class TestTelegramBot(TestCase):
             subject=self.subject,
             difficulty=1
         )
-        
+
         medium_task = Task.objects.create(  # type: ignore
             title='Среднее задание',
             text='Уравнение средней сложности',
@@ -118,7 +116,7 @@ class TestTelegramBot(TestCase):
             subject=self.subject,
             difficulty=2
         )
-        
+
         self.assertEqual(easy_task.difficulty, 1)
         self.assertEqual(medium_task.difficulty, 2)
 
@@ -130,15 +128,15 @@ class TestTelegramBot(TestCase):
             result = 1 / 0
         except ZeroDivisionError:
             result = "Ошибка обработана"
-        
+
         self.assertEqual(result, "Ошибка обработана")
 
     def test_user_progress_tracking(self):
         """Тест отслеживания прогресса пользователя"""
         # Проверяем, что прогресс пользователя может быть отслежен
-        user_tasks = Task.objects.filter(subject=self.subject)  # type: ignore  
+        user_tasks = Task.objects.filter(subject=self.subject)  # type: ignore
         self.assertEqual(user_tasks.count(), 1)
-        
+
         # Проверяем, что задание доступно пользователю
         available_task = user_tasks.first()
         self.assertIsNotNone(available_task)

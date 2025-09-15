@@ -18,8 +18,11 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('users/', views.users_analytics, name='users'),
     path('tasks/', views.tasks_analytics, name='tasks'),
-    
+
     # API
     path('api/stats/', views.api_stats, name='api_stats'),
-    path('api/update-user-profile/', views.update_user_profile, name='update_user_profile'),
-]
+    path(
+        'api/update-user-profile/',
+        views.update_user_profile,
+        name='update_user_profile'),
+        ]

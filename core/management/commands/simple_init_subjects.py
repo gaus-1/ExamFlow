@@ -1,0 +1,102 @@
+"""
+Простая команда для инициализации предметов
+"""
+
+from django.core.management.base import BaseCommand
+from learning.models import Subject
+import logging
+
+logger = logging.getLogger(__name__)
+
+class Command(BaseCommand):
+    help = 'Простая инициализация предметов математики и русского языка'
+
+    def handle(self, *args, **options):
+        self.stdout.write('Создаем предметы математики и русского языка...')
+
+        # Создаем предметы
+        subjects_data = [
+                'name': 'Математика (профильная)',
+                'code': 'math_pro',
+                'exam_type': 'ЕГЭ',
+                'description': 'Профильная математика ЕГЭ - задания 1-19',
+                'icon': '📐',
+                'is_primary': True
+            },
+                'name': 'Математика (непрофильная)',
+                'code': 'math_base',
+                'exam_type': 'ЕГЭ',
+                'description': 'Базовая математика ЕГЭ - задания 1-20',
+                'icon': '📊',
+                'is_primary': True
+            },
+                'name': 'Математика (ОГЭ)',
+                'code': 'math_oge',
+                'exam_type': 'ОГЭ',
+                'description': 'Математика ОГЭ - задания 1-26',
+                'icon': '🔢',
+                'is_primary': True
+            },
+                'name': 'Русский язык (ЕГЭ)',
+                'code': 'russian_ege',
+                'exam_type': 'ЕГЭ',
+                'description': 'Русский язык ЕГЭ - сочинение, тесты, грамматика',
+                'icon': '📝',
+                'is_primary': True
+            },
+                'name': 'Русский язык (ОГЭ)',
+                'code': 'russian_oge',
+                'exam_type': 'ОГЭ',
+                'description': 'Русский язык ОГЭ - изложение, сочинение, тесты',
+                'icon': '📖',
+                'is_primary': True
+            },
+        ]
+
+        created_count = 0
+
+        for subject_data in subjects_data:
+            subject, created = Subject.objects.get_or_create(  # type: ignore
+                name=subject_data['name'],
+                defaults=subject_data
+            )
+
+            if created:
+                created_count += 1
+                self.stdout.write('  ✓ Создан предмет: {subject.name}')
+            else:
+                self.stdout.write('  - Предмет уже существует: {subject.name}')
+
+        # Архивируем ненужные предметы
+        unused_subjects = [
+            'Физика', 'Химия', 'Биология', 'История', 'География',
+            'Литература', 'Информатика', 'Обществознание',
+            'Английский язык', 'Немецкий язык', 'Французский язык', 'Испанский язык'
+        ]
+
+        archived_count = 0
+        for subject_name in unused_subjects:
+            updated = Subject.objects.filter(  # type: ignore
+                name=subject_name).update(
+                is_archived=True)  # type: ignore
+            if updated:
+                archived_count += 1
+
+        self.stdout.write('  ✓ Архивировано предметов: {archived_count}')
+        self.stdout.write('  ✓ Создано предметов: {created_count}')
+
+        # Показываем статистику
+        total_subjects = Subject.objects.count()  # type: ignore
+        primary_subjects = Subject.objects.filter(  # type: ignore
+            is_primary=True).count()  # type: ignore
+        archived_subjects = Subject.objects.filter(  # type: ignore
+            is_archived=True).count()  # type: ignore
+
+        self.stdout.write('\nСтатистика:')
+        self.stdout.write('  Всего предметов: {total_subjects}')
+        self.stdout.write('  Основных предметов: {primary_subjects}')
+        self.stdout.write('  Архивированных предметов: {archived_subjects}')
+
+        self.stdout.write(
+            self.style.SUCCESS('\nПредметы успешно инициализированы!')  # type: ignore
+        )

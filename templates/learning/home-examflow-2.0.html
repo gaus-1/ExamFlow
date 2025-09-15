@@ -1,0 +1,826 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ExamFlow 2.0 - Умный помощник для подготовки к ЕГЭ{% endblock %}
+
+{% block extra_head %}
+  {% include 'partials/seo_meta.html' %}
+{% endblock %}
+
+{# Стили подключаются из base.html с версионированием STATIC_VERSION #}
+
+{% block content %}
+<!-- ========================================
+   HEADER - СОВРЕМЕННАЯ НАВИГАЦИЯ
+   ======================================== -->
+<header class="header">
+  <div class="container container-xl">
+    <div class="header-content flex items-center justify-between">
+      <!-- Логотип с подписью -->
+      <div class="logo-section">
+        <div class="logo-container flex items-center gap-3">
+          <img src="{% static 'images/logo-new.png' %}" alt="ExamFlow" class="logo-image">
+          <span class="logo-text gradient-text font-bold text-xl">ExamFlow</span>
+        </div>
+        <div class="logo-subtitle">Get ready. Check. Stay informed.</div>
+      </div>
+      
+      <!-- Навигация -->
+      <nav class="header-nav">
+        <ul class="nav-list flex items-center gap-6">
+          <li><a href="{% url 'features' %}" class="nav-link">Возможности</a></li>
+          <li><a href="{% url 'learning:subjects_list' %}" class="nav-link">Предметы</a></li>
+          <li><a href="{% url 'pricing' %}" class="nav-link">Тарифы</a></li>
+          <li><a href="{% url 'features' %}" class="nav-link">О нас</a></li>
+        </ul>
+      </nav>
+      
+      <!-- Мобильное меню -->
+      <div class="mobile-menu mobile-only">
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+          <div class="mobile-menu-content">
+            <div class="mobile-menu-header">
+              <div class="logo-container flex items-center gap-3">
+                <img src="{% static 'images/logo-new.png' %}" alt="ExamFlow" class="logo-image">
+                <span class="logo-text gradient-text font-bold text-xl">ExamFlow</span>
+              </div>
+              <button class="mobile-menu-close" onclick="toggleMobileMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <nav class="mobile-nav">
+              <ul class="mobile-nav-list">
+                <li><a href="#features" class="mobile-nav-link" onclick="toggleMobileMenu()">Возможности</a></li>
+                <li><a href="#subjects" class="mobile-nav-link" onclick="toggleMobileMenu()">Предметы</a></li>
+                <li><a href="#pricing" class="mobile-nav-link" onclick="toggleMobileMenu()">Тарифы</a></li>
+                <li><a href="#about" class="mobile-nav-link" onclick="toggleMobileMenu()">О нас</a></li>
+              </ul>
+            </nav>
+            
+            <div class="mobile-menu-actions">
+              <button class="btn btn-ghost w-full mb-3" onclick="focusAI(); toggleMobileMenu()">Задать вопрос</button>
+              <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-primary w-full" onclick="toggleMobileMenu()">Войти</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Действия -->
+      <div class="header-actions flex items-center gap-2">
+        <button class="btn btn-ghost btn-sm" onclick="focusAI()">Задать вопрос</button>
+        <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-primary btn-sm">Войти</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================================
+   HERO SECTION - AI АССИСТЕНТ
+   ======================================== -->
+<section class="hero-section">
+  <div class="container container-lg">
+    <div class="hero-content text-center">
+      <!-- Главный заголовок -->
+      <h1 class="hero-title gradient-text font-bold text-4xl mb-4">
+        Умный помощник для подготовки к ЕГЭ
+      </h1>
+      
+      <!-- Подзаголовок -->
+      <p class="hero-subtitle text-lg text-muted mb-6 max-w-3xl mx-auto">
+        Задайте любой вопрос по ЕГЭ и получите мгновенный ответ от ИИ-ассистента. 
+        От теории до практики — все в одном месте.
+      </p>
+      
+      <!-- CSRF токен для AJAX запросов -->
+      {% csrf_token %}
+      
+      <!-- AI интерфейс в стиле Perplexity.ai -->
+      <div class="ai-interface-container">
+        <div class="ai-interface card glass max-w-4xl mx-auto">
+          <!-- Заголовок AI -->
+          <div class="ai-header text-center mb-6">
+            <div class="ai-icon-container mx-auto mb-4">
+              <div class="ai-icon">🤖</div>
+            </div>
+            <h2 class="ai-title text-2xl font-semibold">ИИ-ассистент ExamFlow</h2>
+            <p class="ai-subtitle text-muted">Задайте вопрос по любому предмету ЕГЭ</p>
+          </div>
+          
+          <!-- Поле ввода AI -->
+          <div class="ai-input-container">
+            {% csrf_token %}
+            <div class="ai-input-wrapper">
+              <input 
+                type="text" 
+                class="ai-input input text-lg" 
+                placeholder="Например: Как решать логарифмы? Или: Объясни теорию вероятности..."
+                maxlength="500"
+              >
+              <button class="ai-send-btn btn btn-primary" type="button">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Подсказки -->
+            <div class="ai-suggestions flex flex-wrap gap-2 justify-center mt-4">
+              <button class="ai-suggestion" onclick="askQuestion('Как решать квадратные уравнения?')">
+                Квадратные уравнения
+              </button>
+              <button class="ai-suggestion" onclick="askQuestion('Объясни теорию вероятности')">
+                Теория вероятности
+              </button>
+              <button class="ai-suggestion" onclick="askQuestion('Как писать сочинение по русскому?')">
+                Сочинение по русскому
+              </button>
+              <button class="ai-suggestion" onclick="askQuestion('Правила английской грамматики')">
+                Английская грамматика
+              </button>
+            </div>
+          </div>
+          
+          <!-- AI чат контейнер -->
+          <div class="ai-chat-container" id="aiChatContainer">
+            <!-- Сообщения будут добавляться сюда -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- ГЕЙМИФИКАЦИЯ - ПРОГРЕСС И ДОСТИЖЕНИЯ -->
+      <div class="gamification-section mt-16">
+        <div class="container container-lg">
+          <div class="section-header text-center mb-12">
+            <h2 class="section-title text-3xl font-bold">Ваш прогресс</h2>
+            <p class="section-subtitle text-lg">Отслеживайте достижения и развивайтесь</p>
+          </div>
+          
+          <!-- Прогресс-трекер -->
+          <div class="progress-tracker card max-w-4xl mx-auto mb-8">
+            <div class="progress-header text-center mb-6">
+              <div class="level-info">
+                <div class="level-badge badge badge-primary text-lg">Уровень 5</div>
+                <h3 class="level-title text-xl font-semibold mt-2">Опытный ученик</h3>
+                <p class="level-subtitle text-muted">До следующего уровня: 250 XP</p>
+              </div>
+            </div>
+            
+            <!-- Прогресс-бар уровня -->
+            <div class="level-progress mb-6">
+              <div class="progress-label flex justify-between text-sm mb-2">
+                <span>Прогресс уровня</span>
+                <span>750 / 1000 XP</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar" style="width: 75%"></div>
+              </div>
+            </div>
+            
+            <!-- Статистика -->
+            <div class="stats-grid grid grid-cols-3 gap-6">
+              <div class="stat-item text-center">
+                <div class="stat-number text-2xl font-bold text-primary">1,250</div>
+                <div class="stat-label text-sm text-muted">Всего XP</div>
+              </div>
+              <div class="stat-item text-center">
+                <div class="stat-number text-2xl font-bold text-success">47</div>
+                <div class="stat-label text-sm text-muted">Решенных задач</div>
+              </div>
+              <div class="stat-item text-center">
+                <div class="stat-number text-2xl font-bold text-accent">12</div>
+                <div class="stat-label text-sm text-muted">Достижений</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Достижения -->
+          <div class="achievements-wall card max-w-4xl mx-auto">
+            <div class="achievements-header text-center mb-6">
+              <h3 class="text-xl font-semibold">Достижения</h3>
+              <p class="text-muted">Зарабатывайте достижения за активность</p>
+            </div>
+            
+            <div class="achievements-grid grid grid-cols-2 md:grid-cols-4 gap-4">
+              <!-- Полученные достижения -->
+              <div class="achievement-item text-center p-4 rounded-lg bg-success/10 border border-success/20">
+                <div class="achievement-icon text-3xl mb-2">🎯</div>
+                <div class="achievement-title text-sm font-medium">Первая задача</div>
+                <div class="achievement-desc text-xs text-muted">Решите первую задачу</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-primary/10 border border-primary/20">
+                <div class="achievement-icon text-3xl mb-2">🔥</div>
+                <div class="achievement-title text-sm font-medium">Серия успехов</div>
+                <div class="achievement-desc text-xs text-muted">5 правильных ответов подряд</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-accent/10 border border-accent/20">
+                <div class="achievement-icon text-3xl mb-2">🧠</div>
+                <div class="achievement-title text-sm font-medium">Любознательный</div>
+                <div class="achievement-desc text-xs text-muted">Задайте 10 вопросов ИИ</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-warning/10 border border-warning/20">
+                <div class="achievement-icon text-3xl mb-2">⚡</div>
+                <div class="achievement-title text-sm font-medium">Скорость</div>
+                <div class="achievement-desc text-xs text-muted">Решите задачу за 30 секунд</div>
+              </div>
+              
+              <!-- Неполученные достижения -->
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">🏆</div>
+                <div class="achievement-title text-sm font-medium">Мастер</div>
+                <div class="achievement-desc text-xs text-muted">Решите 100 задач</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">🌟</div>
+                <div class="achievement-title text-sm font-medium">Эксперт</div>
+                <div class="achievement-desc text-xs text-muted">Достигните 10 уровня</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">📚</div>
+                <div class="achievement-title text-sm font-medium">Эрудит</div>
+                <div class="achievement-desc text-xs text-muted">Изучите все предметы</div>
+              </div>
+              
+              <div class="achievement-item text-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-50">
+                <div class="achievement-icon text-3xl mb-2">💎</div>
+                <div class="achievement-title text-sm font-medium">Легенда</div>
+                <div class="achievement-desc text-xs text-muted">Получите все достижения</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Статистика -->
+      <div class="hero-stats flex items-center justify-center gap-8 mt-12">
+        <div class="stat-item text-center">
+          <div class="stat-number font-bold text-3xl text-primary">50,000+</div>
+          <div class="stat-label text-muted">Учеников</div>
+        </div>
+        <div class="stat-item text-center">
+          <div class="stat-number font-bold text-3xl text-primary">95%</div>
+          <div class="stat-label text-muted">Успешная сдача</div>
+        </div>
+        <div class="stat-item text-center">
+          <div class="stat-number font-bold text-3xl text-primary">24/7</div>
+          <div class="stat-label text-muted">Поддержка ИИ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   FEATURES SECTION - ВОЗМОЖНОСТИ
+   ======================================== -->
+<section id="features" class="features-section">
+  <div class="container container-xl">
+    <div class="section-header text-center mb-12">
+      <h2 class="section-title text-4xl font-bold mb-4">Почему ExamFlow 2.0?</h2>
+      <p class="section-subtitle text-xl text-muted max-w-2xl mx-auto">
+        Мы создали платформу, которая превращает подготовку к ЕГЭ в увлекательное путешествие
+      </p>
+    </div>
+    
+    <div class="features-grid grid grid-cols-3 gap-8">
+      <!-- AI Ассистент -->
+      <div class="feature-card card hover-lift text-center">
+        <div class="feature-icon mb-4">🤖</div>
+        <h3 class="feature-title text-xl font-semibold mb-3">ИИ-ассистент</h3>
+        <p class="feature-description text-muted">
+          Задайте любой вопрос и получите подробный ответ с источниками и примерами
+        </p>
+      </div>
+      
+      <!-- Интерактивная практика -->
+      <div class="feature-card card hover-lift text-center">
+        <div class="feature-icon mb-4">🎯</div>
+        <h3 class="feature-title text-xl font-semibold mb-3">Интерактивная практика</h3>
+        <p class="feature-description text-muted">
+          После изучения теории сразу переходите к решению задач с мгновенной проверкой
+        </p>
+      </div>
+      
+      <!-- Персонализация -->
+      <div class="feature-card card hover-lift text-center">
+        <div class="feature-icon mb-4">⚡</div>
+        <h3 class="feature-title text-xl font-semibold mb-3">Персонализация</h3>
+        <p class="feature-description text-muted">
+          ИИ адаптируется под ваш уровень и предлагает оптимальный план обучения
+        </p>
+      </div>
+      
+      <!-- Геймификация -->
+      <div class="feature-card card hover-lift text-center">
+        <div class="feature-icon mb-4">🏆</div>
+        <h3 class="feature-title text-xl font-semibold mb-3">Геймификация</h3>
+        <p class="feature-description text-muted">
+          Система уровней, достижений и ежедневных челленджей мотивирует учиться
+        </p>
+      </div>
+      
+      <!-- Синхронизация -->
+      <div class="feature-card card hover-lift text-center">
+        <div class="feature-icon mb-4">🔄</div>
+        <h3 class="feature-title text-xl font-semibold mb-3">Синхронизация</h3>
+        <p class="feature-description text-muted">
+          Ваш прогресс синхронизируется между сайтом и Telegram-ботом
+        </p>
+      </div>
+      
+      <!-- Аналитика -->
+      <div class="feature-card card hover-lift text-center">
+        <div class="feature-icon mb-4">📊</div>
+        <h3 class="feature-title text-xl font-semibold mb-3">Детальная аналитика</h3>
+        <p class="feature-description text-muted">
+          Отслеживайте прогресс по темам и получайте рекомендации по улучшению
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   SUBJECTS SECTION - ПРЕДМЕТЫ
+   ======================================== -->
+<section id="subjects" class="subjects-section">
+  <div class="container container-xl">
+    <div class="section-header text-center mb-12">
+      <h2 class="section-title text-4xl font-bold mb-4">Предметы ЕГЭ</h2>
+      <p class="section-subtitle text-xl text-muted">
+        Выберите предмет для углубленного изучения
+      </p>
+    </div>
+    
+    <div class="subjects-grid grid grid-cols-2 gap-6">
+      <!-- Математика -->
+      <div class="subject-card card hover-lift text-center">
+        <div class="subject-icon mb-4">📐</div>
+        <h3 class="subject-title text-lg font-semibold mb-2">Математика</h3>
+        <p class="subject-description text-sm text-muted mb-4">
+          Алгебра, геометрия, тригонометрия
+        </p>
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary btn-sm">
+          Начать изучение
+        </a>
+      </div>
+      
+      <!-- Русский язык -->
+      <div class="subject-card card hover-lift text-center">
+        <div class="subject-icon mb-4">📝</div>
+        <h3 class="subject-title text-lg font-semibold mb-2">Русский язык</h3>
+        <p class="subject-description text-sm text-muted mb-4">
+          Грамматика, сочинение, анализ текста
+        </p>
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary btn-sm">
+          Начать изучение
+        </a>
+      </div>
+      
+      
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   PRACTICE SECTION - ПРАКТИКА
+   ======================================== -->
+<section class="practice-section">
+  <div class="container container-lg">
+    <div class="practice-container">
+      <!-- Контейнер для задач будет заполняться динамически -->
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   GAMIFICATION SECTION - ГЕЙМИФИКАЦИЯ
+   ======================================== -->
+<section class="gamification-section">
+  <div class="container container-xl">
+    <div class="section-header text-center mb-12">
+      <h2 class="section-title text-4xl font-bold mb-4">Ваш прогресс</h2>
+      <p class="section-subtitle text-xl text-muted">
+        Отслеживайте достижения и участвуйте в челленджах
+      </p>
+    </div>
+    
+    <div class="gamification-content grid grid-cols-2 gap-8">
+      <!-- Профиль пользователя -->
+      <div class="user-profile card">
+        <div class="profile-header mb-6">
+          <h3 class="profile-title text-2xl font-semibold mb-2">Ваш профиль</h3>
+          <p class="profile-subtitle text-muted">Продолжайте учиться и расти</p>
+        </div>
+        
+        <div class="profile-stats space-y-4">
+          <div class="stat-row flex items-center justify-between">
+            <span class="stat-label">Уровень:</span>
+            <span class="stat-value user-level font-semibold">Уровень 1</span>
+          </div>
+          
+          <div class="stat-row flex items-center justify-between">
+            <span class="stat-label">Опыт:</span>
+            <span class="stat-value user-xp font-semibold">0 XP</span>
+          </div>
+          
+          <div class="stat-row flex items-center justify-between">
+            <span class="stat-label">Решено задач:</span>
+            <span class="stat-value font-semibold">0</span>
+          </div>
+          
+          <div class="stat-row flex items-center justify-between">
+            <span class="stat-label">Серия дней:</span>
+            <span class="stat-value font-semibold">0 дней</span>
+          </div>
+        </div>
+        
+        <!-- Прогресс до следующего уровня -->
+        <div class="level-progress-container mt-6">
+          <div class="progress-label flex justify-between text-sm mb-2">
+            <span>До следующего уровня</span>
+            <span>0/1000 XP</span>
+          </div>
+          <div class="progress">
+            <div class="level-progress progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Ежедневные челленджи -->
+      <div class="daily-challenges">
+        <h3 class="challenges-title text-2xl font-semibold mb-4">Ежедневные челленджи</h3>
+        <div class="challenges-list">
+          <!-- Челленджи будут добавляться динамически -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   PRICING SECTION - ТАРИФЫ
+   ======================================== -->
+<section id="pricing" class="pricing-section">
+  <div class="container container-xl">
+    <div class="section-header text-center mb-12">
+      <h2 class="section-title text-4xl font-bold mb-4">Выберите тариф</h2>
+      <p class="section-subtitle text-xl text-muted">
+        Начните бесплатно или получите максимум возможностей
+      </p>
+    </div>
+    
+    <div class="pricing-grid grid grid-cols-2 gap-8">
+      <!-- Бесплатный (Freemium) -->
+      <div class="pricing-card card text-center">
+        <div class="pricing-header mb-6">
+          <h3 class="pricing-title text-2xl font-semibold mb-2">Бесплатный (Freemium)</h3>
+          <p class="pricing-subtitle text-muted">Ограничение по запросам</p>
+        </div>
+        
+        <div class="pricing-price mb-6">
+          <span class="price-amount text-4xl font-bold">0₽</span>
+          <span class="price-period text-muted">/месяц</span>
+        </div>
+        
+        <ul class="pricing-features space-y-3 mb-8">
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>До 5 вопросов к ИИ в день</span>
+          </li>
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>Базовые задачи и теория</span>
+          </li>
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>Ограниченные практики</span>
+          </li>
+        </ul>
+        
+        <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-secondary w-full">Начать бесплатно</a>
+      </div>
+      
+      <!-- Подписка (полный доступ) -->
+      <div class="pricing-card card text-center border-primary">
+        <div class="pricing-badge">
+          <span class="badge badge-primary">Популярный</span>
+        </div>
+        
+        <div class="pricing-header mb-6">
+          <h3 class="pricing-title text-2xl font-semibold mb-2">Подписка</h3>
+          <p class="pricing-subtitle text-muted">Полный доступ без ограничений</p>
+        </div>
+        
+        <div class="pricing-price mb-6">
+          <span class="price-amount text-4xl font-bold">999₽</span>
+          <span class="price-period text-muted">/месяц</span>
+        </div>
+        
+        <ul class="pricing-features space-y-3 mb-8">
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>Безлимитные вопросы к ИИ</span>
+          </li>
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>Все задачи, тесты и практики</span>
+          </li>
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>Персональный план обучения</span>
+          </li>
+          <li class="feature-item flex items-center gap-2">
+            <span class="feature-check">✅</span>
+            <span>Приоритетная поддержка</span>
+          </li>
+        </ul>
+        
+        <a href="{% url 'subscribe' %}" class="btn btn-primary w-full">Оформить подписку</a>
+      </div>
+      
+      
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   ABOUT SECTION - О НАС
+   ======================================== -->
+<section id="about" class="about-section">
+  <div class="container container-xl">
+    <div class="about-content grid grid-cols-2 gap-12 items-center">
+      <div class="about-text">
+        <h2 class="about-title text-4xl font-bold mb-6">
+          О ExamFlow 2.0
+        </h2>
+        <p class="about-description text-lg text-muted mb-6">
+          Мы создали революционную платформу для подготовки к ЕГЭ, которая объединяет 
+          искусственный интеллект, интерактивное обучение и геймификацию.
+        </p>
+        <p class="about-description text-lg text-muted mb-6">
+          Наша миссия — сделать подготовку к экзаменам эффективной, увлекательной 
+          и доступной для каждого ученика.
+        </p>
+        
+        <div class="about-stats flex gap-8 mt-8">
+          <div class="about-stat">
+            <div class="stat-number font-bold text-2xl text-primary">2020</div>
+            <div class="stat-label text-muted">Год основания</div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-number font-bold text-2xl text-primary">15+</div>
+            <div class="stat-label text-muted">Предметов</div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-number font-bold text-2xl text-primary">99%</div>
+            <div class="stat-label text-muted">Довольных учеников</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="about-visual">
+        <div class="about-image-container">
+          <img src="{% static 'images/about-illustration.svg' %}" alt="О ExamFlow" class="about-image">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+   FOOTER - ПОДВАЛ
+   ======================================== -->
+<footer class="footer">
+  <div class="container container-xl">
+    <div class="footer-content">
+      <div class="footer-main grid grid-cols-4 gap-8 mb-8">
+        <!-- О компании -->
+        <div class="footer-section">
+          <h3 class="footer-title font-semibold mb-4">ExamFlow</h3>
+          <p class="footer-description text-muted text-sm">
+            Умная платформа для подготовки к ЕГЭ с использованием искусственного интеллекта
+          </p>
+        </div>
+        
+        <!-- Продукт -->
+        <div class="footer-section">
+          <h3 class="footer-title font-semibold mb-4">Продукт</h3>
+          <ul class="footer-links space-y-2">
+            <li><a href="#features" class="footer-link">Возможности</a></li>
+            <li><a href="#subjects" class="footer-link">Предметы</a></li>
+            <li><a href="#pricing" class="footer-link">Тарифы</a></li>
+            <li><a href="#" class="footer-link">API</a></li>
+          </ul>
+        </div>
+        
+        <!-- Поддержка -->
+        <div class="footer-section">
+          <h3 class="footer-title font-semibold mb-4">Поддержка</h3>
+          <ul class="footer-links space-y-2">
+            <li><a href="#" class="footer-link">Документация</a></li>
+            <li><a href="#" class="footer-link">FAQ</a></li>
+            <li><a href="#" class="footer-link">Контакты</a></li>
+            <li><a href="#" class="footer-link">Telegram бот</a></li>
+          </ul>
+        </div>
+        
+        <!-- Компания -->
+        <div class="footer-section">
+          <h3 class="footer-title font-semibold mb-4">Компания</h3>
+          <ul class="footer-links space-y-2">
+            <li><a href="#about" class="footer-link">О нас</a></li>
+            <li><a href="#" class="footer-link">Блог</a></li>
+            <li><a href="#" class="footer-link">Карьера</a></li>
+            <li><a href="#" class="footer-link">Партнеры</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Нижняя часть футера -->
+      <div class="footer-bottom flex items-center justify-between pt-8 border-t border-gray-200">
+        <div class="footer-copyright text-muted text-sm">
+          © 2024 ExamFlow. Все права защищены.
+        </div>
+        
+        <div class="footer-social flex items-center gap-4">
+          <a href="#" class="social-link">Telegram</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ========================================
+   МОДАЛЬНЫЕ ОКНА
+   ======================================== -->
+
+<!-- Модальное окно для практики -->
+<div id="practice-modal" class="modal-overlay" style="display: none;">
+  <div class="modal">
+    <div class="modal-header flex items-center justify-between mb-6">
+      <h3 class="modal-title text-2xl font-semibold">Практика по теме</h3>
+      <button class="modal-close" onclick="closePracticeModal()">✕</button>
+    </div>
+    
+    <div class="modal-content">
+      <div class="problem-container">
+        <!-- Содержимое будет добавляться динамически -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+   КОНЕЦ ГЛАВНОЙ СТРАНИЦЫ EXAMFLOW 2.0
+   ======================================== -->
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/examflow-2.0.js' %}?v=3.3&t={{ timestamp }}&cache=false"></script>
+<script>
+// Принудительная очистка кэша браузера
+if ('caches' in window) {
+    caches.keys().then(function(names) {
+        for (let name of names) {
+            caches.delete(name);
+        }
+    });
+}
+
+// Очистка localStorage и sessionStorage
+localStorage.clear();
+sessionStorage.clear();
+
+console.log('🧹 Кэш браузера очищен принудительно');
+
+// Дополнительные функции для главной страницы
+
+/**
+ * Задать вопрос через подсказки
+ */
+function askQuestion(question) {
+  const aiInput = document.querySelector('.ai-input');
+  if (aiInput) {
+    aiInput.value = question;
+    aiInput.focus();
+    
+    // Автоматически отправляем вопрос
+    setTimeout(() => {
+      const sendButton = document.querySelector('.ai-send-btn');
+      if (sendButton) {
+        sendButton.click();
+      }
+    }, 100);
+  }
+}
+
+/**
+ * Начать практику по предмету
+ */
+function startSubjectPractice(subject) {
+  // Показываем модальное окно
+  const modal = document.getElementById('practice-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    
+    // Инициализируем практику
+    if (window.problemSolver) {
+      window.problemSolver.startPractice(subject);
+    }
+  }
+}
+
+/**
+ * Закрыть модальное окно практики
+ */
+function closePracticeModal() {
+  const modal = document.getElementById('practice-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Главная страница ExamFlow 2.0 загружена!');
+  console.log('📅 Timestamp:', '{{ timestamp }}');
+  
+  // Принудительная очистка кэша для отладки
+  if (window.location.search.includes('nocache')) {
+    console.log('🧹 Принудительная очистка кэша...');
+    // Очищаем localStorage
+    localStorage.clear();
+    // Очищаем sessionStorage
+    sessionStorage.clear();
+  }
+  
+  // Принудительная перезагрузка JavaScript файлов
+  if (window.location.search.includes('reload')) {
+    console.log('🔄 Принудительная перезагрузка JavaScript...');
+    // Перезагружаем страницу
+    window.location.reload(true);
+  }
+  
+  // Принудительная очистка кэша браузера
+  if (window.location.search.includes('clearcache')) {
+    console.log('🧹 Принудительная очистка кэша браузера...');
+    // Очищаем все возможные кэши
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (let name of names) {
+          caches.delete(name);
+        }
+      });
+    }
+    // Очищаем localStorage и sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    // Перезагружаем страницу
+    window.location.reload(true);
+  }
+  
+  // Принудительная очистка кэша для отладки
+  if (window.location.search.includes('debug')) {
+    console.log('🐛 Режим отладки включен...');
+    // Показываем информацию о загруженных файлах
+    console.log('📁 Загруженные JavaScript файлы:');
+    document.querySelectorAll('script[src]').forEach(script => {
+      console.log('  -', script.src);
+    });
+  }
+  
+  // Добавляем анимацию появления элементов
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('fade-in');
+      }
+    });
+  }, observerOptions);
+  
+  // Наблюдаем за всеми карточками и секциями
+  document.querySelectorAll('.feature-card, .subject-card, .pricing-card, .section-header').forEach(el => {
+    observer.observe(el);
+  });
+});
+</script>
+{% endblock %}

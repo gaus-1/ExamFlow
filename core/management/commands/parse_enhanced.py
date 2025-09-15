@@ -27,26 +27,27 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             self.stdout.write("🚀 Запуск улучшенного парсера...")
-            
+
             if options['test']:
                 self.stdout.write("🧪 Тестовый режим")
-                success = run_full_parsing(max_tasks_per_subject=10)  # Ограничиваем для тестирования
+                success = run_full_parsing(
+                    max_tasks_per_subject=10)  # Ограничиваем для тестирования
             else:
                 # Здесь будет вызов полного парсера
                 self.stdout.write("📚 Полный режим парсинга")
                 success = run_full_parsing(options['max_tasks'])
-            
+
             if success:
                 self.stdout.write(
-                    self.style.SUCCESS("✅ Парсинг успешно завершен!") # type: ignore
+                    self.style.SUCCESS("✅ Парсинг успешно завершен!")  # type: ignore
                 )
             else:
                 self.stdout.write(
-                    self.style.ERROR("❌ Ошибка при парсинге") # type: ignore
+                    self.style.ERROR("❌ Ошибка при парсинге")  # type: ignore
                 )
-                
+
         except Exception as e:
-            logger.error(f"Критическая ошибка: {e}")
+            logger.error("Критическая ошибка: {e}")
             self.stdout.write(
-                self.style.ERROR(f"❌ Критическая ошибка: {e}") # type: ignore
+                self.style.ERROR("❌ Критическая ошибка: {e}")  # type: ignore
             )

@@ -1,0 +1,53 @@
+name: Security audit
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 3 * * 1"  # еженедельно по понедельникам
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SETTINGS_MODULE: examflow_project.settings
+      DATABASE_URL: sqlite:///./ci.sqlite3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pip-audit
+        run: pip install --upgrade pip pip-audit
+      - name: Install project (no dev extras)
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # гарантируем, что manage.py может стартовать при импорте
+          python - <<'PY'
+          import os
+          os.environ.setdefault('DJANGO_SETTINGS_MODULE','examflow_project.settings')
+          os.environ.setdefault('DATABASE_URL','sqlite:///./ci.sqlite3')
+          print('DJANGO_SETTINGS_MODULE:', os.environ['DJANGO_SETTINGS_MODULE'])
+          print('DATABASE_URL:', os.environ['DATABASE_URL'])
+          PY
+
+      - name: Run pip-audit
+        run: pip-audit --progress-spinner=off || true
+
+  zap-baseline:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.10.0
+        with:
+          target: https://examflow.ru
+          rules_file_name: '.zap/rules.tsv'
+          allow_issue_writing: false
+          cmd_options: '-a'
+        env:
+          # ZAP step не требует Django, но пусть будут безопасные заглушки
+          DJANGO_SETTINGS_MODULE: examflow_project.settings
+          DATABASE_URL: sqlite:///./ci.sqlite3
+

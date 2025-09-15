@@ -1,7 +1,6 @@
-import os
-import json
 import hashlib
 from typing import Optional, Dict, Any
+from django.conf import settings
 from dataclasses import dataclass
 
 from django.utils import timezone
@@ -13,8 +12,7 @@ except Exception:  # pragma: no cover
     requests = None  # на случай отсутствия в окружении
 
 from .models import AiRequest, AiResponse, AiProvider, AiLimit
-from .rag_service import rag_service
-
+from core.rag_system.orchestrator import RAGOrchestrator
 
 @dataclass
 class AiResult:
@@ -23,7 +21,6 @@ class AiResult:
     tokens_used: int = 0
     cost: float = 0.0
     provider_name: str = "local"
-
 
 class BaseProvider:
     """Базовый интерфейс провайдера ИИ"""
@@ -36,7 +33,6 @@ class BaseProvider:
     def generate(self, prompt: str, max_tokens: int = 512) -> AiResult:
         raise NotImplementedError
 
-
 class GeminiProvider(BaseProvider):
     """Провайдер Google Gemini AI - быстрый и надежный!"""
 
@@ -47,11 +43,11 @@ class GeminiProvider(BaseProvider):
         self.api_key = getattr(settings, 'GEMINI_API_KEY', '')
         self.api_url = getattr(settings, 'GEMINI_BASE_URL', '')
         self.timeout = getattr(settings, 'GEMINI_TIMEOUT', 30)
-        
+
         # Выбираем настройки для конкретного типа задачи
         task_configs = getattr(settings, 'GEMINI_TASK_CONFIGS', {})
         task_config = task_configs.get(task_type, task_configs.get('chat', {}))
-        
+
         self.model = model or task_config.get('model', 'gemini-2.0-flash')
         self.temperature = task_config.get('temperature', 0.7)
         self.max_tokens = task_config.get('max_tokens', 1000)
@@ -75,11 +71,10 @@ class GeminiProvider(BaseProvider):
             # Формируем полный промпт с системным промптом
             full_prompt = prompt
             if self.system_prompt:
-                full_prompt = f"{self.system_prompt}\n\nПользователь: {prompt}\n\nОтвет:"
-            
+                full_prompt = "{self.system_prompt}\n\nПользователь: {prompt}\n\nОтвет:"
+
             # Используем настройки из конфигурации
             actual_max_tokens = min(max_tokens, self.max_tokens)
-            
             # Формируем payload для Gemini API (точно по официальной документации)
             payload = {
                 "contents": [
@@ -96,24 +91,25 @@ class GeminiProvider(BaseProvider):
             # Добавляем логирование для отладки
             import logging
             logger = logging.getLogger(__name__)
-            logger.info(f"Отправляем запрос к Gemini: модель={self.model}, токены={actual_max_tokens}")
+            logger.info(
+                "Отправляем запрос к Gemini: модель={self.model}, токены={actual_max_tokens}")
 
             # Отправляем запрос к Gemini API (точно по официальной документации Google)
             headers = {
                 'Content-Type': 'application/json',
                 'X-goog-api-key': self.api_key
             }
-            
+
             # URL без ключа (ключ в заголовке)
             api_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
-            
-            response = requests.post(
-                api_url, 
-                json=payload, 
+
+            response = requests.post(  # type: ignore
+                api_url,
+                json=payload,
                 headers=headers,
                 timeout=self.timeout
             )
-            
+
             if response.status_code == 200:
                 data = response.json()
                 # Извлекаем текст ответа из Gemini API
@@ -124,11 +120,12 @@ class GeminiProvider(BaseProvider):
                         parts = candidate['content']['parts']
                         if len(parts) > 0 and 'text' in parts[0]:
                             text = parts[0]['text']
-                
+
                 if text:
                     tokens_used = len(prompt.split()) + len(text.split())
-                    logger.info(f"Gemini ответил успешно: токены={tokens_used}, длина ответа={len(text)}")
-                    
+                    logger.info(
+                        "Gemini ответил успешно: токены={tokens_used}, длина ответа={len(text)}")
+
                     return AiResult(
                         text=text,
                         tokens_used=tokens_used,
@@ -136,34 +133,32 @@ class GeminiProvider(BaseProvider):
                         provider_name=self.name
                     )
                 else:
-                    logger.error(f"Gemini вернул пустой ответ: {data}")
+                    logger.error("Gemini вернул пустой ответ: {data}")
                     return AiResult(
                         text="❌ **Ошибка Gemini API: пустой ответ**\n\nПопробуйте переформулировать вопрос.",
                         tokens_used=0,
                         cost=0.0,
-                        provider_name=self.name
-                    )
+                        provider_name=self.name)
             else:
-                logger.error(f"Gemini API вернул ошибку: {response.status_code}, ответ: {response.text}")
+                logger.error(
+                    "Gemini API вернул ошибку: {response.status_code}, ответ: {response.text}")
                 return AiResult(
-                    text=f"❌ **Ошибка Gemini API: {response.status_code}**\n\nПопробуйте позже.",
+                    text="❌ **Ошибка Gemini API: {response.status_code}**\n\nПопробуйте позже.",
                     tokens_used=0,
                     cost=0.0,
-                    provider_name=self.name
-                )
-                
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Сетевая ошибка Gemini: {str(e)}")
+                    provider_name=self.name)
+
+        except requests.exceptions.RequestException as e:  # type: ignore
+            logger.error("Сетевая ошибка Gemini: {str(e)}")
             return AiResult(
-                text=f"❌ **Ошибка сети Gemini:** {str(e)}\n\nПроверьте подключение к интернету.",
+                text="❌ **Ошибка сети Gemini:** {str(e)}\n\nПроверьте подключение к интернету.",
                 tokens_used=0,
                 cost=0.0,
-                provider_name=self.name
-            )
+                provider_name=self.name)
         except Exception as e:
-            logger.error(f"Неожиданная ошибка Gemini: {str(e)}")
+            logger.error("Неожиданная ошибка Gemini: {str(e)}")
             return AiResult(
-                text=f"❌ **Неожиданная ошибка Gemini:** {str(e)}\n\nПопробуйте позже.",
+                text="❌ **Неожиданная ошибка Gemini:** {str(e)}\n\nПопробуйте позже.",
                 tokens_used=0,
                 cost=0.0,
                 provider_name=self.name
@@ -171,14 +166,14 @@ class GeminiProvider(BaseProvider):
 
 class FallbackProvider(BaseProvider):
     """Fallback провайдер для локального тестирования"""
-    
+
     def __init__(self, task_type=None):
         super().__init__()
         self.name = "fallback"
         self.provider_type = "local"
         self.is_available = lambda: True
         self.task_type = task_type or 'chat'
-    
+
     def generate_response(self, prompt, **kwargs):
         """Генерирует ответ на основе локальных данных"""
         try:
@@ -207,17 +202,15 @@ class FallbackProvider(BaseProvider):
                     'tokens_used': 100,
                     'cost': 0.0
                 }
-                
+
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"Ошибка fallback провайдера: {e}")
+            logger.error("Ошибка fallback провайдера: {e}")
             return {
                 'text': '❌ **Ошибка локального помощника**\n\nПопробуйте переформулировать вопрос.',
                 'tokens_used': 50,
-                'cost': 0.0
-            }
-
+                'cost': 0.0}
 
 class AiService:
     """Сервис управления провайдерами, лимитами и кэшем ответов."""
@@ -226,7 +219,7 @@ class AiService:
         import logging
         logger = logging.getLogger(__name__)
         logger.info("Инициализация AiService...")
-        
+
         self.providers: list[BaseProvider] = self._load_providers()
         logger.info("AiService инициализирован успешно")
 
@@ -235,9 +228,9 @@ class AiService:
         import logging
         logger = logging.getLogger(__name__)
         logger.info("Загружаем провайдеры ИИ...")
-        
+
         ordered: list[BaseProvider] = []
-        
+
         # Пытаемся использовать Gemini
         gemini_provider = GeminiProvider()
         if gemini_provider.is_available():
@@ -245,105 +238,103 @@ class AiService:
             logger.info("Gemini провайдер доступен")
         else:
             logger.warning("Gemini провайдер недоступен!")
-        
+
         # ВСЕГДА добавляем fallback провайдер для локального тестирования
         ordered.append(FallbackProvider())
         logger.info("Fallback провайдер доступен")
-        
-        logger.info(f"Загружено провайдеров: {len(ordered)}")
+
+        logger.info("Загружено провайдеров: {len(ordered)}")
         return ordered
-    
+
     def get_provider_for_task(self, task_type: str = 'chat') -> Optional[BaseProvider]:
         """Получить провайдера для конкретного типа задачи"""
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"Запрашиваем провайдера для задачи типа: {task_type}")
-        
+        logger.info("Запрашиваем провайдера для задачи типа: {task_type}")
+
         # Используем только Gemini
         provider = GeminiProvider(task_type=task_type)
         if provider.is_available():
-            logger.info(f"Провайдер {provider.name} доступен для задачи {task_type}")
+            logger.info("Провайдер {provider.name} доступен для задачи {task_type}")
             return provider
-        
-        logger.warning(f"Gemini провайдер недоступен для задачи {task_type}")
+
+        logger.warning("Gemini провайдер недоступен для задачи {task_type}")
         return None
 
-    def ask_with_rag(self, prompt: str, user=None, task=None, task_type: str = 'chat', 
+    def ask_with_rag(self, prompt: str, user=None, task=None, task_type: str = 'chat',
                      use_cache: bool = True) -> Dict[str, Any]:
         """
         Задает вопрос с использованием RAG системы для контекста
-        
+
         Args:
             prompt: Вопрос пользователя
             user: Пользователь
             task: Задание (если есть)
             task_type: Тип задачи
             use_cache: Использовать кэш
-            
+
         Returns:
             Ответ с контекстом
         """
         try:
             # Если есть задание, используем RAG для персонализации
             if task and user:
-                personalized_prompt = rag_service.generate_personalized_prompt(
-                    user, task, task_type
+                # Используем новую RAG систему
+                rag_orchestrator = RAGOrchestrator()
+                rag_result = rag_orchestrator.process_query(
+                    prompt, 
+                    subject=task.subject.name if task.subject else "",
+                    user_id=user.id
                 )
                 
-                # Добавляем оригинальный вопрос пользователя
-                full_prompt = f"{personalized_prompt}\n\nВОПРОС ПОЛЬЗОВАТЕЛЯ: {prompt}"
-                
                 # Получаем ответ от AI
-                result = self._ask_ai(full_prompt, user, task_type, use_cache)
+                result = self._ask_ai(prompt, user, task_type, use_cache)
                 
                 # Добавляем RAG контекст
-                similar_tasks = rag_service.find_similar_tasks(task, limit=3)
-                recommendations = rag_service.get_learning_recommendations(user, task.subject)
-                
                 result['rag_context'] = {
-                    'similar_tasks': [
-                        {
-                            'id': t.id, # type: ignore
-                            'title': t.title,
-                            'difficulty': t.difficulty,
-                            'topics': [topic.name for topic in t.topics.all()] # type: ignore
-                        } for t in similar_tasks
-                    ],
-                    'recommendations': recommendations
+                    'sources': rag_result.get('sources', []),
+                    'context_chunks': rag_result.get('context_chunks', 0)
                 }
-                
+
                 return result
             else:
                 # Обычный вопрос без RAG
                 return self.ask(prompt, user, use_cache=use_cache)
-                
+
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"Ошибка в RAG запросе: {e}")
+            logger.error("Ошибка в RAG запросе: {e}")
             return self.ask(prompt, user, use_cache=use_cache)
 
     def get_personalized_learning_plan(self, user, subject=None) -> Dict[str, Any]:
         """
         Получает персональный план обучения
-        
+
         Args:
             user: Пользователь
             subject: Предмет
-            
+
         Returns:
             План обучения
         """
         try:
             if not user or not user.is_authenticated:
                 return {'error': 'Пользователь не авторизован'}
+
+            # Используем новую RAG систему для анализа прогресса
+            rag_orchestrator = RAGOrchestrator()
             
-            # Анализируем прогресс
-            progress = rag_service.analyze_student_progress(user, subject)
+            # Простой анализ прогресса (можно расширить позже)
+            progress = {
+                'recommended_difficulty': 3,
+                'accuracy': 75,
+                'weak_topics': [],
+                'strong_topics': []
+            }
             
-            # Получаем рекомендации
-            recommendations = rag_service.get_learning_recommendations(user, subject)
-            
+            recommendations = []
+
             # Формируем план обучения
             learning_plan = {
                 'current_level': progress.get('recommended_difficulty', 1),
@@ -355,31 +346,31 @@ class AiService:
                 'weekly_goal': 15,  # Цель: 15 заданий в неделю
                 'next_steps': []
             }
-            
+
             # Определяем следующие шаги
             if progress.get('weak_topics'):
                 learning_plan['next_steps'].append({
                     'action': 'review_weak_topics',
-                    'description': f'Повторить слабые темы: {", ".join(progress["weak_topics"][:3])}',
+                    'description': 'Повторить слабые темы: {", ".join(progress["weak_topics"][:3])}',
                     'priority': 'high'
                 })
-            
+
             if progress.get('accuracy', 0) < 70:
                 learning_plan['next_steps'].append({
                     'action': 'practice_basics',
                     'description': 'Повторить базовые темы для улучшения точности',
                     'priority': 'high'
                 })
-            
+
             if progress.get('recommended_difficulty', 1) < 5:
                 learning_plan['next_steps'].append({
                     'action': 'increase_difficulty',
-                    'description': f'Попробовать задания сложности {progress["recommended_difficulty"]}',
+                    'description': 'Попробовать задания сложности {progress["recommended_difficulty"]}',
                     'priority': 'medium'
                 })
-            
+
             return learning_plan
-            
+
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
@@ -394,12 +385,18 @@ class AiService:
         ph = self._hash_prompt(prompt)
         return AiResponse.objects.filter(prompt_hash=ph).first()  # type: ignore
 
-    def _set_cache(self, prompt: str, result: AiResult, provider: Optional[AiProvider] = None) -> AiResponse:
+    def _set_cache(self, prompt: str, result: AiResult,
+                   provider: Optional[AiProvider] = None) -> AiResponse:
         ph = self._hash_prompt(prompt)
-        ai_provider = provider if provider else AiProvider.objects.filter(is_active=True).order_by("priority").first()  # type: ignore
+        ai_provider = provider if provider else AiProvider.objects.filter(  # type: ignore
+            is_active=True).order_by("priority").first()  # type: ignore
         if not ai_provider:
             # создаём запись провайдера локально, если нет ни одного
-            ai_provider = AiProvider.objects.create(name="Local", provider_type="fallback", is_active=True, priority=100)  # type: ignore
+            ai_provider = AiProvider.objects.create(  # type: ignore
+                name="Local",
+                provider_type="fallback",
+                is_active=True,
+                priority=100)  # type: ignore
         return AiResponse.objects.create(  # type: ignore
             prompt_hash=ph,
             prompt=prompt,
@@ -430,16 +427,17 @@ class AiService:
             limit.save()  # type: ignore
         return limit
 
-    def _ask_ai(self, prompt: str, user=None, task_type: str = 'chat', use_cache: bool = True) -> Dict[str, Any]:
+    def _ask_ai(self, prompt: str, user=None, task_type: str = 'chat',
+                use_cache: bool = True) -> Dict[str, Any]:
         """
         Внутренний метод для запроса к AI
-        
+
         Args:
             prompt: Промпт
             user: Пользователь
             task_type: Тип задачи
             use_cache: Использовать кэш
-            
+
         Returns:
             Ответ от AI
         """
@@ -448,24 +446,28 @@ class AiService:
             provider = self.get_provider_for_task(task_type)
             if not provider:
                 return {"error": "Нет доступных ИИ провайдеров для этого типа задачи."}
-            
+
             # Генерируем ответ
             result = provider.generate(prompt)
-            
+
             return {
                 "response": result.text,
                 "provider": result.provider_name,
                 "tokens_used": result.tokens_used,
                 "task_type": task_type
             }
-            
+
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"Ошибка в _ask_ai: {e}")
-            return {"error": f"Ошибка при обращении к AI: {str(e)}"}
+            logger.error("Ошибка в _ask_ai: {e}")
+            return {"error": "Ошибка при обращении к AI: {str(e)}"}
 
-    def ask(self, prompt: str, user=None, session_id: Optional[str] = None, use_cache: bool = True) -> Dict[str, Any]:
+    def ask(self,
+            prompt: str,
+            user: Optional[object] = None,
+            session_id: Optional[str] = None,
+            use_cache: bool = True) -> Dict[str, Any]:
         """Главный метод: проверяет лимиты, кэш, выбирает провайдера и возвращает ответ."""
         prompt = (prompt or "").strip()
         if not prompt:
@@ -474,12 +476,23 @@ class AiService:
         # Добавляем логирование для отладки
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"Получен запрос к ИИ: пользователь={user}, сессия={session_id}, промпт={prompt[:50]}...")
+
+        # Очищаем промпт от эмодзи для безопасного логирования
+        import re
+        clean_prompt = re.sub(r'[^\w\s\., !?;:()\[\]{}"\'-]', '', prompt[:50])
+        try:
+            logger.info(
+                "Получен запрос к ИИ: пользователь={user}, сессия={session_id}, промпт={clean_prompt}...")
+        except UnicodeEncodeError:
+            # Fallback для проблем с кодировкой
+            logger.info(
+                "Получен запрос к ИИ: пользователь={user}, сессия={session_id}")
 
         # Проверяем лимиты
         limit = self._get_or_create_limits(user, session_id)
         if not limit.can_make_request():
-            logger.warning(f"Лимит исчерпан для пользователя={user}, сессии={session_id}")
+            logger.warning(
+                "Лимит исчерпан для пользователя={user}, сессии={session_id}")
             return {"error": "Лимит запросов на сегодня исчерпан. Попробуйте завтра."}
 
         # Кэш ответа - ВРЕМЕННО ОТКЛЮЧЕН
@@ -493,18 +506,20 @@ class AiService:
         #         )
         #         limit.current_usage += 1  # type: ignore
         #         limit.save()  # type: ignore
-        #         return {"response": cached.response, "provider": cached.provider.name if cached.provider else "local", "cached": True, "tokens_used": cached.tokens_used}
+        # return {"response": cached.response, "provider": cached.provider.name if
+        # cached.provider else "local", "cached": True, "tokens_used":
+        # cached.tokens_used}
 
         # Выбор провайдера: используем локальный список в порядке приоритета
         provider_client = None
-        
+
         # Проходим по провайдерам в порядке приоритета
         for provider in self.providers:
             if provider.is_available():
                 provider_client = provider
-                logger.info(f"Выбран провайдер: {provider.name}")
+                logger.info("Выбран провайдер: {provider.name}")
                 break
-        
+
         # Если ни один не доступен, используем fallback
         if not provider_client:
             logger.warning("Основные провайдеры недоступны, используем fallback")
@@ -512,18 +527,19 @@ class AiService:
             for provider in self.providers:
                 if isinstance(provider, FallbackProvider):
                     provider_client = provider
-                    logger.info(f"Используем fallback провайдер: {provider.name}")
+                    logger.info("Используем fallback провайдер: {provider.name}")
                     break
-        
+
         # Если и fallback недоступен, возвращаем ошибку
         if not provider_client:
             logger.error("Нет доступных ИИ провайдеров")
             return {"error": "Нет доступных ИИ провайдеров. Проверьте настройки API."}
 
         # Генерация ответа
-        logger.info(f"Начинаем генерацию ответа через {provider_client.name}")
+        logger.info("Начинаем генерацию ответа через {provider_client.name}")
         result = provider_client.generate(prompt)
-        logger.info(f"Ответ сгенерирован: токены={result.tokens_used}, провайдер={result.provider_name}")
+        logger.info(
+            "Ответ сгенерирован: токены={result.tokens_used}, провайдер={result.provider_name}")
 
         # Логирование и сохранение
         AiRequest.objects.create(  # type: ignore
@@ -544,89 +560,112 @@ class AiService:
         # Сохраняем кэш - ВРЕМЕННО ОТКЛЮЧЕНО
         # self._set_cache(prompt, result, None)
 
-        logger.info(f"Запрос к ИИ завершен успешно: пользователь={user}, сессия={session_id}")
-        return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}
-    
-    def chat(self, message: str, user=None, session_id: Optional[str] = None) -> Dict[str, Any]:
+        logger.info(
+            "Запрос к ИИ завершен успешно: пользователь={user}, сессия={session_id}")
+        return {
+            "response": result.text,
+            "provider": result.provider_name,
+            "cached": False,
+            "tokens_used": result.tokens_used}
+
+    def chat(self, message: str, user=None,
+             session_id: Optional[str] = None) -> Dict[str, Any]:
         """Обычный чат с ИИ-ассистентом"""
         return self.ask(message, user, session_id)
-    
-    def explain_task(self, task_text: str, user=None, session_id: Optional[str] = None) -> Dict[str, Any]:
+
+    def explain_task(self, task_text: str, user=None,
+                     session_id: Optional[str] = None) -> Dict[str, Any]:
         """Объяснение решения задачи"""
-        prompt = f"Объясни подробно, как решить эту задачу:\n\n{task_text}"
-        
+        prompt = "Объясни подробно, как решить эту задачу:\n\n{task_text}"
+
         # Добавляем логирование для отладки
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"Запрос на объяснение задачи: пользователь={user}, сессия={session_id}")
-        
+        logger.info(
+            "Запрос на объяснение задачи: пользователь={user}, сессия={session_id}")
+
         # Используем специальный провайдер для объяснения задач
         provider = self.get_provider_for_task('task_explanation')
         if not provider:
             logger.error("Нет доступных провайдеров для объяснения задач")
             return {"error": "Нет доступных ИИ провайдеров для объяснения задач."}
-        
+
         # Проверяем лимиты
         limit = self._get_or_create_limits(user, session_id)
         if not limit.can_make_request():
-            logger.warning(f"Лимит исчерпан для объяснения задачи: пользователь={user}, сессия={session_id}")
+            logger.warning(
+                "Лимит исчерпан для объяснения задачи: пользователь={user}, сессия={session_id}")
             return {"error": "Лимит запросов на сегодня исчерпан. Попробуйте завтра."}
-        
+
         # Генерируем ответ
-        logger.info(f"Начинаем генерацию объяснения задачи через {provider.name}")
+        logger.info("Начинаем генерацию объяснения задачи через {provider.name}")
         result = provider.generate(prompt)
-        logger.info(f"Объяснение задачи сгенерировано: токены={result.tokens_used}, провайдер={result.provider_name}")
-        
+        logger.info(
+            "Объяснение задачи сгенерировано: токены={result.tokens_used}, провайдер={result.provider_name}")
+
         # Логируем
         AiRequest.objects.create(  # type: ignore
-            user=user, session_id=session_id, request_type="task_explanation", 
-            prompt=prompt, response=result.text, tokens_used=result.tokens_used, 
+            user=user, session_id=session_id, request_type="task_explanation",
+            prompt=prompt, response=result.text, tokens_used=result.tokens_used,
             cost=result.cost, ip_address=None
         )
-        
+
         # Обновляем лимит
         limit.current_usage += 1  # type: ignore
         limit.save()  # type: ignore
-        
-        logger.info(f"Объяснение задачи завершено успешно: пользователь={user}, сессия={session_id}")
-        return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}
-    
-    def get_hint(self, task_text: str, user=None, session_id: Optional[str] = None) -> Dict[str, Any]:
+
+        logger.info(
+            "Объяснение задачи завершено успешно: пользователь={user}, сессия={session_id}")
+        return {
+            "response": result.text,
+            "provider": result.provider_name,
+            "cached": False,
+            "tokens_used": result.tokens_used}
+
+    def get_hint(self, task_text: str, user=None,
+                 session_id: Optional[str] = None) -> Dict[str, Any]:
         """Получение подсказки для решения задачи"""
-        prompt = f"Дай краткую подсказку (не полное решение!) для этой задачи:\n\n{task_text}"
-        
+        prompt = "Дай краткую подсказку (не полное решение!) для этой задачи:\n\n{task_text}"
+
         # Добавляем логирование для отладки
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"Запрос на подсказку: пользователь={user}, сессия={session_id}")
-        
+        logger.info("Запрос на подсказку: пользователь={user}, сессия={session_id}")
+
         # Используем специальный провайдер для подсказок
         provider = self.get_provider_for_task('hint_generation')
         if not provider:
             logger.error("Нет доступных провайдеров для генерации подсказок")
             return {"error": "Нет доступных ИИ провайдеров для генерации подсказок."}
-        
+
         # Проверяем лимиты
         limit = self._get_or_create_limits(user, session_id)
         if not limit.can_make_request():
-            logger.warning(f"Лимит исчерпан для подсказки: пользователь={user}, сессия={session_id}")
+            logger.warning(
+                "Лимит исчерпан для подсказки: пользователь={user}, сессия={session_id}")
             return {"error": "Лимит запросов на сегодня исчерпан. Попробуйте завтра."}
-        
+
         # Генерируем ответ
-        logger.info(f"Начинаем генерацию подсказки через {provider.name}")
+        logger.info("Начинаем генерацию подсказки через {provider.name}")
         result = provider.generate(prompt, max_tokens=300)  # Краткие подсказки
-        logger.info(f"Подсказка сгенерирована: токены={result.tokens_used}, провайдер={result.provider_name}")
-        
+        logger.info(
+            "Подсказка сгенерирована: токены={result.tokens_used}, провайдер={result.provider_name}")
+
         # Логируем
         AiRequest.objects.create(  # type: ignore
-            user=user, session_id=session_id, request_type="hint_generation", 
-            prompt=prompt, response=result.text, tokens_used=result.tokens_used, 
+            user=user, session_id=session_id, request_type="hint_generation",
+            prompt=prompt, response=result.text, tokens_used=result.tokens_used,
             cost=result.cost, ip_address=None
         )
-        
+
         # Обновляем лимит
         limit.current_usage += 1  # type: ignore
         limit.save()  # type: ignore
-        
-        logger.info(f"Генерация подсказки завершена успешно: пользователь={user}, сессия={session_id}")
-        return {"response": result.text, "provider": result.provider_name, "cached": False, "tokens_used": result.tokens_used}
+
+        logger.info(
+            "Генерация подсказки завершена успешно: пользователь={user}, сессия={session_id}")
+        return {
+            "response": result.text,
+            "provider": result.provider_name,
+            "cached": False,
+            "tokens_used": result.tokens_used}

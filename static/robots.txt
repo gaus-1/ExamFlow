@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Основные страницы
+Allow: /subjects/
+Allow: /math/
+Allow: /russian/
+Allow: /search/
+Allow: /health/
+
+# Запрещенные разделы
+Disallow: /admin/
+Disallow: /api/
+Disallow: /core/
+Disallow: /bot/
+Disallow: /analytics/
+Disallow: /themes/
+Disallow: /ai/
+Disallow: /personalization/
+
+# Sitemap
+Sitemap: https://examflow.ru/sitemap.xml
+
+# Crawl-delay для уважения к серверу
+Crawl-delay: 1

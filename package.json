@@ -1,0 +1,33 @@
+{
+  "name": "examflow",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "minify": "python scripts/minify_assets.py",
+    "build": "python scripts/minify_assets.py && python manage.py collectstatic --noinput",
+    "dev": "python manage.py runserver",
+    "lint": "flake8 . --max-line-length=100",
+    "format": "black . --line-length=100 && isort . --profile=black"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gaus-1/ExamFlow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gaus-1/ExamFlow/issues"
+  },
+  "homepage": "https://github.com/gaus-1/ExamFlow#readme",
+  "description": "",
+  "devDependencies": {
+    "cssnano": "^7.1.1",
+    "terser": "^5.44.0"
+  }
+}

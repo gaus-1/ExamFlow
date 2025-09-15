@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Страница не найдена - ExamFlow{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="section-padding-lg text-center" style="background: #fffef2;">
+    <div class="container">
+        <div class="text-9xl font-bold mb-4" style="color: #252525;">404</div>
+        <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4 heading-animate" style="color: #252525;">
+            Страница не найдена
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed text-reveal" style="color: #666;">
+            К сожалению, запрашиваемая страница не существует или была перемещена
+        </p>
+        
+        <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12 text-reveal">
+            <a href="{% url 'learning:home' %}" class="btn-primary text-lg px-8 py-4 btn-animate">
+                На главную
+            </a>
+            <a href="{% url 'learning:subjects_list' %}" class="btn-secondary text-lg px-8 py-4 btn-animate">
+                К предметам
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Полезные ссылки -->
+<section class="section-padding" style="background: #f8f8f8;">
+    <div class="container">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 heading-animate" style="color: #252525;">
+            Возможно, вы искали:
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <a href="{% url 'learning:subjects_list' %}" class="help-card card-hover text-center">
+                <div class="text-4xl mb-4">📚</div>
+                <h3 class="text-xl font-bold mb-2" style="color: #252525;">Задания ФИПИ</h3>
+                <p class="text-gray-600">Актуальные задания по всем предметам</p>
+            </a>
+            
+            <a href="{% url 'ai:chat' %}" class="help-card card-hover text-center">
+                <div class="text-4xl mb-4">🤖</div>
+                <h3 class="text-xl font-bold mb-2" style="color: #252525;">ИИ-помощник</h3>
+                <p class="text-gray-600">Получите помощь с решением задач</p>
+            </a>
+            
+            <a href="{% url 'features' %}" class="help-card card-hover text-center">
+                <div class="text-4xl mb-4">⚡</div>
+                <h3 class="text-xl font-bold mb-2" style="color: #252525;">Возможности</h3>
+                <p class="text-gray-600">Узнайте о всех функциях платформы</p>
+            </a>
+            
+            <a href="{% url 'pricing' %}" class="help-card card-hover text-center">
+                <div class="text-4xl mb-4">💰</div>
+                <h3 class="text-xl font-bold mb-2" style="color: #252525;">Тарифы</h3>
+                <p class="text-gray-600">Выберите подходящий план</p>
+            </a>
+            
+            <a href="https://t.me/ExamFlowBot" target="_blank" class="help-card card-hover text-center">
+                <div class="text-4xl mb-4">📱</div>
+                <h3 class="text-xl font-bold mb-2" style="color: #252525;">Telegram бот</h3>
+                <p class="text-gray-600">Используйте бота для обучения</p>
+            </a>
+            
+            <a href="{% url 'learning:home' %}" class="help-card card-hover text-center">
+                <div class="text-4xl mb-4">🏠</div>
+                <h3 class="text-xl font-bold mb-2" style="color: #252525;">Главная</h3>
+                <p class="text-gray-600">Вернуться на главную страницу</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section-padding text-center" style="background: #252525; color: #fffef2;">
+    <div class="container">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6" style="color: #fffef2;">
+            Нужна помощь?
+        </h2>
+        <p class="text-lg text-center mb-8 max-w-2xl mx-auto" style="color: #666;">
+            Если вы не можете найти нужную информацию, обратитесь к нам
+        </p>
+        <div class="flex flex-col md:flex-row gap-4 justify-center">
+            <a href="https://t.me/ExamFlowBot" target="_blank" class="btn-primary text-lg px-8 py-4">
+                Написать в бот
+            </a>
+            <a href="{% url 'learning:home' %}" class="btn-secondary text-lg px-8 py-4">
+                На главную
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+.help-card {
+    display: block;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.help-card:hover {
+    border-color: #4A90E2;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(74, 144, 226, 0.15);
+}
+</style>
+{% endblock %}

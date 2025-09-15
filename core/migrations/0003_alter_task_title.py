@@ -13,6 +13,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='task',
             name='title',
-            field=models.CharField(default='Задание без названия', max_length=200, verbose_name='Название задания'),
+            field=models.CharField(
+                default='Задание без названия',
+                max_length=200,
+                verbose_name='Название задания'),
         ),
     ]

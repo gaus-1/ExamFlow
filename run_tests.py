@@ -4,7 +4,6 @@
 """
 
 import os
-import sys
 import django
 
 # Настройка Django
@@ -12,7 +11,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
 # Запуск тестов
-from django.core.management import execute_from_command_line
+from django.core.management import execute_from_command_line  # noqa: E402
 
 if __name__ == '__main__':
     # Запускаем тесты

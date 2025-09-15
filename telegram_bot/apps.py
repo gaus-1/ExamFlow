@@ -1,10 +1,9 @@
 from django.apps import AppConfig
 
-
 class TelegramBotConfig(AppConfig):
     """
     Конфигурация модуля Telegram бота
-    
+
     Этот модуль отвечает за:
     - Обработку команд Telegram бота
     - Webhook интеграцию с Telegram
