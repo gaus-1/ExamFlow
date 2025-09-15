@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import timedelta
 from .models import AiRequest, AiLimit, AiProvider
@@ -12,7 +13,10 @@ logger = logging.getLogger(__name__)
 # СИГНАЛЫ ДЛЯ АВТОМАТИЧЕСКОГО СОЗДАНИЯ ЛИМИТОВ
 # ========================================
 
-@receiver(post_save, sender=User) # type: ignore
+# Получаем модель пользователя безопасно (apps уже готовы внутри AppConfig.ready)
+User = get_user_model()
+
+@receiver(post_save, sender=User)
 def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
     """Автоматически создает лимиты ИИ для нового пользователя"""
     if created:
@@ -35,11 +39,11 @@ def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
                 reset_date=timezone.now() + timedelta(days=30)
             )
 
-            logger.info("Созданы лимиты ИИ для пользователя {instance.username}")
+            logger.info(f"Созданы лимиты ИИ для пользователя {instance.username}")
 
         except Exception as e:
             logger.error(
-                "Ошибка при создании лимитов ИИ для пользователя {instance.username}: {e}")
+                f"Ошибка при создании лимитов ИИ для пользователя {instance.username}: {e}")
 
 # ========================================
 # СИГНАЛЫ ДЛЯ ОБНОВЛЕНИЯ СТАТИСТИКИ ПРОВАЙДЕРОВ
@@ -72,7 +76,7 @@ def check_and_reset_limits(sender, instance, **kwargs):
 
             instance.save()
             logger.info(
-                "Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}")
+                f"Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}")
 
     except Exception as e:
         logger.error("Ошибка при сбросе лимита: {e}")
@@ -85,14 +89,14 @@ def check_and_reset_limits(sender, instance, **kwargs):
 def log_ai_request(sender, instance, created, **kwargs):
     """Логирует создание нового запроса к ИИ"""
     if created:
-        user_info = instance.user.username if instance.user else "Session: {instance.session_id}"
-        logger.info("Новый запрос к ИИ от {user_info}: {instance.request_type}")
+        user_info = instance.user.username if instance.user else f"Session: {instance.session_id}"
+        logger.info(f"Новый запрос к ИИ от {user_info}: {instance.request_type}")
 
 @receiver(post_delete, sender=AiRequest)
 def log_ai_request_deletion(sender, instance, **kwargs):
     """Логирует удаление запроса к ИИ"""
-    user_info = instance.user.username if instance.user else "Session: {instance.session_id}"
-    logger.info("Удален запрос к ИИ от {user_info}: {instance.request_type}")
+    user_info = instance.user.username if instance.user else f"Session: {instance.session_id}"
+    logger.info(f"Удален запрос к ИИ от {user_info}: {instance.request_type}")
 
 # ========================================
 # СИГНАЛЫ ДЛЯ УПРАВЛЕНИЯ КЭШЕМ
@@ -104,7 +108,7 @@ def clear_ai_cache_on_provider_update(sender, instance, **kwargs):
     try:
         # Здесь можно добавить логику очистки кэша
         # Например, очистка Redis кэша или файлового кэша
-        logger.info("Кэш ИИ очищен после обновления провайдера {instance.name}")
+        logger.info(f"Кэш ИИ очищен после обновления провайдера {instance.name}")
 
     except Exception as e:
         logger.error("Ошибка при очистке кэша ИИ: {e}")
@@ -125,8 +129,8 @@ def check_rate_limiting(sender, instance, **kwargs):
 
             if daily_limit and daily_limit.is_exceeded():
                 logger.warning(
-                    "Пользователь {instance.user.username} превысил дневной лимит ИИ "
-                    "({daily_limit.current_usage}/{daily_limit.max_limit})"
+                    f"Пользователь {instance.user.username} превысил дневной лимит ИИ "
+                    f"({daily_limit.current_usage}/{daily_limit.max_limit})"
                 )
 
         except Exception as e:
