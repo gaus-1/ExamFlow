@@ -14,7 +14,7 @@ import hashlib
 import time
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
 from django.db import transaction

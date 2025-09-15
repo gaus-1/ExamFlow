@@ -3,7 +3,7 @@
 """
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 
 class UserSubscription(models.Model):
@@ -13,7 +13,7 @@ class UserSubscription(models.Model):
     ]
 
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='subscription')
     subscription_type = models.CharField(
@@ -48,7 +48,7 @@ class UserSubscription(models.Model):
 class DailyUsage(models.Model):
     """Ежедневное использование ИИ"""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_usage')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='daily_usage')
     date = models.DateField(default=timezone.now)
     ai_requests_count = models.PositiveIntegerField(default=0)  # type: ignore
     created_at = models.DateTimeField(auto_now_add=True)

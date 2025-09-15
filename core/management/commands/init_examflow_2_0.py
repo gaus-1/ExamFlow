@@ -39,17 +39,17 @@ class Command(BaseCommand):  # type: ignore
             # 2. Инициализируем источники ФИПИ
             if not options['skip_sources']:
                 self.stdout.write(
-                    self.style.WARNING(
+                    self.style.WARNING( # type: ignore
                         '🗺️ Инициализируем источники ФИПИ...')  # type: ignore
                 )
                 call_command('init_fipi_source_map', verbosity=0)
                 self.stdout.write(
-                    self.style.SUCCESS(
+                    self.style.SUCCESS( # type: ignore
                         '✅ Источники ФИПИ инициализированы')  # type: ignore
                 )
 
             # 3. Создаем суперпользователя если не существует
-            from django.contrib.auth.models import User
+            from django.conf import settings
             if not User.objects.filter(is_superuser=True).exists():  # type: ignore
                 self.stdout.write(
                     self.style.WARNING('👤 Создаем суперпользователя...')  # type: ignore
@@ -60,7 +60,7 @@ class Command(BaseCommand):  # type: ignore
                     password='admin123'
                 )
                 self.stdout.write(
-                    self.style.SUCCESS(
+                    self.style.SUCCESS( # type: ignore
                         '✅ Суперпользователь создан (admin/admin123)')  # type: ignore
                 )
 
@@ -108,7 +108,7 @@ class Command(BaseCommand):  # type: ignore
             # Проверяем TELEGRAM_BOT_TOKEN
             if not getattr(settings, 'TELEGRAM_BOT_TOKEN', None):
                 self.stdout.write(
-                    self.style.WARNING(
+                    self.style.WARNING( # type: ignore
                         '⚠️ TELEGRAM_BOT_TOKEN не настроен (бот не будет работать)')  # type: ignore
                 )
             else:
@@ -119,7 +119,7 @@ class Command(BaseCommand):  # type: ignore
             # 6. Выводим информацию о доступных командах
             self.stdout.write('\n' + '=' * 60)
             self.stdout.write(
-                self.style.SUCCESS(
+                self.style.SUCCESS( # type: ignore
                     '🎉 ExamFlow 2.0 успешно инициализирован!')  # type: ignore
             )
             self.stdout.write('\n📋 Доступные команды:')

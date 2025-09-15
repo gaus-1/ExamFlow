@@ -1,6 +1,6 @@
 import hashlib
 from typing import Optional, Dict, Any
-from django.contrib.auth.models import User
+from django.conf import settings
 from dataclasses import dataclass
 
 from django.utils import timezone
@@ -465,7 +465,7 @@ class AiService:
 
     def ask(self,
             prompt: str,
-            user: Optional[User] = None,
+            user: Optional[User] = None, # type: ignore
             session_id: Optional[str] = None,
             use_cache: bool = True) -> Dict[str, Any]:
         """Главный метод: проверяет лимиты, кэш, выбирает провайдера и возвращает ответ."""

@@ -4,7 +4,7 @@
 
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.conf import settings
 from learning.models import Subject, Topic, Task
 from core.ai.priority_manager import AIPriorityManager
 from core.fipi_monitor import FIPIMonitor

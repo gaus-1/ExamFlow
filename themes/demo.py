@@ -7,7 +7,7 @@
 """
 
 from .models import UserThemePreference, ThemeUsage, ThemeCustomization
-from django.contrib.auth.models import User
+from django.conf import settings
 import os
 import django
 
