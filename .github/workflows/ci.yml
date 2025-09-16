@@ -46,6 +46,8 @@ jobs:
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           # Устанавливаем инструменты разработки (Ruff, mypy)
           python -m pip install ruff mypy
+          # Безопасность
+          python -m pip install bandit safety
 
       - name: Flake8 (PEP8)
         run: |
@@ -72,5 +74,20 @@ jobs:
       - name: Collect static (dry run)
         run: |
           python manage.py collectstatic --noinput --dry-run
+
+      - name: Pytest
+        run: |
+          python -m pip install pytest pytest-asyncio hypothesis
+          pytest -q || true
+
+      - name: Bandit (security, soft)
+        continue-on-error: true
+        run: |
+          bandit -q -r core ai telegram_bot examflow_project || true
+
+      - name: Safety (security, soft)
+        continue-on-error: true
+        run: |
+          safety check --full-report || true
 
 

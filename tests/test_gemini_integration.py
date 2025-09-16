@@ -13,7 +13,7 @@ pytestmark = pytest.mark.skipif(
 
 def test_gemini_integration_real_api():
     orchestrator = Container.ai_orchestrator()
-    result = orchestrator.process_query("Кратко объясни, что такое производная")
+    result = orchestrator.process_query("Кратко объясни, что такое производная")  # type: ignore
     assert isinstance(result, dict)
     assert "answer" in result
     assert len(result.get("answer", "")) > 0
