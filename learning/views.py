@@ -43,7 +43,7 @@ def home(request):
         tasks_count = Task.objects.count()  # type: ignore
     except Exception as e:
         # Если БД недоступна, используем значения по умолчанию
-        logger.warning("Database error in home view: {e}")
+        logger.warning(f"Database error in home view: {e}")
         base_qs = Subject.objects.none()  # type: ignore
         subjects_count = 0
         tasks_count = 0
@@ -57,7 +57,7 @@ def home(request):
         else:
             subjects = base_qs  # type: ignore
     except Exception as e:
-        logger.warning("Error filtering subjects: {e}")
+        logger.warning(f"Error filtering subjects: {e}")
         subjects = base_qs  # type: ignore
 
     context = {
