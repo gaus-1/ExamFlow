@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
@@ -49,7 +50,7 @@ urlpatterns = [
     path('core/', include('core.urls')),
 
     # Health check endpoints (для Render и мониторинга)
-    path('', include('core.urls')),
+    path('healthz', lambda request: JsonResponse({'status': 'ok'})),
 
     # Модуль персонализации
     path('personalization/', include('core.personalization.urls')),

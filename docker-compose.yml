@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    container_name: examflow-web
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: examflow_project.settings
+      DATABASE_URL: postgres://examflow:examflow@db:5432/examflow
+      REDIS_URL: redis://redis:6379/0
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-000000:dummy}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      SITE_URL: http://localhost:8000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-lc", "python manage.py check || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  db:
+    image: postgres:15-alpine
+    container_name: examflow-db
+    environment:
+      POSTGRES_DB: examflow
+      POSTGRES_USER: examflow
+      POSTGRES_PASSWORD: examflow
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U examflow -d examflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: examflow-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+
