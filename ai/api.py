@@ -9,7 +9,6 @@ API для AI ассистента ExamFlow 2.0
 """
 
 import os
-import google.generativeai as genai
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -21,29 +20,18 @@ import logging
 import hashlib
 from django.core.cache import cache
 from core.freemium.decorators import check_ai_limits
+from ai.clients.gemini_client import GeminiClient
+from ai.orchestrator import AIOrchestrator
 
 logger = logging.getLogger(__name__)
 
-# Настройка Gemini API
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-if not GEMINI_API_KEY:
-    raise RuntimeError('SECURITY: GEMINI_API_KEY must be set in environment variables')
-# Инициализация модели с оптимизацией для скорости
 try:
-    genai.configure(api_key=GEMINI_API_KEY)  # type: ignore
-    # Используем более быструю модель с настройками для скорости
-    model = genai.GenerativeModel(  # type: ignore
-        'gemini-1.5-flash',
-        generation_config=genai.types.GenerationConfig(  # type: ignore
-            max_output_tokens=1000,  # Ограничиваем длину ответа
-            temperature=0.7,  # Баланс между креативностью и скоростью
-            top_p=0.8,
-            top_k=40
-        )
-    )  # type: ignore
+    _ai_client = GeminiClient(model_name='gemini-1.5-flash')
+    _ai_orchestrator = AIOrchestrator(_ai_client)
 except Exception as e:
-    logger.error("Ошибка инициализации Gemini API: {e}")
-    model = None
+    logger.error(f"Ошибка инициализации AI-клиента: {e}")
+    _ai_client = None
+    _ai_orchestrator = None
 
 @method_decorator([login_required, check_ai_limits], name='dispatch')
 class AIAssistantAPI(View):
@@ -98,10 +86,10 @@ class AIAssistantAPI(View):
             prompt = prompt.replace('<', '&lt;').replace('>', '&gt;')
             logger.info("AI API: Промпт: {prompt[:100]}...")
 
-            # Проверяем, что модель инициализирована
-            if model is None:
+            # Проверяем, что оркестратор инициализирован
+            if _ai_orchestrator is None:
                 return JsonResponse({
-                    'error': 'AI модель не инициализирована'
+                    'error': 'AI сервис недоступен'
                 }, status=500)
 
             # Получаем реальный ответ от Gemini API
@@ -114,9 +102,9 @@ class AIAssistantAPI(View):
                 'error': 'Неверный JSON'
             }, status=400)
         except Exception as e:
-            logger.error("AI API Error: {e}")
+            logger.error(f"AI API Error: {e}")
             return JsonResponse({
-                'error': 'Внутренняя ошибка сервера: {str(e)}'
+                'error': f'Внутренняя ошибка сервера: {str(e)}'
             }, status=500)
 
     def generate_ai_response(self, prompt):
@@ -126,61 +114,38 @@ class AIAssistantAPI(View):
         try:
             # Создаем хеш для кэширования (используем SHA-256 для безопасности)
             prompt_hash = hashlib.sha256(prompt.lower().strip().encode()).hexdigest()
-            cache_key = "ai_response_{prompt_hash}"
+            cache_key = f"ai_response_{prompt_hash}"
 
             # Проверяем кэш
             cached_response = cache.get(cache_key)
             if cached_response:
-                logger.info(
-                    "AI API: Используем кэшированный ответ для: {prompt[:50]}...")
+                logger.info(f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
                 return cached_response
 
             # Пытаемся использовать RAG-систему
             try:
-                from core.rag_system.orchestrator import RAGOrchestrator
-                orchestrator = RAGOrchestrator()
-                response_data = orchestrator.process_query(prompt)
-                logger.info("AI API: Использована RAG-система для: {prompt[:50]}...")
+                # Пытаемся использовать наш оркестратор (внутри может быть RAG позже)
+                response_data = _ai_orchestrator.ask(prompt)  # type: ignore
+                logger.info(f"AI API: Ответ получен через AIOrchestrator для: {prompt[:50]}...")
             except Exception as rag_error:
-                logger.warning(
-                    "RAG-система недоступна: {rag_error}, используем fallback")
-
-                # Fallback на базовый Gemini API
-                context = """Эксперт ЕГЭ. Отвечай кратко и по делу.
-
-Вопрос: {prompt}
-
-Ответ должен быть:
-- Кратким и понятным
-- С практическими примерами
-- Соответствовать ЕГЭ
-- Использовать Markdown
-
-Отвечай быстро и структурированно."""
-
-                # Получаем ответ от Gemini
-                response = model.generate_content(context)  # type: ignore
-                answer = response.text
-
-                # Определяем тему для практики
-                practice_topic = self.detect_subject(prompt)
-
-                # Формируем структурированный ответ
+                logger.warning(f"AIOrchestrator недоступен: {rag_error}, используем заглушку")
                 response_data = {
-                    'answer': answer,
-                    'sources': self.get_sources_for_subject(practice_topic),
+                    'answer': 'Сервис ИИ временно недоступен. Попробуйте позже.',
+                    'sources': [],
                     'practice': {
-                        'topic': practice_topic,
-                        'description': 'Практикуйтесь в решении задач по теме "{practice_topic}"'}}
+                        'topic': 'general',
+                        'description': 'Выберите предмет для начала практики'
+                    }
+                }
 
             # Сохраняем в кэш на 1 час
             cache.set(cache_key, response_data, 3600)
-            logger.info("AI API: Сохранили ответ в кэш для: {prompt[:50]}...")
+            logger.info(f"AI API: Сохранили ответ в кэш для: {prompt[:50]}...")
 
             return response_data
 
         except Exception as e:
-            logger.error("AI API Error: {e}")
+            logger.error(f"AI API Error: {e}")
             # Fallback на базовый ответ
             error_msg = (
                 f"Извините, произошла ошибка при обработке вашего вопроса: {str(e)}. "
