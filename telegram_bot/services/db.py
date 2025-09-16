@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 from django.utils import timezone
+from core.container import Container
 
 try:
     from telegram_bot.bot_handlers import (
@@ -44,6 +45,7 @@ except Exception:
         return None
 
 
+# Прокси-функции для обратной совместимости
 check_connection = _db_check_connection
 get_or_create_unified_profile = _db_get_or_create_unified_profile
 update_profile_activity = _db_update_profile_activity
@@ -53,3 +55,14 @@ add_user_message_to_session = _db_add_user_message_to_session
 add_assistant_message_to_session = _db_add_assistant_message_to_session
 create_enhanced_prompt = _db_create_enhanced_prompt
 clear_chat_session_context = _db_clear_chat_session_context
+
+
+# Новые функции с использованием контейнера
+def get_cache() -> Any:
+    """Получает кэш через контейнер зависимостей."""
+    return Container.cache()
+
+
+def get_notifier() -> Any:
+    """Получает уведомления через контейнер зависимостей."""
+    return Container.notifier()

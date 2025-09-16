@@ -1,19 +1,16 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Any
+from core.container import Container
 
 try:
     from telegram_bot.bot_handlers import (
-        get_ai_response as _legacy_get_ai_response,  # type: ignore
         db_create_enhanced_prompt as _legacy_create_enhanced_prompt,  # type: ignore
         db_add_user_message_to_session as _legacy_add_user_message,  # type: ignore
         db_add_assistant_message_to_session as _legacy_add_assistant_message,  # type: ignore
         db_get_or_create_chat_session as _legacy_get_or_create_chat_session,  # type: ignore
     )
 except Exception:
-    def _legacy_get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:  # type: ignore
-        return 'Сервис ИИ временно недоступен'
-
     def _legacy_create_enhanced_prompt(user_message: str, session) -> str:  # type: ignore
         return user_message
 
@@ -46,4 +43,10 @@ def add_assistant_message_to_session(session, message) -> None:
 
 
 def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
-    return _legacy_get_ai_response(prompt, task_type=task_type, user=user, task=task)
+    """Получает ответ от AI через контейнер зависимостей."""
+    try:
+        ai_orchestrator = Container.ai_orchestrator()
+        response_data = ai_orchestrator.process_query(prompt, user=user)  # type: ignore
+        return response_data.get('answer', 'Сервис ИИ временно недоступен')
+    except Exception as e:
+        return f'Ошибка AI сервиса: {str(e)}'
