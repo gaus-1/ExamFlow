@@ -49,6 +49,32 @@
     <meta property="og:locale" content="ru_RU">
     
     <!-- Twitter Meta Tags -->
+    <!-- Schema.org JSON-LD (Organization + WebSite) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ExamFlow",
+      "url": "https://examflow.ru",
+      "logo": "{% static 'images/logo-180.png' %}",
+      "sameAs": [
+        "https://t.me/examflow_bot"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ExamFlow",
+      "url": "https://examflow.ru",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://examflow.ru/learning/search/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ">
     <meta name="twitter:description" content="Персонализированная подготовка с искусственным интеллектом. Умный ассистент поможет эффективно подготовиться к экзаменам.">
@@ -68,6 +94,7 @@
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
     
     <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша (единый CSS) -->
+    <link rel="preload" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" as="style">
     <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" type="text/css">
     
     <!-- Основной JavaScript модуль ExamFlow 2.0 -->
@@ -106,7 +133,8 @@
     
     
     <!-- Основной контент -->
-    <main>
+    <a class="skip-link" href="#main" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Пропустить к содержанию</a>
+    <main id="main" role="main">
         {% block content %}{% endblock %}
     </main>
     
@@ -125,6 +153,12 @@
       try { if (window.gtag) gtag('event', name, params || {}); } catch(e){}
       try { if (window.ym && '{{ YM_ID }}') ym('{{ YM_ID }}', 'reachGoal', name); } catch(e){}
     };
+    // Улучшение доступности: фокус видим при навигации с клавиатуры
+    (function(){
+      var usingKeyboard = false;
+      window.addEventListener('keydown', function(e){ if (e.key === 'Tab') usingKeyboard = true; document.body.classList.add('using-keyboard'); });
+      window.addEventListener('mousedown', function(){ usingKeyboard = false; document.body.classList.remove('using-keyboard'); });
+    })();
     document.addEventListener('click', function(e){
       var el = e.target.closest('[data-analytics]');
       if (!el) return;
