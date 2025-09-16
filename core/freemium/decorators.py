@@ -6,7 +6,7 @@ from functools import wraps
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib import messages
-from .models import DailyUsage
+from .services import can_user_make_ai_request, increment_user_ai_usage
 
 def check_ai_limits(view_func):
     """Декоратор для проверки лимитов ИИ"""
@@ -15,17 +15,14 @@ def check_ai_limits(view_func):
         if not request.user.is_authenticated:
             return JsonResponse({'error': 'Требуется авторизация'}, status=401)
 
-        # Получаем ежедневное использование
-        daily_usage = DailyUsage.get_today_usage(request.user)
-
         # Проверяем лимиты
-        if not daily_usage.can_make_request():
+        if not can_user_make_ai_request(request.user):
             if request.path.endswith('/api/'):
                 return JsonResponse({
                     'error': 'Превышен лимит запросов к ИИ',
                     'limit_reached': True,
-                    'daily_limit': request.subscription_limits.daily_ai_requests,
-                    'used_today': daily_usage.ai_requests_count,
+                    'daily_limit': getattr(request, 'subscription_limits', None).daily_ai_requests if getattr(request, 'subscription_limits', None) else 10,
+                    'used_today': None,
                     'upgrade_url': '/pricing/'
                 }, status=429)
             else:
@@ -35,15 +32,13 @@ def check_ai_limits(view_func):
                 return redirect('pricing')
 
         # Увеличиваем счетчик использования
-        if not daily_usage.increment_usage():
+        try:
+            increment_user_ai_usage(request.user)
+        except Exception:
             if request.path.endswith('/api/'):
-                return JsonResponse({
-                    'error': 'Не удалось зарегистрировать запрос',
-                    'limit_reached': True
-                }, status=429)
-            else:
-                messages.error(request, 'Ошибка регистрации запроса')
-                return redirect('pricing')
+                return JsonResponse({'error': 'Не удалось зарегистрировать запрос', 'limit_reached': True}, status=429)
+            messages.error(request, 'Ошибка регистрации запроса')
+            return redirect('pricing')
 
         return view_func(request, *args, **kwargs)
     return wrapper
