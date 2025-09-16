@@ -9,6 +9,80 @@
  * - Совместимость с Telegram Web App
  */
 
+/* ===== CSS ПЕРЕМЕННЫЕ (единый источник) ===== */
+:root {
+  --primary-color: #2563EB;
+  --secondary-color: #10B981;
+  --accent-color: #F59E0B;
+  --neutral-50: #F8FAFC;
+  --neutral-100: #F1F5F9;
+  --neutral-200: #E2E8F0;
+  --neutral-300: #CBD5E1;
+  --neutral-400: #94A3B8;
+  --neutral-500: #64748B;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1E293B;
+  --neutral-900: #0F172A;
+
+  --success-color: #059669;
+  --warning-color: #D97706;
+  --error-color: #DC2626;
+  --info-color: #0EA5E9;
+
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
 /* ===== БАЗОВЫЕ СТИЛИ ===== */
 * {
   box-sizing: border-box;
@@ -890,4 +964,70 @@ a:hover {
     box-shadow: none;
     border-bottom: 1px solid var(--neutral-300);
   }
+}
+
+/* ===== КОМПОНЕНТЫ (из components.css) ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3) var(--spacing-6);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.5;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left var(--transition-normal);
+}
+.btn:hover:before { left: 100%; }
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.btn:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+
+.btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border-color: var(--primary-color); }
+.btn-primary:hover { background: linear-gradient(135deg, #1D4ED8, #059669); border-color: #1D4ED8; }
+
+.btn-secondary { background: white; color: var(--primary-color); border-color: var(--primary-color); }
+.btn-secondary:hover { background: var(--primary-color); color: white; }
+
+.btn-success { background: var(--success-color); color: white; border-color: var(--success-color); }
+.btn-success:hover { background: #047857; border-color: #047857; }
+
+.btn-warning { background: var(--warning-color); color: white; border-color: var(--warning-color); }
+.btn-warning:hover { background: #B45309; border-color: #B45309; }
+
+.btn-error { background: var(--error-color); color: white; border-color: var(--error-color); }
+.btn-error:hover { background: #B91C1C; border-color: #B91C1C; }
+
+.btn-sm { padding: var(--spacing-2) var(--spacing-4); font-size: var(--text-sm); border-radius: var(--radius-md); }
+.btn-lg { padding: var(--spacing-4) var(--spacing-8); font-size: var(--text-lg); border-radius: var(--radius-xl); }
+.btn-xl { padding: var(--spacing-5) var(--spacing-10); font-size: var(--text-xl); border-radius: var(--radius-2xl); }
+
+/* Формы */
+.form-group { position: relative; margin-bottom: var(--spacing-6); }
+.form-label { display: block; font-family: var(--font-primary); font-size: var(--text-sm); font-weight: 500; color: var(--neutral-700); margin-bottom: var(--spacing-2); transition: all var(--transition-fast); }
+.form-input { width: 100%; padding: var(--spacing-3) var(--spacing-4); font-family: var(--font-primary); font-size: var(--text-base); color: var(--neutral-900); background: white; border: 2px solid var(--neutral-200); border-radius: var(--radius-lg); transition: all var(--transition-fast); outline: none; }
+.form-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+.form-input::placeholder { color: var(--neutral-400); }
+.form-input:disabled { background: var(--neutral-100); color: var(--neutral-500); cursor: not-allowed; }
+
+/* Адаптив для кнопок/форм */
+@media (max-width: 768px) {
+  .btn { width: 100%; justify-content: center; }
+  .form-group { margin-bottom: var(--spacing-4); }
 }
