@@ -21,7 +21,7 @@ def check_ai_limits(view_func):
                 return JsonResponse({
                     'error': 'Превышен лимит запросов к ИИ',
                     'limit_reached': True,
-                    'daily_limit': getattr(request, 'subscription_limits', None).daily_ai_requests if getattr(request, 'subscription_limits', None) else 10,
+                    'daily_limit': getattr(request, 'subscription_limits', None).daily_ai_requests if getattr(request, 'subscription_limits', None) else 10,  # type: ignore
                     'used_today': None,
                     'upgrade_url': '/pricing/'
                 }, status=429)
