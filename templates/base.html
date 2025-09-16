@@ -67,19 +67,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
     
-    <!-- Icons -->
-    {# Локальная копия иконок вместо CDN (для CSP и стабильности) #}
-    <link href="{% static 'vendor/fontawesome/css/all.min.css' %}" rel="stylesheet">
-    
-    <!-- Основные стили -->
-    <!-- CSS-переменные и современные стили -->
-    <link rel="stylesheet" href="{% static 'css/variables.css' %}?v={{ STATIC_VERSION }}" type="text/css">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}?v={{ STATIC_VERSION }}" type="text/css">
-    
-    <!-- Старые стили (удалены). Если потребуется откат, восстановите файл и подключение ниже:
-         <link rel="stylesheet" href="/static/css/aesop-styles.css" type="text/css"> -->
-    
-    <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша -->
+    <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша (единый CSS) -->
     <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" type="text/css">
     
     <!-- Основной JavaScript модуль ExamFlow 2.0 -->
