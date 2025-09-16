@@ -55,14 +55,14 @@ def enable_csp():
     # Добавляем CSP настройки если их нет
     csp_config = '''
 # Content Security Policy
-CSP_DEFAULT_SRC = ("'sel'", )
-CSP_SCRIPT_SRC = ("'sel'", "'unsafe-inline'", "https://cdnjs.cloudflare.com")
-CSP_STYLE_SRC = ("'sel'", "'unsafe-inline'", "https://fonts.googleapis.com")
-CSP_IMG_SRC = ("'sel'", "data:", "https:")
-CSP_FONT_SRC = ("'sel'", "https://fonts.gstatic.com")
-CSP_CONNECT_SRC = ("'sel'", "https://generativelanguage.googleapis.com")
+CSP_DEFAULT_SRC = ("'self'", )
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://www.googletagmanager.com")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com")
 CSP_FRAME_ANCESTORS = ("'none'", )
-CSP_BASE_URI = ("'sel'", )
+CSP_BASE_URI = ("'self'", )
 CSP_OBJECT_SRC = ("'none'", )
 '''
 

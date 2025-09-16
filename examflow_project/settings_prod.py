@@ -89,13 +89,13 @@ CORS_ALLOWED_ORIGINS = [
     'https://examflow.onrender.com',
     ]
 
-# Настройки Content Security Policy
-CSP_DEFAULT_SRC = ("'sel'", )
-CSP_STYLE_SRC = ("'sel'", "'unsafe-inline'", "https://fonts.googleapis.com")
-CSP_SCRIPT_SRC = ("'sel'", "'unsafe-inline'", "https://www.googletagmanager.com")
-CSP_IMG_SRC = ("'sel'", "data:", "https:")
-CSP_FONT_SRC = ("'sel'", "https://fonts.gstatic.com")
-CSP_CONNECT_SRC = ("'sel'", "https://generativelanguage.googleapis.com")
+# Настройки Content Security Policy (разрешаем собственный домен и нужные внешние источники)
+CSP_DEFAULT_SRC = ("'self'", )
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://www.googletagmanager.com")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com")
 
 # Настройки rate limiting для продакшена
 RATELIMIT_USE_CACHE = 'default'
