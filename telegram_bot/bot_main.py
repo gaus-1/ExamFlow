@@ -5,17 +5,19 @@
 """
 
 from .bot_handlers import (
-    start, subjects_menu, show_subject_topics,
+    start, show_subject_topics,
     show_stats, handle_unknown_callback,
-    main_menu, random_task, show_answer, ai_help_handler,
+    random_task, show_answer, ai_help_handler,
     ai_explain_handler, ai_personal_handler, ai_hint_general_handler,
     handle_text_message, learning_plan_menu, search_subject_handler,
     random_subject_handler, show_task_handler, gamification_menu_handler,
     user_stats_handler, achievements_handler, progress_handler,
     overall_progress_handler, subjects_progress_handler, daily_challenges_handler,
     leaderboard_handler, bonus_handler, clear_context_handler,
-    telegram_auth_handler, auth_success_handler
 )
+from telegram_bot.commands.main_menu import main_menu  # тонкая обёртка
+from telegram_bot.commands.subjects import subjects_menu
+from telegram_bot.commands.auth import telegram_auth_handler, auth_success_handler
 from django.conf import settings
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 import os
