@@ -20,18 +20,9 @@ import logging
 import hashlib
 from django.core.cache import cache
 from core.freemium.decorators import check_ai_limits
-from ai.clients.gemini_client import GeminiClient
-from ai.orchestrator import AIOrchestrator
+from core.container import Container
 
 logger = logging.getLogger(__name__)
-
-try:
-    _ai_client = GeminiClient(model_name='gemini-1.5-flash')
-    _ai_orchestrator = AIOrchestrator(_ai_client)
-except Exception as e:
-    logger.error(f"Ошибка инициализации AI-клиента: {e}")
-    _ai_client = None
-    _ai_orchestrator = None
 
 @method_decorator([login_required, check_ai_limits], name='dispatch')
 class AIAssistantAPI(View):
@@ -60,7 +51,7 @@ class AIAssistantAPI(View):
         }
         """
         try:
-            logger.info("AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
+            logger.info(f"AI API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
 
             # Валидация размера запроса
             if len(request.body) > 10000:  # 10KB лимит
@@ -84,15 +75,9 @@ class AIAssistantAPI(View):
 
             # Базовая санитизация
             prompt = prompt.replace('<', '&lt;').replace('>', '&gt;')
-            logger.info("AI API: Промпт: {prompt[:100]}...")
+            logger.info(f"AI API: Промпт: {prompt[:100]}...")
 
-            # Проверяем, что оркестратор инициализирован
-            if _ai_orchestrator is None:
-                return JsonResponse({
-                    'error': 'AI сервис недоступен'
-                }, status=500)
-
-            # Получаем реальный ответ от Gemini API
+            # Получаем реальный ответ от AI через контейнер
             response = self.generate_ai_response(prompt)
 
             return JsonResponse(response)
@@ -122,10 +107,10 @@ class AIAssistantAPI(View):
                 logger.info(f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
                 return cached_response
 
-            # Пытаемся использовать RAG-систему
+            # Используем AI через контейнер
             try:
-                # Пытаемся использовать наш оркестратор (внутри может быть RAG позже)
-                response_data = _ai_orchestrator.ask(prompt)  # type: ignore
+                ai_orchestrator = Container.ai_orchestrator()
+                response_data = ai_orchestrator.process_query(prompt, user=None)  # type: ignore
                 logger.info(f"AI API: Ответ получен через AIOrchestrator для: {prompt[:50]}...")
             except Exception as rag_error:
                 logger.warning(f"AIOrchestrator недоступен: {rag_error}, используем заглушку")
@@ -321,7 +306,7 @@ class ProblemsAPI(View):
             # Fallback если модели не доступны
             return self.get_fallback_problems(topic, limit)
         except Exception as e:
-            logger.error("Error getting problems: {e}")
+            logger.error(f"Error getting problems: {e}")
             return self.get_fallback_problems(topic, limit)
 
     def get_fallback_problems(self, topic, limit):
@@ -373,10 +358,10 @@ class ProblemsAPI(View):
                 return answer == 0
 
         except Task.DoesNotExist:  # type: ignore
-            logger.error("Task {problem_id} not found")
+            logger.error(f"Task {problem_id} not found")
             return False
         except Exception as e:
-            logger.error("Error checking answer: {e}")
+            logger.error(f"Error checking answer: {e}")
             return False
 
     def get_feedback(self, is_correct):
@@ -455,7 +440,7 @@ class UserProfileAPI(View):
             return JsonResponse(profile)
 
         except Exception as e:
-            logger.error("Error getting user profile: {e}")
+            logger.error(f"Error getting user profile: {e}")
             # Fallback профиль
             profile = {
                 'id': user.id,
@@ -562,7 +547,7 @@ class UserProfileAPI(View):
             })
 
         except Exception as e:
-            logger.error("Error updating problem progress: {e}")
+            logger.error(f"Error updating problem progress: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     def update_challenge_progress(self, user, challenge_id):
@@ -593,7 +578,7 @@ class UserProfileAPI(View):
             })
 
         except Exception as e:
-            logger.error("Error updating challenge progress: {e}")
+            logger.error(f"Error updating challenge progress: {e}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 # URL маршруты для API
@@ -605,17 +590,17 @@ def ai_chat_api(request):
 
     Обрабатывает POST запросы к /ai/api/chat/
     """
-    logger.info("AI Chat API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
-    logger.info("AI Chat API: Метод: {request.method}")
-    logger.info("AI Chat API: Headers: {dict(request.headers)}")
+    logger.info(f"AI Chat API: Получен запрос от {request.META.get('REMOTE_ADDR')}")
+    logger.info(f"AI Chat API: Метод: {request.method}")
+    logger.info(f"AI Chat API: Headers: {dict(request.headers)}")
 
     try:
         view = AIAssistantAPI()
         return view.post(request)
     except Exception as e:
-        logger.error("AI Chat API Error: {e}")
+        logger.error(f"AI Chat API Error: {e}")
         return JsonResponse({
-            'error': 'Внутренняя ошибка сервера: {str(e)}'
+            'error': f'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)
 
 @csrf_exempt
