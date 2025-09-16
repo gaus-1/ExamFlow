@@ -1,108 +1,71 @@
 /**
  * 🎨 ExamFlow 2.0 - Современные стили
- * 
- * Чистая, минималистичная система стилей с:
- * - CSS Variables для консистентности
- * - Flexbox/Grid для современной верстки
- * - Адаптивный дизайн
- * - Плавные анимации
- * - Совместимость с Telegram Web App
+ * Улучшенная палитра, бережные анимации, единый дизайн.
  */
 
 /* ===== CSS ПЕРЕМЕННЫЕ (единый источник) ===== */
 :root {
-  --primary-color: #2563EB;
-  --secondary-color: #10B981;
-  --accent-color: #F59E0B;
-  --neutral-50: #F8FAFC;
-  --neutral-100: #F1F5F9;
-  --neutral-200: #E2E8F0;
-  --neutral-300: #CBD5E1;
-  --neutral-400: #94A3B8;
-  --neutral-500: #64748B;
-  --neutral-600: #475569;
-  --neutral-700: #334155;
-  --neutral-800: #1E293B;
-  --neutral-900: #0F172A;
+  /* Брендовые цвета (светлая тема) */
+  --primary-color: #2563EB;             /* Синий: акцент и действия */
+  --secondary-color: #10B981;           /* Зелёный: успех и подтверждения */
+  --accent-color: #F59E0B;              /* Оранжевый: выделение */
 
-  --success-color: #059669;
-  --warning-color: #D97706;
-  --error-color: #DC2626;
+  /* Нейтральная палитра, согласована с #fffef2/#252525/#666/#f8f8f8 */
+  --neutral-50: #fffef2;                /* Фон страниц */
+  --neutral-100: #f8f8f8;               /* Блоки/карточки */
+  --neutral-200: #ececec;               /* Бордеры/разделители */
+  --neutral-300: #dcdcdc;               /* Лёгкие бордеры */
+  --neutral-400: #bdbdbd;               /* Подписи */
+  --neutral-500: #666666;               /* Вторичный текст */
+  --neutral-600: #4d4d4d;               /* Текст на карточках */
+  --neutral-700: #383838;               /* Заголовки тёмные */
+  --neutral-800: #2c2c2c;               /* Тёмный */
+  --neutral-900: #252525;               /* Базовый текст */
+
+  --success-color: #10B981;             /* Совпадает с secondary */
+  --warning-color: #F59E0B;
+  --error-color: #EF4444;
   --info-color: #0EA5E9;
 
   --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-heading: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem; --text-lg: 1.125rem;
+  --text-xl: 1.25rem; --text-2xl: 1.5rem; --text-3xl: 1.875rem; --text-4xl: 2.25rem; --text-5xl: 3rem;
 
-  --spacing-1: 0.25rem;
-  --spacing-2: 0.5rem;
-  --spacing-3: 0.75rem;
-  --spacing-4: 1rem;
-  --spacing-5: 1.25rem;
-  --spacing-6: 1.5rem;
-  --spacing-8: 2rem;
-  --spacing-10: 2.5rem;
-  --spacing-12: 3rem;
-  --spacing-16: 4rem;
-  --spacing-20: 5rem;
-  --spacing-24: 6rem;
+  --spacing-1: 0.25rem; --spacing-2: 0.5rem; --spacing-3: 0.75rem; --spacing-4: 1rem;
+  --spacing-5: 1.25rem; --spacing-6: 1.5rem; --spacing-8: 2rem; --spacing-10: 2.5rem;
+  --spacing-12: 3rem; --spacing-16: 4rem; --spacing-20: 5rem; --spacing-24: 6rem;
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.5rem;
-  --radius-full: 9999px;
+  --radius-sm: 0.25rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-2xl: 1.5rem; --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 14px -6px rgba(0,0,0,0.12), 0 3px 6px -4px rgba(0,0,0,0.10);
+  --shadow-lg: 0 16px 30px -10px rgba(0,0,0,0.18), 0 8px 16px -8px rgba(0,0,0,0.14);
+  --shadow-xl: 0 28px 45px -12px rgba(0,0,0,0.22);
+  --shadow-2xl: 0 40px 70px -20px rgba(0,0,0,0.28);
 
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --transition-fast: 150ms cubic-bezier(.2,.8,.2,1);
+  --transition-normal: 280ms cubic-bezier(.2,.8,.2,1);
+  --transition-slow: 450ms cubic-bezier(.2,.8,.2,1);
 
-  --z-dropdown: 1000;
-  --z-sticky: 1020;
-  --z-fixed: 1030;
-  --z-modal-backdrop: 1040;
-  --z-modal: 1050;
-  --z-popover: 1060;
-  --z-tooltip: 1070;
+  --z-dropdown: 1000; --z-sticky: 1020; --z-fixed: 1030; --z-modal-backdrop: 1040; --z-modal: 1050; --z-popover: 1060; --z-tooltip: 1070;
+
+  /* Градиенты */
+  --gradient-brand: linear-gradient(135deg, var(--primary-color) 0%, #4F46E5 25%, #0EA5E9 100%);
+  --gradient-accent: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+}
+
+/* Бережно относимся к пользователям с reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root { --transition-fast: 1ms linear; --transition-normal: 1ms linear; --transition-slow: 1ms linear; }
 }
 
 /* ===== БАЗОВЫЕ СТИЛИ ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-  font-size: 16px;
-}
-
-body {
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  line-height: 1.6;
-  color: var(--neutral-900);
-  background-color: var(--neutral-50);
-  overflow-x: hidden;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body { font-family: var(--font-primary); font-size: var(--text-base); line-height: 1.6; color: var(--neutral-900); background-color: var(--neutral-50); overflow-x: hidden; }
 
 /* ===== ТИПОГРАФИКА ===== */
 h1, h2, h3, h4, h5, h6 {
@@ -344,7 +307,7 @@ a:hover {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -355,7 +318,7 @@ a:hover {
 @keyframes slideInRight {
   from {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(24px);
   }
   to {
     opacity: 1;
@@ -366,7 +329,7 @@ a:hover {
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(.96);
   }
   to {
     opacity: 1;
@@ -374,19 +337,20 @@ a:hover {
   }
 }
 
-.animate-fade-in { animation: fadeIn 0.6s ease; }
-.animate-fade-in-up { animation: fadeInUp 0.6s ease; }
-.animate-slide-in-right { animation: slideInRight 0.6s ease; }
-.animate-scale-in { animation: scaleIn 0.6s ease; }
+.animate-fade-in { animation: fadeIn .6s var(--transition-normal); }
+.animate-fade-in-up { animation: fadeInUp .7s var(--transition-normal); }
+.animate-slide-in-right { animation: slideInRight .7s var(--transition-normal); }
+.animate-scale-in { animation: scaleIn .6s var(--transition-normal); }
 
 /* ===== HEADER ===== */
 .header {
-  background: white;
+  background: #fff;
   box-shadow: var(--shadow-sm);
-  border-bottom: 1px solid var(--neutral-100);
+  border-bottom: 1px solid var(--neutral-200);
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
+  backdrop-filter: saturate(160%) blur(6px);
 }
 
 .header-content {
@@ -447,17 +411,17 @@ a:hover {
 .nav-link {
   font-family: var(--font-primary);
   font-size: var(--text-base);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--neutral-700);
   text-decoration: none;
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .nav-link:hover {
   color: var(--primary-color);
-  background: var(--neutral-50);
+  background: rgba(37, 99, 235, 0.06);
 }
 
 .nav-link.active {
@@ -524,7 +488,7 @@ a:hover {
 
 /* ===== HERO СЕКЦИЯ ===== */
 .hero-section {
-  background: linear-gradient(135deg, var(--neutral-50) 0%, white 100%);
+  background: linear-gradient(135deg, var(--neutral-50) 0%, #ffffff 70%);
   padding: var(--spacing-24) 0;
   text-align: center;
 }
@@ -532,19 +496,19 @@ a:hover {
 .hero-title {
   font-family: var(--font-heading);
   font-size: var(--text-5xl);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--neutral-900);
   margin-bottom: var(--spacing-4);
   line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .hero-subtitle {
   font-size: var(--text-xl);
   color: var(--neutral-600);
   margin-bottom: var(--spacing-8);
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 720px;
+  margin: 0 auto var(--spacing-8);
 }
 
 .hero-actions {
@@ -587,19 +551,8 @@ a:hover {
 }
 
 /* ===== КАРТОЧКИ ===== */
-.card {
-  background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-  transition: all var(--transition-normal);
-  border: 1px solid var(--neutral-100);
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-}
+.card { background: #fff; border-radius: var(--radius-xl); box-shadow: var(--shadow-md); border: 1px solid var(--neutral-200); transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-fast); overflow: hidden; }
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); border-color: var(--neutral-300); }
 
 .card-header {
   padding: var(--spacing-6);
@@ -638,84 +591,17 @@ a:hover {
 }
 
 /* ===== AI ЧАТ ===== */
-.ai-chat-container {
-  background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  padding: var(--spacing-6);
-  margin: var(--spacing-8) 0;
-}
-
-.ai-chat-input-container {
-  position: relative;
-  margin-bottom: var(--spacing-4);
-}
-
-.ai-chat-input {
-  width: 100%;
-  padding: var(--spacing-4);
-  border: 2px solid var(--neutral-200);
-  border-radius: var(--radius-lg);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  resize: vertical;
-  min-height: 60px;
-  transition: all var(--transition-fast);
-}
-
-.ai-chat-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.ai-chat-submit {
-  position: absolute;
-  bottom: var(--spacing-2);
-  right: var(--spacing-2);
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-2);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.ai-chat-submit:hover {
-  background: var(--secondary-color);
-  transform: scale(1.05);
-}
-
-.ai-responses {
-  max-height: 400px;
-  overflow-y: auto;
-  margin-top: var(--spacing-4);
-}
-
-.ai-response {
-  background: var(--neutral-50);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-4);
-  margin-bottom: var(--spacing-3);
-}
-
-.ai-response-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-}
-
-.ai-response-text {
-  color: var(--neutral-800);
-  line-height: 1.6;
-}
-
-.ai-response-time {
-  font-size: var(--text-xs);
-  color: var(--neutral-500);
-  text-align: right;
-}
+.ai-chat-container { background: #fff; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); padding: var(--spacing-6); margin: var(--spacing-8) 0; border: 1px solid var(--neutral-200); }
+.ai-chat-input-container { position: relative; margin-bottom: var(--spacing-4); }
+.ai-chat-input { width: 100%; padding: var(--spacing-4); border: 2px solid var(--neutral-200); border-radius: var(--radius-lg); font-family: var(--font-primary); font-size: var(--text-base); resize: vertical; min-height: 60px; transition: all var(--transition-fast); }
+.ai-chat-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+.ai-chat-submit { position: absolute; bottom: var(--spacing-2); right: var(--spacing-2); background: var(--primary-color); color: #fff; border: none; border-radius: var(--radius-md); padding: var(--spacing-2); cursor: pointer; transition: all var(--transition-fast); }
+.ai-chat-submit:hover { background: var(--secondary-color); transform: scale(1.05); }
+.ai-responses { max-height: 400px; overflow-y: auto; margin-top: var(--spacing-4); }
+.ai-response { background: var(--neutral-50); border-radius: var(--radius-lg); padding: var(--spacing-4); margin-bottom: var(--spacing-3); }
+.ai-response-content { display: flex; flex-direction: column; gap: var(--spacing-2); }
+.ai-response-text { color: var(--neutral-800); line-height: 1.6; }
+.ai-response-time { font-size: var(--text-xs); color: var(--neutral-500); text-align: right; }
 
 /* ===== АДАПТИВНОСТЬ ===== */
 @media (max-width: 768px) {
@@ -789,41 +675,14 @@ a:hover {
 
 /* ===== ТЕМНАЯ ТЕМА ===== */
 [data-theme="dark"] {
-  --neutral-50: #0F172A;
-  --neutral-100: #1E293B;
-  --neutral-200: #334155;
-  --neutral-300: #475569;
-  --neutral-400: #64748B;
-  --neutral-500: #94A3B8;
-  --neutral-600: #CBD5E1;
-  --neutral-700: #E2E8F0;
-  --neutral-800: #F1F5F9;
-  --neutral-900: #F8FAFC;
+  --neutral-50: #0f1115; --neutral-100: #141821; --neutral-200: #1a1f2a; --neutral-300: #222838;
+  --neutral-400: #2f374d; --neutral-500: #95a0b5; --neutral-600: #c4ccda; --neutral-700: #e2e6ef; --neutral-800: #f3f5f9; --neutral-900: #fafbff;
 }
-
-[data-theme="dark"] .header {
-  background: var(--neutral-100);
-  border-bottom-color: var(--neutral-200);
-}
-
-[data-theme="dark"] .card {
-  background: var(--neutral-100);
-  border-color: var(--neutral-200);
-}
-
-[data-theme="dark"] .ai-chat-container {
-  background: var(--neutral-100);
-}
-
-[data-theme="dark"] .ai-chat-input {
-  background: var(--neutral-200);
-  border-color: var(--neutral-300);
-  color: var(--neutral-800);
-}
-
-[data-theme="dark"] .ai-response {
-  background: var(--neutral-200);
-}
+[data-theme="dark"] .header { background: var(--neutral-100); border-bottom-color: var(--neutral-200); }
+[data-theme="dark"] .card { background: var(--neutral-100); border-color: var(--neutral-200); }
+[data-theme="dark"] .ai-chat-container { background: var(--neutral-100); }
+[data-theme="dark"] .ai-chat-input { background: var(--neutral-200); border-color: var(--neutral-300); color: var(--neutral-800); }
+[data-theme="dark"] .ai-response { background: var(--neutral-200); }
 
 /* ===== УТИЛИТЫ ДЛЯ АНИМАЦИЙ ===== */
 .animate-on-scroll {
@@ -926,17 +785,8 @@ a:hover {
   overflow: hidden;
 }
 
-.text-gradient {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.border-gradient {
-  border: 2px solid;
-  border-image: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) 1;
-}
+.text-gradient { background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.border-gradient { border: 2px solid; border-image: var(--gradient-brand) 1; }
 
 /* ===== TELEGRAM WEB APP СОВМЕСТИМОСТЬ ===== */
 .telegram-web-app {
@@ -967,52 +817,21 @@ a:hover {
 }
 
 /* ===== КОМПОНЕНТЫ (из components.css) ===== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-3) var(--spacing-6);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: 600;
-  line-height: 1.5;
-  text-decoration: none;
-  border: 2px solid transparent;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-}
-.btn:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left var(--transition-normal);
-}
-.btn:hover:before { left: 100%; }
-.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--spacing-3) var(--spacing-6); font-family: var(--font-primary); font-size: var(--text-base); font-weight: 600; line-height: 1.5; text-decoration: none; border: 2px solid transparent; border-radius: var(--radius-lg); cursor: pointer; transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+.btn:before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent); transform: translateX(-120%); transition: transform var(--transition-normal); }
+.btn:hover:before { transform: translateX(120%); }
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 .btn:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
 
-.btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border-color: var(--primary-color); }
-.btn-primary:hover { background: linear-gradient(135deg, #1D4ED8, #059669); border-color: #1D4ED8; }
+.btn-primary { background: var(--gradient-brand); color: #fff; border-color: transparent; }
+.btn-primary:hover { filter: brightness(1.03); }
 
-.btn-secondary { background: white; color: var(--primary-color); border-color: var(--primary-color); }
-.btn-secondary:hover { background: var(--primary-color); color: white; }
+.btn-secondary { background: #fff; color: var(--primary-color); border-color: var(--primary-color); }
+.btn-secondary:hover { background: var(--primary-color); color: #fff; }
 
-.btn-success { background: var(--success-color); color: white; border-color: var(--success-color); }
-.btn-success:hover { background: #047857; border-color: #047857; }
-
-.btn-warning { background: var(--warning-color); color: white; border-color: var(--warning-color); }
-.btn-warning:hover { background: #B45309; border-color: #B45309; }
-
-.btn-error { background: var(--error-color); color: white; border-color: var(--error-color); }
-.btn-error:hover { background: #B91C1C; border-color: #B91C1C; }
+.btn-success { background: var(--success-color); color: #fff; border-color: var(--success-color); }
+.btn-warning { background: var(--warning-color); color: #fff; border-color: var(--warning-color); }
+.btn-error { background: var(--error-color); color: #fff; border-color: var(--error-color); }
 
 .btn-sm { padding: var(--spacing-2) var(--spacing-4); font-size: var(--text-sm); border-radius: var(--radius-md); }
 .btn-lg { padding: var(--spacing-4) var(--spacing-8); font-size: var(--text-lg); border-radius: var(--radius-xl); }
