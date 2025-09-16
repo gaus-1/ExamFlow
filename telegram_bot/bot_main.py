@@ -18,6 +18,20 @@ from .bot_handlers import (
 from telegram_bot.commands.main_menu import main_menu  # тонкая обёртка
 from telegram_bot.commands.subjects import subjects_menu
 from telegram_bot.commands.auth import telegram_auth_handler, auth_success_handler
+from telegram_bot.commands.tasks import (
+    show_subject_topics, random_task, show_answer, show_task_handler,
+    search_subject_handler, random_subject_handler,
+)
+from telegram_bot.commands.ai import (
+    ai_help_handler, ai_explain_handler, ai_personal_handler,
+    ai_hint_general_handler, handle_text_message, clear_context_handler,
+)
+from telegram_bot.commands.gamification import (
+    gamification_menu_handler, user_stats_handler, achievements_handler,
+    progress_handler, overall_progress_handler, subjects_progress_handler,
+    daily_challenges_handler, leaderboard_handler, bonus_handler, show_stats,
+    handle_unknown_callback,
+)
 from django.conf import settings
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 import os
