@@ -7,7 +7,7 @@ import dj_database_url
 from .settings import *  # noqa: F403, F401
 
 # Принудительно отключаем DEBUG в продакшене
-DEBUG = False
+DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
 # Генерируем новый SECRET_KEY для продакшена
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -18,11 +18,11 @@ if not SECRET_KEY:
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_SECONDS = 31536000  # 1 год
+SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '31536000'))  # по умолчанию 1 год
 SECURE_REDIRECT_EXEMPT = []
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'true').lower() == 'true'
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'true').lower() == 'true'
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'true').lower() == 'true'
 X_FRAME_OPTIONS = 'DENY'
 
 # Настройки статических файлов для продакшена
@@ -39,6 +39,22 @@ DATABASES = {
 }
 
 # Настройки логирования для продакшена
+class MaskSecretsFilter:
+    """Фильтр для маскировки секретов в логах."""
+    SENSITIVE_KEYS = ("password", "secret", "token", "authorization", "api_key", "sessionid")
+
+    def filter(self, record):  # noqa: D401
+        try:
+            msg = str(record.getMessage())
+            for key in self.SENSITIVE_KEYS:
+                if key in msg.lower():
+                    msg = msg.replace(key, "***")
+            record.msg = msg
+        except Exception:
+            pass
+        return True
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -52,7 +68,13 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
+            'filters': ['mask_secrets']
         },
+    },
+    'filters': {
+        'mask_secrets': {
+            '()': MaskSecretsFilter,
+        }
     },
     'root': {
         'handlers': ['console'],

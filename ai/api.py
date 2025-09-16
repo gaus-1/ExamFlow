@@ -12,6 +12,7 @@ import os
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -583,6 +584,7 @@ class UserProfileAPI(View):
 
 # URL маршруты для API
 @csrf_exempt
+@ratelimit(key='ip', rate='20/m', block=True)
 @require_http_methods(["POST"])
 def ai_chat_api(request):
     """
@@ -604,6 +606,7 @@ def ai_chat_api(request):
         }, status=500)
 
 @csrf_exempt
+@ratelimit(key='ip', rate='60/m', block=True)
 @require_http_methods(["GET", "POST"])
 def problems_api(request):
     """

@@ -1,33 +1,37 @@
 {
-  "name": "examflow",
-  "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs",
-    "test": "tests"
-  },
+  "name": "examflow-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Frontend tooling for ExamFlow (ESLint, Prettier, Vite, Vitest).",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "minify": "python scripts/minify_assets.py",
-    "build": "python scripts/minify_assets.py && python manage.py collectstatic --noinput",
-    "dev": "python manage.py runserver",
-    "lint": "flake8 . --max-line-length=100",
-    "format": "black . --line-length=100 && isort . --profile=black"
+    "lint": "eslint .",
+    "format": "prettier -w .",
+    "test": "vitest run",
+    "test:ui": "vitest",
+    "build": "vite build",
+    "dev": "vite",
+    "prepare": "husky"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gaus-1/ExamFlow.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/gaus-1/ExamFlow/issues"
-  },
-  "homepage": "https://github.com/gaus-1/ExamFlow#readme",
-  "description": "",
   "devDependencies": {
-    "cssnano": "^7.1.1",
-    "terser": "^5.44.0"
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.4.0",
+    "@types/node": "^22.7.5",
+    "@vitest/ui": "^2.1.3",
+    "axe-core": "^4.10.2",
+    "eslint": "^9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-n": "^17.10.3",
+    "eslint-plugin-promise": "^7.1.0",
+    "eslint-plugin-security": "^2.1.0",
+    "husky": "^9.1.6",
+    "jsdom": "^25.0.1",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.3"
   }
 }

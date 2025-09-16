@@ -64,7 +64,7 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
             response['Cross-Origin-Embedder-Policy'] = settings.SECURE_CROSS_ORIGIN_EMBEDDER_POLICY
 
         # Дополнительные заголовки безопасности
-        response['X-Content-Type-Options'] = 'nosnif'
+        response['X-Content-Type-Options'] = 'nosniff'
         response['X-Frame-Options'] = 'DENY'
         response['X-XSS-Protection'] = '1; mode=block'
 
