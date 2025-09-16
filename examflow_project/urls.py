@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
+from django.http import HttpResponse
+from django.http import JsonResponse, HttpResponse
+from django.contrib.sitemaps.views import sitemap
+from core.sitemaps import StaticViewSitemap, RootViewSitemap
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
@@ -86,7 +89,22 @@ urlpatterns = [
     path('features/', lambda request: render(request, 'features.html'), name='features'),
     path('pricing/', lambda request: render(request, 'pricing.html'), name='pricing'),
     path('subscribe/', lambda request: render(request, 'subscribe.html'), name='subscribe'),
-        ]
+    # Sitemap.xml
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': {'static': StaticViewSitemap, 'root': RootViewSitemap}},
+        name='django.contrib.sitemaps.views.sitemap'
+    ),
+    # robots.txt (минимально достаточный)
+    path(
+        'robots.txt',
+        lambda r: HttpResponse(
+            b"User-agent: *\nAllow: /\nSitemap: https://examflow.ru/sitemap.xml\n",  # type: ignore
+            content_type='text/plain'
+        )
+    ),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
