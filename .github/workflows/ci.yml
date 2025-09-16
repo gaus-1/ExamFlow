@@ -44,12 +44,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          # Устанавливаем инструменты разработки (Ruff, mypy)
+          python -m pip install ruff mypy
 
       - name: Flake8 (PEP8)
         run: |
           python -m pip install flake8
           # Базовая проверка основных модулей; допускаем длинные строки и спорные правила
           flake8 --max-line-length=120 --ignore=E501,W503,E203,F401 core/ learning/ examflow_project/ telegram_bot/
+
+      - name: Ruff (soft)
+        run: |
+          # Мягкая проверка кодстайла Ruff (не падаем по ошибкам)
+          ruff --version
+          ruff check . || true
+
+      - name: mypy (soft)
+        continue-on-error: true
+        run: |
+          mypy --version
+          mypy . || true
 
       - name: Django system check
         run: |
