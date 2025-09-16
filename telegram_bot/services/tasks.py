@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import Any
+from core.container import Container
+
 try:
     from telegram_bot.bot_handlers import (
         db_get_all_subjects_with_tasks as _db_get_all_subjects_with_tasks,  # type: ignore
@@ -57,7 +60,7 @@ except Exception:
         return None
 
 
-# Обёртки
+# Прокси-функции для обратной совместимости
 get_all_subjects_with_tasks = _db_get_all_subjects_with_tasks
 get_subject_ids = _db_get_subject_ids
 get_subjects_by_ids = _db_get_subjects_by_ids
@@ -71,3 +74,14 @@ set_current_task_id = _db_set_current_task_id
 get_task_by_id = _db_get_task_by_id
 get_current_task_id = _get_current_task_id
 set_current_task_id_alt = _set_current_task_id
+
+
+# Новые функции с использованием контейнера
+def get_cache() -> Any:
+    """Получает кэш через контейнер зависимостей."""
+    return Container.cache()
+
+
+def get_notifier() -> Any:
+    """Получает уведомления через контейнер зависимостей."""
+    return Container.notifier()
