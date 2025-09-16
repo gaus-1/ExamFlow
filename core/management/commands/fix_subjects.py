@@ -68,5 +68,5 @@ class Command(BaseCommand):
             subject = Subject.objects.create(**data)  # type: ignore
             self.stdout.write(f'✓ Создан предмет: {subject.name}')
 
-        self.stdout.write(self.style.SUCCESS(
+        self.stdout.write(self.style.SUCCESS( # type: ignore
             'Предметы исправлены! Теперь только математика и русский язык.'))  # type: ignore
