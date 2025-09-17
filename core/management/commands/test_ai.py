@@ -78,7 +78,7 @@ class Command(BaseCommand):
             
             for i, query in enumerate(test_queries, 1):
                 try:
-                    response = ai_orchestrator.process_query(query)  # type: ignore
+                    response = ai_orchestrator.ask(query)  # type: ignore
                     if response and isinstance(response, dict) and 'answer' in response:
                         answer_length = len(response['answer'])
                         self.stdout.write(f"  ✅ Запрос {i}: получен ответ ({answer_length} символов)")
