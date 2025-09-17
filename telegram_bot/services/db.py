@@ -45,24 +45,25 @@ except Exception:
         return None
 
 
-# Прокси-функции для обратной совместимости
-check_connection = _db_check_connection
-get_or_create_unified_profile = _db_get_or_create_unified_profile
-update_profile_activity = _db_update_profile_activity
-get_profile_progress = _db_get_profile_progress
-get_or_create_chat_session = _db_get_or_create_chat_session
-add_user_message_to_session = _db_add_user_message_to_session
-add_assistant_message_to_session = _db_add_assistant_message_to_session
-create_enhanced_prompt = _db_create_enhanced_prompt
-clear_chat_session_context = _db_clear_chat_session_context
+# Современные функции через Container (вместо legacy прокси)
+def check_connection() -> bool:
+    """Проверяет подключение к базе данных."""
+    try:
+        from django.db import connection
+        connection.ensure_connection()
+        return True
+    except Exception:
+        return False
 
 
-# Новые функции с использованием контейнера
-def get_cache() -> Any:
+def get_cache():
     """Получает кэш через контейнер зависимостей."""
     return Container.cache()
 
 
-def get_notifier() -> Any:
+def get_notifier():
     """Получает уведомления через контейнер зависимостей."""
     return Container.notifier()
+
+
+# Функции удалены - используйте функции выше

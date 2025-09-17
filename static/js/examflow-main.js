@@ -1,12 +1,16 @@
 /**
  * 🚀 ExamFlow - Основной JavaScript модуль
  * Современная интерактивность для образовательной платформы
+ * ES2025+ стандарты с современными API
  */
 
 class ExamFlowApp {
+  #isLoading = false;  // Приватное поле
+  #aiChat = null;
+  #intersectionObserver = null;
+  #abortController = new AbortController();
+
   constructor() {
-    this.isLoading = false;
-    this.aiChat = null;
     this.init();
   }
 
@@ -86,11 +90,11 @@ class ExamFlowApp {
     const input = document.getElementById('aiInput');
     const chat = document.getElementById('aiChat');
     
-    if (!input || !input.value.trim() || this.isLoading) return;
+    if (!input || !input.value.trim() || this.#isLoading) return;
     
     const question = input.value.trim();
     input.value = '';
-    this.isLoading = true;
+    this.#isLoading = true;
     
     // Показываем чат если скрыт
     if (chat) {
@@ -141,7 +145,7 @@ class ExamFlowApp {
       this.removeMessage(loadingId);
       this.addMessage('assistant', '❌ Произошла ошибка соединения. Попробуйте позже.');
     } finally {
-      this.isLoading = false;
+      this.#isLoading = false;
     }
   }
 
@@ -276,7 +280,7 @@ class ExamFlowApp {
       rootMargin: '0px 0px -50px 0px'
     };
     
-    const observer = new IntersectionObserver((entries) => {
+    this.#intersectionObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-in');
@@ -290,8 +294,16 @@ class ExamFlowApp {
     
     // Наблюдаем за карточками и секциями
     document.querySelectorAll('.card, .feature-card, .stat-card').forEach(el => {
-      observer.observe(el);
+      this.#intersectionObserver.observe(el);
     });
+  }
+
+  // Очистка ресурсов
+  destroy() {
+    this.#abortController.abort();
+    if (this.#intersectionObserver) {
+      this.#intersectionObserver.disconnect();
+    }
   }
 
   // ===== ДОСТУПНОСТЬ =====
@@ -325,7 +337,7 @@ class ExamFlowApp {
   // ===== ИНИЦИАЛИЗАЦИЯ КОМПОНЕНТОВ =====
   initializeComponents() {
     // Инициализация AI чата
-    this.aiChat = document.getElementById('aiChat');
+    this.#aiChat = document.getElementById('aiChat');
     
     // Инициализация прогресс-баров с анимацией
     this.animateProgressBars();
