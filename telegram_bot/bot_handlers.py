@@ -302,24 +302,26 @@ def get_or_create_user(telegram_user):
     """
     Получить или создать пользователя Django с профилем
 
-    Создает пользователя с username = tg_{telegram_id}
+    Создает пользователя с telegram_id
     Автоматически создает профиль и рейтинг
     """
-    username = "tg_{telegram_user.id}"
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    
     user, created = User.objects.get_or_create(  # type: ignore
-        username=username,
+        telegram_id=telegram_user.id,
         defaults={
-            'first_name': telegram_user.first_name or '',
-            'last_name': telegram_user.last_name or '',
+            'telegram_first_name': telegram_user.first_name or '',
+            'telegram_last_name': telegram_user.last_name or '',
+            'telegram_username': telegram_user.username or '',
         }
     )
 
-    # Создаем или получаем профиль
+    # Создаем или получаем профиль (используем core.models.UserProfile)
+    from core.models import UserProfile
     profile, profile_created = UserProfile.objects.get_or_create(  # type: ignore
         user=user,
-        defaults={
-            'telegram_id': str(telegram_user.id)
-        }
+        defaults={}
     )
 
     # Создаем рейтинг если нужно
