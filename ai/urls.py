@@ -11,7 +11,8 @@ urlpatterns = [
     # AI чат (основной endpoint)
     path('chat/', api.ai_chat_api, name='chat'),
 
-    # AI чат (API endpoint)
+    # AI чат (API endpoint) - основной путь для фронтенда
+    path('api/', api.ai_chat_api, name='ai_api'),
     path('api/chat/', api.ai_chat_api, name='ai_chat_api'),
 
     # Задачи
@@ -19,4 +20,4 @@ urlpatterns = [
 
     # Профиль пользователя
     path('api/user/profile/', api.user_profile_api, name='user_profile_api'),
-        ]
+]
