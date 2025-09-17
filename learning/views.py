@@ -37,7 +37,7 @@ def home(request):
     """
     # Получаем статистику с обработкой ошибок БД
     try:
-        base_qs = Subject.objects.filter(
+        base_qs = Subject.objects.filter(  # type: ignore
             is_archived=False, is_primary=True)  # type: ignore
         subjects_count = base_qs.count()  # type: ignore
         tasks_count = Task.objects.count()  # type: ignore
@@ -69,7 +69,7 @@ def home(request):
 
     # SEO
     context.update(seo_utils.seo_for_home())
-    return render(request, 'learning/home-examflow-2.0.html', context)
+    return render(request, 'index.html', context)
 
 def subjects_list(request):
     """
@@ -82,7 +82,7 @@ def subjects_list(request):
     """
     # Получаем предметы c фокусом; безопасный fallback
     try:
-        subjects = Subject.objects.filter(
+        subjects = Subject.objects.filter(  # type: ignore
             is_archived=False,
             is_primary=True).order_by('name')  # type: ignore
     except Exception:
