@@ -1,0 +1,664 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ{% endblock %}
+
+{% block content %}
+<!-- ===== ХЕДЕР ===== -->
+<header class="header">
+  <div class="container container-xl">
+    <div class="header-content">
+      <!-- Логотип -->
+      <a href="/" class="logo">
+        <div class="logo-icon">🎯</div>
+        <span>ExamFlow</span>
+      </a>
+      
+      <!-- Навигация -->
+      <nav class="nav hidden-mobile">
+        <a href="#features" class="nav-link">Возможности</a>
+        <a href="#subjects" class="nav-link">Предметы</a>
+        <a href="#pricing" class="nav-link">Тарифы</a>
+        <a href="#about" class="nav-link">О нас</a>
+      </nav>
+      
+      <!-- Действия -->
+      <div class="flex items-center gap-4">
+        <button class="btn btn-ghost hidden-mobile" onclick="focusAI()">
+          Задать вопрос
+        </button>
+        <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-primary">
+          Войти
+        </a>
+        
+        <!-- Мобильное меню -->
+        <button class="mobile-menu-toggle visible-mobile" onclick="toggleMobileMenu()">
+          <span class="mobile-menu-line"></span>
+          <span class="mobile-menu-line"></span>
+          <span class="mobile-menu-line"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO СЕКЦИЯ ===== -->
+<section class="hero">
+  <div class="container container-lg">
+    <h1 class="hero-title">
+      Умный помощник для подготовки к ЕГЭ
+    </h1>
+    <p class="hero-subtitle">
+      Задайте любой вопрос по ЕГЭ и получите мгновенный ответ от ИИ-ассистента. 
+      От теории до практики — всё в одном месте.
+    </p>
+    
+    <!-- AI интерфейс -->
+    <div class="ai-interface">
+      <div class="ai-input-container">
+        <input 
+          type="text" 
+          class="ai-input" 
+          placeholder="Например: Как решать квадратные уравнения?"
+          maxlength="500"
+          id="aiInput"
+        >
+        <button class="ai-send-btn btn btn-primary" onclick="sendAIQuery()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Быстрые вопросы -->
+      <div class="ai-suggestions">
+        <button class="ai-suggestion" onclick="askQuestion('Как решать квадратные уравнения?')">
+          Квадратные уравнения
+        </button>
+        <button class="ai-suggestion" onclick="askQuestion('Объясни теорию вероятности')">
+          Теория вероятности
+        </button>
+        <button class="ai-suggestion" onclick="askQuestion('Как писать сочинение по русскому?')">
+          Сочинение
+        </button>
+        <button class="ai-suggestion" onclick="askQuestion('Правила дифференцирования')">
+          Производные
+        </button>
+      </div>
+      
+      <!-- Область ответов ИИ -->
+      <div id="aiChat" class="ai-chat" style="display: none;">
+        <!-- Ответы будут добавляться сюда -->
+      </div>
+    </div>
+    
+    <!-- Статистика -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">50,000+</div>
+        <div class="stat-label">Учеников</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">95%</div>
+        <div class="stat-label">Успешная сдача</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Поддержка ИИ</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ВОЗМОЖНОСТИ ===== -->
+<section id="features" class="section">
+  <div class="container container-xl">
+    <div class="section-header">
+      <h2 class="section-title">Почему ExamFlow?</h2>
+      <p class="section-subtitle">
+        Мы создали платформу, которая превращает подготовку к ЕГЭ в увлекательное путешествие
+      </p>
+    </div>
+    
+    <div class="feature-grid">
+      <!-- AI Ассистент -->
+      <div class="feature-card card hover-lift">
+        <div class="feature-icon">🤖</div>
+        <h3 class="feature-title">ИИ-ассистент</h3>
+        <p class="feature-description">
+          Задайте любой вопрос и получите подробный ответ с источниками и примерами
+        </p>
+      </div>
+      
+      <!-- Персонализация -->
+      <div class="feature-card card hover-lift">
+        <div class="feature-icon">⚡</div>
+        <h3 class="feature-title">Персонализация</h3>
+        <p class="feature-description">
+          ИИ адаптируется под ваш уровень и предлагает оптимальный план обучения
+        </p>
+      </div>
+      
+      <!-- Практика -->
+      <div class="feature-card card hover-lift">
+        <div class="feature-icon">🎯</div>
+        <h3 class="feature-title">Интерактивная практика</h3>
+        <p class="feature-description">
+          Тысячи заданий с мгновенной проверкой и подробными объяснениями
+        </p>
+      </div>
+      
+      <!-- Геймификация -->
+      <div class="feature-card card hover-lift">
+        <div class="feature-icon">🏆</div>
+        <h3 class="feature-title">Геймификация</h3>
+        <p class="feature-description">
+          Система уровней, достижений и ежедневных челленджей мотивирует учиться
+        </p>
+      </div>
+      
+      <!-- Telegram бот -->
+      <div class="feature-card card hover-lift">
+        <div class="feature-icon">📱</div>
+        <h3 class="feature-title">Telegram бот</h3>
+        <p class="feature-description">
+          Учитесь где угодно с синхронизацией прогресса между сайтом и ботом
+        </p>
+      </div>
+      
+      <!-- Аналитика -->
+      <div class="feature-card card hover-lift">
+        <div class="feature-icon">📊</div>
+        <h3 class="feature-title">Детальная аналитика</h3>
+        <p class="feature-description">
+          Отслеживайте прогресс по темам и получайте рекомендации по улучшению
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ПРЕДМЕТЫ ===== -->
+<section id="subjects" class="section bg-gray-50">
+  <div class="container container-xl">
+    <div class="section-header">
+      <h2 class="section-title">Предметы ЕГЭ и ОГЭ</h2>
+      <p class="section-subtitle">
+        Выберите предмет для углубленного изучения
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-8">
+      <!-- Математика -->
+      <div class="card hover-lift text-center">
+        <div class="feature-icon">📐</div>
+        <h3 class="feature-title">Математика</h3>
+        <p class="feature-description mb-6">
+          Профильная и базовая математика ЕГЭ, математика ОГЭ
+        </p>
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">
+          Начать изучение
+        </a>
+      </div>
+      
+      <!-- Русский язык -->
+      <div class="card hover-lift text-center">
+        <div class="feature-icon">📝</div>
+        <h3 class="feature-title">Русский язык</h3>
+        <p class="feature-description mb-6">
+          Сочинение, тесты, грамматика для ЕГЭ и ОГЭ
+        </p>
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-primary">
+          Начать изучение
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TELEGRAM ИНТЕГРАЦИЯ ===== -->
+<section class="section">
+  <div class="container container-lg">
+    <div class="grid grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="section-title text-left">
+          Учитесь где угодно с Telegram-ботом
+        </h2>
+        <p class="text-lg text-muted mb-8">
+          Полная синхронизация прогресса между сайтом и ботом. 
+          Задавайте вопросы ИИ, решайте задачи и отслеживайте прогресс прямо в Telegram.
+        </p>
+        
+        <div class="flex gap-4">
+          <a href="https://t.me/examflow_bot" target="_blank" class="btn btn-primary">
+            Открыть бота
+          </a>
+          <button class="btn btn-outline" onclick="showQR()">
+            QR-код
+          </button>
+        </div>
+      </div>
+      
+      <div class="telegram-widget">
+        <div class="telegram-qr">
+          <svg width="200" height="200" viewBox="0 0 200 200" style="background: white; border-radius: var(--radius-lg);">
+            <!-- QR код для @examflow_bot -->
+            <rect width="200" height="200" fill="white"/>
+            <g fill="#000">
+              <!-- Упрощенный QR-код паттерн -->
+              <rect x="10" y="10" width="30" height="30"/>
+              <rect x="160" y="10" width="30" height="30"/>
+              <rect x="10" y="160" width="30" height="30"/>
+              <rect x="50" y="50" width="100" height="100" fill="none" stroke="#000" stroke-width="2"/>
+              <text x="100" y="105" text-anchor="middle" font-family="Arial" font-size="12" fill="#666">
+                @examflow_bot
+              </text>
+            </g>
+          </svg>
+        </div>
+        <h3 class="font-semibold mb-2 text-center">@examflow_bot</h3>
+        <p class="text-muted text-sm text-center">
+          Отсканируйте QR-код или найдите бота в Telegram
+        </p>
+        <div class="mt-4 text-center">
+          <a href="https://t.me/examflow_bot" class="btn btn-primary btn-sm">
+            Открыть в Telegram
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ТАРИФЫ ===== -->
+<section id="pricing" class="section bg-gray-50">
+  <div class="container container-lg">
+    <div class="section-header">
+      <h2 class="section-title">Выберите тариф</h2>
+      <p class="section-subtitle">
+        Начните бесплатно или получите максимум возможностей
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-8">
+      <!-- Бесплатный -->
+      <div class="card text-center">
+        <h3 class="text-2xl font-bold mb-2">Бесплатный</h3>
+        <p class="text-muted mb-6">Ограниченный доступ</p>
+        
+        <div class="mb-8">
+          <span class="text-4xl font-bold">0₽</span>
+          <span class="text-muted">/месяц</span>
+        </div>
+        
+        <ul class="text-left mb-8" style="list-style: none; padding: 0;">
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>До 5 вопросов к ИИ в день</span>
+          </li>
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>Базовые задачи и теория</span>
+          </li>
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>Telegram бот</span>
+          </li>
+        </ul>
+        
+        <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-outline w-full">
+          Начать бесплатно
+        </a>
+      </div>
+      
+      <!-- Премиум -->
+      <div class="card text-center" style="border-color: var(--primary-300); position: relative;">
+        <div class="badge badge-primary" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%);">
+          Популярный
+        </div>
+        
+        <h3 class="text-2xl font-bold mb-2">Премиум</h3>
+        <p class="text-muted mb-6">Полный доступ</p>
+        
+        <div class="mb-8">
+          <span class="text-4xl font-bold">999₽</span>
+          <span class="text-muted">/месяц</span>
+        </div>
+        
+        <ul class="text-left mb-8" style="list-style: none; padding: 0;">
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>Безлимитные вопросы к ИИ</span>
+          </li>
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>Все задачи и материалы</span>
+          </li>
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>Персональный план обучения</span>
+          </li>
+          <li class="flex items-center gap-2 mb-3">
+            <span class="text-success">✓</span>
+            <span>Приоритетная поддержка</span>
+          </li>
+        </ul>
+        
+        <a href="{% url 'subscribe' %}" class="btn btn-primary w-full">
+          Оформить подписку
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== О НАС ===== -->
+<section id="about" class="section">
+  <div class="container container-lg">
+    <div class="grid grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="section-title text-left">
+          О ExamFlow
+        </h2>
+        <p class="text-lg text-muted mb-6">
+          Мы создали революционную платформу для подготовки к ЕГЭ, которая объединяет 
+          искусственный интеллект, интерактивное обучение и геймификацию.
+        </p>
+        <p class="text-lg text-muted mb-8">
+          Наша миссия — сделать подготовку к экзаменам эффективной, увлекательной 
+          и доступной для каждого ученика.
+        </p>
+        
+        <div class="grid grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-primary">2024</div>
+            <div class="text-sm text-muted">Год основания</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-primary">5+</div>
+            <div class="text-sm text-muted">Предметов</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-primary">99%</div>
+            <div class="text-sm text-muted">Довольных учеников</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <div style="width: 300px; height: 300px; background: var(--gradient-brand); border-radius: var(--radius-2xl); margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: var(--text-6xl);">
+          🎓
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ФУТЕР ===== -->
+<footer class="footer">
+  <div class="container container-xl">
+    <div class="footer-grid">
+      <!-- О компании -->
+      <div class="footer-section">
+        <h3>ExamFlow</h3>
+        <p class="text-sm text-gray-400 mb-4">
+          Умная платформа для подготовки к ЕГЭ с использованием искусственного интеллекта
+        </p>
+      </div>
+      
+      <!-- Продукт -->
+      <div class="footer-section">
+        <h3>Продукт</h3>
+        <ul class="footer-links">
+          <li><a href="#features" class="footer-link">Возможности</a></li>
+          <li><a href="#subjects" class="footer-link">Предметы</a></li>
+          <li><a href="#pricing" class="footer-link">Тарифы</a></li>
+          <li><a href="{% url 'learning:subjects_list' %}" class="footer-link">Практика</a></li>
+        </ul>
+      </div>
+      
+      <!-- Поддержка -->
+      <div class="footer-section">
+        <h3>Поддержка</h3>
+        <ul class="footer-links">
+          <li><a href="{% url 'faq' %}" class="footer-link">FAQ</a></li>
+          <li><a href="https://t.me/examflow_bot" class="footer-link">Telegram бот</a></li>
+          <li><a href="#" class="footer-link">Контакты</a></li>
+        </ul>
+      </div>
+      
+      <!-- Компания -->
+      <div class="footer-section">
+        <h3>Компания</h3>
+        <ul class="footer-links">
+          <li><a href="#about" class="footer-link">О нас</a></li>
+          <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
+          <li><a href="#" class="footer-link">Условия использования</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div>
+        © 2024 ExamFlow. Все права защищены.
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://t.me/examflow_bot" class="footer-link">Telegram</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Мобильное меню -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay">
+  <div class="mobile-menu-content">
+    <div class="flex justify-between items-center mb-8">
+      <div class="logo">
+        <div class="logo-icon">🎯</div>
+        <span>ExamFlow</span>
+      </div>
+      <button onclick="toggleMobileMenu()" class="btn btn-ghost">✕</button>
+    </div>
+    
+    <nav class="flex flex-col gap-4">
+      <a href="#features" class="nav-link" onclick="toggleMobileMenu()">Возможности</a>
+      <a href="#subjects" class="nav-link" onclick="toggleMobileMenu()">Предметы</a>
+      <a href="#pricing" class="nav-link" onclick="toggleMobileMenu()">Тарифы</a>
+      <a href="#about" class="nav-link" onclick="toggleMobileMenu()">О нас</a>
+    </nav>
+    
+    <div class="mt-8">
+      <button class="btn btn-ghost w-full mb-3" onclick="focusAI(); toggleMobileMenu()">
+        Задать вопрос
+      </button>
+      <a href="{% url 'telegram_auth:telegram_login' %}" class="btn btn-primary w-full">
+        Войти
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- AI Чат Виджет -->
+{% include 'ai/chat-widget.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ===== ОСНОВНЫЕ ФУНКЦИИ =====
+
+// Фокус на AI инпуте
+function focusAI() {
+  const aiInput = document.getElementById('aiInput');
+  if (aiInput) {
+    aiInput.focus();
+    aiInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// Отправка вопроса к ИИ
+async function sendAIQuery() {
+  const input = document.getElementById('aiInput');
+  const chat = document.getElementById('aiChat');
+  
+  if (!input || !input.value.trim()) return;
+  
+  const question = input.value.trim();
+  input.value = '';
+  
+  // Показываем чат
+  chat.style.display = 'block';
+  
+  // Добавляем вопрос пользователя
+  addMessage('user', question);
+  
+  // Показываем индикатор загрузки
+  const loadingId = addMessage('assistant', 'Думаю...', true);
+  
+  try {
+    // Отправляем запрос к API
+    const response = await fetch('/ai/api/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ prompt: question })
+    });
+    
+    const data = await response.json();
+    
+    // Удаляем индикатор загрузки
+    removeMessage(loadingId);
+    
+    if (data.answer) {
+      addMessage('assistant', data.answer);
+    } else {
+      addMessage('assistant', 'Извините, не удалось получить ответ. Попробуйте еще раз.');
+    }
+    
+  } catch (error) {
+    removeMessage(loadingId);
+    addMessage('assistant', 'Произошла ошибка. Попробуйте позже.');
+  }
+}
+
+// Быстрые вопросы
+function askQuestion(question) {
+  const input = document.getElementById('aiInput');
+  if (input) {
+    input.value = question;
+    sendAIQuery();
+  }
+}
+
+// Добавление сообщения в чат
+function addMessage(type, text, isLoading = false) {
+  const chat = document.getElementById('aiChat');
+  const messageId = 'msg-' + Date.now();
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.id = messageId;
+  messageDiv.className = `ai-message ${type}`;
+  
+  if (isLoading) {
+    messageDiv.innerHTML = `
+      <div class="flex items-center gap-2">
+        <div class="animate-pulse">🤖</div>
+        <span>${text}</span>
+      </div>
+    `;
+  } else {
+    messageDiv.innerHTML = `
+      <div class="message-content">
+        ${type === 'user' ? '👤' : '🤖'} ${text}
+      </div>
+    `;
+  }
+  
+  chat.appendChild(messageDiv);
+  messageDiv.scrollIntoView({ behavior: 'smooth' });
+  
+  return messageId;
+}
+
+// Удаление сообщения
+function removeMessage(messageId) {
+  const message = document.getElementById(messageId);
+  if (message) {
+    message.remove();
+  }
+}
+
+// Мобильное меню
+function toggleMobileMenu() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  if (overlay) {
+    overlay.classList.toggle('active');
+  }
+}
+
+// Получение CSRF токена
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Плавная прокрутка к якорям
+document.addEventListener('DOMContentLoaded', function() {
+  // Обработка ссылок с якорями
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetElement = document.getElementById(targetId);
+      
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+  
+  // Обработка Enter в AI инпуте
+  const aiInput = document.getElementById('aiInput');
+  if (aiInput) {
+    aiInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendAIQuery();
+      }
+    });
+  }
+  
+  // Анимация появления элементов при скролле
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-fade-in');
+      }
+    });
+  }, observerOptions);
+  
+  // Наблюдаем за карточками
+  document.querySelectorAll('.card, .feature-card').forEach(el => {
+    observer.observe(el);
+  });
+});
+</script>
+{% endblock %}

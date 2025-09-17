@@ -93,17 +93,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ExamFlow">
     
-    <!-- Стили ExamFlow 2.0 с версионированием для сброса кэша (единый CSS) -->
-    <link rel="preload" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" as="style">
-    <link rel="stylesheet" href="{% static 'css/examflow-2.0.css' %}?v={{ STATIC_VERSION }}" type="text/css">
+    <!-- Единая система стилей ExamFlow -->
+    <link rel="preload" href="{% static 'css/examflow-unified.css' %}?v={{ STATIC_VERSION }}" as="style">
+    <link rel="stylesheet" href="{% static 'css/examflow-unified.css' %}?v={{ STATIC_VERSION }}" type="text/css">
     
-    <!-- Основной JavaScript модуль ExamFlow 2.0 -->
-    <script src="{% static 'js/main.js' %}?v={{ STATIC_VERSION }}"></script>
-    
-    <!-- Дополнительные модули -->
-    <script src="{% static 'js/modules/ai-learning.js' %}?v={{ STATIC_VERSION }}"></script>
-    <script src="{% static 'js/modules/gamification.js' %}?v={{ STATIC_VERSION }}"></script>
-    <script src="{% static 'js/modules/theme-manager.js' %}?v={{ STATIC_VERSION }}"></script>
+    <!-- Основной JavaScript модуль ExamFlow -->
+    <script src="{% static 'js/examflow-main.js' %}?v={{ STATIC_VERSION }}" defer></script>
     
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}

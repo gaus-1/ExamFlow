@@ -1,0 +1,388 @@
+<!-- AI Чат Виджет для встраивания на любую страницу -->
+<div class="ai-widget" id="aiWidget">
+  <div class="ai-widget-header">
+    <div class="ai-widget-title">
+      <span class="ai-icon">🤖</span>
+      <span>ИИ-ассистент</span>
+    </div>
+    <button class="ai-widget-toggle" onclick="toggleAIWidget()">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="ai-widget-content">
+    <!-- Быстрый старт -->
+    <div class="ai-quick-start">
+      <p class="ai-welcome">Задайте любой вопрос по ЕГЭ:</p>
+      <div class="ai-quick-questions">
+        <button class="ai-quick-btn" onclick="askQuickQuestion('Как решать логарифмы?')">
+          Логарифмы
+        </button>
+        <button class="ai-quick-btn" onclick="askQuickQuestion('Объясни производные')">
+          Производные
+        </button>
+        <button class="ai-quick-btn" onclick="askQuickQuestion('Сочинение ЕГЭ')">
+          Сочинение
+        </button>
+      </div>
+    </div>
+    
+    <!-- Чат -->
+    <div class="ai-chat-messages" id="aiChatMessages">
+      <!-- Сообщения будут добавляться сюда -->
+    </div>
+    
+    <!-- Поле ввода -->
+    <div class="ai-input-area">
+      <div class="ai-input-wrapper">
+        <input 
+          type="text" 
+          class="ai-widget-input" 
+          placeholder="Напишите ваш вопрос..."
+          id="aiWidgetInput"
+          maxlength="500"
+        >
+        <button class="ai-send-widget-btn" onclick="sendWidgetQuery()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Кнопка для открытия виджета -->
+<button class="ai-widget-fab" onclick="openAIWidget()" id="aiWidgetFab">
+  <span class="ai-fab-icon">🤖</span>
+  <span class="ai-fab-text">Спросить ИИ</span>
+</button>
+
+<style>
+/* Стили для AI виджета */
+.ai-widget {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  width: 380px;
+  max-height: 600px;
+  background: var(--color-background);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--color-border);
+  z-index: var(--z-modal);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--gradient-brand);
+  color: white;
+}
+
+.ai-widget-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+.ai-widget-toggle {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.ai-widget-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ai-widget-content {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+}
+
+.ai-quick-start {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.ai-welcome {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.ai-quick-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ai-quick-btn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  background: var(--gray-100);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ai-quick-btn:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-200);
+  color: var(--primary-600);
+}
+
+.ai-chat-messages {
+  flex: 1;
+  padding: var(--space-4);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ai-input-area {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.ai-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ai-widget-input {
+  width: 100%;
+  padding: var(--space-3);
+  padding-right: var(--space-10);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  resize: none;
+}
+
+.ai-widget-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ai-send-widget-btn {
+  position: absolute;
+  right: var(--space-2);
+  width: 32px;
+  height: 32px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.ai-send-widget-btn:hover {
+  transform: scale(1.05);
+}
+
+/* FAB кнопка */
+.ai-widget-fab {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  background: var(--gradient-brand);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  z-index: var(--z-fixed);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+.ai-widget-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.ai-fab-icon {
+  font-size: var(--text-lg);
+}
+
+.ai-fab-text {
+  font-size: var(--text-sm);
+}
+
+/* Адаптивность виджета */
+@media (max-width: 480px) {
+  .ai-widget {
+    width: calc(100vw - var(--space-4));
+    right: var(--space-2);
+    bottom: var(--space-2);
+  }
+  
+  .ai-widget-fab {
+    right: var(--space-2);
+    bottom: var(--space-2);
+  }
+  
+  .ai-fab-text {
+    display: none;
+  }
+}
+</style>
+
+<script>
+// Функции для AI виджета
+function openAIWidget() {
+  const widget = document.getElementById('aiWidget');
+  const fab = document.getElementById('aiWidgetFab');
+  
+  if (widget && fab) {
+    widget.style.display = 'flex';
+    fab.style.display = 'none';
+    
+    // Фокус на инпуте
+    setTimeout(() => {
+      const input = document.getElementById('aiWidgetInput');
+      if (input) input.focus();
+    }, 100);
+  }
+}
+
+function toggleAIWidget() {
+  const widget = document.getElementById('aiWidget');
+  const fab = document.getElementById('aiWidgetFab');
+  
+  if (widget && fab) {
+    widget.style.display = 'none';
+    fab.style.display = 'flex';
+  }
+}
+
+function askQuickQuestion(question) {
+  const input = document.getElementById('aiWidgetInput');
+  if (input) {
+    input.value = question;
+    sendWidgetQuery();
+  }
+}
+
+async function sendWidgetQuery() {
+  const input = document.getElementById('aiWidgetInput');
+  const messages = document.getElementById('aiChatMessages');
+  
+  if (!input || !input.value.trim()) return;
+  
+  const question = input.value.trim();
+  input.value = '';
+  
+  // Добавляем сообщение пользователя
+  addWidgetMessage('user', question);
+  
+  // Добавляем индикатор загрузки
+  const loadingId = addWidgetMessage('assistant', 'Думаю...', true);
+  
+  try {
+    const response = await fetch('/ai/api/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken()
+      },
+      body: JSON.stringify({ prompt: question })
+    });
+    
+    const data = await response.json();
+    
+    // Удаляем индикатор загрузки
+    removeWidgetMessage(loadingId);
+    
+    if (data.answer) {
+      addWidgetMessage('assistant', data.answer);
+    } else {
+      addWidgetMessage('assistant', 'Извините, не удалось получить ответ.');
+    }
+    
+  } catch (error) {
+    removeWidgetMessage(loadingId);
+    addWidgetMessage('assistant', 'Произошла ошибка. Попробуйте позже.');
+  }
+}
+
+function addWidgetMessage(type, text, isLoading = false) {
+  const messages = document.getElementById('aiChatMessages');
+  if (!messages) return null;
+  
+  const messageId = 'widget-msg-' + Date.now();
+  const messageDiv = document.createElement('div');
+  messageDiv.id = messageId;
+  messageDiv.className = `ai-message ${type}`;
+  
+  const icon = type === 'user' ? '👤' : '🤖';
+  const content = isLoading ? 
+    `<div class="flex items-center gap-2"><span>${icon}</span><span>${text}</span><div class="loading-dots"><span>.</span><span>.</span><span>.</span></div></div>` :
+    `<div><span class="message-icon">${icon}</span> ${text}</div>`;
+  
+  messageDiv.innerHTML = content;
+  messages.appendChild(messageDiv);
+  
+  // Прокрутка к новому сообщению
+  messages.scrollTop = messages.scrollHeight;
+  
+  return messageId;
+}
+
+function removeWidgetMessage(messageId) {
+  const message = document.getElementById(messageId);
+  if (message) {
+    message.remove();
+  }
+}
+
+function getCSRFToken() {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'csrftoken') {
+      return decodeURIComponent(value);
+    }
+  }
+  return '';
+}
+
+// Обработка Enter в виджете
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('aiWidgetInput');
+  if (input) {
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendWidgetQuery();
+      }
+    });
+  }
+});
+</script>
