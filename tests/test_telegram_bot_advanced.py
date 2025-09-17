@@ -74,8 +74,15 @@ class TestBotHandlers(TestCase):
         self.mock_update.message.text = "/search тест запрос"
         self.mock_update.message.reply_text = Mock()
 
-        # Вызываем обработчик
-        self.handlers.search_command(self.mock_update, self.mock_context)
+        # Вызываем обработчик асинхронно
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(
+                self.handlers.search_command(self.mock_update, self.mock_context)
+            )
+        finally:
+            loop.close()
 
         # Проверяем, что RAG система была вызвана
         mock_rag.process_query.assert_called_once()
@@ -99,8 +106,15 @@ class TestBotHandlers(TestCase):
         self.mock_update.message.text = "/fipi математика"
         self.mock_update.message.reply_text = Mock()
 
-        # Вызываем обработчик
-        self.handlers.fipi_command(self.mock_update, self.mock_context)
+        # Вызываем обработчик асинхронно
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(
+                self.handlers.fipi_command(self.mock_update, self.mock_context)
+            )
+        finally:
+            loop.close()
 
         # Проверяем, что RAG система была вызвана с правильными параметрами
         mock_rag.process_query.assert_called_once()
@@ -123,9 +137,15 @@ class TestBotHandlers(TestCase):
                 'sources': [],
                 'cached': False
             }
-
-            # Вызываем обработчик
-            self.handlers.handle_message(self.mock_update, self.mock_context)
+            # Вызываем обработчик (асинхронный вызов, результат нужно ожидать)
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                loop.run_until_complete(
+                    self.handlers.handle_message(self.mock_update, self.mock_context)
+                )
+            finally:
+                loop.close()
 
             # Проверяем, что RAG система была вызвана
             mock_rag.process_query.assert_called_once()
@@ -139,8 +159,15 @@ class TestBotHandlers(TestCase):
         self.mock_update.message.text = None
         self.mock_update.message.reply_text = Mock()
 
-        # Вызываем обработчик
-        self.handlers.handle_message(self.mock_update, self.mock_context)
+        # Вызываем обработчик (асинхронный вызов, результат нужно ожидать)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(
+                self.handlers.handle_message(self.mock_update, self.mock_context)
+            )
+        finally:
+            loop.close()
 
         # Проверяем, что сообщение было отправлено
         self.mock_update.message.reply_text.assert_called_once()
@@ -159,8 +186,15 @@ class TestBotHandlers(TestCase):
             mock_rag_class.return_value = mock_rag
             mock_rag.process_query.side_effect = Exception("Тестовая ошибка")
 
-            # Вызываем обработчик
-            self.handlers.handle_message(self.mock_update, self.mock_context)
+            # Вызываем обработчик (асинхронный вызов, результат нужно ожидать)
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                loop.run_until_complete(
+                    self.handlers.handle_message(self.mock_update, self.mock_context)
+                )
+            finally:
+                loop.close()
 
             # Проверяем, что ошибка была обработана
             self.mock_update.message.reply_text.assert_called_once()
