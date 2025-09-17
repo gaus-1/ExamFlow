@@ -1,6 +1,7 @@
 # Generated manually for UserProfile and DataChunk updates
 
 from django.db import migrations, models
+from django.conf import settings
 import django.db.models.deletion
 
 
@@ -23,7 +24,7 @@ class Migration(migrations.Migration):
                 ('subscription_type', models.CharField(choices=[('free', 'Бесплатный'), ('premium', 'Премиум')], default='free', max_length=20, verbose_name='Тип подписки')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='auth.user', verbose_name='Пользователь')),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Пользователь')),
             ],
             options={
                 'verbose_name': 'Профиль пользователя',

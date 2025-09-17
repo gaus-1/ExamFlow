@@ -7,32 +7,7 @@ class Migration(migrations.Migration):
         ('learning', '0005_simple_focus_math_russian'),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='subject',
-            name='code',
-            field=models.CharField(max_length=32, null=True, blank=True, db_index=True),
-        ),
-        migrations.AddField(
-            model_name='subject',
-            name='description',
-            field=models.TextField(null=True, blank=True),
-        ),
-        migrations.AddField(
-            model_name='subject',
-            name='icon',
-            field=models.CharField(max_length=8, null=True, blank=True),
-        ),
-        migrations.AddField(
-            model_name='subject',
-            name='is_archived',
-            field=models.BooleanField(default=False, db_index=True),
-        ),
-        migrations.AddField(
-            model_name='subject',
-            name='is_primary',
-            field=models.BooleanField(default=False, db_index=True),
-        ),
-    ]
+    # Поля уже добавлены в 0004_focus_math_russian, делаем no-op для совместимости
+    operations = []
 
 
