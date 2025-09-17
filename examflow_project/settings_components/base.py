@@ -1,6 +1,7 @@
 """Базовые настройки Django для ExamFlow."""
 
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -89,20 +90,27 @@ TEMPLATES = [
 WSGI_APPLICATION = 'examflow_project.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'examflow'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'prefer',  # Изменено с 'require' на 'prefer' для локальной разработки
-            'connect_timeout': 30,
-        },
+_DATABASE_URL = os.getenv('DATABASE_URL')
+if _DATABASE_URL:
+    # Используем DATABASE_URL, если он задан (для тестов/CI/локально можно указать sqlite:///)
+    DATABASES = {
+        'default': dj_database_url.config(default=_DATABASE_URL)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'examflow'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+            'OPTIONS': {
+                'sslmode': 'prefer',  # Изменено с 'require' на 'prefer' для локальной разработки
+                'connect_timeout': 30,
+            },
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

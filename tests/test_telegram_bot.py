@@ -3,6 +3,7 @@
 """
 
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from core.models import Subject, Task
 
@@ -12,10 +13,12 @@ class TestTelegramBot(TestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         # Создаем тестового пользователя
-        self.user = User.objects.create_user( # type: ignore
-            username='testuser',
-            email='test@example.com',
-            password='testpassword123'
+        User = get_user_model()
+        self.user = User.objects.create(  # type: ignore
+            telegram_id=123456789,
+            telegram_username='testuser',
+            telegram_first_name='Test',
+            telegram_last_name='User'
         )
 
         # Создаем тестовые данные
@@ -42,8 +45,8 @@ class TestTelegramBot(TestCase):
 
     def test_user_creation(self):
         """Тест создания пользователя"""
-        self.assertEqual(self.user.username, 'testuser')
-        self.assertEqual(self.user.email, 'test@example.com')
+        self.assertEqual(self.user.telegram_username, 'testuser')
+        # email отсутствует у TelegramUser по умолчанию
 
     def test_subject_creation(self):
         """Тест создания предмета"""
@@ -94,7 +97,8 @@ class TestTelegramBot(TestCase):
     def test_user_session_management(self):
         """Тест управления сессиями пользователей"""
         # Проверяем, что пользователь может быть создан и найден
-        found_user = User.objects.filter(username='testuser').first() # type: ignore    
+        User = get_user_model()
+        found_user = User.objects.filter(telegram_id=123456789).first()  # type: ignore
         self.assertIsNotNone(found_user)
         self.assertEqual(found_user, self.user)
 

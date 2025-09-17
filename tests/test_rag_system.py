@@ -19,6 +19,7 @@ class TestRAGOrchestrator(TestCase):
         """Тест успешной обработки запроса"""
         # Мокаем векторный поиск
         mock_vector_store.return_value.search.return_value = [
+            {
                 'text': 'Тестовый контекст',
                 'similarity': 0.85,
                 'subject': 'mathematics',
@@ -44,11 +45,13 @@ class TestRAGOrchestrator(TestCase):
     def test_build_context_with_results(self):
         """Тест построения контекста с результатами"""
         search_results = [
+            {
                 'text': 'Контекст 1',
                 'similarity': 0.9,
                 'subject': 'mathematics',
                 'source': 'fipi.ru'
             },
+            {
                 'text': 'Контекст 2',
                 'similarity': 0.8,
                 'subject': 'physics',
@@ -164,6 +167,9 @@ class TestVectorStore(TestCase):
         # Мокаем данные
         query_embedding = [1, 0, 0]
         chunks = [
+            {'text': 'Текст 1', 'embedding': [1, 0, 0], 'subject': 'mathematics', 'source': 'fipi.ru'},
+            {'text': 'Текст 2', 'embedding': [0.7, 0.2, 0.1], 'subject': 'russian', 'source': 'fipi.ru'},
+            {'text': 'Текст 3', 'embedding': [0.9, 0.05, 0.05], 'subject': 'physics', 'source': 'fipi.ru'},
         ]
 
         similar = self.vector_store.find_similar_chunks(query_embedding, chunks, limit=2) # type: ignore
@@ -212,6 +218,7 @@ class TestIntegration(TestCase):
         """Тест полного пайплайна обработки запроса"""
         # Настраиваем моки
         mock_vector_store.return_value.search.return_value = [
+            {
                 'text': 'Контекст о математике',
                 'similarity': 0.9,
                 'subject': 'mathematics',
