@@ -6,12 +6,17 @@
 const CACHE_NAME = 'examflow-v3.0';
 const STATIC_CACHE = 'examflow-static-v3.0';
 
-// Ресурсы для кэширования
+// Ресурсы для кэширования (только локальные)
 const CACHE_RESOURCES = [
   '/',
   '/static/css/examflow-unified.css',
-  '/static/js/examflow-main.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+  '/static/js/examflow-main.js'
+];
+
+// Внешние ресурсы кэшируются отдельно
+const EXTERNAL_RESOURCES = [
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
+  'https://fonts.gstatic.com'
 ];
 
 // Установка Service Worker
@@ -19,14 +24,26 @@ self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker: установка');
   
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('📦 Кэширование статических ресурсов');
+    Promise.all([
+      // Кэшируем локальные ресурсы
+      caches.open(STATIC_CACHE).then((cache) => {
+        console.log('📦 Кэширование локальных ресурсов');
         return cache.addAll(CACHE_RESOURCES);
+      }),
+      // Кэшируем внешние ресурсы отдельно (если доступны)
+      caches.open('external-cache').then((cache) => {
+        console.log('🌐 Кэширование внешних ресурсов');
+        return Promise.allSettled(
+          EXTERNAL_RESOURCES.map(url => 
+            fetch(url, { mode: 'cors' })
+              .then(response => response.ok ? cache.put(url, response) : null)
+              .catch(() => console.log('⚠️ Внешний ресурс недоступен:', url))
+          )
+        );
       })
-      .catch((error) => {
-        console.error('❌ Ошибка кэширования:', error);
-      })
+    ]).catch((error) => {
+      console.error('❌ Ошибка кэширования:', error);
+    })
   );
   
   // Принудительная активация нового SW
