@@ -150,10 +150,9 @@ class AITester:
             ai_orchestrator = Container.ai_orchestrator()
             if ai_orchestrator:
                 self.log_result("AI Orchestrator", True, "создан через Container")
-                
                 # Тестируем прямой вызов
                 try:
-                    response = ai_orchestrator.process_query("Тест прямого вызова")  # type: ignore
+                    response = ai_orchestrator.ask("Тест прямого вызова")  # type: ignore
                     if response and isinstance(response, dict) and 'answer' in response:
                         answer_preview = response['answer'][:50] + "..."
                         self.log_result("Прямой AI вызов", True, f"ответ: {answer_preview}")

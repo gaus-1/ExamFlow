@@ -111,7 +111,7 @@ class AIAssistantAPI(View):
             # Используем AI через контейнер
             try:
                 ai_orchestrator = Container.ai_orchestrator()
-                response_data = ai_orchestrator.process_query(prompt, user=None)  # type: ignore
+                response_data = ai_orchestrator.ask(prompt)  # type: ignore
                 logger.info(f"AI API: Ответ получен через AIOrchestrator для: {prompt[:50]}...")
             except Exception as rag_error:
                 logger.warning(f"AIOrchestrator недоступен: {rag_error}, используем заглушку")

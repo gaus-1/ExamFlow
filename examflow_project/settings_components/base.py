@@ -180,7 +180,7 @@ CORS_ALLOW_CREDENTIALS = True
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://localhost:6379/1'),
+        'LOCATION': os.getenv('REDIS_URL', 'rediss://red-d2qldkje5dus73c73tr0:zccbozd9aZ5sbiSSZ8xZaJpW9qM3BnOz@oregon-keyvalue.render.com:6379'),
     }
 }
 

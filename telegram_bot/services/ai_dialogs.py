@@ -46,7 +46,7 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
     """Получает ответ от AI через контейнер зависимостей."""
     try:
         ai_orchestrator = Container.ai_orchestrator()
-        response_data = ai_orchestrator.process_query(prompt, user=user)  # type: ignore
+        response_data = ai_orchestrator.ask(prompt)  # type: ignore
         return response_data.get('answer', 'Сервис ИИ временно недоступен')
     except Exception as e:
         return f'Ошибка AI сервиса: {str(e)}'
