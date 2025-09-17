@@ -22,6 +22,7 @@ from core.services.chat_session import ChatSessionService
 from django.utils import timezone
 from ai.services import AiService
 from .gamification import TelegramGamification
+from .utils.text_utils import clean_markdown_text, clean_log_text, format_ai_response
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
@@ -29,21 +30,7 @@ logger = logging.getLogger(__name__)
 # Инициализация системы геймификации
 gamification = TelegramGamification()
 
-def clean_markdown_text(text: str) -> str:
-    """
-    Очищает текст от проблемных символов Markdown для безопасной отправки в Telegram
-    """
-    return text.replace(
-        '*',
-        '').replace(
-        '_',
-        '').replace(
-            '`',
-            '').replace(
-                '**',
-                '').replace(
-                    '__',
-        '')
+# Функция clean_markdown_text перенесена в utils/text_utils.py
 
 def create_standard_button(text: str, callback_data: str) -> InlineKeyboardButton:
     """
@@ -1327,11 +1314,10 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode=None
         )
 
-        # Очищаем сообщение от эмодзи для логов
-        import re  # type: ignore
-        clean_message = re.sub(r'[^\w\s\-., !?]', '', user_message[:50])  # type: ignore
+        # Логируем с очищенным текстом
+        clean_message = clean_log_text(user_message)
         logger.info(
-            "Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}...")
+            f"Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}")
 
     except Exception as e:  # type: ignore
         logger.error("Ошибка в handle_ai_message: {e}")
