@@ -143,7 +143,38 @@ class ExamFlowApp {
     } catch (error) {
       console.error('AI API Error:', error);
       this.removeMessage(loadingId);
-      this.addMessage('assistant', '❌ Произошла ошибка соединения. Попробуйте позже.');
+      
+      // Пробуем экстренный API
+      try {
+        console.log('🚨 Пробуем экстренный AI API...');
+        const emergencyResponse = await fetch('/ai/emergency/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': this.getCSRFToken()
+          },
+          body: JSON.stringify({ prompt: question })
+        });
+        
+        if (emergencyResponse.ok) {
+          const emergencyData = await emergencyResponse.json();
+          if (emergencyData.answer) {
+            this.addMessage('assistant', `🚨 ${emergencyData.answer}`);
+            
+            if (emergencyData.sources && emergencyData.sources.length > 0) {
+              const sourcesText = '📚 Источники:\n' + emergencyData.sources.slice(0, 3).map(s => s.title).join('\n');
+              this.addMessage('assistant', sourcesText, false, 'sources');
+            }
+          } else {
+            this.addMessage('assistant', '❌ Экстренный сервис также недоступен. Попробуйте позже.');
+          }
+        } else {
+          this.addMessage('assistant', '❌ Произошла ошибка соединения. Попробуйте позже.');
+        }
+      } catch (emergencyError) {
+        console.error('Emergency AI API Error:', emergencyError);
+        this.addMessage('assistant', '❌ Все сервисы ИИ временно недоступны. Попробуйте позже или воспользуйтесь материалами ФИПИ.');
+      }
     } finally {
       this.#isLoading = false;
     }

@@ -3,7 +3,7 @@ URL маршруты для AI API ExamFlow 2.0
 """
 
 from django.urls import path
-from . import api
+from . import api, emergency_api
 
 app_name = 'ai'  # Определяем namespace
 
@@ -20,4 +20,7 @@ urlpatterns = [
 
     # Профиль пользователя
     path('api/user/profile/', api.user_profile_api, name='user_profile_api'),
+    
+    # Экстренный AI API (без базы данных)
+    path('emergency/', emergency_api.emergency_ai_api, name='emergency_ai_api'),
 ]

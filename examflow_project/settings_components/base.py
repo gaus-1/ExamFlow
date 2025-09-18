@@ -97,17 +97,17 @@ if _DATABASE_URL:
         'default': dj_database_url.config(default=_DATABASE_URL)
     }
     # Настройки SSL для PostgreSQL на Render.com
-    if 'postgres' in _DATABASE_URL and 'render.com' in _DATABASE_URL:
+    if 'postgres' in _DATABASE_URL and ('render.com' in _DATABASE_URL or '35.227.164.209' in _DATABASE_URL):
         DATABASES['default']['OPTIONS'] = {
-            'sslmode': 'require',
-            'sslcert': None,
-            'sslkey': None,
-            'sslrootcert': None,
+            'sslmode': 'prefer',  # Изменено с require на prefer для стабильности
+            'connect_timeout': 60,  # Увеличен таймаут
+            'application_name': 'ExamFlow',
         }
     elif 'postgres' in _DATABASE_URL and 'localhost' in _DATABASE_URL:
         # Локальный PostgreSQL без SSL
         DATABASES['default']['OPTIONS'] = {
             'sslmode': 'disable',
+            'connect_timeout': 30,
         }
 else:
     DATABASES = {
