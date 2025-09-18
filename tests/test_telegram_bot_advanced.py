@@ -2,12 +2,10 @@
 Расширенные тесты для Telegram бота.
 """
 
-import pytest
 import asyncio
 from unittest.mock import Mock, patch, AsyncMock
 from django.test import TestCase
 from telegram_bot.bot_handlers import BotHandlers
-from core.rag_system.orchestrator import RAGOrchestrator
 
 class TestBotHandlers(TestCase):
     """Тесты обработчиков Telegram бота."""

@@ -11,7 +11,6 @@ import json
 import logging
 import threading
 import requests  # type: ignore
-from datetime import datetime
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 try:
@@ -340,7 +339,7 @@ def test_bot_api(request):
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
         if not token:
             return JsonResponse({'status': 'error', 'message': 'Bot token not configured'}, status=500)
-        
+
         resp = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=8)
         data = resp.json()
         if not data.get('ok'):

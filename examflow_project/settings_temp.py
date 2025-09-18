@@ -2,9 +2,6 @@
 Временные настройки Django для исправления миграций.
 """
 
-import os
-import sys
-import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()

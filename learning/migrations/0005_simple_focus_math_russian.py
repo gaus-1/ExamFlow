@@ -1,6 +1,6 @@
 # Generated migration for focusing on Math and Russian (simplified)
 
-from django.db import migrations, models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):

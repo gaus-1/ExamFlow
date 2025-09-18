@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
 from telegram import Update  # type: ignore
 from telegram.ext import ContextTypes  # type: ignore
 

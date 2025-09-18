@@ -2,8 +2,7 @@
 Расширенные тесты для RAG системы с кэшированием.
 """
 
-import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from django.test import TestCase
 from django.core.cache import cache
 from core.rag_system.orchestrator import RAGOrchestrator

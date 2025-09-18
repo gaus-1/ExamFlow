@@ -26,7 +26,7 @@ def webapp_home(request):
 def webapp_subjects(request):
     """Страница предметов в Web App"""
     subjects = Subject.objects.filter(is_archived=False)[:10]  # type: ignore
-    
+
     context = {
         'page_title': 'Предметы',
         'subjects': subjects,
@@ -49,7 +49,7 @@ def webapp_stats(request):
     try:
         subjects_count = Subject.objects.count()  # type: ignore
         tasks_count = Task.objects.count()  # type: ignore
-        
+
         context = {
             'page_title': 'Статистика',
             'subjects_count': subjects_count,
@@ -65,7 +65,7 @@ def webapp_stats(request):
             'is_webapp': True,
             'error': 'Ошибка загрузки данных'
         }
-    
+
     return render(request, 'telegram_webapp/stats.html', context)
 
 
@@ -76,36 +76,36 @@ def webapp_ai_api(request):
     try:
         data = json.loads(request.body)
         prompt = data.get('prompt', '').strip()
-        
+
         if not prompt:
             return JsonResponse({
                 'success': False,
                 'error': 'Пустой запрос'
             })
-        
+
         # Ограничиваем длину запроса
         if len(prompt) > 1000:
             return JsonResponse({
                 'success': False,
                 'error': 'Слишком длинный вопрос (максимум 1000 символов)'
             })
-        
+
         # Получаем ответ от ИИ
         ai_orchestrator = Container.ai_orchestrator()
         response_data = ai_orchestrator.ask(prompt)
-        
+
         answer = response_data.get('answer', 'Не удалось получить ответ')
-        
+
         # Ограничиваем длину ответа для Web App
         if len(answer) > 2000:
             answer = answer[:2000] + "..."
-        
+
         return JsonResponse({
             'success': True,
             'answer': answer,
             'processing_time': response_data.get('processing_time', 0)
         })
-        
+
     except json.JSONDecodeError:
         return JsonResponse({
             'success': False,

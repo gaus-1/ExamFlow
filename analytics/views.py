@@ -17,7 +17,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
 from datetime import timedelta
-from django.conf import settings
 from learning.models import (
     Subject, Task, UserProgress, UserRating
 )
@@ -238,7 +237,7 @@ def api_stats(request):
                 last_login__date=timezone.now().date()
             ).count(),
             'telegram': User.objects.filter(username__startswith='tg_').count(), # type: ignore
-            'web': User.objects.exclude(username__startswith='tg_').count(), # type: ignore         
+            'web': User.objects.exclude(username__startswith='tg_').count(), # type: ignore
         },
         'tasks': {
             'total': Task.objects.count(),  # type: ignore

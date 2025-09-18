@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any, Optional
-from django.utils import timezone
 from core.container import Container
 
 try:

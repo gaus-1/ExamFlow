@@ -14,14 +14,19 @@ from typing import Dict, List, Optional
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from learning.models import UserProgress, Achievement
 from core.models import UnifiedProfile
-from django.conf import settings
+
+User = get_user_model()  # Определяем User модель
 
 logger = logging.getLogger(__name__)
 
+# УСТАРЕЛО: Этот класс разделен на модули в telegram_bot/gamification/
+# Используйте: from telegram_bot.gamification import TelegramGamification
+
 class TelegramGamification:
-    """Класс для управления геймификацией в Telegram боте"""
+    """УСТАРЕВШИЙ класс - используйте новую модульную структуру"""
 
     def __init__(self):
         self.points_per_correct = 10  # Очки за правильный ответ
@@ -81,7 +86,7 @@ class TelegramGamification:
                 username=f"tg_{user_id}",
                 defaults={'first_name': f'User {user_id}'}
             )
-            
+
             # Получаем прогресс по предметам
             subjects_progress = UserProgress.objects.filter(  # type: ignore
                 user_id=django_user.id
@@ -122,7 +127,7 @@ class TelegramGamification:
                 username=f"tg_{user_id}",
                 defaults={'first_name': f'User {user_id}'}
             )
-            
+
             # Достижение за первый правильный ответ
             if action == "correct_answer" and kwargs.get('first_correct'):
                 achievement = self._create_achievement(
@@ -233,7 +238,7 @@ class TelegramGamification:
                     username=f"tg_{profile.telegram_id}",
                     defaults={'first_name': f'User {profile.telegram_id}'}
                 )
-                
+
                 leaderboard.append({
                     'rank': i,
                     'username': django_user.username or f"Пользователь {profile.telegram_id}",

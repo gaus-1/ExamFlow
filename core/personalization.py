@@ -12,7 +12,6 @@ import logging
 from django.utils import timezone
 from django.db.models import Count, Avg, Q
 from learning.models import Subject, Task, UserProgress
-from core.models import UnifiedProfile
 from datetime import timedelta
 import json
 

@@ -19,13 +19,13 @@ def clean_markdown_text(text: str) -> str:
     """
     if not text:
         return ""
-    
+
     # Удаляем все Markdown символы одним regex
     cleaned = re.sub(r'[*_`~\[\]()#]', '', text)
-    
+
     # Удаляем множественные пробелы
     cleaned = re.sub(r'\s+', ' ', cleaned)
-    
+
     return cleaned.strip()
 
 
@@ -42,14 +42,14 @@ def clean_log_text(text: str, max_length: int = 50) -> str:
     """
     if not text:
         return ""
-    
+
     # Удаляем эмодзи и специальные символы
     cleaned = re.sub(r'[^\w\s\-., !?]', '', text)
-    
+
     # Обрезаем до нужной длины
     if len(cleaned) > max_length:
         cleaned = cleaned[:max_length] + "..."
-    
+
     return cleaned.strip()
 
 
@@ -66,14 +66,14 @@ def format_ai_response(response: str, max_length: int = 4000) -> str:
     """
     if not response:
         return "❌ Пустой ответ от ИИ"
-    
+
     # Очищаем от проблемных символов
     cleaned = clean_markdown_text(response)
-    
+
     # Обрезаем если слишком длинный
     if len(cleaned) > max_length:
         cleaned = cleaned[:max_length - 50] + "\n\n... (ответ обрезан)"
-    
+
     return cleaned
 
 
@@ -89,10 +89,10 @@ def create_error_message(error: str, context: Optional[str] = None) -> str:
         Форматированное сообщение об ошибке
     """
     base_message = f"❌ {error}"
-    
+
     if context:
         base_message += f"\n\n💡 {context}"
-    
+
     return base_message
 
 
@@ -108,10 +108,10 @@ def create_success_message(message: str, action: Optional[str] = None) -> str:
         Форматированное сообщение об успехе
     """
     base_message = f"✅ {message}"
-    
+
     if action:
         base_message += f"\n\n➡️ {action}"
-    
+
     return base_message
 
 
@@ -129,7 +129,7 @@ def truncate_text(text: str, max_length: int, suffix: str = "...") -> str:
     """
     if not text or len(text) <= max_length:
         return text
-    
+
     return text[:max_length - len(suffix)] + suffix
 
 
@@ -158,12 +158,12 @@ def is_valid_telegram_message(text: str) -> bool:
     """
     if not text or not text.strip():
         return False
-    
+
     if len(text) > 4096:  # Лимит Telegram
         return False
-    
+
     # Проверяем на наличие только пробелов/символов
     if not re.search(r'[a-zA-Zа-яА-Я0-9]', text):
         return False
-    
+
     return True

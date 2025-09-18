@@ -3,7 +3,6 @@
 """
 
 from django.test import TestCase, Client
-from django.conf import settings
 from django.urls import reverse
 from .models import UserThemePreference, ThemeUsage, ThemeCustomization
 
@@ -169,7 +168,7 @@ class ThemesIntegrationTest(TestCase):
             self.assertEqual(response.status_code, 200) # type: ignore
 
         # Проверяем, что создались записи об использовании
-        usage_count = ThemeUsage.objects.filter(user=self.user).count() # type: ignore  
+        usage_count = ThemeUsage.objects.filter(user=self.user).count() # type: ignore
         self.assertGreater(usage_count, 0)
 
 class ThemesAdminTest(TestCase):
@@ -178,7 +177,7 @@ class ThemesAdminTest(TestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         self.client = Client()
-        self.admin_user = User.objects.create_superuser( # type: ignore         
+        self.admin_user = User.objects.create_superuser( # type: ignore
             username='admin',
             email='admin@example.com',
             password='adminpass123'
