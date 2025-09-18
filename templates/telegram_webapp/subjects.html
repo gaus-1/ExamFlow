@@ -1,0 +1,94 @@
+{% extends 'telegram_webapp/base.html' %}
+
+{% block content %}
+<div class="subjects-intro">
+    <p style="text-align: center; margin-bottom: 20px; color: var(--tg-theme-hint-color, #999999);">
+        Выберите предмет для изучения 📚
+    </p>
+</div>
+
+<div class="subject-list">
+    {% if subjects %}
+        {% for subject in subjects %}
+        <div class="subject-item" onclick="selectSubject('{{ subject.id }}', '{{ subject.name }}')">
+            <div class="subject-name">
+                {% if 'русск' in subject.name|lower or 'russian' in subject.code|lower %}📝
+                {% elif 'математик' in subject.name|lower or 'math' in subject.code|lower %}📐
+                {% else %}📚
+                {% endif %}
+                {{ subject.name }}
+            </div>
+            <div class="subject-desc">
+                {% if subject.description %}
+                    {{ subject.description|truncatechars:80 }}
+                {% else %}
+                    Подготовка к ЕГЭ и ОГЭ по предмету
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="error">
+            📚 Предметы загружаются...
+        </div>
+    {% endif %}
+</div>
+
+<!-- Кнопка назад -->
+<div style="margin-top: 32px;">
+    <button class="btn btn-secondary" onclick="goHome()">
+        ← Назад в меню
+    </button>
+</div>
+
+<!-- Быстрые действия -->
+<div style="margin-top: 24px;">
+    <h4 style="margin-bottom: 12px; color: var(--tg-theme-text-color, #000000);">
+        ⚡ Быстрые действия:
+    </h4>
+    <div style="display: grid; gap: 8px;">
+        <button class="btn btn-secondary" onclick="goToAIChat()">
+            🤖 Спросить ИИ о любом предмете
+        </button>
+        <button class="btn btn-secondary" onclick="randomTask()">
+            🎲 Случайное задание
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectSubject(subjectId, subjectName) {
+    hapticFeedback();
+    
+    // Показываем информацию о предмете
+    showAlert(`Выбран предмет: ${subjectName}\n\nВ данный момент доступен ИИ-помощник для этого предмета. Перейти к чату?`);
+    
+    // Можно добавить логику перехода к заданиям по предмету
+    setTimeout(() => {
+        goToAIChat();
+    }, 1500);
+}
+
+function randomTask() {
+    hapticFeedback();
+    showAlert('🎲 Функция случайных заданий скоро будет доступна!');
+}
+
+// Анимация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const subjects = document.querySelectorAll('.subject-item');
+    subjects.forEach((subject, index) => {
+        subject.style.opacity = '0';
+        subject.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            subject.style.transition = 'all 0.3s ease';
+            subject.style.opacity = '1';
+            subject.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

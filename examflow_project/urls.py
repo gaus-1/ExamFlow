@@ -49,6 +49,9 @@ urlpatterns = [
     # Модуль ИИ-ассистента
     path('ai/', include('ai.urls')),
 
+    # Telegram Web App
+    path('webapp/', include('telegram_bot.webapp_urls')),
+
     # Модуль core (персонализация и RAG-система)
     path('core/', include('core.urls')),
 

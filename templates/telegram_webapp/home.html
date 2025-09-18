@@ -1,0 +1,82 @@
+{% extends 'telegram_webapp/base.html' %}
+
+{% block content %}
+<div class="welcome-message">
+    <p style="text-align: center; margin-bottom: 24px; color: var(--tg-theme-hint-color, #999999);">
+        Привет! 👋 Готов помочь с подготовкой к ЕГЭ и ОГЭ!
+    </p>
+</div>
+
+<div class="button-grid">
+    <!-- Основная кнопка ИИ -->
+    <button class="btn btn-primary" onclick="goToAIChat()">
+        🤖 СПРОСИТЬ ИИ
+    </button>
+    
+    <!-- Вторая строка кнопок -->
+    <div class="button-row">
+        <button class="btn btn-secondary" onclick="goToSubjects()">
+            📚 ПРАКТИКА
+        </button>
+        <button class="btn btn-secondary" onclick="goToStats()">
+            🏆 ПРОГРЕСС
+        </button>
+    </div>
+    
+    <!-- Кнопка сайта -->
+    <button class="btn btn-secondary" onclick="openWebsite()">
+        🌐 САЙТ
+    </button>
+</div>
+
+<div class="stats-preview" style="margin-top: 32px;">
+    <h3 style="text-align: center; margin-bottom: 16px; color: var(--tg-theme-text-color, #000000);">
+        📊 Статистика платформы
+    </h3>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="subjectsCount">-</div>
+            <div class="stat-label">Предметов</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="tasksCount">-</div>
+            <div class="stat-label">Заданий</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openWebsite() {
+    window.Telegram.WebApp.openLink('https://examflow.ru');
+}
+
+// Загружаем статистику
+async function loadStats() {
+    try {
+        const response = await fetch('/webapp/stats/');
+        if (response.ok) {
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const subjectsElement = doc.querySelector('[data-subjects-count]');
+            const tasksElement = doc.querySelector('[data-tasks-count]');
+            
+            if (subjectsElement && tasksElement) {
+                document.getElementById('subjectsCount').textContent = subjectsElement.dataset.subjectsCount;
+                document.getElementById('tasksCount').textContent = tasksElement.dataset.tasksCount;
+            }
+        }
+    } catch (error) {
+        console.log('Не удалось загрузить статистику:', error);
+        document.getElementById('subjectsCount').textContent = '5';
+        document.getElementById('tasksCount').textContent = '25';
+    }
+}
+
+// Загружаем статистику при загрузке страницы
+document.addEventListener('DOMContentLoaded', loadStats);
+</script>
+{% endblock %}
