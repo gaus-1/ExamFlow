@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Предметы - ExamFlow{% endblock %}
+
+{% block content %}
+<div class="container container-xl">
+    <div class="section-header">
+        <h1 class="section-title">Предметы для подготовки</h1>
+        <p class="section-subtitle">
+            Выберите предмет для изучения. У нас есть материалы по математике и русскому языку для ЕГЭ и ОГЭ.
+        </p>
+    </div>
+
+    {% if subjects %}
+    <div class="grid grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {% for subject in subjects %}
+        <div class="card hover-lift text-center">
+            <div class="feature-icon mb-4">
+                {% if 'математик' in subject.name|lower %}📐
+                {% elif 'русск' in subject.name|lower %}📝
+                {% else %}📚
+                {% endif %}
+            </div>
+            
+            <h3 class="feature-title mb-4">{{ subject.name }}</h3>
+            
+            <div class="text-sm text-muted mb-6">
+                {% if subject.description %}
+                    {{ subject.description|truncatewords:15 }}
+                {% else %}
+                    Подготовка к ЕГЭ и ОГЭ по предмету {{ subject.name|lower }}
+                {% endif %}
+            </div>
+
+            <!-- Статистика заданий -->
+            <div class="stats-mini mb-6">
+                <div class="stat-item">
+                    <div class="stat-number">{{ subject.task_count|default:0 }}</div>
+                    <div class="stat-label">Заданий</div>
+                </div>
+                {% if user.is_authenticated and subject.user_progress %}
+                <div class="stat-item">
+                    <div class="stat-number">{{ subject.user_progress }}</div>
+                    <div class="stat-label">Решено</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Кнопки действий -->
+            <div class="flex flex-col gap-3">
+                <a href="{% url 'learning:subject_detail' subject.id %}" class="btn btn-primary">
+                    📚 Изучать предмет
+                </a>
+                
+                <a href="{% url 'learning:random_task' %}?subject={{ subject.id }}" class="btn btn-outline">
+                    🎲 Случайное задание
+                </a>
+                
+                <button onclick="askAI('{{ subject.name }}')" class="btn btn-ghost">
+                    🤖 Спросить ИИ
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <div class="feature-icon mb-4">📚</div>
+        <h3 class="text-xl font-semibold mb-4">Предметы загружаются...</h3>
+        <p class="text-muted mb-8">
+            Мы добавляем материалы по математике и русскому языку. 
+            Пока можете воспользоваться ИИ-помощником.
+        </p>
+        <a href="/#ai-interface" class="btn btn-primary">
+            🤖 Задать вопрос ИИ
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Дополнительные возможности -->
+    <div class="mt-16 text-center">
+        <h3 class="text-lg font-semibold mb-6">Дополнительные возможности</h3>
+        <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
+            <a href="/#ai-interface" class="card text-center p-6 hover-lift">
+                <div class="text-2xl mb-2">🤖</div>
+                <div class="font-medium">ИИ-помощник</div>
+                <div class="text-sm text-muted">Персональные ответы</div>
+            </a>
+            
+            <a href="https://t.me/examflow_bot" class="card text-center p-6 hover-lift">
+                <div class="text-2xl mb-2">📱</div>
+                <div class="font-medium">Telegram бот</div>
+                <div class="text-sm text-muted">Учись везде</div>
+            </a>
+            
+            <a href="{% url 'learning:random_task' %}" class="card text-center p-6 hover-lift">
+                <div class="text-2xl mb-2">🎯</div>
+                <div class="font-medium">Тренировка</div>
+                <div class="text-sm text-muted">Случайные задания</div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-mini {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-600);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-mini {
+        gap: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function askAI(subjectName) {
+    const questions = {
+        'математика': 'Как решать квадратные уравнения?',
+        'русский': 'Что такое причастие в русском языке?'
+    };
+    
+    const defaultQuestion = questions[subjectName.toLowerCase()] || `Расскажи про ${subjectName}`;
+    
+    // Перенаправляем на главную с вопросом
+    const aiSection = document.getElementById('ai-interface');
+    if (aiSection) {
+        window.location.href = '/#ai-interface';
+        setTimeout(() => {
+            const aiInput = document.getElementById('aiInput');
+            if (aiInput) {
+                aiInput.value = defaultQuestion;
+                aiInput.focus();
+            }
+        }, 500);
+    }
+}
+</script>
+{% endblock %}
