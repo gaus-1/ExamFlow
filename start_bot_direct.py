@@ -14,8 +14,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 import django
 django.setup()
 
-# Импортируем ультра простого бота
-from bot_ultra_simple import main
+# Импортируем рабочего бота
+from bot_working import main
 
 if __name__ == "__main__":
     try:
