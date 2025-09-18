@@ -107,19 +107,61 @@ class AIAssistantAPI(View):
                 logger.info(f"AI API: Используем кэшированный ответ для: {prompt[:50]}...")
                 return cached_response
 
-            # Используем AI через контейнер
+            # Используем AI через контейнер с улучшенной обработкой ошибок
             try:
                 ai_orchestrator = Container.ai_orchestrator()
-                response_data = ai_orchestrator.ask(prompt)  # type: ignore
-                logger.info(f"AI API: Ответ получен через AIOrchestrator для: {prompt[:50]}...")
-            except Exception as rag_error:
-                logger.warning(f"AIOrchestrator недоступен: {rag_error}, используем заглушку")
+                
+                # Добавляем таймаут через threading (кроссплатформенно)
+                import threading
+                import time
+                
+                response_data = None
+                exception_occurred = None
+                
+                def ai_request():
+                    nonlocal response_data, exception_occurred
+                    try:
+                        response_data = ai_orchestrator.ask(prompt)  # type: ignore
+                        logger.info(f"AI API: Ответ получен через AIOrchestrator для: {prompt[:50]}...")
+                    except Exception as e:
+                        exception_occurred = e
+                
+                # Запускаем в отдельном потоке с таймаутом
+                thread = threading.Thread(target=ai_request)
+                thread.daemon = True
+                thread.start()
+                thread.join(timeout=30)  # 30 секунд таймаут
+                
+                if thread.is_alive():
+                    raise TimeoutError("AI запрос превысил лимит времени")
+                
+                if exception_occurred:
+                    raise exception_occurred
+                    
+                if response_data is None:
+                    raise Exception("AI не вернул ответ")
+                    
+            except TimeoutError:
+                logger.error("AI API: Таймаут запроса")
                 response_data = {
-                    'answer': 'Сервис ИИ временно недоступен. Попробуйте позже.',
+                    'answer': 'Запрос занял слишком много времени. Попробуйте сформулировать вопрос короче.',
                     'sources': [],
                     'practice': {
                         'topic': 'general',
-                        'description': 'Выберите предмет для начала практики'
+                        'description': 'Попробуйте задать более конкретный вопрос'
+                    }
+                }
+            except Exception as rag_error:
+                logger.error(f"AIOrchestrator ошибка: {rag_error}")
+                response_data = {
+                    'answer': 'Сервис ИИ временно недоступен. Попробуйте через несколько минут.',
+                    'sources': [
+                        {'title': 'ФИПИ - Русский язык', 'url': 'https://fipi.ru/ege/demoversii-specifikacii-kodifikatory#!/tab/151883967-1'},
+                        {'title': 'ФИПИ - Математика', 'url': 'https://fipi.ru/ege/demoversii-specifikacii-kodifikatory#!/tab/151883967-4'}
+                    ],
+                    'practice': {
+                        'topic': 'general',
+                        'description': 'Пока ИИ недоступен, изучите материалы ФИПИ'
                     }
                 }
 
