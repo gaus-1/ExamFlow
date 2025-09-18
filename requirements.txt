@@ -1,0 +1,33 @@
+# ===== ОСНОВНЫЕ ЗАВИСИМОСТИ =====
+Django==4.2.7
+gunicorn==21.2.0
+psycopg2-binary==2.9.7
+redis==5.0.1
+
+# ===== AI И МАШИННОЕ ОБУЧЕНИЕ =====
+google-generativeai==0.3.2
+openai==1.3.7
+
+# ===== ВЕБ И API =====
+django-cors-headers==4.3.1
+django-ratelimit==4.1.0
+djangorestframework==3.14.0
+whitenoise==6.6.0
+
+# ===== УТИЛИТЫ =====
+python-dotenv==1.0.0
+Pillow==10.1.0
+qrcode==7.4.2
+requests==2.31.0
+beautifulsoup4==4.12.2
+
+# ===== БАЗА ДАННЫХ =====
+dj-database-url==2.1.0
+
+# ===== БЕЗОПАСНОСТЬ =====
+django-csp==3.7
+
+# ===== РАЗРАБОТКА (только для локальной среды) =====
+# pytest==7.4.3
+# pytest-django==4.7.0
+# ruff==0.1.6

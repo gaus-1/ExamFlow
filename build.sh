@@ -1,18 +1,24 @@
-#!/bin/bash
-# ExamFlow Build Script для Render.com
+#!/usr/bin/env bash
 
-echo "🚀 Начинаем сборку ExamFlow..."
+# Скрипт сборки ExamFlow для Render.com
+set -e
+
+echo "🔨 Сборка ExamFlow..."
+
+# Обновляем pip
+echo "📦 Обновляем pip..."
+pip install --upgrade pip
 
 # Устанавливаем зависимости
 echo "📦 Устанавливаем Python зависимости..."
-pip install -r config/requirements.txt
+pip install --no-cache-dir -r requirements.txt
 
-# Собираем статические файлы
-echo "📁 Собираем статические файлы..."
-python manage.py collectstatic --noinput
+# Проверяем установку Django
+echo "🔍 Проверяем установку Django..."
+python -c "import django; print(f'✅ Django {django.get_version()} установлен')"
 
-# Применяем миграции
-echo "🗄️ Применяем миграции базы данных..."
-python manage.py migrate
+# Проверяем установку gunicorn
+echo "🔍 Проверяем установку gunicorn..."
+python -c "import gunicorn; print('✅ Gunicorn установлен')"
 
 echo "✅ Сборка завершена успешно!"
