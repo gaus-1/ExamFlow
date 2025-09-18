@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ subject.name }} - ExamFlow{% endblock %}
+
+{% block content %}
+<div class="container container-xl">
+    <div class="section-header">
+        <h1 class="section-title">
+            {% if 'математик' in subject.name|lower %}📐{% elif 'русск' in subject.name|lower %}📝{% else %}📚{% endif %}
+            {{ subject.name }}
+        </h1>
+        <p class="section-subtitle">
+            {% if subject.description %}
+                {{ subject.description }}
+            {% else %}
+                Подготовка к ЕГЭ и ОГЭ по предмету {{ subject.name|lower }}
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Статистика предмета -->
+    <div class="stats-grid grid-cols-3 mb-12">
+        <div class="stat-card">
+            <div class="stat-number">{{ subject.task_count|default:0 }}</div>
+            <div class="stat-label">Всего заданий</div>
+        </div>
+        
+        {% if user.is_authenticated and user_stats %}
+        <div class="stat-card">
+            <div class="stat-number">{{ user_stats.solved_tasks|default:0 }}</div>
+            <div class="stat-label">Решено вами</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-number">{{ user_stats.accuracy|default:0|floatformat:0 }}%</div>
+            <div class="stat-label">Точность</div>
+        </div>
+        {% else %}
+        <div class="stat-card">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Решено вами</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-number">—</div>
+            <div class="stat-label">Точность</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Действия -->
+    <div class="grid grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+        <div class="card text-center p-8">
+            <div class="text-4xl mb-4">🎲</div>
+            <h3 class="text-xl font-semibold mb-4">Случайное задание</h3>
+            <p class="text-muted mb-6">
+                Получите случайное задание по предмету для практики
+            </p>
+            <a href="{% url 'learning:random_task' %}?subject={{ subject.id }}" class="btn btn-primary">
+                Начать практику
+            </a>
+        </div>
+        
+        <div class="card text-center p-8">
+            <div class="text-4xl mb-4">🤖</div>
+            <h3 class="text-xl font-semibold mb-4">ИИ-помощник</h3>
+            <p class="text-muted mb-6">
+                Задайте вопрос по предмету нашему ИИ-ассистенту
+            </p>
+            <button onclick="askAI('{{ subject.name }}')" class="btn btn-primary">
+                Спросить ИИ
+            </button>
+        </div>
+    </div>
+
+    <!-- Темы предмета (если есть) -->
+    {% if topics %}
+    <div class="mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Темы предмета</h2>
+        <div class="grid grid-cols-3 gap-6">
+            {% for topic in topics %}
+            <div class="card p-6 hover-lift">
+                <h3 class="font-semibold mb-2">{{ topic.name }}</h3>
+                <p class="text-sm text-muted mb-4">
+                    Изучите тему {{ topic.name|lower }}
+                </p>
+                <a href="{% url 'learning:topic_detail' topic.id %}" class="btn btn-outline btn-sm">
+                    Изучать тему
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Примеры вопросов для ИИ -->
+    <div class="bg-gray-50 p-8 rounded-lg">
+        <h3 class="text-lg font-semibold mb-4 text-center">💡 Примеры вопросов для ИИ</h3>
+        <div class="grid grid-cols-2 gap-4">
+            {% if 'математик' in subject.name|lower %}
+            <button onclick="askAI('Как решить квадратное уравнение?')" class="ai-suggestion">
+                📐 Как решить квадратное уравнение?
+            </button>
+            <button onclick="askAI('Что такое производная функции?')" class="ai-suggestion">
+                📐 Что такое производная функции?
+            </button>
+            <button onclick="askAI('Объясни теорему Пифагора')" class="ai-suggestion">
+                📐 Объясни теорему Пифагора
+            </button>
+            <button onclick="askAI('Как найти площадь треугольника?')" class="ai-suggestion">
+                📐 Как найти площадь треугольника?
+            </button>
+            {% elif 'русск' in subject.name|lower %}
+            <button onclick="askAI('Что такое причастие?')" class="ai-suggestion">
+                📝 Что такое причастие?
+            </button>
+            <button onclick="askAI('Как писать сочинение ЕГЭ?')" class="ai-suggestion">
+                📝 Как писать сочинение ЕГЭ?
+            </button>
+            <button onclick="askAI('Правила пунктуации')" class="ai-suggestion">
+                📝 Правила пунктуации
+            </button>
+            <button onclick="askAI('Деепричастные обороты')" class="ai-suggestion">
+                📝 Деепричастные обороты
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="text-center mt-12">
+        <a href="{% url 'learning:subjects_list' %}" class="btn btn-outline">
+            ← Назад к предметам
+        </a>
+        <a href="/" class="btn btn-ghost ml-4">
+            🏠 На главную
+        </a>
+    </div>
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--primary-600);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ai-suggestion {
+    background: white;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.ai-suggestion:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-200);
+    color: var(--primary-700);
+}
+
+@media (max-width: 768px) {
+    .grid-cols-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function askAI(question) {
+    // Перенаправляем на главную с вопросом
+    const aiSection = document.getElementById('ai-interface');
+    if (aiSection) {
+        window.location.href = '/#ai-interface';
+        // Используем sessionStorage для передачи вопроса
+        sessionStorage.setItem('aiQuestion', question);
+    }
+}
+
+// На главной странице проверяем сохраненный вопрос
+if (window.location.hash === '#ai-interface' && sessionStorage.getItem('aiQuestion')) {
+    setTimeout(() => {
+        const aiInput = document.getElementById('aiInput');
+        if (aiInput) {
+            aiInput.value = sessionStorage.getItem('aiQuestion');
+            sessionStorage.removeItem('aiQuestion');
+            aiInput.focus();
+            
+            // Автоматически отправляем вопрос
+            if (typeof window.examFlowApp !== 'undefined' && window.examFlowApp.sendAIQuery) {
+                window.examFlowApp.sendAIQuery();
+            }
+        }
+    }, 500);
+}
+</script>
+{% endblock %}

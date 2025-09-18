@@ -19,7 +19,7 @@ from django.contrib import messages
 import logging
 from learning.models import Subject, Task  # type: ignore
 from core.models import UserProgress  # type: ignore
-import core.seo as seo_utils
+# import core.seo as seo_utils  # Модуль удален
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +67,7 @@ def home(request):
         'timestamp': int(time.time()),
     }
 
-    # SEO
-    context.update(seo_utils.seo_for_home())
+    # SEO - базовые мета-теги встроены в шаблон
     return render(request, 'index.html', context)
 
 def subjects_list(request):
@@ -99,9 +98,11 @@ def subjects_list(request):
             ).count()
             subject.user_progress = solved_tasks
 
+    # Добавляем количество заданий для каждого предмета
+    for subject in subjects:
+        subject.task_count = Task.objects.filter(subject=subject).count()  # type: ignore
+    
     ctx = {'subjects': subjects}
-    # SEO для списка (фокусные предметы)
-    ctx.update(seo_utils.seo_for_subject('математика и русский', '/subjects/'))
     return render(request, 'learning/subjects_list.html', ctx)
 
 def subject_detail(request, subject_id):
@@ -140,7 +141,7 @@ def subject_detail(request, subject_id):
         'topics': topics,
         'user_stats': user_stats,
     }
-    ctx.update(seo_utils.seo_for_subject(subject.name, request.path))
+    # SEO мета-теги встроены в базовый шаблон
     return render(request, 'learning/subject_detail.html', ctx)
 
 def topic_detail(request, topic_id):
