@@ -6,18 +6,20 @@
 import os
 import sys
 import asyncio
-import django
 
 # Настройка Django
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+
+import django
 django.setup()
 
-# Импортируем бота
-from telegram_bot.bot_simple import main
+# Импортируем ультра простого бота
+from bot_ultra_simple import main
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        main()  # Без asyncio.run()
     except Exception as e:
         print(f"Критическая ошибка: {e}")
         sys.exit(1)
