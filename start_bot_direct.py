@@ -13,7 +13,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
 django.setup()
 
 # Импортируем бота
-from telegram_bot.bot_24_7 import main
+from telegram_bot.bot_simple import main
 
 if __name__ == "__main__":
     try:
