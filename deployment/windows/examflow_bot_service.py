@@ -41,8 +41,8 @@ class ExamFlowBotService:
     def start_bot_process(self):
         """Запуск процесса бота"""
         try:
-            # Команда запуска
-            cmd = [str(VENV_PYTHON), str(BOT_SCRIPT)]
+            # Команда запуска (прямой скрипт)
+            cmd = [str(VENV_PYTHON), str(PROJECT_ROOT / 'start_bot_direct.py')]
             
             # Переменные окружения
             env = os.environ.copy()
@@ -58,11 +58,11 @@ class ExamFlowBotService:
                 text=True
             )
             
-            logger.info(f"✅ Бот запущен с PID: {self.process.pid}")
+            logger.info(f"Бот запущен с PID: {self.process.pid}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Ошибка запуска бота: {e}")
+            logger.error(f"Ошибка запуска бота: {e}")
             return False
     
     def stop_bot_process(self):
@@ -108,7 +108,7 @@ class ExamFlowBotService:
     
     def run_service(self):
         """Основной цикл сервиса"""
-        logger.info("🚀 Запуск ExamFlow Bot Service")
+        logger.info("Запуск ExamFlow Bot Service")
         
         # Создаем директорию логов
         (PROJECT_ROOT / 'logs').mkdir(exist_ok=True)

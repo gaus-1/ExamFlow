@@ -1282,9 +1282,10 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Создаем расширенный промпт с контекстом
         enhanced_prompt = await db_create_enhanced_prompt(user_message, chat_session)
 
+
         # Получаем ответ от AI с контекстом
-        ai_response = await get_ai_response(
-            enhanced_prompt,
+        ai_response = await get_ai_response(  # type: ignore
+            await enhanced_prompt,  # type: ignore
             task_type='direct_question',
             user=django_user
         )
