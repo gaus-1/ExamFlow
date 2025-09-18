@@ -4,7 +4,7 @@
 Настраивает приложение бота и регистрирует обработчики команд
 """
 
-from .bot_handlers import (
+from telegram_bot.bot_handlers import (
     start, show_subject_topics,
     show_stats, handle_unknown_callback,
     random_task, show_answer, ai_help_handler,

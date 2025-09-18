@@ -25,7 +25,7 @@ from core.container import Container
 
 logger = logging.getLogger(__name__)
 
-@method_decorator([login_required, check_ai_limits], name='dispatch')
+@method_decorator([check_ai_limits], name='dispatch')
 class AIAssistantAPI(View):
     """
     API для ИИ-ассистента с реальным Gemini API
