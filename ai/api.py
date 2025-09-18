@@ -25,7 +25,6 @@ from core.container import Container
 
 logger = logging.getLogger(__name__)
 
-@method_decorator([check_ai_limits], name='dispatch')
 class AIAssistantAPI(View):
     """
     API для ИИ-ассистента с реальным Gemini API
@@ -154,14 +153,10 @@ class AIAssistantAPI(View):
 
         subjects = {
             'mathematics': [
-                'математик', 'алгебр', 'геометр', 'уравнен', 'функц', 'производн', 'интеграл'], 'russian': [
-                'русск', 'сочинен', 'грамматик', 'орфограф', 'пунктуац'], 'physics': [
-                'физик', 'механик', 'электричеств', 'оптик', 'термодинамик'], 'chemistry': [
-                    'хими', 'органическ', 'неорганическ', 'молекул'], 'biology': [
-                        'биолог', 'клетк', 'генетик', 'эволюц'], 'history': [
-                            'истори', 'дата', 'событи', 'войн'], 'social_studies': [
-                                'обществознан', 'полит', 'экономик', 'социолог'], 'english': [
-                                    'английск', 'english', 'грамматик', 'vocabulary']}
+                'математик', 'алгебр', 'геометр', 'уравнен', 'функц', 'производн', 'интеграл', 'профиль', 'базов'], 
+            'russian': [
+                'русск', 'сочинен', 'грамматик', 'орфограф', 'пунктуац', 'литератур']
+        }
 
         for subject, keywords in subjects.items():
             if any(keyword in prompt_lower for keyword in keywords):
@@ -175,20 +170,12 @@ class AIAssistantAPI(View):
         """
         sources_map = {
             'mathematics': [
+                {'title': 'ФИПИ - Математика', 'url': 'https://fipi.ru/ege/demoversii-specifikacii-kodifikatory#!/tab/151883967-4'},
+                {'title': 'Решу ЕГЭ - Математика', 'url': 'https://ege.sdamgia.ru/'}
             ],
             'russian': [
-            ],
-            'physics': [
-            ],
-            'chemistry': [
-            ],
-            'biology': [
-            ],
-            'history': [
-            ],
-            'social_studies': [
-            ],
-            'english': [
+                {'title': 'ФИПИ - Русский язык', 'url': 'https://fipi.ru/ege/demoversii-specifikacii-kodifikatory#!/tab/151883967-1'},
+                {'title': 'Решу ЕГЭ - Русский', 'url': 'https://rus-ege.sdamgia.ru/'}
             ]
         }
 
@@ -271,16 +258,12 @@ class ProblemsAPI(View):
         try:
             from core.models import Task  # type: ignore
 
-            # Получаем предмет по теме
+            # Получаем предмет по теме (только русский и математика)
             subject_mapping = {
                 'mathematics': 'Математика',
-                'russian': 'Русский язык',
-                'physics': 'Физика',
-                'chemistry': 'Химия',
-                'biology': 'Биология',
-                'history': 'История',
-                'social_studies': 'Обществознание',
-                'english': 'Английский язык'
+                'math_profile': 'Математика (профильная)',
+                'math_basic': 'Математика (непрофильная)', 
+                'russian': 'Русский язык'
             }
 
             subject_name = subject_mapping.get(topic, topic)
@@ -314,30 +297,50 @@ class ProblemsAPI(View):
         """
         Fallback задачи если база данных недоступна
         """
-        fallback_problems = {'mathematics': [{'id': 1,
-                                              'text': 'Решите квадратное уравнение: x² - 5x + 6 = 0',
-                                              'options': ['x₁ = 2, x₂ = 3',
-                                                          'x₁ = -2, x₂ = -3',
-                                                          'x₁ = 1, x₂ = 6',
-                                                          'x₁ = -1, x₂ = -6'],
-                                              'correct_answer': 0,
-                                              'hint': 'Используйте формулу дискриминанта: D = b² - 4ac'},
-                                             {'id': 2,
-                                              'text': 'Найдите площадь круга с радиусом 5 см',
-                                              'options': ['25π см²',
-                                                          '50π см²',
-                                                          '100π см²',
-                                                          '125π см²'],
-                                              'correct_answer': 0,
-                                              'hint': 'Площадь круга: S = πr²'}],
-                             'russian': [{'id': 3,
-                                          'text': 'В каком предложении есть грамматическая ошибка?',
-                                          'options': ['Он пришел домой поздно.',
-                                                      'Мы с ним договорились о встрече.',
-                                                      'По приезду в город мы сразу отправились в музей.',
-                                                      'Дети играли во дворе.'],
-                                          'correct_answer': 2,
-                                          'hint': 'Правильно: "По приезде в город"'}]}
+        fallback_problems = {
+            'mathematics': [
+                {
+                    'id': 1,
+                    'text': 'Решите квадратное уравнение: x² - 5x + 6 = 0',
+                    'options': ['x₁ = 2, x₂ = 3', 'x₁ = -2, x₂ = -3', 'x₁ = 1, x₂ = 6', 'x₁ = -1, x₂ = -6'],
+                    'correct_answer': 0,
+                    'hint': 'Используйте формулу дискриминанта: D = b² - 4ac'
+                },
+                {
+                    'id': 2,
+                    'text': 'Найдите производную функции f(x) = x³ + 2x² - 5x + 1',
+                    'options': ['3x² + 4x - 5', '3x² + 2x - 5', 'x² + 4x - 5', '3x³ + 4x² - 5x'],
+                    'correct_answer': 0,
+                    'hint': 'Производная степенной функции: (xⁿ)\' = n·xⁿ⁻¹'
+                }
+            ],
+            'russian': [
+                {
+                    'id': 3,
+                    'text': 'В каком предложении есть грамматическая ошибка?',
+                    'options': [
+                        'Он пришел домой поздно.',
+                        'Мы с ним договорились о встрече.',
+                        'По приезду в город мы сразу отправились в музей.',
+                        'Дети играли во дворе.'
+                    ],
+                    'correct_answer': 2,
+                    'hint': 'Правильно: "По приезде в город"'
+                },
+                {
+                    'id': 4,
+                    'text': 'Укажите предложение с деепричастным оборотом:',
+                    'options': [
+                        'Читая книгу, он делал заметки.',
+                        'Прочитанная книга лежала на столе.',
+                        'Он читал книгу внимательно.',
+                        'Книга была прочитана быстро.'
+                    ],
+                    'correct_answer': 0,
+                    'hint': 'Деепричастие отвечает на вопросы "что делая?" или "что сделав?"'
+                }
+            ]
+        }
 
         return fallback_problems.get(topic, [])[:limit]
 

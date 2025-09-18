@@ -1,0 +1,149 @@
+{% extends 'telegram_webapp/base.html' %}
+
+{% block content %}
+<div class="stats-intro">
+    <p style="text-align: center; margin-bottom: 20px; color: var(--tg-theme-hint-color, #999999);">
+        Статистика платформы ExamFlow 📊
+    </p>
+</div>
+
+{% if error %}
+<div class="error">
+    {{ error }}
+</div>
+{% endif %}
+
+<div class="stats-grid">
+    <div class="stat-card" data-subjects-count="{{ subjects_count }}">
+        <div class="stat-number">{{ subjects_count }}</div>
+        <div class="stat-label">Предметов</div>
+    </div>
+    <div class="stat-card" data-tasks-count="{{ tasks_count }}">
+        <div class="stat-number">{{ tasks_count }}</div>
+        <div class="stat-label">Заданий</div>
+    </div>
+</div>
+
+<div class="stats-details" style="margin-top: 24px;">
+    <h4 style="margin-bottom: 16px; color: var(--tg-theme-text-color, #000000);">
+        🎯 Доступно сейчас:
+    </h4>
+    
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="stat-card" style="margin-bottom: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">
+                        🤖 ИИ-помощник
+                    </div>
+                    <div style="font-size: 12px; color: var(--tg-theme-hint-color, #999999);">
+                        Gemini + DeepSeek
+                    </div>
+                </div>
+                <div style="color: #4CAF50; font-weight: 600;">
+                    ✅ Работает
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card" style="margin-bottom: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">
+                        📚 База знаний
+                    </div>
+                    <div style="font-size: 12px; color: var(--tg-theme-hint-color, #999999);">
+                        📐 Математика (профиль/база), 📝 Русский язык
+                    </div>
+                </div>
+                <div style="color: #4CAF50; font-weight: 600;">
+                    ✅ Активна
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card" style="margin-bottom: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 4px;">
+                        🔄 Синхронизация
+                    </div>
+                    <div style="font-size: 12px; color: var(--tg-theme-hint-color, #999999);">
+                        Бот ↔ Веб-сайт
+                    </div>
+                </div>
+                <div style="color: #4CAF50; font-weight: 600;">
+                    ✅ Включена
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div style="margin-top: 32px;">
+    <h4 style="margin-bottom: 12px; color: var(--tg-theme-text-color, #000000);">
+        ⚡ Начать обучение:
+    </h4>
+    <div style="display: grid; gap: 8px;">
+        <button class="btn btn-primary" onclick="goToAIChat()">
+            🤖 Задать вопрос ИИ
+        </button>
+        <button class="btn btn-secondary" onclick="goToSubjects()">
+            📚 Выбрать предмет
+        </button>
+    </div>
+</div>
+
+<!-- Кнопка назад -->
+<div style="margin-top: 24px;">
+    <button class="btn btn-secondary" onclick="goHome()">
+        ← Назад в меню
+    </button>
+</div>
+
+<!-- Дополнительная информация -->
+<div style="margin-top: 32px; padding: 16px; background: var(--tg-theme-secondary-bg-color, #f8f8f8); border-radius: 12px;">
+    <h4 style="margin-bottom: 12px; color: var(--tg-theme-text-color, #000000); text-align: center;">
+        📱 ExamFlow 2025
+    </h4>
+    <p style="font-size: 14px; color: var(--tg-theme-hint-color, #999999); text-align: center; line-height: 1.4;">
+        Современная платформа подготовки к ЕГЭ и ОГЭ с искусственным интеллектом. 
+        Персональные ответы, адаптивное обучение, актуальные материалы.
+    </p>
+    <div style="text-align: center; margin-top: 12px;">
+        <button class="btn btn-secondary" onclick="openWebsite()" style="font-size: 14px; padding: 8px 16px;">
+            🌐 Открыть сайт
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openWebsite() {
+    window.Telegram.WebApp.openLink('https://examflow.ru');
+}
+
+// Анимация счетчиков при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        if (finalValue > 0) {
+            let currentValue = 0;
+            const increment = Math.ceil(finalValue / 20);
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= finalValue) {
+                    currentValue = finalValue;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentValue;
+            }, 50);
+        }
+    });
+});
+</script>
+{% endblock %}

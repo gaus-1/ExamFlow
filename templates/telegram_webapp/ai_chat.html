@@ -1,0 +1,177 @@
+{% extends 'telegram_webapp/base.html' %}
+
+{% block content %}
+<div class="ai-chat">
+    <p style="text-align: center; margin-bottom: 20px; color: var(--tg-theme-hint-color, #999999);">
+        Задавайте любые вопросы по ЕГЭ и ОГЭ! 🤖
+    </p>
+    
+    <div class="ai-input-container">
+        <textarea 
+            id="aiInput" 
+            class="ai-input" 
+            placeholder="Например: Как решить уравнение x² + 5x + 6 = 0?"
+            rows="3"
+            maxlength="1000"
+        ></textarea>
+        
+        <button class="btn btn-primary" onclick="sendQuestion()" id="sendBtn">
+            Отправить вопрос
+        </button>
+    </div>
+    
+    <div class="ai-response" id="aiResponse">
+        <div class="loading" id="loadingIndicator" style="display: none;">
+            🤖 Думаю над ответом...
+        </div>
+        <div id="responseText"></div>
+    </div>
+</div>
+
+<!-- Кнопка назад -->
+<div style="margin-top: 32px;">
+    <button class="btn btn-secondary" onclick="goHome()">
+        ← Назад в меню
+    </button>
+</div>
+
+<!-- Примеры вопросов -->
+<div style="margin-top: 24px;">
+    <h4 style="margin-bottom: 12px; color: var(--tg-theme-text-color, #000000);">
+        💡 Примеры вопросов:
+    </h4>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="example-question" onclick="setQuestion('Как решить квадратное уравнение x² + 5x + 6 = 0?')">
+            📐 Как решить квадратное уравнение?
+        </button>
+        <button class="example-question" onclick="setQuestion('Что такое причастие в русском языке?')">
+            📝 Что такое причастие в русском языке?
+        </button>
+        <button class="example-question" onclick="setQuestion('Найти производную функции f(x) = x³ + 2x')">
+            📐 Найти производную функции
+        </button>
+        <button class="example-question" onclick="setQuestion('Как правильно писать деепричастные обороты?')">
+            📝 Деепричастные обороты
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+.example-question {
+    background: var(--tg-theme-secondary-bg-color, #f8f8f8);
+    border: 1px solid var(--tg-theme-section-separator-color, #e0e0e0);
+    color: var(--tg-theme-text-color, #000000);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.example-question:hover {
+    background: var(--tg-theme-button-color, #007AFF);
+    color: var(--tg-theme-button-text-color, #ffffff);
+}
+</style>
+
+<script>
+async function sendQuestion() {
+    const input = document.getElementById('aiInput');
+    const responseDiv = document.getElementById('aiResponse');
+    const responseText = document.getElementById('responseText');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    const question = input.value.trim();
+    
+    if (!question) {
+        showAlert('Пожалуйста, введите вопрос');
+        return;
+    }
+    
+    if (question.length > 1000) {
+        showAlert('Вопрос слишком длинный (максимум 1000 символов)');
+        return;
+    }
+    
+    // Показываем загрузку
+    responseDiv.style.display = 'block';
+    loadingIndicator.style.display = 'block';
+    responseText.style.display = 'none';
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Отправляю...';
+    
+    try {
+        const response = await fetch('/webapp/api/ask/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: question
+            })
+        });
+        
+        const data = await response.json();
+        
+        // Скрываем загрузку
+        loadingIndicator.style.display = 'none';
+        responseText.style.display = 'block';
+        
+        if (data.success) {
+            responseText.innerHTML = `
+                <div style="margin-bottom: 12px;">
+                    <strong>🤖 ExamFlow AI:</strong>
+                </div>
+                <div style="line-height: 1.5;">
+                    ${data.answer.replace(/\n/g, '<br>')}
+                </div>
+                ${data.processing_time ? `<div style="margin-top: 12px; font-size: 12px; color: var(--tg-theme-hint-color, #999999);">⏱️ ${data.processing_time.toFixed(1)}с</div>` : ''}
+            `;
+            
+            // Очищаем поле ввода
+            input.value = '';
+            
+            // Вибрация при получении ответа
+            hapticFeedback();
+            
+        } else {
+            responseText.innerHTML = `
+                <div class="error">
+                    ❌ ${data.error || 'Произошла ошибка'}
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        loadingIndicator.style.display = 'none';
+        responseText.style.display = 'block';
+        responseText.innerHTML = `
+            <div class="error">
+                ❌ Ошибка соединения. Попробуйте позже.
+            </div>
+        `;
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Отправить вопрос';
+    }
+}
+
+function setQuestion(question) {
+    document.getElementById('aiInput').value = question;
+    hapticFeedback();
+}
+
+// Отправка по Enter (с Ctrl/Cmd)
+document.getElementById('aiInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        sendQuestion();
+    }
+});
+</script>
+{% endblock %}
