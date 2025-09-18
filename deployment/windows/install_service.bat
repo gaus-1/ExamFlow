@@ -54,7 +54,7 @@ deployment\windows\nssm.exe remove ExamFlowBot confirm 2>nul
 REM Создаем новый сервис
 echo Создаем сервис ExamFlowBot...
 deployment\windows\nssm.exe install ExamFlowBot "%CD%\venv\Scripts\python.exe"
-deployment\windows\nssm.exe set ExamFlowBot Arguments "%CD%\deployment\windows\examflow_bot_service.py"
+deployment\windows\nssm.exe set ExamFlowBot AppParameters "%CD%\deployment\windows\examflow_bot_service.py"
 deployment\windows\nssm.exe set ExamFlowBot AppDirectory "%CD%"
 deployment\windows\nssm.exe set ExamFlowBot DisplayName "ExamFlow Telegram Bot"
 deployment\windows\nssm.exe set ExamFlowBot Description "24/7 Telegram бот для подготовки к ЕГЭ и ОГЭ"
