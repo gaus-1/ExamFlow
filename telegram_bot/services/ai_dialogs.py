@@ -42,8 +42,11 @@ def add_assistant_message_to_session(session, message) -> None:
 
 
 def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
-    """Получает ответ от AI через контейнер зависимостей."""
+    """Получает ответ от AI с памятью контекста."""
     try:
+        # Импортируем менеджер контекста
+        from telegram_bot.memory import BotContextManager
+        
         # Используем экстренный AI API для бота (прямой Gemini)
         import google.generativeai as genai
         from django.conf import settings
@@ -55,6 +58,20 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
         # Настраиваем Gemini
         genai.configure(api_key=api_key)  # type: ignore
         model = genai.GenerativeModel('gemini-1.5-flash')  # type: ignore
+        
+        # Инициализируем менеджер контекста
+        context_manager = BotContextManager()
+        
+        # Получаем ID пользователя
+        user_id = getattr(user, 'telegram_id', None) if user else None
+        if not user_id and hasattr(user, 'id'):
+            user_id = user.id
+        
+        # Формируем промпт с контекстом
+        if user_id:
+            prompt_with_context = context_manager.format_context_for_ai(user_id, prompt)
+        else:
+            prompt_with_context = prompt
         
         # Создаем промпт с ролью ExamFlow
         system_prompt = """Ты - ExamFlow AI, дружелюбный помощник для подготовки к ЕГЭ и ОГЭ.
@@ -68,23 +85,33 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
 - Иногда добавляй уместные шутки по теме
 - Представляйся как "ExamFlow AI" 
 - Помогай конкретными примерами и пошаговыми решениями
+- ВАЖНО: Учитывай предыдущие сообщения студента для персонализации
+- Если студент продолжает тему - развивай её дальше
 - Если вопрос не по твоим предметам - вежливо перенаправь на математику или русский
 
 Отвечай кратко и по делу, максимум 400 слов."""
 
-        full_prompt = f"{system_prompt}\n\nВопрос студента: {prompt}"
+        full_prompt = f"{system_prompt}\n\n{prompt_with_context}"
         
         # Получаем ответ
         response = model.generate_content(full_prompt)
         
         if response.text:
             answer = response.text.strip()
+            
+            # Сохраняем сообщения в контекст
+            if user_id:
+                context_manager.add_message(user_id, prompt, is_user=True)
+                context_manager.add_message(user_id, answer, is_user=False)
+            
             # Ограничиваем длину для Telegram
             if len(answer) > 4000:
                 answer = answer[:4000] + "..."
             return answer
         else:
             return 'Не удалось получить ответ от ИИ. Попробуйте переформулировать вопрос.'
-            
     except Exception as e:
+        # type: ignore
+        import logging  # Импортируем логгер, если не был импортирован ранее
+        logging.error(f"Ошибка AI сервиса с контекстом: {e}")
         return f'Ошибка AI сервиса: попробуйте позже'

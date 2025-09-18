@@ -23,7 +23,7 @@ def get_ai_service():
             from .services import AiService
             ai_service = AiService()
             logger.info("AiService успешно создан")
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка создания AiService: {e}")
             return None
     return ai_service
@@ -48,7 +48,7 @@ def ai_chat(request):
             'user': request.user,
         }
         return render(request, 'ai/chat.html', context)
-    except Exception as e:  # type: ignore
+    except Exception:  # type: ignore
         # Мягкий fallback: не отдаём 500, показываем информативную страницу
         logger.error("Ошибка рендера страницы чата: {e}")
         context = {
@@ -90,8 +90,11 @@ def ai_generate(request):
 @require_http_methods(["POST"])
 @ratelimit(key='ip', rate='20/m', block=True)
 def api_chat(request):
-    """API для чата с ИИ"""
+    """API для чата с ИИ с памятью контекста"""
     try:
+        # Импортируем менеджер контекста
+        from .context_manager import WebContextManager
+        
         data = json.loads(request.body)
         prompt = data.get('prompt', '').strip()
         if not prompt:
@@ -102,18 +105,29 @@ def api_chat(request):
             request.session.save()
         session_id = request.session.session_key
 
+        # Инициализируем менеджер контекста
+        context_manager = WebContextManager()
+        
+        # Формируем промпт с контекстом
+        prompt_with_context = context_manager.format_context_for_ai(session_id, prompt)
+
         ai_service_instance = get_ai_service()
         if ai_service_instance is None:
             return JsonResponse({'error': 'ИИ временно недоступен'}, status=503)
 
         result = ai_service_instance.ask(
-            prompt=prompt,
+            prompt=prompt_with_context,  # Используем промпт с контекстом
             user=request.user if request.user.is_authenticated else None,
             session_id=session_id)
         if 'error' in result:
             return JsonResponse({'error': result['error']}, status=429)
 
         text = result.get('response', '') or ''
+        
+        # Сохраняем диалог в контекст
+        context_manager.add_message(session_id, prompt, is_user=True)
+        context_manager.add_message(session_id, text, is_user=False)
+        
         # Источники: извлекаем URL из текста ответа (если присутствуют)
         url_pattern = re.compile(r"https?://\S+", re.IGNORECASE)
         found_urls = url_pattern.findall(text)
@@ -131,12 +145,15 @@ def api_chat(request):
 
         # Follow-ups: простые действия в экосистеме
         followups = [
+            {
                 'label': 'Показать задания по предметам',
-                'hre': '/learning/subjects/'
+                'href': '/learning/subjects/'
             },
+            {
                 'label': 'Случайное задание',
-                'hre': '/learning/random/'
+                'href': '/learning/random/'
             },
+            {
                 'label': 'Задать уточняющий вопрос',
                 'action': 'refocus-input'
             }
@@ -154,9 +171,37 @@ def api_chat(request):
 
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Неверный JSON'}, status=400)
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в API чата: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def clear_context(request):
+    """API для очистки контекста диалога"""
+    try:
+        from .context_manager import WebContextManager
+        
+        # Гарантируем наличие session_id
+        if not request.session.session_key:
+            request.session.save()
+        session_id = request.session.session_key
+        
+        context_manager = WebContextManager()
+        success = context_manager.clear_context(session_id)
+        
+        return JsonResponse({
+            'success': success,
+            'message': 'Контекст диалога очищен' if success else 'Ошибка очистки контекста'
+        })
+        
+    except Exception as e:
+        logger.error(f"Ошибка очистки контекста: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Ошибка сервера'
+        }, status=500)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -179,7 +224,7 @@ def api_explain(request):
             'cost': 0.0
         })
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в API объяснения: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
 
@@ -197,8 +242,9 @@ def api_search(request):
 
         # TODO: Реализовать логику поиска
         results = [
+            {
                 'id': 1,
-                'title': 'Задание по запросу "{query}"',
+                'title': f'Задание по запросу "{query}"',
                 'description': 'Описание задания находится в разработке',
                 'subject': 'Математика',
                 'difficulty': 'Средний'
@@ -212,7 +258,7 @@ def api_search(request):
             'cost': 0.0
         })
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в API поиска: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
 
@@ -224,7 +270,6 @@ def api_generate(request):
     try:
         data = json.loads(request.body)
         topic = data.get('topic', '')
-        difficulty = data.get('difficulty', 'medium')
 
         if not topic:
             return JsonResponse({'error': 'Не указана тема'}, status=400)
@@ -242,7 +287,7 @@ def api_generate(request):
             'cost': 0.0
         })
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в API генерации: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
 
@@ -295,7 +340,7 @@ def api_limits(request):
             }
         })
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в API лимитов: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
 
@@ -321,16 +366,17 @@ def api_voice(request):
         command = data.get('command', '')
 
         if not audio_data and not command:
-            return JsonResponse(
+            return JsonResponse({'error': 'Не указаны аудио данные или команда'}, status=400)
 
         # TODO: Реализовать логику голосового помощника
         response = {
-            'text': 'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
-            'audio_url': None}
+            'text': f'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
+            'audio_url': None
+        }
 
         return JsonResponse(response)
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в API голосового помощника: {e}")
         return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
 
