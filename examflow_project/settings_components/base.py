@@ -192,6 +192,10 @@ CORS_ALLOW_CREDENTIALS = True
 # Telegram settings
 TELEGRAM_BOT_USERNAME = 'examflow_bot'  # Имя бота без @
 
+# AI API Keys
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
+
 # Cache settings
 CACHES = {
     'default': {
