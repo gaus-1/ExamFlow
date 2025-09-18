@@ -67,7 +67,7 @@ if not DEBUG:
         # Дополнительные настройки для стабильности
         db_config['CONN_MAX_AGE'] = 600  # type: ignore
         db_config['CONN_HEALTH_CHECKS'] = True  # type: ignore
-        
+
         # Убираем проблемные параметры для psycopg2
         if 'CLIENT_CLASS' in db_config:
             del db_config['CLIENT_CLASS']

@@ -12,17 +12,15 @@ import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 from telegram.ext import ContextTypes
-from django.conf import settings
 from learning.models import (
     Subject, Task, UserProgress, UserRating
 )
-from core.models import UnifiedProfile
 from core.services.unified_profile import UnifiedProfileService
 from core.services.chat_session import ChatSessionService
 from django.utils import timezone
 from ai.services import AiService
 from .gamification import TelegramGamification
-from .utils.text_utils import clean_markdown_text, clean_log_text, format_ai_response
+from .utils.text_utils import clean_markdown_text, clean_log_text
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
@@ -294,7 +292,7 @@ def get_or_create_user(telegram_user):
     """
     from django.contrib.auth import get_user_model
     User = get_user_model()
-    
+
     user, created = User.objects.get_or_create(  # type: ignore
         telegram_id=telegram_user.id,
         defaults={
@@ -336,7 +334,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Создаем нижнее закрепленное меню с 4 кнопками
     if not is_callback:  # Только при команде /start
         try:
-            from telegram import ReplyKeyboardMarkup, KeyboardButton
+            from telegram import ReplyKeyboardMarkup
             keyboard = [
             ]
             reply_markup = ReplyKeyboardMarkup(
@@ -1085,7 +1083,7 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     """
     try:
         query = update.callback_query
-        await query.answer()  # type: ignore    
+        await query.answer()  # type: ignore
 
         # Получаем пользователя
         user, created = await db_get_or_create_user(update.effective_user)
@@ -1218,7 +1216,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         logger.error("Ошибка в handle_text_message: {e}")
         try:
             await context.bot.send_message(
-                chat_id=update.effective_chat.id,  # type: ignore       
+                chat_id=update.effective_chat.id,  # type: ignore
                 text="❌ Произошла ошибка. Попробуйте позже.",
                 reply_to_message_id=update.message.message_id  # type: ignore
             )
@@ -1362,7 +1360,7 @@ async def random_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
         # Получаем случайный предмет с заданиями
         subjects = await db_get_all_subjects_with_tasks()
         if not subjects:
-            await query.edit_message_text("❌ Нет доступных предметов")  # type: ignore 
+            await query.edit_message_text("❌ Нет доступных предметов")  # type: ignore
             return
 
         import random
@@ -1496,11 +1494,11 @@ async def telegram_auth_handler(update: Update, context: ContextTypes.DEFAULT_TY
     user_id = update.effective_user.id  # type: ignore
     username = update.effective_user.username or "User"  # type: ignore
     first_name = update.effective_user.first_name or "User"  # type: ignore
-    
+
     # Получаем настройки сайта
     from django.conf import settings
     site_url = getattr(settings, 'SITE_URL', 'https://examflow.ru')
-    
+
     auth_text = f"""
 🔐 **ВХОД ЧЕРЕЗ TELEGRAM**
 
@@ -1519,7 +1517,7 @@ async def telegram_auth_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
     keyboard = [
         [InlineKeyboardButton(
-            "🚀 ВОЙТИ ЧЕРЕЗ TELEGRAM", 
+            "🚀 ВОЙТИ ЧЕРЕЗ TELEGRAM",
             url=f"{site_url}/auth/telegram/login/?user_id={user_id}&username={username}&first_name={first_name}"
         )],
         [create_standard_button("🏠 Главное меню", "main_menu")]
@@ -1549,7 +1547,7 @@ async def auth_success_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer()
 
     user_id = update.effective_user.id  # type: ignore
-    
+
     success_text = f"""
 ✅ **АВТОРИЗАЦИЯ УСПЕШНА!**
 
@@ -1709,7 +1707,7 @@ async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id  # type: ignore
     keyboard = gamification.create_progress_keyboard(user_id)
 
-    await query.edit_message_text(  # type: ignore  
+    await query.edit_message_text(  # type: ignore
         "📊 **ПРОГРЕСС ОБУЧЕНИЯ**\n\n"
         "Выберите тип прогресса для просмотра:",
         reply_markup=keyboard,
@@ -1926,7 +1924,7 @@ async def bonus_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = InlineKeyboardMarkup([
     ])
 
-    await query.edit_message_text(  # type: ignore  
+    await query.edit_message_text(  # type: ignore
         bonus_text,
         reply_markup=keyboard,
         parse_mode='Markdown'
@@ -1967,52 +1965,52 @@ class BotHandlers:  # type: ignore
     daily_challenges_handler = staticmethod(daily_challenges_handler)
     leaderboard_handler = staticmethod(leaderboard_handler)
     bonus_handler = staticmethod(bonus_handler)
-    
+
     # Дополнительные методы для тестов
     @staticmethod
     def help_command(update, context):
         """Команда /help - показывает справку"""
         return handle_text_message(update, context)
-    
+
     @staticmethod
     def search_command(update, context):
         """Команда /search - поиск по базе знаний"""
         return handle_ai_message(update, context)
-    
+
     @staticmethod
     def fipi_command(update, context):
         """Команда /fipi - поиск в материалах ФИПИ"""
         return handle_ai_message(update, context)
-    
+
     @staticmethod
     def _parse_search_command(text):
         """Парсинг команды поиска"""
         if text and text.startswith('/search '):
             return text[8:].strip()
         return None
-    
+
     @staticmethod
     def _parse_fipi_command(text):
         """Парсинг команды ФИПИ"""
         if text and text.startswith('/fipi '):
             return text[6:].strip()
         return None
-    
+
     @staticmethod
     def _format_rag_response(response):
         """Форматирование ответа RAG системы"""
         answer = response.get('answer', '')
         sources = response.get('sources', [])
         processing_time = response.get('processing_time', 0)
-        
+
         formatted = f"🤖 {answer}\n\n"
-        
+
         if sources:
             formatted += "📚 Источники:\n"
             for i, source in enumerate(sources[:3], 1):
                 formatted += f"{i}. {source}\n"
-        
+
         if processing_time:
             formatted += f"\n⏱️ Время обработки: {processing_time:.1f}с"
-            
+
         return formatted

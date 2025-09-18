@@ -16,7 +16,7 @@ from .text_utils import (
 
 __all__ = [
     'clean_markdown_text',
-    'clean_log_text', 
+    'clean_log_text',
     'format_ai_response',
     'create_error_message',
     'create_success_message',

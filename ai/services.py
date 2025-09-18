@@ -282,14 +282,14 @@ class AiService:
                 # Используем новую RAG систему
                 rag_orchestrator = RAGOrchestrator()
                 rag_result = rag_orchestrator.process_query(
-                    prompt, 
+                    prompt,
                     subject=task.subject.name if task.subject else "",
                     user_id=user.id
                 )
-                
+
                 # Получаем ответ от AI
                 result = self._ask_ai(prompt, user, task_type, use_cache)
-                
+
                 # Добавляем RAG контекст
                 result['rag_context'] = {
                     'sources': rag_result.get('sources', []),
@@ -324,7 +324,7 @@ class AiService:
 
             # Используем новую RAG систему для анализа прогресса
             rag_orchestrator = RAGOrchestrator()
-            
+
             # Простой анализ прогресса (можно расширить позже)
             progress = {
                 'recommended_difficulty': 3,
@@ -332,7 +332,7 @@ class AiService:
                 'weak_topics': [],
                 'strong_topics': []
             }
-            
+
             recommendations = []
 
             # Формируем план обучения

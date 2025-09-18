@@ -3,7 +3,6 @@
 """
 
 from django.test import TestCase, Client
-from django.conf import settings
 from core.models import Subject, Task, UserProgress
 
 class TestLearning(TestCase):

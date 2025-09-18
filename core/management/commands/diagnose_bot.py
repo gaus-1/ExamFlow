@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 import logging
 import requests
-import json
 
 logger = logging.getLogger(__name__)
 

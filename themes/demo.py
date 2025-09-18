@@ -7,7 +7,6 @@
 """
 
 from .models import UserThemePreference, ThemeUsage, ThemeCustomization
-from django.conf import settings
 import os
 import django
 

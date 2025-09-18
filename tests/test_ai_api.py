@@ -4,7 +4,6 @@ Unit тесты для AI API
 
 import json
 from django.test import TestCase, Client
-from django.conf import settings
 from unittest.mock import patch, MagicMock
 
 class TestAIAssistantAPI(TestCase):
@@ -153,7 +152,7 @@ class TestUserProfileAPI(TestCase):
         )
 
         self.assertEqual(response.status_code, 200) # type: ignore
-        data = json.loads(response.content) # type: ignore  
+        data = json.loads(response.content) # type: ignore
         self.assertIn('status', data)
         self.assertEqual(data['status'], 'success')
 

@@ -4,7 +4,6 @@
 
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.conf import settings
 from learning.models import Subject, Topic, Task
 from core.ai.priority_manager import AIPriorityManager
 from core.fipi_monitor import FIPIMonitor
@@ -107,7 +106,7 @@ class MathRussianFocusTestCase(TestCase):
             difficulty='medium'
         )
 
-        self.russian_task = Task.objects.create( # type: ignore     
+        self.russian_task = Task.objects.create( # type: ignore
             title='Сочинение по тексту',
             description='Напишите сочинение по предложенному тексту',
             subject=self.russian_ege,
@@ -372,5 +371,5 @@ class IntegrationTestCase(TestCase):
         response = self.client.get(reverse('learning:focused_search'), {'q': 'тест'})
         search_time = time.time() - start_time
 
-        self.assertEqual(response.status_code, 200) # type: ignore  
+        self.assertEqual(response.status_code, 200) # type: ignore
         self.assertLess(search_time, 1.0)  # Менее 1 секунды

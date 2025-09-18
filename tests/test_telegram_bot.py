@@ -4,7 +4,6 @@
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from core.models import Subject, Task
 
 class TestTelegramBot(TestCase):

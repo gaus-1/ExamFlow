@@ -6,7 +6,7 @@ import schedule
 import time
 import threading
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.utils import timezone
 from django.core.management import call_command
 from django.conf import settings

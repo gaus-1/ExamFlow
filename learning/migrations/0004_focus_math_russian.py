@@ -6,16 +6,16 @@ from django.db import migrations, models
 def archive_unused_subjects(apps, schema_editor):
     """Архивирует ненужные предметы"""
     Subject = apps.get_model('learning', 'Subject')
-    
+
     unused_subjects = [
         'Физика', 'Химия', 'Биология', 'История', 'География',
         'Литература', 'Информатика', 'Обществознание',
         'Английский язык', 'Немецкий язык', 'Французский язык', 'Испанский язык'
     ]
-    
+
     for subject_name in unused_subjects:
         Subject.objects.filter(name=subject_name).update(is_archived=True)
-    
+
     print(f"Архивировано {len(unused_subjects)} предметов")
 
 
@@ -28,7 +28,7 @@ def restore_unused_subjects(apps, schema_editor):
 def create_math_variants(apps, schema_editor):
     """Создает варианты математики"""
     Subject = apps.get_model('learning', 'Subject')
-    
+
     math_variants = [
         {
             'name': 'Математика (профильная)',
@@ -55,7 +55,7 @@ def create_math_variants(apps, schema_editor):
             'is_primary': True
         },
     ]
-    
+
     for variant in math_variants:
         subject, created = Subject.objects.get_or_create(
             name=variant['name'],
@@ -81,7 +81,7 @@ def remove_math_variants(apps, schema_editor):
 def create_russian_variants(apps, schema_editor):
     """Создает варианты русского языка"""
     Subject = apps.get_model('learning', 'Subject')
-    
+
     russian_variants = [
         {
             'name': 'Русский язык (ЕГЭ)',
@@ -100,7 +100,7 @@ def create_russian_variants(apps, schema_editor):
             'is_primary': True
         },
     ]
-    
+
     for variant in russian_variants:
         subject, created = Subject.objects.get_or_create(
             name=variant['name'],
@@ -166,19 +166,19 @@ class Migration(migrations.Migration):
             name='updated_at',
             field=models.DateTimeField(auto_now=True, verbose_name='Дата обновления'),
         ),
-        
+
         # Архивируем ненужные предметы
         migrations.RunPython(
             code=archive_unused_subjects,
             reverse_code=restore_unused_subjects,
         ),
-        
+
         # Создаем варианты математики
         migrations.RunPython(
             code=create_math_variants,
             reverse_code=remove_math_variants,
         ),
-        
+
         # Создаем варианты русского языка
         migrations.RunPython(
             code=create_russian_variants,

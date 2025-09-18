@@ -70,7 +70,6 @@ def run_startup_tasks():
             logger.info("🤖 Настройка Telegram webhook...")
             try:
                 # Передаём вычисленный SITE_URL для корректного webhook
-                from django.conf import settings as dj_settings
                 call_command(
                     'setup_webhook',
                     'set',

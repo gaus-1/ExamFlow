@@ -20,7 +20,7 @@ urlpatterns = [
 
     # Профиль пользователя
     path('api/user/profile/', api.user_profile_api, name='user_profile_api'),
-    
+
     # Экстренный AI API (без базы данных)
     path('emergency/', emergency_api.emergency_ai_api, name='emergency_ai_api'),
 ]
