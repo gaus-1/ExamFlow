@@ -121,9 +121,9 @@
                     if (event.data.type === 'auth_success') {
                         document.getElementById('loading').style.display = 'block';
                         
-                        // Перенаправляем в бота с токеном
+                        // Перенаправляем в бота для завершения аутентификации
                         setTimeout(() => {
-                            window.location.href = 'https://t.me/{{ bot_username }}?start=auth_success_' + event.data.token;
+                            window.location.href = 'https://t.me/examflow_bot?start=auth_complete';
                         }, 2000);
                     }
                 }

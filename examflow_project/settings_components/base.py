@@ -96,6 +96,19 @@ if _DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(default=_DATABASE_URL)
     }
+    # Настройки SSL для PostgreSQL на Render.com
+    if 'postgres' in _DATABASE_URL and 'render.com' in _DATABASE_URL:
+        DATABASES['default']['OPTIONS'] = {
+            'sslmode': 'require',
+            'sslcert': None,
+            'sslkey': None,
+            'sslrootcert': None,
+        }
+    elif 'postgres' in _DATABASE_URL and 'localhost' in _DATABASE_URL:
+        # Локальный PostgreSQL без SSL
+        DATABASES['default']['OPTIONS'] = {
+            'sslmode': 'disable',
+        }
 else:
     DATABASES = {
         'default': {
@@ -175,6 +188,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Telegram settings
+TELEGRAM_BOT_USERNAME = 'examflow_bot'  # Имя бота без @
 
 # Cache settings
 CACHES = {

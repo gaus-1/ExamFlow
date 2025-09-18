@@ -1,0 +1,80 @@
+# ExamFlow - Render.com Configuration
+# Автоматическое развертывание с веб-сервером и Telegram ботом
+
+services:
+  # Веб-сервер Django
+  - type: web
+    name: examflow-web
+    env: python
+    plan: starter  # Можно изменить на standard для большей производительности
+    buildCommand: |
+      pip install -r config/requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+    startCommand: |
+      gunicorn examflow_project.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SETTINGS_MODULE
+        value: examflow_project.settings_prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: examflow-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: examflow-redis
+          property: connectionString
+    domains:
+      - examflow.ru
+      - www.examflow.ru
+    
+  # Telegram Bot Worker (24/7)
+  - type: worker
+    name: examflow-bot
+    env: python
+    plan: starter
+    buildCommand: |
+      pip install -r config/requirements.txt
+    startCommand: |
+      python deployment/render/bot_worker.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SETTINGS_MODULE
+        value: examflow_project.settings_prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: examflow-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: examflow-redis
+          property: connectionString
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false  # Секретная переменная, настраивается в панели
+      - key: GEMINI_API_KEY
+        sync: false  # Секретная переменная
+      - key: SECRET_KEY
+        sync: false  # Секретная переменная
+    # Автоперезапуск при сбоях
+    autoDeploy: true
+
+databases:
+  # PostgreSQL база данных
+  - name: examflow-db
+    databaseName: examflow
+    user: examflow
+    plan: starter  # 1GB бесплатно
+    region: oregon
+    postgresMajorVersion: 15
+
+  # Redis для кэширования
+  - type: redis
+    name: examflow-redis
+    plan: starter  # 25MB бесплатно
+    region: oregon
+    maxmemoryPolicy: allkeys-lru
