@@ -5,11 +5,16 @@
       <span class="ai-icon">🤖</span>
       <span>ИИ-ассистент</span>
     </div>
-    <button class="ai-widget-toggle" onclick="toggleAIWidget()">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
+    <div class="ai-widget-controls">
+      <button class="ai-context-clear" onclick="clearAIContext()" title="Очистить контекст диалога">
+        🗑️
+      </button>
+      <button class="ai-widget-toggle" onclick="toggleAIWidget()">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
   </div>
   
   <div class="ai-widget-content">
@@ -94,6 +99,13 @@
   font-weight: 600;
 }
 
+.ai-widget-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ai-context-clear,
 .ai-widget-toggle {
   background: none;
   border: none;
@@ -102,8 +114,10 @@
   padding: var(--space-1);
   border-radius: var(--radius-md);
   transition: background var(--transition-fast);
+  font-size: var(--text-sm);
 }
 
+.ai-context-clear:hover,
 .ai-widget-toggle:hover {
   background: rgba(255, 255, 255, 0.1);
 }
@@ -360,6 +374,36 @@ function removeWidgetMessage(messageId) {
   const message = document.getElementById(messageId);
   if (message) {
     message.remove();
+  }
+}
+
+async function clearAIContext() {
+  try {
+    const response = await fetch('/ai/clear-context/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken()
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Очищаем сообщения в виджете
+      const messages = document.getElementById('aiChatMessages');
+      if (messages) {
+        messages.innerHTML = '';
+      }
+      
+      // Показываем уведомление
+      addWidgetMessage('assistant', '🗑️ Контекст диалога очищен. Начинаем новый разговор!');
+    } else {
+      addWidgetMessage('assistant', '❌ Не удалось очистить контекст');
+    }
+  } catch (error) {
+    console.error('Ошибка очистки контекста:', error);
+    addWidgetMessage('assistant', '❌ Ошибка очистки контекста');
   }
 }
 
