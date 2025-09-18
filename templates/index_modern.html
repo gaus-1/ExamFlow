@@ -167,19 +167,23 @@
                 <h2 class="section-title">Предметы</h2>
                 
                 <div class="subjects-grid">
-                    <div class="subject-card" onclick="window.location.href='{% url 'learning:subjects_list' %}'">
+                    <a href="{% url 'learning:subjects_list' %}" class="subject-card-link">
+                    <div class="subject-card">
                         <div class="subject-icon">📐</div>
                         <h3 class="subject-title">Математика</h3>
                         <p class="subject-desc">Профильная и базовая математика ЕГЭ, ОГЭ</p>
                         <div class="subject-arrow">→</div>
                     </div>
+                    </a>
                     
-                    <div class="subject-card" onclick="window.location.href='{% url 'learning:subjects_list' %}'">
+                    <a href="{% url 'learning:subjects_list' %}" class="subject-card-link">
+                    <div class="subject-card">
                         <div class="subject-icon">📝</div>
                         <h3 class="subject-title">Русский язык</h3>
                         <p class="subject-desc">Сочинение, грамматика, литература для ЕГЭ и ОГЭ</p>
                         <div class="subject-arrow">→</div>
                     </div>
+                    </a>
                 </div>
             </div>
         </section>
