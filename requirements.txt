@@ -1,6 +1,6 @@
 # ===== ОСНОВНЫЕ ЗАВИСИМОСТИ =====
 Django==4.2.7
-gunicorn==21.2.0
+gunicorn==23.0.0
 psycopg2-binary==2.9.7
 redis==5.0.1
 
