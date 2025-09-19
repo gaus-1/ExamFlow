@@ -83,8 +83,17 @@ if not DEBUG:
         # Дополнительная обработка для Render PostgreSQL
         if 'render.com' in database_url or 'dpg-' in database_url:
             # Специальные настройки для Render
-            DATABASES['default']['OPTIONS']['sslmode'] = 'require'  # type: ignore
-            DATABASES['default']['OPTIONS']['connect_timeout'] = 60  # type: ignore
+            DATABASES['default']['OPTIONS'].update({  # type: ignore
+                'sslmode': 'require',
+                'connect_timeout': 60,
+                'application_name': 'examflow_render',
+                'keepalives_idle': 600,
+                'keepalives_interval': 30,
+                'keepalives_count': 3,
+                'tcp_keepalives_idle': 600,
+                'tcp_keepalives_interval': 30,
+                'tcp_keepalives_count': 3,
+            })
             
             # Принудительно устанавливаем ENGINE для Render
             DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'  # type: ignore
@@ -92,6 +101,15 @@ if not DEBUG:
             # Настройки для стабильности соединения
             DATABASES['default']['CONN_MAX_AGE'] = 0  # type: ignore
             DATABASES['default']['CONN_HEALTH_CHECKS'] = False  # type: ignore
+            
+            # Дополнительные настройки для Render
+            DATABASES['default']['ATOMIC_REQUESTS'] = False  # type: ignore
+            DATABASES['default']['AUTOCOMMIT'] = True  # type: ignore
+            
+            # Настройки для обхода проблем с SSL
+            DATABASES['default']['OPTIONS']['sslcert'] = None  # type: ignore
+            DATABASES['default']['OPTIONS']['sslkey'] = None  # type: ignore
+            DATABASES['default']['OPTIONS']['sslrootcert'] = None  # type: ignore
 
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки
     try:
