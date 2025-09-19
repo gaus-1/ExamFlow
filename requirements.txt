@@ -41,5 +41,29 @@ coverage==7.3.2
 locust==2.17.0
 selenium==4.15.2
 
+# ===== БЕЗОПАСНОСТЬ =====
+bandit==1.7.5
+safety==2.3.5
+cryptography==41.0.7
+
+# ===== ПРОИЗВОДИТЕЛЬНОСТЬ =====
+psutil==5.9.6
+memory-profiler==0.61.0
+
+# ===== ВИЗУАЛЬНОЕ ТЕСТИРОВАНИЕ =====
+Pillow==10.1.0
+opencv-python==4.8.1.78
+
+# ===== КРОССБРАУЗЕРНОЕ ТЕСТИРОВАНИЕ =====
+webdriver-manager==4.0.1
+
+# ===== FRONTEND ТЕСТИРОВАНИЕ =====
+# Эти пакеты устанавливаются через npm в tests/frontend/
+# @testing-library/jest-dom
+# @testing-library/react
+# @testing-library/user-event
+# jest
+# eslint
+
 # ===== РАЗРАБОТКА =====
 ruff==0.1.6

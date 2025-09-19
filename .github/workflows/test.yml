@@ -217,12 +217,12 @@ jobs:
         python manage.py migrate --run-syncdb
         pytest tests/bots/ -v --cov=. --cov-report=xml --cov-report=html --junitxml=reports/junit-bot.xml
     
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: bot
-        name: bot-tests
+        - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v3
+          with:
+            file: ./coverage.xml
+            flags: bot
+            name: bot-tests
 
   # UI тесты
   ui-tests:
@@ -254,38 +254,220 @@ jobs:
           - 6379:6379
     
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+      
+      - name: Install Firefox
+        uses: browser-actions/setup-firefox@v1
+      
+      - name: Run UI tests
+        env:
+          DJANGO_SETTINGS_MODULE: examflow_project.settings
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/examflow_test
+          REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: test-secret-key
+          DEBUG: True
+        run: |
+          python manage.py migrate --run-syncdb
+          pytest tests/ui/ -v --cov=. --cov-report=xml --cov-report=html --junitxml=reports/junit-ui.xml
+      
+      - name: Run CSS tests
+        run: |
+          pytest tests/ui/test_css_styles.py -v --junitxml=reports/junit-css.xml
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: ui
+          name: ui-tests
+
+  # Frontend JavaScript тесты
+  frontend-tests:
+    runs-on: ubuntu-latest
+    needs: lint
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install frontend dependencies
+        run: |
+          cd tests/frontend
+          npm install
+      
+      - name: Run JavaScript tests
+        run: |
+          cd tests/frontend
+          npm test -- --coverage --watchAll=false
+      
+      - name: Run ESLint
+        run: |
+          cd tests/frontend
+          npm run lint
+
+  # Security тесты
+  security-tests:
+    runs-on: ubuntu-latest
+    needs: lint
     
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: examflow_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     
-    - name: Install Chrome
-      uses: browser-actions/setup-chrome@v1
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run security tests
+        env:
+          DJANGO_SETTINGS_MODULE: examflow_project.settings
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/examflow_test
+          SECRET_KEY: test-secret-key
+          DEBUG: True
+        run: |
+          python manage.py migrate --run-syncdb
+          pytest tests/security/ -v --junitxml=reports/junit-security.xml
+      
+      - name: Run Bandit security audit
+        run: |
+          pip install bandit
+          bandit -r . -f json -o reports/bandit-report.json
+      
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: reports/
+
+  # Cross-browser тесты
+  cross-browser-tests:
+    runs-on: ubuntu-latest
+    needs: lint
     
-    - name: Run UI tests
-      env:
-        DJANGO_SETTINGS_MODULE: examflow_project.settings
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/examflow_test
-        REDIS_URL: redis://localhost:6379/0
-        SECRET_KEY: test-secret-key
-        DEBUG: True
-      run: |
-        python manage.py migrate --run-syncdb
-        pytest tests/ui/ -v --cov=. --cov-report=xml --cov-report=html --junitxml=reports/junit-ui.xml
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: examflow_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
-        flags: ui
-        name: ui-tests
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Install browsers
+        uses: browser-actions/setup-chrome@v1
+      
+      - name: Run cross-browser tests
+        env:
+          DJANGO_SETTINGS_MODULE: examflow_project.settings
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/examflow_test
+          SECRET_KEY: test-secret-key
+          DEBUG: True
+        run: |
+          python manage.py migrate --run-syncdb
+          pytest tests/cross_browser/ -v --junitxml=reports/junit-cross-browser.xml
+
+  # Performance тесты
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: examflow_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+      
+      - name: Install Lighthouse
+        run: |
+          npm install -g lighthouse
+      
+      - name: Run performance tests
+        env:
+          DJANGO_SETTINGS_MODULE: examflow_project.settings
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/examflow_test
+          SECRET_KEY: test-secret-key
+          DEBUG: True
+        run: |
+          python manage.py migrate --run-syncdb
+          pytest tests/performance/ -v --junitxml=reports/junit-performance.xml
 
   # Load тесты (запускаются только на main ветке)
   load-tests:
