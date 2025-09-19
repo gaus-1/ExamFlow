@@ -62,10 +62,10 @@ class TestSimpleFunctionality:
     def test_exception_handling(self):
         """Тест обработки исключений"""
         with pytest.raises(ZeroDivisionError):
-            1 / 0
+            _ = 1 / 0
         
         with pytest.raises(KeyError):
-            {}['missing_key']
+            _ = {}['missing_key']
 
 
 class TestExamFlowSpecific:
