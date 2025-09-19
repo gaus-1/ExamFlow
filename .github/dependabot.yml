@@ -1,35 +1,31 @@
-# Dependabot конфигурация для автоматического обновления зависимостей
-# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
-
 version: 2
 updates:
-  # Python зависимости
+  # Python dependencies
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "09:00"
+      timezone: "Europe/Moscow"
     open-pull-requests-limit: 10
     reviewers:
-      - "Vyacheslav"
+      - "vyacheslav"
     assignees:
-      - "Vyacheslav"
+      - "vyacheslav"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
-      - "security"
-    # Автоматическое обновление только для безопасности
+      - "python"
     ignore:
-      # Игнорируем мажорные версии Django без ручной проверки
+      # Игнорируем major updates для стабильных версий
       - dependency-name: "Django"
         update-types: ["version-update:semver-major"]
-      # Игнорируем критические зависимости без ручной проверки
-      - dependency-name: "psycopg"
+      - dependency-name: "djangorestframework"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "python-telegram-bot"
+      - dependency-name: "psycopg2-binary"
         update-types: ["version-update:semver-major"]
 
   # GitHub Actions
@@ -39,52 +35,35 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
+      timezone: "Europe/Moscow"
     open-pull-requests-limit: 5
     reviewers:
-      - "Vyacheslav"
+      - "vyacheslav"
     assignees:
-      - "Vyacheslav"
+      - "vyacheslav"
     commit-message:
-      prefix: "ci"
+      prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "github-actions"
 
-  # npm зависимости (если появятся)
+  # Node.js dependencies (если есть)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "09:00"
+      timezone: "Europe/Moscow"
     open-pull-requests-limit: 5
     reviewers:
-      - "Vyacheslav"
+      - "vyacheslav"
     assignees:
-      - "Vyacheslav"
+      - "vyacheslav"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
-      - "frontend"
-
-  # Docker зависимости
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 5
-    reviewers:
-      - "Vyacheslav"
-    assignees:
-      - "Vyacheslav"
-    commit-message:
-      prefix: "chore"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "docker"
+      - "javascript"
