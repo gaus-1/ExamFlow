@@ -68,7 +68,7 @@ def home(request):
     }
 
     # SEO - базовые мета-теги встроены в шаблон
-    return render(request, 'index.html', context)
+    return render(request, 'index_modern.html', context)
 
 def subjects_list(request):
     """
