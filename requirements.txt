@@ -2,7 +2,7 @@
 Django==4.2.7
 gunicorn==21.2.0
 psycopg2-binary==2.9.7
-redis==5.0.1
+redis==6.4.0
 
 # ===== AI И МАШИННОЕ ОБУЧЕНИЕ =====
 google-generativeai==0.3.2
