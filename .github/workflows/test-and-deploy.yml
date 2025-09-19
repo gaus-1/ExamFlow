@@ -13,7 +13,7 @@ jobs:
     
     steps:
     - name: 📥 Клонирование репозитория
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       
     - name: 🐍 Настройка Python
       uses: actions/setup-python@v4
@@ -46,7 +46,7 @@ jobs:
     
     steps:
     - name: 📥 Клонирование репозитория
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       
     - name: 🐍 Настройка Python
       uses: actions/setup-python@v4
