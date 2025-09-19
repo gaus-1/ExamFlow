@@ -7,6 +7,7 @@
 - TelegramGamification: координация (фасад)
 """
 
+from typing import Dict, Any, Optional
 from .points_manager import PointsManager
 from .achievements_manager import AchievementsManager
 
