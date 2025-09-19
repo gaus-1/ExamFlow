@@ -267,7 +267,7 @@ jobs:
           pip install -r requirements.txt
       
       - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
       
       - name: Install Firefox
         uses: browser-actions/setup-firefox@v1
@@ -408,7 +408,7 @@ jobs:
           pip install -r requirements.txt
       
       - name: Install browsers
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
       
       - name: Run cross-browser tests
         env:
@@ -453,7 +453,7 @@ jobs:
           pip install -r requirements.txt
       
       - name: Install Chrome
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
       
       - name: Install Lighthouse
         run: |
