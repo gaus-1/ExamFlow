@@ -52,27 +52,46 @@ if not DEBUG:
     database_url = os.getenv('DATABASE_URL')
     if database_url:
         db_config = dj_database_url.parse(database_url)
-        # Добавляем SSL настройки для Render с более мягкими параметрами
+        
+        # Исправляем SSL настройки для Render PostgreSQL
         if 'OPTIONS' not in db_config:
             db_config['OPTIONS'] = {}
 
-        # Настройки для psycopg2 (используется на Render)
+        # Настройки SSL для Render PostgreSQL
         db_config['OPTIONS']['sslmode'] = 'require'  # type: ignore
-        db_config['OPTIONS']['connect_timeout'] = 30  # type: ignore
+        db_config['OPTIONS']['sslcert'] = ''  # type: ignore
+        db_config['OPTIONS']['sslkey'] = ''  # type: ignore
+        db_config['OPTIONS']['sslrootcert'] = ''  # type: ignore
+        
+        # Настройки таймаутов для стабильности
+        db_config['OPTIONS']['connect_timeout'] = 60  # type: ignore
         db_config['OPTIONS']['keepalives_idle'] = 600  # type: ignore
         db_config['OPTIONS']['keepalives_interval'] = 30  # type: ignore
         db_config['OPTIONS']['keepalives_count'] = 3  # type: ignore
-        db_config['OPTIONS']['application_name'] = 'examflow_render'  # type: ignore
-
-        # Дополнительные настройки для стабильности
-        db_config['CONN_MAX_AGE'] = 600  # type: ignore
+        
+        # Настройки подключения
+        db_config['CONN_MAX_AGE'] = 300  # type: ignore
         db_config['CONN_HEALTH_CHECKS'] = True  # type: ignore
-
-        # Убираем проблемные параметры для psycopg2
-        if 'CLIENT_CLASS' in db_config:
-            del db_config['CLIENT_CLASS']
+        
+        # Убираем проблемные параметры
+        for key in ['CLIENT_CLASS', 'ENGINE']:
+            if key in db_config:
+                del db_config[key]
 
         DATABASES['default'] = dict(db_config)  # type: ignore
+        
+        # Дополнительная обработка для Render PostgreSQL
+        if 'render.com' in database_url or 'dpg-' in database_url:
+            # Специальные настройки для Render
+            DATABASES['default']['OPTIONS']['sslmode'] = 'require'  # type: ignore
+            DATABASES['default']['OPTIONS']['connect_timeout'] = 60  # type: ignore
+            
+            # Принудительно устанавливаем ENGINE для Render
+            DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'  # type: ignore
+            
+            # Настройки для стабильности соединения
+            DATABASES['default']['CONN_MAX_AGE'] = 0  # type: ignore
+            DATABASES['default']['CONN_HEALTH_CHECKS'] = False  # type: ignore
 
     # Временно отключаем drf-spectacular в продакшене для исправления ошибки
     try:
