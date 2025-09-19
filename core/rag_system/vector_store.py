@@ -13,7 +13,7 @@ class VectorStore:
     def __init__(self):
         self.data = []
     
-    def add_document(self, content: str, metadata: dict = None):
+    def add_document(self, content: str, metadata: dict = None): # type: ignore
         """Добавление документа"""
         logger.info(f"Добавлен документ: {content[:50]}...")
         self.data.append({
