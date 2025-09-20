@@ -1,41 +1,41 @@
 /* ===== EXAMFLOW MODERN CSS VARIABLES ===== */
 :root {
-  /* Современная минималистичная цветовая палитра */
-  --color-background: #0a0a0a;
-  --color-surface: #111111;
-  --color-surface-hover: #1a1a1a;
-  --color-border: #222222;
-  --color-border-light: #333333;
+  /* Светлая современная цветовая палитра */
+  --color-background: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-surface-hover: #e9ecef;
+  --color-border: #dee2e6;
+  --color-border-light: #e9ecef;
   
   /* Текст */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a0a0a0;
-  --color-text-muted: #666666;
+  --color-text-primary: #212529;
+  --color-text-secondary: #6c757d;
+  --color-text-muted: #adb5bd;
   
   /* Акценты */
-  --color-accent: #00d4ff;
-  --color-accent-hover: #00b8e6;
-  --color-accent-dark: #0099cc;
+  --color-accent: #0d6efd;
+  --color-accent-hover: #0b5ed7;
+  --color-accent-dark: #0a58ca;
   
   /* Градиенты */
-  --gradient-primary: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-  --gradient-surface: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+  --gradient-primary: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  --gradient-surface: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   
   /* Типографика */
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
   
-  /* Размеры */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  --text-6xl: 3.75rem;
+  /* Размеры - адаптивные */
+  --text-xs: clamp(0.75rem, 2vw, 0.75rem);
+  --text-sm: clamp(0.875rem, 2.5vw, 0.875rem);
+  --text-base: clamp(1rem, 3vw, 1rem);
+  --text-lg: clamp(1.125rem, 3.5vw, 1.125rem);
+  --text-xl: clamp(1.25rem, 4vw, 1.25rem);
+  --text-2xl: clamp(1.5rem, 4.5vw, 1.5rem);
+  --text-3xl: clamp(1.875rem, 5vw, 1.875rem);
+  --text-4xl: clamp(2.25rem, 6vw, 2.25rem);
+  --text-5xl: clamp(3rem, 8vw, 3rem);
+  --text-6xl: clamp(3.75rem, 10vw, 3.75rem);
   
   /* Отступы */
   --space-1: 0.25rem;
@@ -57,11 +57,11 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
   
-  /* Тени */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  /* Тени для светлой темы */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   
   /* Переходы */
   --transition-fast: 0.15s ease;
@@ -1081,5 +1081,219 @@ body {
   .ai-hub {
     max-width: 700px;
     margin: 0 auto var(--space-16);
+  }
+}
+
+/* ===== АДАПТИВНЫЕ МЕДИА-ЗАПРОСЫ ===== */
+
+/* Очень маленькие экраны (до 480px) */
+@media (max-width: 480px) {
+  :root {
+    --text-5xl: clamp(2rem, 6vw, 2.5rem);
+    --text-6xl: clamp(2.5rem, 7vw, 3rem);
+    --space-16: 2rem;
+    --space-20: 2.5rem;
+    --space-24: 3rem;
+  }
+  
+  .hero-title {
+    font-size: var(--text-4xl);
+    line-height: 1.1;
+  }
+  
+  .hero-subtitle {
+    font-size: var(--text-lg);
+  }
+  
+  .container {
+    padding: 0 var(--space-4);
+  }
+  
+  .subject-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+/* Маленькие экраны (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .subject-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Средние экраны (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .subject-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Большие экраны (1025px+) */
+@media (min-width: 1025px) {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+  }
+  
+  .hero-section {
+    padding: var(--space-24) 0;
+  }
+  
+  .hero-title {
+    font-size: var(--text-6xl);
+  }
+  
+  .subject-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .pricing-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+}
+
+/* Очень большие экраны (1440px+) */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+  }
+  
+  .hero-title {
+    font-size: clamp(3.5rem, 4vw, 4rem);
+  }
+  
+  .hero-subtitle {
+    font-size: var(--text-2xl);
+  }
+}
+
+/* Высокие экраны (aspect ratio > 16:9) */
+@media (min-aspect-ratio: 16/9) {
+  .hero-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Портретная ориентация */
+@media (orientation: portrait) and (max-width: 768px) {
+  .hero-title {
+    font-size: var(--text-4xl);
+  }
+  
+  .hero-subtitle {
+    font-size: var(--text-lg);
+  }
+  
+  .subject-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ландшафтная ориентация на мобильных */
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero-section {
+    padding: var(--space-8) 0;
+  }
+  
+  .hero-title {
+    font-size: var(--text-3xl);
+  }
+  
+  .hero-subtitle {
+    font-size: var(--text-base);
+  }
+}
+
+/* Улучшения для touch устройств */
+@media (pointer: coarse) {
+  .btn, .subject-card, .pricing-card {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-6);
+  }
+  
+  .subject-card {
+    padding: var(--space-6);
+  }
+  
+  .pricing-card {
+    padding: var(--space-8);
+  }
+}
+
+/* Поддержка темной темы (если пользователь предпочитает) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0a0a0a;
+    --color-surface: #111111;
+    --color-surface-hover: #1a1a1a;
+    --color-border: #222222;
+    --color-border-light: #333333;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #a0a0a0;
+    --color-text-muted: #666666;
+    --color-accent: #00d4ff;
+    --color-accent-hover: #00b8e6;
+    --color-accent-dark: #0099cc;
+    --gradient-primary: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+    --gradient-surface: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Улучшения доступности */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Высокий контраст */
+@media (prefers-contrast: high) {
+  :root {
+    --color-text-primary: #000000;
+    --color-background: #ffffff;
+    --color-accent: #0000ff;
+    --color-border: #000000;
   }
 }
