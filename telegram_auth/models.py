@@ -3,12 +3,41 @@
 """
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
+
+
+class TelegramUserManager(BaseUserManager):
+    """Кастомный менеджер для TelegramUser"""
+    
+    def create_user(self, telegram_id, **extra_fields):
+        """Создает обычного пользователя"""
+        if not telegram_id:
+            raise ValueError('Telegram ID обязателен')
+        
+        user = self.model(telegram_id=telegram_id, **extra_fields)
+        user.set_unusable_password()
+        user.save(using=self._db)
+        return user
+    
+    def create_superuser(self, telegram_id, **extra_fields):
+        """Создает суперпользователя"""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Суперпользователь должен иметь is_staff=True')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Суперпользователь должен иметь is_superuser=True')
+        
+        return self.create_user(telegram_id, **extra_fields)
 
 
 class TelegramUser(AbstractUser):
     """Пользователь с Telegram аутентификацией"""
+    
+    # Кастомный менеджер
+    objects = TelegramUserManager()
 
     # Убираем стандартные поля Django User, которые нам не нужны
     username = None

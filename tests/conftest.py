@@ -36,11 +36,10 @@ def client():
 def user():
     """Создание тестового пользователя"""
     user = User.objects.create_user(
-        username='testuser',
-        email='test@examflow.ru',
-        password='testpass123',
         telegram_id=123456789,
-        telegram_username='testuser'
+        telegram_username='testuser',
+        telegram_first_name='Test',
+        telegram_last_name='User'
     )
     return user
 
@@ -49,10 +48,9 @@ def user():
 def admin_user():
     """Создание тестового администратора"""
     admin = User.objects.create_superuser(
-        username='admin',
-        email='admin@examflow.ru',
-        password='adminpass123',
-        telegram_id=987654321
+        telegram_id=987654321,
+        telegram_username='admin',
+        telegram_first_name='Admin'
     )
     return admin
 
