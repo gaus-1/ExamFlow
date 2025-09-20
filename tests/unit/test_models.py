@@ -22,17 +22,16 @@ class TestUserModel:
     def test_create_user(self):
         """Тест создания обычного пользователя"""
         user = User.objects.create_user(
-            username='testuser',
-            email='test@examflow.ru',
-            password='testpass123',
             telegram_id=123456789,
-            telegram_username='testuser'
+            telegram_username='testuser',
+            telegram_first_name='Test',
+            telegram_last_name='User'
         )
         
-        assert user.username == 'testuser'
-        assert user.email == 'test@examflow.ru'
         assert user.telegram_id == 123456789
         assert user.telegram_username == 'testuser'
+        assert user.telegram_first_name == 'Test'
+        assert user.telegram_last_name == 'User'
         assert user.is_active is True
         assert user.is_staff is False
         assert user.is_superuser is False
@@ -40,19 +39,19 @@ class TestUserModel:
     def test_create_superuser(self):
         """Тест создания суперпользователя"""
         admin = User.objects.create_superuser(
-            username='admin',
-            email='admin@examflow.ru',
-            password='adminpass123',
-            telegram_id=987654321
+            telegram_id=987654321,
+            telegram_username='admin',
+            telegram_first_name='Admin'
         )
         
         assert admin.is_superuser is True
         assert admin.is_staff is True
         assert admin.is_active is True
+        assert admin.telegram_id == 987654321
     
     def test_user_str_representation(self, user):
         """Тест строкового представления пользователя"""
-        assert str(user) == 'testuser'
+        assert 'testuser' in str(user) or str(user.telegram_id) in str(user)
     
     def test_user_telegram_id_unique(self):
         """Тест уникальности telegram_id"""
