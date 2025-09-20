@@ -151,20 +151,12 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
 
 💬 СТИЛЬ: Кратко и по делу (до 300 слов)
 🚫 НЕ упоминай провайдера ИИ
-🚫 Если вопрос не по твоим предметам - скажи: "Я специализируюсь на математике и русском языке!""""
+🚫 Если вопрос не по твоим предметам - скажи: "Я специализируюсь на математике и русском языке!"""
 
         full_prompt = f"{system_prompt}\n\n{prompt_with_context}"
         
-        # Настраиваем параметры генерации
-        generation_config = genai.types.GenerationConfig(
-            temperature=config.get('temperature', 0.7),
-            max_output_tokens=config.get('max_tokens', 300),
-            top_p=0.8,
-            top_k=40
-        )
-        
         # Получаем ответ
-        response = model.generate_content(full_prompt, generation_config=generation_config)
+        response = model.generate_content(full_prompt)
         
         if response.text:
             answer = response.text.strip()
