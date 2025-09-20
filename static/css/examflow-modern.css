@@ -108,7 +108,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(10, 10, 10, 0.95);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
   z-index: var(--z-fixed);
@@ -343,6 +343,64 @@ body {
   border-color: var(--color-accent);
   color: var(--color-accent);
   transform: translateY(-1px);
+}
+
+/* ===== TELEGRAM BOT СЕКЦИЯ ===== */
+.telegram-bot-section {
+  margin-top: var(--space-8);
+  padding: var(--space-6);
+  background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.telegram-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+  line-height: 1.5;
+}
+
+.telegram-bot-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: rgba(255, 255, 255, 0.95);
+  color: #0088cc;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--text-base);
+  transition: all var(--transition-normal);
+  border: 2px solid transparent;
+  box-shadow: var(--shadow-lg);
+}
+
+.telegram-bot-btn:hover {
+  background: white;
+  color: #006699;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.telegram-icon {
+  font-size: var(--text-xl);
+}
+
+.telegram-text-btn {
+  font-weight: 600;
+}
+
+.telegram-arrow {
+  font-size: var(--text-lg);
+  transition: transform var(--transition-normal);
+}
+
+.telegram-bot-btn:hover .telegram-arrow {
+  transform: translateX(4px);
 }
 
 /* ===== AI ЧАТ ===== */
@@ -929,6 +987,27 @@ body {
   
   .ai-hub {
     padding: var(--space-6);
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    text-align: center;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+  }
+  
+  .footer-qr {
+    margin-top: var(--space-8);
+    order: -1;
+  }
+  
+  .qr-container {
+    align-items: center;
   }
   
   .quick-questions {

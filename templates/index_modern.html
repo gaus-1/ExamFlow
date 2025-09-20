@@ -87,6 +87,16 @@
                             </button>
                         </div>
                         
+                        <!-- Кнопка перехода в Telegram бота -->
+                        <div class="telegram-bot-section">
+                            <p class="telegram-text">💡 Для более персонализированной помощи и интерактивных заданий:</p>
+                            <a href="https://t.me/ExamFlowBot" target="_blank" class="telegram-bot-btn">
+                                <span class="telegram-icon">🤖</span>
+                                <span class="telegram-text-btn">Открыть в Telegram</span>
+                                <span class="telegram-arrow">→</span>
+                            </a>
+                        </div>
+                        
                         <!-- Область ответов ИИ -->
                         <div id="aiChat" class="ai-chat" style="display: none;">
                             <div class="ai-chat-header">
@@ -296,13 +306,13 @@
             
             try {
                 // Отправляем запрос к API (ОРИГИНАЛЬНАЯ ЛОГИКА)
-                const response = await fetch('/ai/api/', {
+                const response = await fetch('/api/ai/query/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify({ prompt: question })
+                    body: JSON.stringify({ query: question })
                 });
                 
                 if (!response.ok) {
@@ -341,7 +351,7 @@
                             'Content-Type': 'application/json',
                             'X-CSRFToken': getCookie('csrftoken')
                         },
-                        body: JSON.stringify({ prompt: question })
+                        body: JSON.stringify({ query: question })
                     });
                     
                     if (emergencyResponse.ok) {
