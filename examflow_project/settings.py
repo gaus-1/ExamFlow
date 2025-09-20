@@ -128,6 +128,9 @@ if not DEBUG:
 
 # API ключи и внешние сервисы
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_TIMEOUT = 10  # Сокращенный timeout для быстрых ответов
+GEMINI_MOBILE_TIMEOUT = 5  # Еще более короткий timeout для мобильных
+GEMINI_MAX_TOKENS = 512  # Ограничение токенов для быстрых ответов
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_WEBHOOK_SECRET = os.getenv('TELEGRAM_WEBHOOK_SECRET', '')
 DATABASE_URL = os.getenv('DATABASE_URL', '')
@@ -154,6 +157,9 @@ TELEGRAM_BOT_CONFIG = {
     'POLLING_INTERVAL': 1,
     'MAX_CONNECTIONS': 100,
     'TIMEOUT': 30,
+    'MOBILE_TIMEOUT': 15,  # Сокращенный timeout для мобильных
+    'AI_RESPONSE_TIMEOUT': 10,  # Timeout для AI ответов
+    'CACHE_AI_RESPONSES': True,  # Кэширование AI ответов
     }
 
 # Настройки кэширования

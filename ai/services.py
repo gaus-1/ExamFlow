@@ -38,11 +38,16 @@ class GeminiProvider(BaseProvider):
 
     name = "gemini"
 
-    def __init__(self, model: Optional[str] = None, task_type: str = 'chat') -> None:
+    def __init__(self, model: Optional[str] = None, task_type: str = 'chat', is_mobile: bool = False) -> None:
         # Используем настройки из Django settings
         self.api_key = getattr(settings, 'GEMINI_API_KEY', '')
         self.api_url = getattr(settings, 'GEMINI_BASE_URL', '')
-        self.timeout = getattr(settings, 'GEMINI_TIMEOUT', 30)
+        
+        # Выбираем timeout в зависимости от устройства
+        if is_mobile:
+            self.timeout = getattr(settings, 'GEMINI_MOBILE_TIMEOUT', 5)
+        else:
+            self.timeout = getattr(settings, 'GEMINI_TIMEOUT', 10)
 
         # Выбираем настройки для конкретного типа задачи
         task_configs = getattr(settings, 'GEMINI_TASK_CONFIGS', {})
@@ -73,8 +78,12 @@ class GeminiProvider(BaseProvider):
             if self.system_prompt:
                 full_prompt = "{self.system_prompt}\n\nПользователь: {prompt}\n\nОтвет:"
 
-            # Используем настройки из конфигурации
-            actual_max_tokens = min(max_tokens, self.max_tokens)
+            # Используем настройки из конфигурации с учетом мобильных устройств
+            if self.is_mobile:
+                mobile_max_tokens = getattr(settings, 'GEMINI_MAX_TOKENS', 512)
+                actual_max_tokens = min(max_tokens, mobile_max_tokens)
+            else:
+                actual_max_tokens = min(max_tokens, self.max_tokens)
             # Формируем payload для Gemini API (точно по официальной документации)
             payload = {
                 "contents": [
@@ -215,13 +224,14 @@ class FallbackProvider(BaseProvider):
 class AiService:
     """Сервис управления провайдерами, лимитами и кэшем ответов."""
 
-    def __init__(self) -> None:
+    def __init__(self, is_mobile: bool = False) -> None:
         import logging
         logger = logging.getLogger(__name__)
         logger.info("Инициализация AiService...")
 
+        self.is_mobile = is_mobile
         self.providers: list[BaseProvider] = self._load_providers()
-        logger.info("AiService инициализирован успешно")
+        logger.info(f"AiService инициализирован успешно (мобильный: {is_mobile})")
 
     def _load_providers(self) -> list[BaseProvider]:
         # Используем только Google Gemini AI
@@ -232,7 +242,7 @@ class AiService:
         ordered: list[BaseProvider] = []
 
         # Пытаемся использовать Gemini
-        gemini_provider = GeminiProvider()
+        gemini_provider = GeminiProvider(is_mobile=self.is_mobile)
         if gemini_provider.is_available():
             ordered.append(gemini_provider)
             logger.info("Gemini провайдер доступен")

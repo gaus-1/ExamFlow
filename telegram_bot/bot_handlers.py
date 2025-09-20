@@ -25,6 +25,23 @@ from .utils.text_utils import clean_markdown_text, clean_log_text
 # Настройка логирования
 logger = logging.getLogger(__name__)
 
+def is_mobile_telegram_user(user) -> bool:
+    """
+    Определяет, использует ли пользователь мобильное устройство в Telegram
+    """
+    # В Telegram нет прямого способа определить устройство,
+    # но мы можем использовать эвристики на основе поведения
+    if not user:
+        return False
+    
+    # Проверяем, есть ли у пользователя username (чаще на десктопе)
+    # и время активности (мобильные пользователи чаще активны в определенное время)
+    has_username = bool(getattr(user, 'username', None))
+    
+    # Простая эвристика: если нет username, вероятно мобильный пользователь
+    # Также можно добавить проверку по времени последней активности
+    return not has_username
+
 # Инициализация системы геймификации
 gamification = TelegramGamification()
 
@@ -122,12 +139,26 @@ def db_clear_chat_session_context(telegram_user):
 # ИИ сервис для асинхронного использования
 
 @sync_to_async
-def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) -> str:
+def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None, is_mobile: bool = False) -> str:
     """Получает персонализированный ответ от ИИ с использованием RAG системы"""
     try:
-        # Используем базовый AI-сервис
+        # Импортируем утилиты мобильной оптимизации
+        from telegram_bot.utils.mobile_optimization import (
+            generate_prompt_hash, get_cached_ai_response, cache_ai_response,
+            optimize_response_for_mobile, get_mobile_optimized_config
+        )
+        
+        # Проверяем кэш для быстрых ответов
+        if is_mobile:
+            prompt_hash = generate_prompt_hash(prompt, user.id if user else 0)
+            cached_response = get_cached_ai_response(prompt_hash)
+            if cached_response:
+                logger.info(f"Возвращаем закэшированный ответ для мобильного устройства")
+                return cached_response
+        
+        # Используем базовый AI-сервис с мобильной оптимизацией
         from ai.services import AiService
-        ai_service = AiService()
+        ai_service = AiService(is_mobile=is_mobile)
 
         # Получаем ответ от AI
         if user is None:
@@ -138,6 +169,15 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
             return f"❌ Ошибка: {result['error']}"
 
         response = result['response']
+
+        # Оптимизируем ответ для мобильных устройств
+        if is_mobile:
+            mobile_config = get_mobile_optimized_config()
+            response = optimize_response_for_mobile(response, mobile_config['max_response_length'])
+            
+            # Кэшируем ответ для будущих запросов
+            prompt_hash = generate_prompt_hash(prompt, user.id if user else 0)
+            cache_ai_response(prompt_hash, response, 300)  # Кэшируем на 5 минут
 
         # Убираем фразу о провайдере ИИ
 
@@ -944,12 +984,16 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Получаем или создаем Django User для совместимости с AI сервисом
                 django_user, created = await db_get_or_create_user(user)
 
+                # Определяем, является ли пользователь мобильным
+                is_mobile = is_mobile_telegram_user(user)
+                
                 ai_response = await get_ai_response(
                     "Объясни, как решить это задание. Дай пошаговое решение с объяснением каждого шага. "
                     "Учитывай мой текущий уровень и слабые темы.",
                     task_type='task_help',
                     user=django_user,
-                    task=task
+                    task=task,
+                    is_mobile=is_mobile
                 )
 
                 # Формируем ответ с кнопками
@@ -1042,12 +1086,16 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
             parse_mode=None
         )
 
+        # Определяем, является ли пользователь мобильным
+        is_mobile = is_mobile_telegram_user(update.effective_user)
+        
         # Получаем объяснение от AI
         ai_response = await get_ai_response(
             "Объясни простыми словами основные темы по математике, которые нужны для ЕГЭ. "
             "Дай краткое, но понятное объяснение с примерами.",
             task_type='topic_explanation',
-            user=user
+            user=user,
+            is_mobile=is_mobile
         )
 
         # Формируем ответ с кнопками
@@ -1096,11 +1144,15 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
 
         # Получаем персональные советы от AI
+        # Определяем, является ли пользователь мобильным
+        is_mobile = is_mobile_telegram_user(update.effective_user)
+        
         ai_response = await get_ai_response(
             "Проанализируй мой прогресс в обучении и дай персональные советы "
             "по подготовке к ЕГЭ. Что мне нужно подтянуть? Какие темы повторить?",
             task_type='personal_advice',
-            user=user
+            user=user,
+            is_mobile=is_mobile
         )
 
         # Формируем ответ с кнопками
@@ -1148,12 +1200,16 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
             parse_mode=None
         )
 
+        # Определяем, является ли пользователь мобильным
+        is_mobile = is_mobile_telegram_user(update.effective_user)
+        
         # Получаем общую подсказку от AI
         ai_response = await get_ai_response(
             "Дай общие советы по решению математических задач ЕГЭ. "
             "Какие подходы использовать? На что обращать внимание?",
             task_type='general_hint',
-            user=user
+            user=user,
+            is_mobile=is_mobile
         )
 
         # Формируем ответ с кнопками
@@ -1281,11 +1337,15 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         enhanced_prompt = await db_create_enhanced_prompt(user_message, chat_session)
 
 
-        # Получаем ответ от AI с контекстом
+        # Определяем, является ли пользователь мобильным
+        is_mobile = is_mobile_telegram_user(user)
+        
+        # Получаем ответ от AI с контекстом и мобильной оптимизацией
         ai_response = await get_ai_response(  # type: ignore
             await enhanced_prompt,  # type: ignore
             task_type='direct_question',
-            user=django_user
+            user=django_user,
+            is_mobile=is_mobile
         )
 
         # Добавляем ответ ассистента в контекст
