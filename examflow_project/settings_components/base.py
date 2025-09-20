@@ -65,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.premium.middleware.PremiumAccessMiddleware',
+    # 'core.premium.middleware.PremiumAccessMiddleware',  # Отключено - модуль не существует
 ]
 
 ROOT_URLCONF = 'examflow_project.urls'
@@ -100,15 +100,17 @@ if _DATABASE_URL:
     if 'postgres' in _DATABASE_URL and ('render.com' in _DATABASE_URL or '35.227.164.209' in _DATABASE_URL or 'dpg-' in _DATABASE_URL):
         DATABASES['default']['OPTIONS'] = {
             'sslmode': 'require',  # Требуется для Render PostgreSQL
-            'connect_timeout': 60,  # Увеличен таймаут
+            'connect_timeout': 30,  # Уменьшен таймаут для быстрого обнаружения проблем
             'application_name': 'ExamFlow',
             'keepalives_idle': 600,
             'keepalives_interval': 30,
             'keepalives_count': 3,
+            'target_session_attrs': 'read-write',  # Дополнительная настройка для Render
         }
         # Дополнительные настройки для Render
         DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
         DATABASES['default']['CONN_MAX_AGE'] = 0  # Отключаем пул соединений для Render
+        DATABASES['default']['CONN_HEALTH_CHECKS'] = True  # Проверка здоровья соединений
     elif 'postgres' in _DATABASE_URL and 'localhost' in _DATABASE_URL:
         # Локальный PostgreSQL без SSL
         DATABASES['default']['OPTIONS'] = {
