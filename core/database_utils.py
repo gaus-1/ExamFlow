@@ -83,23 +83,19 @@ def close_database_connections():
 
 def test_database_connectivity():
     """
-    Тестирует подключение к базе данных
+    Тестирует подключение к базе данных - упрощенная версия для Render
     """
     try:
-        ensure_database_connection()
-        
         with connection.cursor() as cursor:
-            # Проверяем базовые операции
-            cursor.execute("SELECT version()")
-            version = cursor.fetchone()[0]
-            logger.info(f"PostgreSQL version: {version}")
-            
-            # Проверяем SSL соединение
-            cursor.execute("SELECT ssl_is_used()")
-            ssl_used = cursor.fetchone()[0]
-            logger.info(f"SSL connection: {'Yes' if ssl_used else 'No'}")
-            
-            return True
+            # Простая проверка
+            cursor.execute("SELECT 1")
+            result = cursor.fetchone()
+            if result and result[0] == 1:
+                logger.info("Database connectivity test passed")
+                return True
+            else:
+                logger.error("Database connectivity test failed: unexpected result")
+                return False
             
     except Exception as e:
         logger.error(f"Database connectivity test failed: {e}")
