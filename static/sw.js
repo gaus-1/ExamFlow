@@ -1,194 +1,281 @@
-// ExamFlow Service Worker для PWA
-const CACHE_NAME = 'examflow-v1.0';
-const STATIC_CACHE_URLS = [
-  '/',
-  '/subjects/',
-  '/static/manifest.json',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'
+/**
+ * ExamFlow Service Worker
+ * Кэширование и оптимизация производительности
+ */
+
+const CACHE_NAME = 'examflow-v1.0.0';
+const STATIC_CACHE = 'examflow-static-v1.0.0';
+const DYNAMIC_CACHE = 'examflow-dynamic-v1.0.0';
+
+// Ресурсы для кэширования при установке
+const STATIC_ASSETS = [
+    '/',
+    '/static/css/examflow-ux-optimized.css',
+    '/static/js/examflow-optimizations.js',
+    '/static/images/examflow-logo.png',
+    '/static/images/examflow-og-image.jpg',
+    // Шрифты
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+    'https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2'
 ];
+
+// Стратегии кэширования
+const CACHE_STRATEGIES = {
+    // Статические ресурсы - Cache First
+    static: ['css', 'js', 'woff', 'woff2', 'png', 'jpg', 'jpeg', 'svg', 'ico'],
+    
+    // HTML страницы - Network First
+    html: ['html', 'htm'],
+    
+    // API запросы - Network First с fallback
+    api: ['/api/', '/telegram_auth/', '/learning/'],
+    
+    // Изображения - Cache First
+    images: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg']
+};
 
 // Установка Service Worker
 self.addEventListener('install', event => {
-  console.log('ExamFlow SW: Installing...');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('ExamFlow SW: Caching static resources');
-        return cache.addAll(STATIC_CACHE_URLS);
-      })
-      .then(() => {
-        console.log('ExamFlow SW: Installation complete');
-        return self.skipWaiting();
-      })
-  );
+    console.log('[SW] Installing...');
+    
+    event.waitUntil(
+        caches.open(STATIC_CACHE)
+            .then(cache => {
+                console.log('[SW] Caching static assets');
+                return cache.addAll(STATIC_ASSETS);
+            })
+            .then(() => {
+                console.log('[SW] Static assets cached');
+                return self.skipWaiting();
+            })
+            .catch(error => {
+                console.error('[SW] Failed to cache static assets:', error);
+            })
+    );
 });
 
 // Активация Service Worker
 self.addEventListener('activate', event => {
-  console.log('ExamFlow SW: Activating...');
-  event.waitUntil(
-    caches.keys()
-      .then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => {
-            if (cacheName !== CACHE_NAME) {
-              console.log('ExamFlow SW: Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(() => {
-        console.log('ExamFlow SW: Activation complete');
-        return self.clients.claim();
-      })
-  );
+    console.log('[SW] Activating...');
+    
+    event.waitUntil(
+        caches.keys()
+            .then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+                            console.log('[SW] Deleting old cache:', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+            .then(() => {
+                console.log('[SW] Activated');
+                return self.clients.claim();
+            })
+    );
 });
 
-// Обработка запросов
+// Перехват запросов
 self.addEventListener('fetch', event => {
-  const { request } = event;
-  
-  // Пропускаем не-GET запросы и внешние API
-  if (request.method !== 'GET' || 
-      request.url.includes('/api/') ||
-      request.url.includes('telegram') ||
-      request.url.includes('chrome-extension')) {
-    return;
-  }
-  
-  event.respondWith(
-    caches.match(request)
-      .then(cachedResponse => {
-        // Возвращаем кэшированный ответ если есть
-        if (cachedResponse) {
-          console.log('ExamFlow SW: Serving from cache:', request.url);
-          return cachedResponse;
+    const { request } = event;
+    const url = new URL(request.url);
+    
+    // Пропускаем не-GET запросы
+    if (request.method !== 'GET') {
+        return;
+    }
+    
+    // Пропускаем chrome-extension и другие протоколы
+    if (!url.protocol.startsWith('http')) {
+        return;
+    }
+    
+    event.respondWith(handleRequest(request));
+});
+
+// Обработка запросов с различными стратегиями
+async function handleRequest(request) {
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+    const extension = getFileExtension(pathname);
+    
+    try {
+        // Статические ресурсы - Cache First
+        if (CACHE_STRATEGIES.static.includes(extension)) {
+            return await cacheFirst(request, STATIC_CACHE);
         }
         
-        // Иначе делаем сетевой запрос
-        return fetch(request)
-          .then(response => {
-            // Проверяем валидность ответа
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+        // HTML страницы - Network First
+        if (CACHE_STRATEGIES.html.includes(extension) || pathname === '/') {
+            return await networkFirst(request, DYNAMIC_CACHE);
+        }
+        
+        // API запросы - Network First с fallback
+        if (CACHE_STRATEGIES.api.some(apiPath => pathname.startsWith(apiPath))) {
+            return await networkFirst(request, DYNAMIC_CACHE);
+        }
+        
+        // Изображения - Cache First
+        if (CACHE_STRATEGIES.images.includes(extension)) {
+            return await cacheFirst(request, STATIC_CACHE);
+        }
+        
+        // По умолчанию - Network First
+        return await networkFirst(request, DYNAMIC_CACHE);
+        
+    } catch (error) {
+        console.error('[SW] Error handling request:', error);
+        
+        // Fallback для HTML страниц
+        if (pathname === '/' || CACHE_STRATEGIES.html.includes(extension)) {
+            const fallbackResponse = await caches.match('/');
+            if (fallbackResponse) {
+                return fallbackResponse;
             }
-            
-            // Клонируем ответ для кэширования
-            const responseToCache = response.clone();
-            
-            // Кэшируем ответ для статических ресурсов
-            if (request.url.includes('.css') || 
-                request.url.includes('.js') || 
-                request.url.includes('.png') || 
-                request.url.includes('.jpg') ||
-                request.url.includes('.woff')) {
-              
-              caches.open(CACHE_NAME)
-                .then(cache => {
-                  console.log('ExamFlow SW: Caching new resource:', request.url);
-                  cache.put(request, responseToCache);
-                });
-            }
-            
-            return response;
-          })
-          .catch(() => {
-            // В случае отсутствия сети показываем офлайн страницу
-            if (request.destination === 'document') {
-              return caches.match('/offline.html') || 
-                     new Response('ExamFlow временно недоступен. Проверьте подключение к интернету.', {
-                       headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-                     });
-            }
-            
-            // Для других ресурсов возвращаем пустой ответ
-            return new Response('', { status: 408, statusText: 'Request timeout' });
-          });
-      })
-  );
-});
+        }
+        
+        // Возвращаем ошибку
+        return new Response('Network error', {
+            status: 503,
+            statusText: 'Service Unavailable'
+        });
+    }
+}
 
-// Push уведомления (для будущего использования)
+// Стратегия Cache First
+async function cacheFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(request);
+    
+    if (cachedResponse) {
+        return cachedResponse;
+    }
+    
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+        cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+}
+
+// Стратегия Network First
+async function networkFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    
+    try {
+        const networkResponse = await fetch(request);
+        
+        if (networkResponse.ok) {
+            cache.put(request, networkResponse.clone());
+        }
+        
+        return networkResponse;
+    } catch (error) {
+        console.log('[SW] Network failed, trying cache:', error);
+        
+        const cachedResponse = await cache.match(request);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
+        
+        throw error;
+    }
+}
+
+// Получение расширения файла
+function getFileExtension(pathname) {
+    const parts = pathname.split('.');
+    return parts.length > 1 ? parts.pop().toLowerCase() : '';
+}
+
+// Обработка push уведомлений
 self.addEventListener('push', event => {
-  if (!event.data) return;
-  
-  const data = event.data.json();
-  
-  const options = {
-    body: data.body || 'У вас есть новые задания для решения!',
-    icon: '/static/icons/icon-192x192.png',
-    badge: '/static/icons/icon-72x72.png',
-    tag: 'examflow-notification',
-    data: data.url || '/',
-    actions: [
-      {
-        action: 'open',
-        title: 'Открыть',
-        icon: '/static/icons/icon-96x96.png'
-      },
-      {
-        action: 'close',
-        title: 'Закрыть'
-      }
-    ],
-    requireInteraction: true,
-    silent: false
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'ExamFlow', options)
-  );
+    if (!event.data) {
+        return;
+    }
+    
+    const data = event.data.json();
+    const options = {
+        body: data.body,
+        icon: '/static/images/examflow-logo.png',
+        badge: '/static/images/examflow-badge.png',
+        vibrate: [100, 50, 100],
+        data: {
+            dateOfArrival: Date.now(),
+            primaryKey: data.primaryKey || 1
+        },
+        actions: [
+            {
+                action: 'explore',
+                title: 'Открыть ExamFlow',
+                icon: '/static/images/examflow-logo.png'
+            },
+            {
+                action: 'close',
+                title: 'Закрыть',
+                icon: '/static/images/close.png'
+            }
+        ]
+    };
+    
+    event.waitUntil(
+        self.registration.showNotification(data.title || 'ExamFlow', options)
+    );
 });
 
 // Обработка кликов по уведомлениям
 self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  
-  if (event.action === 'close') {
-    return;
-  }
-  
-  const url = event.notification.data || '/';
-  
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then(clientList => {
-        // Ищем уже открытое окно
-        for (let client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.navigate(url);
-            return client.focus();
-          }
-        }
-        
-        // Открываем новое окно
-        if (clients.openWindow) {
-          return clients.openWindow(url);
-        }
-      })
-  );
+    event.notification.close();
+    
+    if (event.action === 'explore') {
+        event.waitUntil(
+            clients.openWindow('/')
+        );
+    } else if (event.action === 'close') {
+        // Просто закрываем уведомление
+        return;
+    } else {
+        // По умолчанию открываем главную страницу
+        event.waitUntil(
+            clients.openWindow('/')
+        );
+    }
 });
 
-// Синхронизация в фоне (для будущего использования)
+// Синхронизация в фоне
 self.addEventListener('sync', event => {
-  console.log('ExamFlow SW: Background sync:', event.tag);
-  
-  if (event.tag === 'background-sync') {
-    event.waitUntil(
-      // Здесь можно синхронизировать данные
-      fetch('/api/sync/')
-        .then(response => response.json())
-        .then(data => {
-          console.log('ExamFlow SW: Background sync completed:', data);
-        })
-        .catch(error => {
-          console.error('ExamFlow SW: Background sync failed:', error);
+    if (event.tag === 'background-sync') {
+        event.waitUntil(doBackgroundSync());
+    }
+});
+
+async function doBackgroundSync() {
+    // Здесь можно добавить логику синхронизации данных
+    console.log('[SW] Background sync triggered');
+}
+
+// Обработка сообщений от клиента
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+// Очистка старых кэшей
+async function cleanupOldCaches() {
+    const cacheNames = await caches.keys();
+    const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE];
+    
+    return Promise.all(
+        cacheNames.map(cacheName => {
+            if (!currentCaches.includes(cacheName)) {
+                console.log('[SW] Deleting old cache:', cacheName);
+                return caches.delete(cacheName);
+            }
         })
     );
-  }
-});
-
-console.log('ExamFlow Service Worker loaded');
+}
