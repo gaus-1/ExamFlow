@@ -111,7 +111,7 @@ if _DATABASE_URL:
         DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql'
         DATABASES['default']['CONN_MAX_AGE'] = 0  # Отключаем пул соединений для Render
         DATABASES['default']['CONN_HEALTH_CHECKS'] = True  # Проверка здоровья соединений
-    elif 'postgres' in _DATABASE_URL and 'localhost' in _DATABASE_URL:
+    elif 'postgres' in _DATABASE_URL and ('localhost' in _DATABASE_URL or '127.0.0.1' in _DATABASE_URL):
         # Локальный PostgreSQL без SSL
         DATABASES['default']['OPTIONS'] = {
             'sslmode': 'disable',
