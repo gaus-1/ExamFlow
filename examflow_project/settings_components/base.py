@@ -204,6 +204,32 @@ TELEGRAM_BOT_USERNAME = 'examflow_bot'  # Имя бота без @
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
 
+# AI Configuration
+GEMINI_TASK_CONFIGS = {
+    'chat': {
+        'model': 'gemini-1.5-flash',
+        'temperature': 0.7,
+        'max_tokens': 300,
+        'system_prompt': 'Ты - ExamFlow AI, эксперт по подготовке к ЕГЭ и ОГЭ. Отвечай кратко и по делу.'
+    },
+    'math': {
+        'model': 'gemini-1.5-flash',
+        'temperature': 0.3,
+        'max_tokens': 400,
+        'system_prompt': 'Ты - ExamFlow AI, эксперт по математике ЕГЭ и ОГЭ. Давай пошаговые решения.'
+    },
+    'russian': {
+        'model': 'gemini-1.5-flash',
+        'temperature': 0.5,
+        'max_tokens': 350,
+        'system_prompt': 'Ты - ExamFlow AI, эксперт по русскому языку ЕГЭ и ОГЭ. Помогай с грамматикой и сочинениями.'
+    }
+}
+
+# AI Timeouts
+GEMINI_TIMEOUT = 10
+GEMINI_MOBILE_TIMEOUT = 5
+
 # Cache settings
 CACHES = {
     'default': {
