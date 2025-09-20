@@ -97,7 +97,7 @@ if _DATABASE_URL:
         'default': dj_database_url.config(default=_DATABASE_URL)
     }
     # Настройки SSL для PostgreSQL на Render.com
-    if 'postgres' in _DATABASE_URL and ('render.com' in _DATABASE_URL or '35.227.164.209' in _DATABASE_URL or 'dpg-' in _DATABASE_URL):
+    if 'postgres' in _DATABASE_URL and ('render.com' in _DATABASE_URL or '35.227.164.209' in _DATABASE_URL or 'dpg-d2dn09ali9vc73b2lg7g-a' in _DATABASE_URL or 'dpg-' in _DATABASE_URL):
         DATABASES['default']['OPTIONS'] = {
             'sslmode': 'require',  # Требуется для Render PostgreSQL
             'connect_timeout': 30,  # Уменьшен таймаут для быстрого обнаружения проблем
