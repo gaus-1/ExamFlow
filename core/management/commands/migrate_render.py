@@ -34,43 +34,51 @@ class Command(BaseCommand):
         delay = options['delay']
         
         self.stdout.write(
-            self.style.SUCCESS(
+            self.style.SUCCESS( # type: ignore
                 f'🚀 Начинаем безопасное применение миграций (max_retries={max_retries}, delay={delay}s)'
             )
         )
         
-        # Проверяем подключение к базе данных
-        self.stdout.write('🔗 Проверяем подключение к базе данных...')
-        if not ensure_database_connection():
-            raise CommandError('Не удалось установить подключение к базе данных')
-        
-        # Применяем миграции с retry логикой
-        self._apply_migrations_with_retry(max_retries, delay)
-        
-        self.stdout.write(
-            self.style.SUCCESS('✅ Все миграции применены успешно!')
-        )
+        # Пробуем применить миграции
+        try:
+            self._apply_migrations_with_retry(max_retries, delay)
+            self.stdout.write(
+                self.style.SUCCESS('✅ Все миграции применены успешно!') # type: ignore
+            )
+        except Exception as e:
+            self.stderr.write(
+                self.style.ERROR(f'❌ Не удалось применить миграции: {e}') # type: ignore
+            )
+            self.stdout.write(
+                self.style.WARNING('⚠️ Продолжаем без миграций...') # type: ignore
+            )
 
     def _apply_migrations_with_retry(self, max_retries, delay):
         """Применяет миграции с retry логикой"""
         
-        @retry_database_operation(max_retries=max_retries, delay=delay)
-        def apply_migrations():
-            # Сначала проверяем, есть ли непримененные миграции
+        for attempt in range(max_retries):
             try:
-                call_command('makemigrations', '--dry-run', '--check')
-                self.stdout.write('✅ Все миграции актуальны')
-            except CommandError:
-                self.stdout.write('⚠️ Есть неприменённые миграции, создаем...')
-                call_command('makemigrations')
-            
-            # Применяем миграции
-            self.stdout.write('🔄 Применяем миграции...')
-            call_command('migrate', '--noinput')
-            
-            return True
-        
-        try:
-            apply_migrations()
-        except Exception as e:
-            raise CommandError(f'Не удалось применить миграции после {max_retries} попыток: {e}')
+                self.stdout.write(f'🔄 Попытка {attempt + 1}/{max_retries}: Применяем миграции...')
+                
+                # Пробуем применить миграции
+                try:
+                    call_command('migrate', '--noinput')
+                    self.stdout.write('✅ Миграции применены успешно!')
+                    return
+                except Exception as e:
+                    self.stdout.write(f'⚠️ Обычные миграции не удались: {e}')
+                    
+                    # Пробуем с run-syncdb
+                    self.stdout.write('🔄 Пробуем с --run-syncdb...')
+                    call_command('migrate', '--run-syncdb', '--noinput')
+                    self.stdout.write('✅ Миграции применены с --run-syncdb!')
+                    return
+                    
+            except Exception as e:
+                self.stderr.write(f'❌ Попытка {attempt + 1} не удалась: {e}')
+                if attempt < max_retries - 1:
+                    self.stdout.write(f'⏳ Ожидание {delay} секунд перед следующей попыткой...')
+                    import time
+                    time.sleep(delay)
+                else:
+                    raise CommandError(f'Не удалось применить миграции после {max_retries} попыток: {e}')

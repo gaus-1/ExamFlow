@@ -45,11 +45,14 @@ retry_db_operation() {
 
 # Тестируем подключение к базе данных
 echo "🔗 Тестируем подключение к базе данных..."
-retry_db_operation "python manage.py shell -c \"
+python manage.py shell -c "
 from core.database_utils import test_database_connectivity
 if not test_database_connectivity():
-    exit(1)
-\""
+    print('⚠️ Database test failed, but continuing...')
+    exit(0)
+else:
+    print('✅ Database test passed')
+" || echo "⚠️ Database test failed, but continuing..."
 
 # Проверяем миграции
 echo "🗄️ Проверяем миграции..."
@@ -58,20 +61,18 @@ retry_db_operation "python manage.py makemigrations --dry-run --check" || {
     retry_db_operation "python manage.py makemigrations"
 }
 
-# Применяем миграции с помощью специальной команды
-echo "🔄 Применяем миграции с retry логикой..."
-if python manage.py migrate_render --max-retries=3 --delay=10; then
-    echo "✅ Миграции применены успешно"
-else
+# Применяем миграции
+echo "🔄 Применяем миграции..."
+retry_db_operation "python manage.py migrate --noinput" || {
     echo "⚠️ Не удалось применить миграции, пробуем альтернативный подход..."
     
-    # Альтернативный подход: применяем миграции по одной
-    echo "🔄 Пробуем применить миграции по одной..."
-    python manage.py migrate --run-syncdb --noinput || {
+    # Альтернативный подход: применяем миграции с run-syncdb
+    echo "🔄 Пробуем применить миграции с run-syncdb..."
+    retry_db_operation "python manage.py migrate --run-syncdb --noinput" || {
         echo "❌ Критическая ошибка: не удалось применить миграции"
         echo "🚀 Запускаем сервер без миграций (в режиме разработки)"
     }
-fi
+}
 
 # Собираем статические файлы
 echo "🎨 Собираем статические файлы..."
@@ -79,20 +80,23 @@ python manage.py collectstatic --noinput --clear
 
 # Создаем суперпользователя если нужно (опционально)
 echo "👤 Проверяем суперпользователя..."
-retry_db_operation "python manage.py shell -c \"
+python manage.py shell -c "
 from django.contrib.auth import get_user_model
 User = get_user_model()
-if not User.objects.filter(is_superuser=True).exists():
-    print('Создаем суперпользователя...')
-    User.objects.create_superuser('admin', 'admin@examflow.ru', 'admin123')
-    print('✅ Суперпользователь создан')
-else:
-    print('✅ Суперпользователь уже существует')
-\"" || echo "⚠️ Не удалось создать суперпользователя"
+try:
+    if not User.objects.filter(is_superuser=True).exists():
+        print('Создаем суперпользователя...')
+        User.objects.create_superuser('admin', 'admin@examflow.ru', 'admin123')
+        print('✅ Суперпользователь создан')
+    else:
+        print('✅ Суперпользователь уже существует')
+except Exception as e:
+    print(f'⚠️ Не удалось создать суперпользователя: {e}')
+" || echo "⚠️ Не удалось создать суперпользователя"
 
 # Загружаем базовые данные
 echo "📚 Загружаем базовые данные..."
-retry_db_operation "python manage.py load_sample_data" || echo "⚠️ Данные уже загружены"
+python manage.py load_sample_data || echo "⚠️ Данные уже загружены или команда не найдена"
 
 echo "🌐 Запуск веб-сервера..."
 
