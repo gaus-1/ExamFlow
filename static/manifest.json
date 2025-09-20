@@ -1,63 +1,155 @@
 {
-  "name": "ExamFlow - Платформа подготовки к экзаменам",
+  "name": "ExamFlow - ИИ-помощник для подготовки к ЕГЭ и ОГЭ",
   "short_name": "ExamFlow",
-  "description": "Современная платформа для подготовки к экзаменам с использованием ИИ",
+  "description": "Умный помощник для подготовки к экзаменам с персонализированным обучением и ИИ-анализом прогресса",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fffef2",
-  "theme_color": "#252525",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ru",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/static/icons/icon-72x72.png",
+      "src": "/static/images/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-96x96.png",
+      "src": "/static/images/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-128x128.png",
+      "src": "/static/images/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-144x144.png",
+      "src": "/static/images/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-152x152.png",
+      "src": "/static/images/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-192x192.png",
+      "src": "/static/images/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-384x384.png",
+      "src": "/static/images/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "/static/icons/icon-512x512.png",
+      "src": "/static/images/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     }
   ],
-  "categories": ["education", "productivity"],
-  "lang": "ru",
-  "dir": "ltr"
+  "screenshots": [
+    {
+      "src": "/static/images/screenshot-mobile-1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Главная страница ExamFlow на мобильном устройстве"
+    },
+    {
+      "src": "/static/images/screenshot-mobile-2.png", 
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Интерфейс обучения в ExamFlow"
+    },
+    {
+      "src": "/static/images/screenshot-desktop-1.png",
+      "sizes": "1280x720", 
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Главная страница ExamFlow на десктопе"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Начать обучение",
+      "short_name": "Обучение",
+      "description": "Быстрый доступ к обучению",
+      "url": "/learning/",
+      "icons": [
+        {
+          "src": "/static/images/shortcut-learning.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Telegram бот",
+      "short_name": "Telegram",
+      "description": "Открыть Telegram бота",
+      "url": "https://t.me/ExamFlowBot",
+      "icons": [
+        {
+          "src": "/static/images/shortcut-telegram.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "ИИ-помощник",
+      "short_name": "ИИ",
+      "description": "Задать вопрос ИИ-ассистенту",
+      "url": "/#ai-assistant",
+      "icons": [
+        {
+          "src": "/static/images/shortcut-ai.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "web",
+      "url": "https://examflow.ru"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate",
+  "file_handlers": [
+    {
+      "action": "/upload/",
+      "accept": {
+        "text/plain": [".txt"],
+        "application/pdf": [".pdf"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+examflow",
+      "url": "/handle?protocol=%s"
+    }
+  ]
 }
