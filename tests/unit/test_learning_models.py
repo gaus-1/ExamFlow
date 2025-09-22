@@ -24,24 +24,24 @@ class TestLearningModels(TestCase):
         )
         
         # Создаем предмет
-        self.subject = Subject.objects.create(
+        self.subject = Subject.objects.create( # type: ignore
             name='Математика',
             description='Математика для ЕГЭ'
         )
         
         # Создаем задание
-        self.task = Task.objects.create(
+        self.task = Task.objects.create( # type: ignore
             title='Тестовое задание',
-            content='Решите уравнение x + 1 = 2',
+            description='Решите уравнение x + 1 = 2',
             subject=self.subject,
-            difficulty='easy'
+            difficulty=1
         )
     
     def test_subject_creation(self):
         """Тест создания предмета"""
         from learning.models import Subject
         
-        subject = Subject.objects.create(
+        subject = Subject.objects.create( # type: ignore
             name='Русский язык',
             description='Русский язык для ЕГЭ'
         )
@@ -54,24 +54,24 @@ class TestLearningModels(TestCase):
         """Тест создания задания"""
         from learning.models import Task
         
-        task = Task.objects.create(
+        task = Task.objects.create( # type: ignore
             title='Новое задание',
             content='Решите систему уравнений',
             subject=self.subject,
-            difficulty='medium'
+            difficulty=2
         )
         
         assert task.title == 'Новое задание'
-        assert task.content == 'Решите систему уравнений'
+        assert task.description == 'Решите систему уравнений'
         assert task.subject == self.subject
-        assert task.difficulty == 'medium'
+        assert task.difficulty == 2
         assert str(task) == 'Новое задание'
     
     def test_user_progress_creation(self):
         """Тест создания прогресса пользователя"""
         from learning.models import UserProgress
         
-        progress = UserProgress.objects.create(
+        progress = UserProgress.objects.create( # type: ignore
             user=self.user,
             task=self.task,
             is_completed=True,
@@ -93,7 +93,7 @@ class TestLearningModels(TestCase):
         """Тест связи прогресса с пользователем"""
         from learning.models import UserProgress
         
-        progress = UserProgress.objects.create(
+        progress = UserProgress.objects.create( # type: ignore
             user=self.user,
             task=self.task,
             is_completed=False
@@ -114,7 +114,7 @@ class TestLearningModels(TestCase):
         """Тест метода __str__ для UserProgress"""
         from learning.models import UserProgress
         
-        progress = UserProgress.objects.create(
+        progress = UserProgress.objects.create( # type: ignore
             user=self.user,
             task=self.task,
             is_completed=True

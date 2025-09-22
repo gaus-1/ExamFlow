@@ -33,7 +33,8 @@ class TestHealthCheck:
             assert isinstance(response, JsonResponse)
             assert response.status_code == 200
             
-            data = response.json()
+            import json
+            data = json.loads(response.content)
             assert data['status'] == 'ok'
             assert 'timestamp' in data
             assert data['database'] == 'ok'
@@ -56,7 +57,8 @@ class TestHealthCheck:
             
             assert response.status_code == 500
             
-            data = response.json()
+            import json
+            data = json.loads(response.content)
             assert data['status'] == 'degraded'
             assert 'error: DB Error' in data['database']
             assert data['cache'] == 'ok'
@@ -77,7 +79,8 @@ class TestHealthCheck:
             
             assert response.status_code == 500
             
-            data = response.json()
+            import json
+            data = json.loads(response.content)
             assert data['status'] == 'degraded'
             assert data['database'] == 'ok'
             assert 'error: Cache Error' in data['cache']
@@ -95,6 +98,6 @@ class TestHealthCheck:
         assert isinstance(response, JsonResponse)
         assert response.status_code == 200
         
-        data = response.json()
+        data = response.json() # type: ignore
         assert data['status'] == 'ok'
         assert 'timestamp' in data

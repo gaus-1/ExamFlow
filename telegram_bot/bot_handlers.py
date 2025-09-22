@@ -110,7 +110,7 @@ def db_get_profile_progress(profile):
 @sync_to_async
 def db_get_or_create_chat_session(telegram_user, django_user=None):
     """Получает или создает сессию чата для пользователя"""
-    return ChatSessionService.get_or_create_session(
+    return ChatSessionService.get_or_create_session( # type: ignore
         telegram_id=telegram_user.id,
         user=django_user
     )
@@ -118,23 +118,23 @@ def db_get_or_create_chat_session(telegram_user, django_user=None):
 @sync_to_async
 def db_add_user_message_to_session(session, message):
     """Добавляет сообщение пользователя в сессию"""
-    ChatSessionService.add_user_message(session, message)
+    ChatSessionService.add_user_message(session, message) # type: ignore
 
 @sync_to_async
 def db_add_assistant_message_to_session(session, message):
     """Добавляет ответ ассистента в сессию"""
-    ChatSessionService.add_assistant_message(session, message)
+    ChatSessionService.add_assistant_message(session, message) # type: ignore
 
 @sync_to_async
 def db_create_enhanced_prompt(user_message, session):
     """Создает расширенный промпт с контекстом"""
-    return ChatSessionService.create_enhanced_prompt(user_message, session)
+    return ChatSessionService.create_enhanced_prompt(user_message, session) # type: ignore
 
 @sync_to_async
 def db_clear_chat_session_context(telegram_user):
     """Очищает контекст сессии пользователя"""
-    session = ChatSessionService.get_or_create_session(telegram_id=telegram_user.id)
-    ChatSessionService.clear_session_context(session)
+    session = ChatSessionService.get_or_create_session(telegram_id=telegram_user.id) # type: ignore
+    ChatSessionService.clear_session_context(session) # type: ignore
 
 # ИИ сервис для асинхронного использования
 
@@ -150,8 +150,8 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None, 
             return "❌ API ключ Gemini не настроен"
         
         # Настраиваем Gemini
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        genai.configure(api_key=api_key) # type: ignore 
+        model = genai.GenerativeModel('gemini-1.5-flash') # type: ignore
         
         # Определяем предмет по промпту
         subject_detected = ""
@@ -250,11 +250,11 @@ def db_get_subject_name(subject_id: int) -> str:
 
 @sync_to_async
 def db_set_current_task_id(user, task_id: int):
-    set_current_task_id(user, task_id)
+    set_current_task_id(user, task_id) # type: ignore
 
 @sync_to_async
 def db_get_or_create_user(telegram_user):
-    return get_or_create_user(telegram_user)
+    return get_or_create_user(telegram_user) # type: ignore
 
 @sync_to_async
 def db_get_task_by_id(task_id: int):
@@ -294,6 +294,7 @@ def get_current_task_id(user):
     """Получает ID текущего задания из профиля пользователя"""
     try:
         profile = UserProfile.objects.get(user=user)  # type: ignore
+        profile = UserProfile.objects.get(user=user)  # type: ignore
         return profile.current_task_id
     except UserProfile.DoesNotExist:  # type: ignore
         return None
@@ -301,6 +302,7 @@ def get_current_task_id(user):
 def set_current_task_id(user, task_id):
     """Устанавливает ID текущего задания в профиле пользователя"""
     try:
+        profile = UserProfile.objects.get(user=user)  # type: ignore
         profile = UserProfile.objects.get(user=user)  # type: ignore
         profile.current_task_id = task_id
         profile.save()
@@ -1609,7 +1611,7 @@ async def gamification_menu_handler(update: Update, context: ContextTypes.DEFAUL
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    keyboard = gamification.create_gamification_keyboard(user_id)
+    keyboard = gamification.create_gamification_keyboard(user_id) # type: ignore
 
     await query.edit_message_text(  # type: ignore
         "🎮 **ГЕЙМИФИКАЦИЯ**\n\n"
@@ -1624,7 +1626,7 @@ async def user_stats_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    stats = await gamification.get_user_stats(user_id)
+    stats = await gamification.get_user_stats(user_id) # type: ignore
 
     if not stats.get('success'):
         await query.edit_message_text(  # type: ignore
@@ -1677,7 +1679,7 @@ async def achievements_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    stats = await gamification.get_user_stats(user_id)
+    stats = await gamification.get_user_stats(user_id) # type: ignore
 
     if not stats.get('success'):
         await query.edit_message_text(  # type: ignore
@@ -1726,7 +1728,7 @@ async def progress_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    keyboard = gamification.create_progress_keyboard(user_id)
+    keyboard = gamification.create_progress_keyboard(user_id) # type: ignore
 
     await query.edit_message_text(  # type: ignore
         "📊 **ПРОГРЕСС ОБУЧЕНИЯ**\n\n"
@@ -1741,7 +1743,7 @@ async def overall_progress_handler(update: Update, context: ContextTypes.DEFAULT
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    stats = await gamification.get_user_stats(user_id)
+    stats = await gamification.get_user_stats(user_id) # type: ignore       
 
     if not stats.get('success'):
         await query.edit_message_text(  # type: ignore
@@ -1794,7 +1796,7 @@ async def subjects_progress_handler(update: Update, context: ContextTypes.DEFAUL
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    stats = await gamification.get_user_stats(user_id)
+    stats = await gamification.get_user_stats(user_id) # type: ignore
 
     if not stats.get('success'):
         await query.edit_message_text(  # type: ignore
@@ -1845,7 +1847,7 @@ async def daily_challenges_handler(update: Update, context: ContextTypes.DEFAULT
     await query.answer()  # type: ignore
 
     user_id = update.effective_user.id  # type: ignore
-    challenges = await gamification.get_daily_challenges(user_id)
+    challenges = await gamification.get_daily_challenges(user_id) # type: ignore
 
     if not challenges:
         challenges_text = """
@@ -1885,7 +1887,7 @@ async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     query = update.callback_query
     await query.answer()  # type: ignore
 
-    leaderboard = await gamification.get_leaderboard(10)
+    leaderboard = await gamification.get_leaderboard(10) # type: ignore     
 
     if not leaderboard:
         leaderboard_text = """
