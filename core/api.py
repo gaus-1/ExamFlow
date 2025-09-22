@@ -42,6 +42,9 @@ class AIQueryView(View):
                 }, status=400)
 
             logger.info(f"Получен запрос от пользователя {user_id}: {query[:100]}...")
+            
+            # Проверяем fallback режим для Render без БД
+            fallback_mode = os.getenv('FALLBACK_MODE', 'false').lower() == 'true'
 
             # Прямое обращение к Gemini API без заглушек
             try:
@@ -81,12 +84,14 @@ class AIQueryView(View):
                 logger.error(f"Ошибка Gemini API: {e}")
                 answer = "Сервис временно недоступен. Попробуйте позже."
 
-            # Получаем источники через RAG
-            try:
-                rag_result = self.orchestrator.process_query(query, user_id)
-                sources = rag_result.get('sources', [])
-            except Exception:
-                sources = []
+            # Получаем источники через RAG (только если не fallback режим)
+            sources = []
+            if not fallback_mode:
+                try:
+                    rag_result = self.orchestrator.process_query(query, user_id)
+                    sources = rag_result.get('sources', [])
+                except Exception:
+                    sources = []
 
             logger.info(f"Запрос обработан успешно для пользователя {user_id}")
             return JsonResponse({
