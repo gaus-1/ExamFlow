@@ -11,6 +11,7 @@ import json
 
 from core.rag_system.orchestrator import RAGOrchestrator
 from core.rag_system.vector_store import VectorStore
+from core.container import Container
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +41,32 @@ class AIQueryView(View):
                     'answer': 'Пожалуйста, задайте вопрос по подготовке к ЕГЭ.'
                 }, status=400)
 
-            logger.info("Получен запрос от пользователя {user_id}: {query[:100]}...")
+            logger.info(f"Получен запрос от пользователя {user_id}: {query[:100]}...")
 
-            # Обрабатываем запрос через оркестратор
-            response = self.orchestrator.process_query(query, user_id)
+            # Быстрый ответ через AI orchestrator (минимальная задержка)
+            try:
+                ai = Container.ai_orchestrator()
+                # Исправлено: убран несуществующий параметр user_id
+                ai_result = ai.ask(prompt=query)  # type: ignore
+                answer = ai_result.get('answer') if isinstance(ai_result, dict) else None
+            except Exception:
+                answer = None
 
-            logger.info("Запрос обработан успешно для пользователя {user_id}")
-            return JsonResponse(response)
+            # Параллельно достанем контекст через RAG (на случай необходимости источников)
+            rag_result = self.orchestrator.process_query(query, user_id)
+            sources = rag_result.get('sources', [])
+            context = rag_result.get('context', '')
+
+            if not answer:
+                # Фолбэк: соберем краткий ответ из контекста
+                answer = context or "Извините, не удалось получить ответ сейчас. Попробуйте переформулировать вопрос."
+
+            logger.info(f"Запрос обработан успешно для пользователя {user_id}")
+            return JsonResponse({
+                'success': True,
+                'answer': answer,
+                'sources': sources
+            })
 
         except json.JSONDecodeError:
             return JsonResponse({
@@ -54,11 +74,43 @@ class AIQueryView(View):
                 'answer': 'Произошла ошибка при обработке запроса.'
             }, status=400)
         except Exception as e:
-            logger.error("Ошибка в AIQueryView: {e}")
+            logger.error(f"Ошибка в AIQueryView: {e}")
             return JsonResponse({
                 'error': str(e),
                 'answer': 'Произошла ошибка при обработке запроса. Попробуйте позже.'
             }, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EmergencyAIView(View):
+    """
+    Экстренный (fallback) API для ИИ, используется старым фронтендом по пути /ai/emergency/
+    Возвращает быстрый краткий ответ без сложного контекста.
+    """
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body or '{}')
+            query = (data.get('query') or data.get('prompt') or '').strip()
+
+            if not query:
+                return JsonResponse({'success': False, 'error': 'Пустой запрос'}, status=400)
+
+            # Мгновенный краткий ответ через оркестратор контейнера
+            try:
+                ai = Container.ai_orchestrator()
+                ai_result = ai.ask(prompt=query)  # type: ignore
+                answer = ai_result.get('answer') if isinstance(ai_result, dict) else None
+            except Exception:
+                answer = None
+
+            if not answer:
+                answer = 'Ваш запрос принят. Попробуйте сформулировать его точнее по математике или русскому языку.'
+
+            return JsonResponse({'success': True, 'answer': answer})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class VectorStoreStatsView(View):
@@ -72,7 +124,7 @@ class VectorStoreStatsView(View):
         """
         try:
             vector_store = VectorStore()
-            stats = vector_store.get_statistics()
+            stats = vector_store.get_statistics() # type: ignore
 
             return JsonResponse({
                 'status': 'success',
@@ -146,7 +198,7 @@ class HealthCheckView(View):
             # Проверяем векторное хранилище
             try:
                 vector_store = VectorStore()
-                stats = vector_store.get_statistics()
+                stats = vector_store.get_statistics() # type: ignore
                 health_status['components']['vector_store'] = {
                     'status': 'healthy',
                     'stats': stats
