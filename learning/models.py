@@ -29,6 +29,9 @@ class ExamType(models.Model):
 class Subject(models.Model):
     """Предмет для изучения"""
     EXAM_TYPES = [
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
+        ('other', 'Другое'),
     ]
 
     name = models.CharField(max_length=100, verbose_name="Название предмета")
@@ -38,9 +41,10 @@ class Subject(models.Model):
         default='',
         verbose_name="Код предмета")
     exam_type = models.CharField(
-        max_length=3,
+        max_length=10,
         choices=EXAM_TYPES,
-        default='ЕГЭ',
+        default='ege',
+        blank=True,
         verbose_name="Тип экзамена")
     description = models.TextField(blank=True, default='', verbose_name="Описание")
     icon = models.CharField(
