@@ -26,11 +26,19 @@ def focused_subjects_list(request):
         }
         return render(request, 'learning/focused_subjects.html', context)
     except Exception as e:
-        # Без заглушек: показываем информативную страницу ошибки с кодом 500
-        return render(request, 'learning/subject_error.html', {
-            'message': 'Ошибка загрузки предметов. Попробуйте позже.',
-            'details': str(e)
-        }, status=500)
+        # Логируем ошибку и возвращаем безопасную страницу
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Ошибка в focused_subjects_list: {e}")
+        
+        # Возвращаем минимальную рабочую страницу
+        context = {
+            'math_subjects': [],
+            'russian_subjects': [],
+            'total_subjects': 0,
+            'focus_message': 'Предметы временно недоступны. Попробуйте позже.'
+        }
+        return render(request, 'learning/focused_subjects.html', context)
 
 def math_subject_detail(request, subject_id):
     """Детальная страница предмета математики"""

@@ -257,4 +257,4 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@examflow.ru')
 ADMIN_URL = os.getenv('ADMIN_URL', 'admin/')
 
 # Static version for cache busting
-STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250922-1')
+STATIC_VERSION = os.getenv('STATIC_VERSION', 'v20250922-2')

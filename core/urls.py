@@ -64,7 +64,7 @@ def faq_view(request):
         'Где посмотреть типичные ошибки?': 'На страницах заданий мы выделяем частые ошибки и даём рекомендации, как их избегать.',
         'Есть ли видеоразборы?': 'Да, для сложных тем — видеоразборы с пошаговыми объяснениями.',
     }
-    from . import seo as core_seo
+    from . import seo as core_seo  # type: ignore
     context = {
         'page_title': 'FAQ — ответы по подготовке к ЕГЭ/ОГЭ — ExamFlow',
         'page_description': 'Частые вопросы о подготовке к ЕГЭ/ОГЭ по математике и русскому: ошибки, критерии ФИПИ, видеоразборы.',
@@ -107,7 +107,7 @@ urlpatterns = [
     path('api/ai/query/', api.AIQueryView.as_view(), name='ai_query'),
     # Совместимость со старым фронтендом
     path('ai/api/', api.AIQueryView.as_view(), name='ai_query_legacy'),
-    path('ai/emergency/', api.AIQueryView.as_view(), name='ai_query_emergency'),
+    path('ai/emergency/', api.EmergencyAIView.as_view(), name='ai_query_emergency'),
     path('api/ai/search/', api.SearchView.as_view(), name='ai_search'),
     path('api/ai/stats/', api.VectorStoreStatsView.as_view(), name='vector_stats'),
     path('api/health/', api.HealthCheckView.as_view(), name='health_check'),
