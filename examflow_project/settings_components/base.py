@@ -98,16 +98,11 @@ if _DATABASE_URL:
     }
     # Настройки SSL для PostgreSQL на Render.com
     if 'postgres' in _DATABASE_URL and ('render.com' in _DATABASE_URL or '35.227.164.209' in _DATABASE_URL or 'dpg-d2dn09ali9vc73b2lg7g-a' in _DATABASE_URL or 'dpg-' in _DATABASE_URL):
-        # Настройки совместимые с psycopg3/libpq
+        # Минимальный набор опций для совместимости с psycopg3 на Windows/CI
         DATABASES['default']['OPTIONS'] = {
             'sslmode': 'require',
             'connect_timeout': 60,
             'application_name': 'examflow_render',
-            # keepalive через стандартные опции libpq (часть драйверов игнорирует *_idle без включения keepalives)
-            'keepalives': 1,
-            'keepalives_idle': 120,
-            'keepalives_interval': 30,
-            'keepalives_count': 5,
             'target_session_attrs': 'read-write',
         }
         # Дополнительные настройки для Render
