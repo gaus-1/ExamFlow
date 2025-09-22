@@ -40,10 +40,10 @@ class TelegramUser(AbstractUser):
     objects = TelegramUserManager()
 
     # Убираем стандартные поля Django User, которые нам не нужны
-    username = None
-    email = None
-    first_name = None
-    last_name = None
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(blank=True)
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
 
     # Telegram поля
     telegram_id = models.BigIntegerField(unique=True, verbose_name="Telegram ID")

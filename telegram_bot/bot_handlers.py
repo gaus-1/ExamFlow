@@ -140,75 +140,61 @@ def db_clear_chat_session_context(telegram_user):
 
 @sync_to_async
 def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None, is_mobile: bool = False) -> str:
-    """Получает персонализированный ответ от ИИ с использованием RAG системы"""
+    """Получает ответ от Gemini AI без заглушек"""
     try:
-        # Импортируем утилиты мобильной оптимизации
-        from telegram_bot.utils.mobile_optimization import (
-            generate_prompt_hash, get_cached_ai_response, cache_ai_response,
-            optimize_response_for_mobile, get_mobile_optimized_config
-        )
+        import google.generativeai as genai
+        from django.conf import settings
         
-        # Проверяем кэш для быстрых ответов
-        if is_mobile:
-            prompt_hash = generate_prompt_hash(prompt, user.id if user else 0)
-            cached_response = get_cached_ai_response(prompt_hash)
-            if cached_response:
-                logger.info(f"Возвращаем закэшированный ответ для мобильного устройства")
-                return cached_response
+        api_key = getattr(settings, 'GEMINI_API_KEY', '')
+        if not api_key:
+            return "❌ API ключ Gemini не настроен"
         
-        # Используем базовый AI-сервис с мобильной оптимизацией
-        from ai.services import AiService
-        ai_service = AiService(is_mobile=is_mobile)
+        # Настраиваем Gemini
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        # Определяем предмет по промпту
+        subject_detected = ""
+        if any(word in prompt.lower() for word in ['математика', 'матем', 'уравнение', 'функция', 'геометрия']):
+            subject_detected = "математика"
+        elif any(word in prompt.lower() for word in ['русский', 'сочинение', 'грамматика', 'орфография']):
+            subject_detected = "русский язык"
+        
+        # Системный промпт для ExamFlow
+        system_prompt = f"""Ты - ExamFlow AI, эксперт по подготовке к ЕГЭ и ОГЭ.
 
-        # Получаем ответ от AI
-        if user is None:
-            return "❌ Ошибка: пользователь не определен"
-        result = ai_service.ask(prompt, user)
+Специализируешься на:
+📐 Математике (профильная и базовая, ОГЭ) - уравнения, функции, геометрия, алгебра
+📝 Русском языке (ЕГЭ и ОГЭ) - грамматика, орфография, сочинения, литература
 
-        if 'error' in result:
-            return f"❌ Ошибка: {result['error']}"
+Стиль общения:
+- Краткий и конкретный ответ (до 300 слов)
+- Пошаговые решения для математики
+- Примеры и образцы для русского языка
+- НЕ упоминай провайдера ИИ
+- Если вопрос по {subject_detected}, дай подробный ответ
+- Если вопрос не по твоим предметам - скажи: "Я специализируюсь на математике и русском языке для ЕГЭ/ОГЭ"
 
-        response = result['response']
+Отвечай кратко и по делу."""
 
-        # Оптимизируем ответ для мобильных устройств
-        if is_mobile:
-            mobile_config = get_mobile_optimized_config()
-            response = optimize_response_for_mobile(response, mobile_config['max_response_length'])
+        full_prompt = f"{system_prompt}\n\nВопрос: {prompt}"
+        
+        # Получаем ответ
+        response = model.generate_content(full_prompt)
+        
+        if response.text:
+            answer = response.text.strip()
             
-            # Кэшируем ответ для будущих запросов
-            prompt_hash = generate_prompt_hash(prompt, user.id if user else 0)
-            cache_ai_response(prompt_hash, response, 300)  # Кэшируем на 5 минут
-
-        # Убираем фразу о провайдере ИИ
-
-        # Добавляем персональные рекомендации
-        personalization_data = result.get('personalization_data', {})
-        if personalization_data:
-            # Добавляем слабые темы
-            weak_topics = personalization_data.get('weak_topics', [])
-            if weak_topics:
-                response += "\n\n⚠️ **Ваши слабые темы:**"
-                for topic in weak_topics[:2]:
-                    subject = topic.get('subject', 'Неизвестно')
-                    failed_tasks = topic.get('failed_tasks', 0)
-                    response += "\n• {subject}: {failed_tasks} проваленных заданий"
-
-            # Добавляем рекомендации
-            recommendations = personalization_data.get('recommendations', [])
-            if recommendations:
-                response += "\n\n💡 **Персональные рекомендации:**"
-                for rec in recommendations[:2]:
-                    title = rec.get('title', 'Рекомендация')
-                    action = rec.get('action', '')
-                    response += "\n• {title}"
-                    if action:
-                        response += " - {action}"
-
-        return response
-
+            # Ограничиваем длину для Telegram
+            if len(answer) > 4000:
+                answer = answer[:3997] + "..."
+            return answer
+        else:
+            return 'Не удалось получить ответ от ИИ. Попробуйте переформулировать вопрос.'
+            
     except Exception as e:
-        logger.error("Ошибка при получении персонализированного ответа от ИИ: {e}")
-        return "❌ Ошибка ИИ-ассистента: {str(e)}"
+        logger.error(f"Ошибка AI сервиса: {e}")
+        return f'❌ Ошибка AI сервиса: {str(e)}'
 
 @sync_to_async
 def db_get_all_subjects_with_tasks():

@@ -53,6 +53,65 @@ class ChatSessionService:
             logger.error(f"Ошибка создания сессии чата: {e}")
             # Возвращаем заглушку
             return ChatSessionService._create_mock_session(user_profile, session_type)
+
+    # Методы, ожидаемые тестами unit (create/get/update/delete by user_id/session_id)
+    @staticmethod
+    def create_session(user_id: int, subject: str = ""):
+        try:
+            from django.contrib.auth import get_user_model
+            from core.models import ChatSession
+            import uuid
+            User = get_user_model()
+            user = User.objects.filter(id=user_id).first()
+            if not user:
+                return None
+            session = ChatSession.objects.create(
+                user=user,
+                telegram_id=getattr(user, 'telegram_id', 0) or 0,
+                session_id=str(uuid.uuid4()),
+                context_messages=[{"role": "system", "content": f"Тема: {subject}"}]
+            )
+            return session
+        except Exception as e:
+            logger.error(f"Ошибка create_session: {e}")
+            return None
+
+    @staticmethod
+    def get_session(user_id: int):
+        try:
+            from core.models import ChatSession
+            return ChatSession.objects.filter(user_id=user_id).order_by('-last_activity').first()
+        except Exception as e:
+            logger.error(f"Ошибка get_session: {e}")
+            return None
+
+    @staticmethod
+    def update_session(session_id: str, message_role: str, message_content: str) -> bool:
+        try:
+            from core.models import ChatSession
+            session = ChatSession.objects.filter(session_id=session_id).first()
+            if not session:
+                return False
+            session.add_message(message_role, message_content)
+            session.last_activity = timezone.now()
+            session.save()
+            return True
+        except Exception as e:
+            logger.error(f"Ошибка update_session: {e}")
+            return False
+
+    @staticmethod
+    def delete_session(session_id: str) -> bool:
+        try:
+            from core.models import ChatSession
+            session = ChatSession.objects.filter(session_id=session_id).first()
+            if not session:
+                return False
+            session.delete()
+            return True
+        except Exception as e:
+            logger.error(f"Ошибка delete_session: {e}")
+            return False
     
     @staticmethod
     def _create_mock_session(user_profile, session_type: str):

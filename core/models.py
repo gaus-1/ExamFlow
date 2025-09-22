@@ -391,6 +391,9 @@ class UserProfile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="Пользователь")  # type: ignore
+    # Поля Telegram для совместимости с тестами
+    telegram_id = models.BigIntegerField(null=True, blank=True, verbose_name="Telegram ID")
+    telegram_username = models.CharField(max_length=100, blank=True, verbose_name="Telegram Username")
     query_stats = models.JSONField(
         default=dict,
         blank=True,

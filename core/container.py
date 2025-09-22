@@ -106,8 +106,9 @@ class SimpleAIOrchestrator:
             
             if response.text:
                 answer = response.text.strip()
+                # Увеличенный лимит обрезки для соответствия требованиям тестов
                 if len(answer) > 4000:
-                    answer = answer[:4000] + "..."
+                    answer = answer[:3997] + "..."
                 
                 return {
                     'answer': answer,
