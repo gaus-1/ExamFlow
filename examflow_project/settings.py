@@ -65,9 +65,6 @@ if not DEBUG:
         
         # Настройки таймаутов для стабильности
         db_config['OPTIONS']['connect_timeout'] = 60  # type: ignore
-        db_config['OPTIONS']['keepalives_idle'] = 600  # type: ignore
-        db_config['OPTIONS']['keepalives_interval'] = 30  # type: ignore
-        db_config['OPTIONS']['keepalives_count'] = 3  # type: ignore
         
         # Настройки подключения
         db_config['CONN_MAX_AGE'] = 300  # type: ignore
@@ -87,12 +84,6 @@ if not DEBUG:
                 'sslmode': 'require',
                 'connect_timeout': 60,
                 'application_name': 'examflow_render',
-                'keepalives_idle': 600,
-                'keepalives_interval': 30,
-                'keepalives_count': 3,
-                'tcp_keepalives_idle': 600,
-                'tcp_keepalives_interval': 30,
-                'tcp_keepalives_count': 3,
             })
             
             # Принудительно устанавливаем ENGINE для Render

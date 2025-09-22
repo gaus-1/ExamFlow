@@ -37,7 +37,7 @@ class AiLimit(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     session_id = models.CharField(max_length=100, null=True, blank=True)
-    limit_type = models.CharField(max_length=20, choices=LIMIT_TYPES)
+    limit_type = models.CharField(max_length=20, choices=LIMIT_TYPES, default='daily')
     current_usage = models.IntegerField(default=0)
     max_limit = models.IntegerField()
     reset_date = models.DateTimeField()
@@ -84,6 +84,13 @@ class AiLimit(models.Model):
             return now + timedelta(days=30)
         else:  # total
             return now + timedelta(days=365)  # Год
+
+    def save(self, *args, **kwargs):
+        """Гарантируем корректное заполнение reset_date"""
+        if not self.reset_date:
+            # при первом сохранении рассчитываем дату сброса от текущего момента
+            self.reset_date = self.calculate_next_reset_date()
+        super().save(*args, **kwargs)
 
 class AiProvider(models.Model):
     """Модель для управления провайдерами ИИ"""

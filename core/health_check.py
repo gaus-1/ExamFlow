@@ -34,7 +34,7 @@ def health_check_view(request):
             'timestamp': str(datetime.now())
         }
         
-        return JsonResponse(status)
+        return JsonResponse(status, status=200)
         
     except Exception as e:
         logger.error(f"Health check failed: {e}")
@@ -50,4 +50,4 @@ def simple_health_check(request):
     """
     Simple health check endpoint
     """
-    return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'ok'}, status=200)
