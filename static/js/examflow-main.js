@@ -169,7 +169,27 @@ class ExamFlowApp {
             this.addMessage('assistant', '❌ Экстренный сервис также недоступен. Попробуйте позже.');
           }
         } else {
-          this.addMessage('assistant', '❌ Произошла ошибка соединения. Попробуйте позже.');
+          // Третий уровень fallback
+          try {
+            console.log('🚨 Пробуем fallback AI API...');
+            const fallbackResponse = await fetch('/fallback/ai/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': this.getCSRFToken()
+              },
+              body: JSON.stringify({ query: question })
+            });
+            
+            if (fallbackResponse.ok) {
+              const fallbackData = await fallbackResponse.json();
+              this.addMessage('assistant', `🔧 ${fallbackData.answer || 'Fallback ответ получен'}`);
+            } else {
+              this.addMessage('assistant', '❌ Произошла ошибка соединения. Попробуйте позже.');
+            }
+          } catch (fallbackError) {
+            this.addMessage('assistant', '❌ Произошла ошибка соединения. Попробуйте позже.');
+          }
         }
       } catch (emergencyError) {
         console.error('Emergency AI API Error:', emergencyError);
