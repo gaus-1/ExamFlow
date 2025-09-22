@@ -30,6 +30,8 @@ if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
 # Автоматический fallback режим для Render при проблемах с БД
 if RENDER_HOST:
     os.environ.setdefault('FALLBACK_MODE', 'true')
+    # Принудительно отключаем БД на Render при SSL проблемах
+    os.environ.setdefault('USE_SQLITE_FALLBACK', 'true')
 
 # Application definition
 INSTALLED_APPS = [
@@ -95,7 +97,22 @@ WSGI_APPLICATION = 'examflow_project.wsgi.application'
 
 # Database
 _DATABASE_URL = os.getenv('DATABASE_URL')
-if _DATABASE_URL:
+# Проверяем принудительный SQLite fallback для Render
+USE_SQLITE_FALLBACK = os.getenv('USE_SQLITE_FALLBACK', 'false').lower() == 'true'
+
+if USE_SQLITE_FALLBACK and RENDER_HOST:
+    # Принудительный SQLite для Render при проблемах с PostgreSQL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/tmp/examflow_render.db',
+            'OPTIONS': {
+                'timeout': 30,
+            },
+        }
+    }
+    print("🔧 RENDER FALLBACK: Используется SQLite вместо PostgreSQL")
+elif _DATABASE_URL:
     # Используем DATABASE_URL, если он задан (для тестов/CI/локально можно указать sqlite:///)
     DATABASES = {
         'default': dj_database_url.config(default=_DATABASE_URL)

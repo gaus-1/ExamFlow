@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 return True
         except OperationalError as e:
             self.stdout.write(self.style.ERROR(
-                '❌ Ошибка подключения к базе данных: {e}'))  # type: ignore
+                f'❌ Ошибка подключения к базе данных: {e}'))  # type: ignore
             return False
 
     def check_tables(self):
