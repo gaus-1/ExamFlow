@@ -9,35 +9,39 @@ from .models import Subject, Task, Topic
 
 def focused_subjects_list(request):
     """Список предметов с фокусом на математике и русском языке"""
-    # Получаем только основные предметы (не архивированные)
-    subjects = Subject.objects.filter(
-        is_archived=False,
-        is_primary=True
-    ).order_by('name')
+    try:
+        subjects = Subject.objects.filter( # type: ignore
+            is_archived=False,
+            is_primary=True
+        ).order_by('name')
 
-    # Группируем по типам
-    math_subjects = subjects.filter(name__icontains='математика')
-    russian_subjects = subjects.filter(name__icontains='русский')
+        math_subjects = subjects.filter(name__icontains='математика')
+        russian_subjects = subjects.filter(name__icontains='русский')
 
-    context = {
-        'math_subjects': math_subjects,
-        'russian_subjects': russian_subjects,
-        'total_subjects': subjects.count(),
-        'focus_message': 'Специализируемся на математике и русском языке'
-    }
-
-    return render(request, 'learning/focused_subjects.html', context)
+        context = {
+            'math_subjects': math_subjects,
+            'russian_subjects': russian_subjects,
+            'total_subjects': subjects.count(),
+            'focus_message': 'Специализируемся на математике и русском языке'
+        }
+        return render(request, 'learning/focused_subjects.html', context)
+    except Exception as e:
+        # Без заглушек: показываем информативную страницу ошибки с кодом 500
+        return render(request, 'learning/subject_error.html', {
+            'message': 'Ошибка загрузки предметов. Попробуйте позже.',
+            'details': str(e)
+        }, status=500)
 
 def math_subject_detail(request, subject_id):
     """Детальная страница предмета математики"""
     try:
-        subject = Subject.objects.get(id=subject_id, name__icontains='математика')
+        subject = Subject.objects.get(id=subject_id, name__icontains='математика') # type: ignore
 
         # Получаем темы по математике
-        topics = Topic.objects.filter(subject=subject).order_by('name')
+        topics = Topic.objects.filter(subject=subject).order_by('name') # type: ignore
 
         # Статистика
-        total_tasks = Task.objects.filter(subject=subject).count()
+        total_tasks = Task.objects.filter(subject=subject).count() # type: ignore
         completed_tasks = 0  # TODO: реализовать подсчет выполненных задач
 
         context = {
@@ -50,21 +54,26 @@ def math_subject_detail(request, subject_id):
 
         return render(request, 'learning/math_subject_detail.html', context)
 
-    except Subject.DoesNotExist:
+    except Subject.DoesNotExist: # type: ignore
         return render(request, 'learning/subject_not_found.html', {
             'message': 'Предмет математики не найден'
-        })
+        }, status=404)
+    except Exception as e:
+        return render(request, 'learning/subject_error.html', {
+            'message': 'Ошибка при загрузке данных по математике.',
+            'details': str(e)
+        }, status=500)
 
 def russian_subject_detail(request, subject_id):
     """Детальная страница предмета русского языка"""
     try:
-        subject = Subject.objects.get(id=subject_id, name__icontains='русский')
+        subject = Subject.objects.get(id=subject_id, name__icontains='русский') # type: ignore
 
         # Получаем темы по русскому языку
-        topics = Topic.objects.filter(subject=subject).order_by('name')
+        topics = Topic.objects.filter(subject=subject).order_by('name') # type: ignore
 
         # Статистика
-        total_tasks = Task.objects.filter(subject=subject).count()
+        total_tasks = Task.objects.filter(subject=subject).count() # type: ignore
         completed_tasks = 0  # TODO: реализовать подсчет выполненных задач
 
         context = {
@@ -77,10 +86,15 @@ def russian_subject_detail(request, subject_id):
 
         return render(request, 'learning/russian_subject_detail.html', context)
 
-    except Subject.DoesNotExist:
+    except Subject.DoesNotExist: # type: ignore
         return render(request, 'learning/subject_not_found.html', {
             'message': 'Предмет русского языка не найден'
-        })
+        }, status=404)
+    except Exception as e:
+        return render(request, 'learning/subject_error.html', {
+            'message': 'Ошибка при загрузке данных по русскому языку.',
+            'details': str(e)
+        }, status=500)
 
 def focused_search(request):
     """Поиск с фокусом на математике и русском языке"""
@@ -90,7 +104,7 @@ def focused_search(request):
         return JsonResponse({'results': [], 'message': 'Введите поисковый запрос'})
 
     # Поиск только по основным предметам
-    math_tasks = Task.objects.filter(
+    math_tasks = Task.objects.filter( # type: ignore
         subject__name__icontains='математика',
         subject__is_archived=False,
         subject__is_primary=True
@@ -98,7 +112,7 @@ def focused_search(request):
         Q(title__icontains=query) | Q(description__icontains=query)
     )[:10]
 
-    russian_tasks = Task.objects.filter(
+    russian_tasks = Task.objects.filter( # type: ignore
         subject__name__icontains='русский',
         subject__is_archived=False,
         subject__is_primary=True
@@ -136,13 +150,13 @@ def focused_search(request):
 
 def get_subject_statistics(request):
     """Статистика по предметам"""
-    math_subjects = Subject.objects.filter(
+    math_subjects = Subject.objects.filter( # type: ignore  
         name__icontains='математика',
         is_archived=False,
         is_primary=True
     )
 
-    russian_subjects = Subject.objects.filter(
+    russian_subjects = Subject.objects.filter( # type: ignore
         name__icontains='русский',
         is_archived=False,
         is_primary=True
