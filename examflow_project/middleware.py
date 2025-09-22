@@ -19,7 +19,7 @@ class DatabaseErrorMiddleware(MiddlewareMixin):
     def process_exception(self, request, exception):
         """Обрабатывает исключения базы данных"""
         if isinstance(exception, OperationalError):
-            logger.error("Database error: {exception}")
+            logger.error(f"Database error: {exception}")
             # Закрываем проблемное соединение
             try:
                 connection.close()
@@ -48,9 +48,9 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
             policy_parts = []
             for feature, origins in settings.PERMISSIONS_POLICY.items():
                 if origins:
-                    policy_parts.append("{feature}=({', '.join(origins)})")
+                    policy_parts.append(f"{feature}=({', '.join(origins)})")
                 else:
-                    policy_parts.append("{feature}=()")
+                    policy_parts.append(f"{feature}=()")
 
             if policy_parts:
                 response['Permissions-Policy'] = ', '.join(policy_parts)
@@ -71,8 +71,8 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         # Логирование подозрительной активности
         if self._is_suspicious_request(request):
             logger.warning(
-                "[SECURITY] Подозрительный запрос: {request.method} {request.path} "
-                "от IP {self._get_client_ip(request)}"
+                f"[SECURITY] Подозрительный запрос: {request.method} {request.path} "
+                f"от IP {self._get_client_ip(request)}"
             )
 
         return response
