@@ -42,13 +42,14 @@ class AIQueryView(View):
                 }, status=400)
 
             logger.info(f"Получен запрос от пользователя {user_id}: {query[:100]}...")
-            
+            import os  # type: ignore
+
             # Проверяем fallback режим для Render без БД
-            fallback_mode = os.getenv('FALLBACK_MODE', 'false').lower() == 'true'
+            fallback_mode = os.getenv('FALLBACK_MODE', 'false').lower() == 'true'  # type: ignore
 
             # Прямое обращение к Gemini API без заглушек
             try:
-                import google.generativeai as genai
+                import google.generativeai as genai  # type: ignore
                 from django.conf import settings
                 
                 api_key = getattr(settings, 'GEMINI_API_KEY', '')

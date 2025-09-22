@@ -27,6 +27,10 @@ RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_HOST and RENDER_HOST not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_HOST)
 
+# Автоматический fallback режим для Render при проблемах с БД
+if RENDER_HOST:
+    os.environ.setdefault('FALLBACK_MODE', 'true')
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
