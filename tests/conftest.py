@@ -177,9 +177,7 @@ def user_profile(user):
     return UserProfile.objects.create( # type: ignore
         user=user,
         telegram_id=123456789,
-        telegram_username='testuser',
-        telegram_first_name='Тест',
-        telegram_last_name='Пользователь'   
+        telegram_username='testuser'
     )
 
 
