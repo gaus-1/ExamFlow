@@ -11,8 +11,16 @@ class Subject(models.Model):
     """Модель предмета"""
     name = models.CharField(max_length=100, verbose_name="Название")
     code = models.CharField(max_length=10, unique=True, verbose_name="Код предмета")
-    exam_type = models.CharField(max_length=20, choices=[
-    ], verbose_name="Тип экзамена")
+    EXAM_TYPES = [
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
+        ('other', 'Другое'),
+    ]
+    exam_type = models.CharField(
+        max_length=20, 
+        choices=EXAM_TYPES, 
+        default='ege',
+        verbose_name="Тип экзамена")
     description = models.TextField(blank=True, verbose_name="Описание")
     icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -175,6 +183,10 @@ class DailyChallenge(models.Model):
     """Ежедневные вызовы"""
 
     CHALLENGE_TYPES = [
+        ('daily_tasks', 'Ежедневные задания'),
+        ('streak', 'Серия правильных ответов'),
+        ('subject_focus', 'Фокус на предмете'),
+        ('time_challenge', 'Временной вызов'),
     ]
 
     title = models.CharField(max_length=200, verbose_name="Название")
@@ -229,7 +241,7 @@ class UserChallenge(models.Model):
             return 0
         return min(
             100,
-            (self.current_value / self.challenge.target_value) * 100  # type: ignore
+            (self.current_progress / self.challenge.target_value) * 100  # type: ignore
         )
 
 class ChatSession(models.Model):
@@ -286,7 +298,7 @@ class ChatSession(models.Model):
         for msg in self.context_messages[-self.max_context_length:]:  # type: ignore
             # type: ignore
             role = "Пользователь" if msg['role'] == 'user' else "Ассистент"
-            context_parts.append("{role}: {msg['content']}")  # type: ignore
+            context_parts.append(f"{role}: {msg['content']}")  # type: ignore
 
         return "\n".join(context_parts)
 
@@ -299,6 +311,10 @@ class FIPIData(models.Model):
     """Модель для хранения данных с ФИПИ"""
 
     DATA_TYPES = [
+        ('tasks', 'Задания'),
+        ('theory', 'Теория'),
+        ('examples', 'Примеры'),
+        ('solutions', 'Решения'),
     ]
 
     title = models.CharField(max_length=500, verbose_name="Название")
@@ -312,8 +328,15 @@ class FIPIData(models.Model):
         blank=True,
         null=True,
         verbose_name="Предмет")
-    exam_type = models.CharField(max_length=20, choices=[
-    ], default='ege', verbose_name="Тип экзамена")
+    FIPI_EXAM_TYPES = [
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
+    ]
+    exam_type = models.CharField(
+        max_length=20, 
+        choices=FIPI_EXAM_TYPES, 
+        default='ege', 
+        verbose_name="Тип экзамена")
     content_hash = models.CharField(
         max_length=64,
         unique=True,
@@ -404,16 +427,24 @@ class UserProfile(models.Model):
         verbose_name="Последние запросы")
     preferred_subjects = models.JSONField(
         default=list, blank=True, verbose_name="Предпочитаемые предметы")
+    DIFFICULTY_CHOICES = [
+        ('easy', 'Легкий'),
+        ('medium', 'Средний'),
+        ('hard', 'Сложный'),
+    ]
     difficulty_preference = models.CharField(
         max_length=20,
-        choices=[
-        ],
+        choices=DIFFICULTY_CHOICES,
         default='medium',
         verbose_name="Предпочитаемая сложность")
+    SUBSCRIPTION_CHOICES = [
+        ('free', 'Бесплатная'),
+        ('premium', 'Премиум'),
+        ('pro', 'Профессиональная'),
+    ]
     subscription_type = models.CharField(
         max_length=20,
-        choices=[
-        ],
+        choices=SUBSCRIPTION_CHOICES,
         default='free',
         verbose_name="Тип подписки")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -440,18 +471,36 @@ class FIPISourceMap(models.Model):
     """Модель для хранения карты источников данных fipi.ru"""
 
     DATA_TYPES = [
+        ('tasks', 'Задания'),
+        ('theory', 'Теория'),
+        ('examples', 'Примеры'),
+        ('solutions', 'Решения'),
     ]
 
     EXAM_TYPES = [
+        ('ege', 'ЕГЭ'),
+        ('oge', 'ОГЭ'),
     ]
 
     PRIORITIES = [
+        (1, 'Критический'),
+        (2, 'Высокий'),
+        (3, 'Средний'),
+        (4, 'Низкий'),
     ]
 
     UPDATE_FREQUENCIES = [
+        ('daily', 'Ежедневно'),
+        ('weekly', 'Еженедельно'),
+        ('monthly', 'Ежемесячно'),
+        ('annually', 'Ежегодно'),
     ]
 
     FILE_FORMATS = [
+        ('HTML', 'HTML'),
+        ('PDF', 'PDF'),
+        ('DOC', 'DOC'),
+        ('JSON', 'JSON'),
     ]
 
     # Основные поля

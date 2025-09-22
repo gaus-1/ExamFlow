@@ -54,10 +54,7 @@ class UnifiedProfileService:
                 profile = UserProfile.objects.create( # type: ignore
                     user=user,
                     telegram_id=telegram_id,
-                    telegram_username=telegram_username or f"user_{telegram_id}",
-                    telegram_first_name="",
-                    telegram_last_name="",
-                    current_task_id=None
+                    telegram_username=telegram_username or f"user_{telegram_id}"
                 )
                 
                 logger.info(f"Создан новый профиль для telegram_id={telegram_id}")
@@ -81,11 +78,7 @@ class UnifiedProfileService:
             unique_username = f"tg_{telegram_id}_{username}" if username else f"tg_{telegram_id}"
             
             user = User.objects.create_user(
-                username=unique_username,
-                telegram_id=telegram_id,
-                telegram_username=username,
-                telegram_first_name="",
-                telegram_last_name=""
+                username=unique_username
             )
             
             logger.info(f"Создан Django пользователь: {unique_username}")
@@ -103,9 +96,6 @@ class UnifiedProfileService:
                 self.id = telegram_id
                 self.telegram_id = telegram_id
                 self.telegram_username = telegram_username or f"user_{telegram_id}"
-                self.telegram_first_name = ""
-                self.telegram_last_name = ""
-                self.current_task_id = None
                 self.user = None
             
             def save(self):

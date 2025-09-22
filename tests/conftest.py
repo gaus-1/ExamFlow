@@ -148,11 +148,10 @@ def math_task(math_subject):
     from learning.models import Task
     return Task.objects.create( # type: ignore
         title='Решите уравнение',
-        content='Решите уравнение: 2x + 5 = 13',
+        description='Решите уравнение: 2x + 5 = 13',
         answer='4',
         subject=math_subject,
-        difficulty=2,
-        task_type='numerical'
+        difficulty=2
     )
 
 
@@ -162,11 +161,10 @@ def russian_task(russian_subject):
     from learning.models import Task
     return Task.objects.create( # type: ignore
         title='Вставьте пропущенную букву',
-        content='В слове "в...рона" пропущена буква:',
+        description='В слове "в...рона" пропущена буква:',
         answer='о',
         subject=russian_subject,
-        difficulty=1,
-        task_type='text'
+        difficulty=1
     )
 
 
