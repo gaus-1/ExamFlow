@@ -60,13 +60,13 @@ def create_main_message(text: str) -> str:
     """
     Создает основное сообщение бота в стиле 2025
     """
-    return "**{text}**"
+    return f"**{text}**"
 
 def create_warning_message(text: str) -> str:
     """
     Создает предупреждающее сообщение бота в стиле 2025
     """
-    return "⚠️ {text}"
+    return f"⚠️ {text}"
 
 # Синхронные функции БД, обёрнутые для безопасного вызова в async-контексте
 
@@ -364,6 +364,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             from telegram import ReplyKeyboardMarkup
             keyboard = [
+                ['📚 Предметы', '🎯 Задания'],
+                ['📊 Статистика', '🤖 ИИ-помощник']
             ]
             reply_markup = ReplyKeyboardMarkup(
                 keyboard, resize_keyboard=True, one_time_keyboard=False)
@@ -376,13 +378,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     parse_mode='Markdown'
                 )
         except Exception as e:
-            logger.error("Ошибка создания нижнего меню: {e}")
+            logger.error(f"Ошибка создания нижнего меню: {e}")
 
     # Получаем или создаем UnifiedProfile
     try:
         profile = await db_get_or_create_unified_profile(user)
         await db_update_profile_activity(profile)
-        logger.info("UnifiedProfile получен/создан для пользователя {user.id}")
+        logger.info(f"UnifiedProfile получен/создан для пользователя {user.id}")
 
         # Получаем прогресс пользователя для персонализации
         progress = await db_get_profile_progress(profile)
@@ -440,10 +442,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     parse_mode='Markdown'
                 )
 
-        logger.info("Пользователь {user.id} запустил бота")
+        logger.info(f"Пользователь {user.id} запустил бота")
 
     except Exception as e:
-        logger.error("Ошибка в команде start: {e}")
+        logger.error(f"Ошибка в команде start: {e}")
         error_text = "❌ Произошла ошибка. Попробуйте позже."
         if is_callback:
             if update.callback_query:  # type: ignore
@@ -913,10 +915,10 @@ async def learning_plan_menu(update: Update, context: ContextTypes.DEFAULT_TYPE)
             parse_mode='Markdown'
         )
 
-        logger.info("Пользователь {user.id} получил план обучения")
+        logger.info(f"Пользователь {user.id} получил план обучения")
 
     except Exception as e:
-        logger.error("Ошибка в learning_plan_menu: {e}")
+        logger.error(f"Ошибка в learning_plan_menu: {e}")
         await query.edit_message_text(  # type: ignore
             "❌ Произошла ошибка при получении плана обучения. Попробуйте позже."
         )
@@ -1097,10 +1099,10 @@ async def ai_explain_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
 
-        logger.info("Пользователь {user.id} получил объяснение темы от ИИ")
+        logger.info(f"Пользователь {user.id} получил объяснение темы от ИИ")
 
     except Exception as e:
-        logger.error("Ошибка в ai_explain_handler: {e}")
+        logger.error(f"Ошибка в ai_explain_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1149,10 +1151,10 @@ async def ai_personal_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
 
-        logger.info("Пользователь {user.id} получил персональные советы от ИИ")
+        logger.info(f"Пользователь {user.id} получил персональные советы от ИИ")
 
     except Exception as e:
-        logger.error("Ошибка в ai_personal_handler: {e}")
+        logger.error(f"Ошибка в ai_personal_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1201,10 +1203,10 @@ async def ai_hint_general_handler(update: Update, context: ContextTypes.DEFAULT_
             parse_mode=None  # Отключаем Markdown для избежания ошибок парсинга
         )
 
-        logger.info("Пользователь {user.id} получил общую подсказку от ИИ")
+        logger.info(f"Пользователь {user.id} получил общую подсказку от ИИ")
 
     except Exception as e:
-        logger.error("Ошибка в ai_hint_general_handler: {e}")
+        logger.error(f"Ошибка в ai_hint_general_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
 # ============================================================================
@@ -1237,7 +1239,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         await handle_ai_message(update, context)
 
     except Exception as e:
-        logger.error("Ошибка в handle_text_message: {e}")
+        logger.error(f"Ошибка в handle_text_message: {e}")
         try:
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,  # type: ignore
@@ -1264,7 +1266,7 @@ async def handle_menu_button(
         elif button_text == "🏆 Прогресс":
             await show_stats(update, context)
     except Exception as e:
-        logger.error("Ошибка в handle_menu_button: {e}")
+        logger.error(f"Ошибка в handle_menu_button: {e}")
         if update.message:  # type: ignore
             await update.message.reply_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
@@ -1474,10 +1476,10 @@ async def clear_context_handler(update: Update, context: ContextTypes.DEFAULT_TY
             parse_mode='Markdown'
         )
 
-        logger.info("Пользователь {user.id} очистил контекст чата")
+        logger.info(f"Пользователь {user.id} очистил контекст чата")
 
     except Exception as e:
-        logger.error("Ошибка при очистке контекста: {e}")
+        logger.error(f"Ошибка при очистке контекста: {e}")
         await query.edit_message_text(  # type: ignore
             "❌ Произошла ошибка при очистке контекста. Попробуйте позже.",
             reply_markup=InlineKeyboardMarkup([[  # type: ignore

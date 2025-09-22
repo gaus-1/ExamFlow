@@ -54,6 +54,9 @@ urlpatterns = [
 
     # Модуль core (персонализация и RAG-система)
     path('core/', include('core.urls')),
+    
+    # AI API маршруты на корневом уровне для фронтенда
+    path('', include('core.urls')),  # Добавляем core URLs на корень для AI API
 
     # Health check endpoints (для Render и мониторинга)
     path('healthz', lambda request: JsonResponse({'status': 'ok'})),

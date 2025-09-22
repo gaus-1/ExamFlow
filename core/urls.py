@@ -98,6 +98,7 @@ def faq_view(request):
     return render(request, 'faq.html', context)
 
 from . import api  # noqa: E402
+from . import fallback_views  # noqa: E402
 from .health_check import health_check_view, simple_health_check  # noqa: E402
 from core.rag_system.search_api import fipi_semantic_search  # noqa: E402
 from core.rag_system import ai_api  # noqa: E402
@@ -108,6 +109,10 @@ urlpatterns = [
     # Совместимость со старым фронтендом
     path('ai/api/', api.AIQueryView.as_view(), name='ai_query_legacy'),
     path('ai/emergency/', api.EmergencyAIView.as_view(), name='ai_query_emergency'),
+    
+    # Fallback API для работы без БД
+    path('fallback/ai/', fallback_views.FallbackAIView.as_view(), name='fallback_ai'),
+    path('fallback/subjects/', fallback_views.fallback_subjects_view, name='fallback_subjects'),
     path('api/ai/search/', api.SearchView.as_view(), name='ai_search'),
     path('api/ai/stats/', api.VectorStoreStatsView.as_view(), name='vector_stats'),
     path('api/health/', api.HealthCheckView.as_view(), name='health_check'),
