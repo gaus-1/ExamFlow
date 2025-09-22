@@ -66,9 +66,9 @@ class Command(BaseCommand):
                         '✅ ЗАГРУЗКА ЗАВЕРШЕНА УСПЕШНО!'
                     )
                 )
-                self.stdout.write('⏱️ Время выполнения: {duration}')
+                self.stdout.write(f'⏱️ Время выполнения: {duration}')
                 self.stdout.write(
-                    '📅 Завершено: {end_time.strftime("%Y-%m-%d %H:%M:%S")}')
+                    f'📅 Завершено: {end_time.strftime("%Y-%m-%d %H:%M:%S")}')
 
                 # Показываем статистику
                 self._show_statistics()
@@ -86,10 +86,10 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(
                 self.style.ERROR(  # type: ignore
-                    '❌ КРИТИЧЕСКАЯ ОШИБКА: {e}'
+                    f'❌ КРИТИЧЕСКАЯ ОШИБКА: {e}'
                 )
             )
-            logger.error("Ошибка в команде load_fipi_data: {e}")
+            logger.error(f"Ошибка в команде load_fipi_data: {e}")
             return 1
 
     def _update_subjects_only(self):
