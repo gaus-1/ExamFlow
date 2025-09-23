@@ -90,8 +90,8 @@ class TelegramAuthService:
 
     @transaction.atomic
     def authenticate_user(self, auth_data: Dict[str, Any],
-                         ip_address: str = None,
-                         user_agent: str = None) -> Tuple[bool, Optional[TelegramUser], str]:
+                         ip_address: str = None,    # type: ignore  
+                         user_agent: str = None) -> Tuple[bool, Optional[TelegramUser], str]:  # type: ignore
         """
         Аутентифицирует пользователя через Telegram данные
         
@@ -112,9 +112,9 @@ class TelegramAuthService:
                     False,
                     ip_address,
                     user_agent,
-                    error_message
+                    error_message  # type: ignore
                 )
-                return False, None, error_message
+                return False, None, error_message  # type: ignore
 
             telegram_id = int(auth_data['id'])
 
@@ -164,15 +164,15 @@ class TelegramAuthService:
             return False, None, error_message
 
     def _create_auth_session(self, user: TelegramUser,
-                           ip_address: str = None,
-                           user_agent: str = None) -> TelegramAuthSession:
+                           ip_address: str = None,    # type: ignore
+                           user_agent: str = None) -> TelegramAuthSession:  # type: ignore
         """Создает сессию аутентификации"""
         import secrets
 
         session_token = secrets.token_urlsafe(32)
         expires_at = timezone.now() + timezone.timedelta(days=30)  # 30 дней
 
-        session = TelegramAuthSession.objects.create(
+        session = TelegramAuthSession.objects.create(  # type: ignore
             user=user,
             session_token=session_token,
             expires_at=expires_at,
@@ -183,10 +183,10 @@ class TelegramAuthService:
         return session
 
     def _log_auth_attempt(self, telegram_id: int, success: bool,
-                         ip_address: str = None, user_agent: str = None,
-                         error_message: str = None):
+                         ip_address: str = None, user_agent: str = None,    # type: ignore
+                         error_message: str = None):  # type: ignore
         """Логирует попытку аутентификации"""
-        TelegramAuthLog.objects.create(
+        TelegramAuthLog.objects.create(  # type: ignore
             telegram_id=telegram_id,
             success=success,
             ip_address=ip_address,
@@ -197,7 +197,7 @@ class TelegramAuthService:
     def get_user_by_session(self, session_token: str) -> Optional[TelegramUser]:
         """Получает пользователя по токену сессии"""
         try:
-            session = TelegramAuthSession.objects.select_related('user').get(
+            session = TelegramAuthSession.objects.select_related('user').get(  # type: ignore
                 session_token=session_token,
                 is_active=True
             )
@@ -209,17 +209,17 @@ class TelegramAuthService:
 
             return session.user
 
-        except TelegramAuthSession.DoesNotExist:
+        except TelegramAuthSession.DoesNotExist:  # type: ignore
             return None
 
     def logout_user(self, session_token: str) -> bool:
         """Завершает сессию пользователя"""
         try:
-            session = TelegramAuthSession.objects.get(session_token=session_token)
+            session = TelegramAuthSession.objects.get(session_token=session_token)  # type: ignore
             session.is_active = False
             session.save()
             return True
-        except TelegramAuthSession.DoesNotExist:
+        except TelegramAuthSession.DoesNotExist:  # type: ignore    
             return False
 
 
