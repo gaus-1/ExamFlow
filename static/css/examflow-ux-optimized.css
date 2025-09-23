@@ -546,6 +546,9 @@ p {
   grid-template-columns: 1fr;
   gap: var(--space-8);
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
   min-height: 300px;
   align-items: start;
 }
@@ -553,7 +556,9 @@ p {
 @media (min-width: 768px) {
   .footer-content {
     grid-template-columns: 2fr 1fr 1fr 1fr;
-    justify-items: stretch;
+    justify-items: start;
+    align-items: start;
+    gap: var(--space-12);
   }
 }
 
