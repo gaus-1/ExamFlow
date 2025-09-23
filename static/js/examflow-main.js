@@ -114,7 +114,7 @@ class ExamFlowApp {
           'Content-Type': 'application/json',
           'X-CSRFToken': this.getCSRFToken()
         },
-        body: JSON.stringify({ prompt: question })
+        body: JSON.stringify({ query: question })
       });
       
       if (!response.ok) {
@@ -153,7 +153,7 @@ class ExamFlowApp {
             'Content-Type': 'application/json',
             'X-CSRFToken': this.getCSRFToken()
           },
-          body: JSON.stringify({ prompt: question })
+          body: JSON.stringify({ query: question })
         });
         
         if (emergencyResponse.ok) {

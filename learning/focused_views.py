@@ -148,7 +148,7 @@ def focused_search(request):
             'title': task.title,
             'subject': task.subject.name,
             'type': 'math',
-            'url': '/task/{task.id}/'
+            'url': f'/task/{task.id}/'
         })
 
     # Добавляем результаты по русскому языку
@@ -158,7 +158,7 @@ def focused_search(request):
             'title': task.title,
             'subject': task.subject.name,
             'type': 'russian',
-            'url': '/task/{task.id}/'
+            'url': f'/task/{task.id}/'
         })
 
     return JsonResponse({
