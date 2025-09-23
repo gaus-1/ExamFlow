@@ -16,7 +16,9 @@ AUTH_USER_MODEL = 'telegram_auth.TelegramUser'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'examflow.ru, www.examflow.ru, localhost, 127.0.0.1, testserver, examflow.onrender.com').split(', ') if h.strip()]
+# Разбор ALLOWED_HOSTS без зависимости от пробелов после запятых
+_ALLOWED_HOSTS_RAW = os.getenv('ALLOWED_HOSTS', 'examflow.ru,www.examflow.ru,localhost,127.0.0.1,testserver,examflow.onrender.com')
+ALLOWED_HOSTS = [h.strip() for h in _ALLOWED_HOSTS_RAW.split(',') if h.strip()]
 # Доп. подстраховка для прод окружений, где Render делает health-пинги от имени домена
 for host in ['examflow.ru', 'www.examflow.ru']:
     if host not in ALLOWED_HOSTS:
@@ -249,17 +251,27 @@ GEMINI_TASK_CONFIGS = {
 GEMINI_TIMEOUT = 10
 GEMINI_MOBILE_TIMEOUT = 5
 
-# Cache settings
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'rediss://red-d2qldkje5dus73c73tr0:zccbozd9aZ5sbiSSZ8xZaJpW9qM3BnOz@oregon-keyvalue.render.com:6379'),
+# Cache settings (условный Redis/LocMem)
+_USE_REDIS_CACHE = os.getenv('USE_REDIS_CACHE', '0') == '1'
+_REDIS_URL = os.getenv('REDIS_URL', '')
+if _USE_REDIS_CACHE and _REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': _REDIS_URL,
+        }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'examflow-local-cache',
+        }
+    }
 
 # Celery settings
-CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = _REDIS_URL or 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = _REDIS_URL or 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
