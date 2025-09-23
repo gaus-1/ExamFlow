@@ -49,11 +49,11 @@
 
             <!-- Кнопки действий -->
             <div class="flex flex-col gap-3">
-                <a href="{% url 'learning:subject_detail' subject.id %}" class="btn btn-primary">
+                <a href="{% url 'learning:subject_detail' subject.id %}" class="btn btn-primary" rel="nofollow">
                     📚 Изучать предмет
                 </a>
                 
-                <a href="{% url 'learning:random_task' %}?subject={{ subject.id }}" class="btn btn-outline">
+                <a href="{% url 'learning:random_task_subject' subject.id %}" class="btn btn-outline" rel="nofollow">
                     🎲 Случайное задание
                 </a>
                 

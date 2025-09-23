@@ -178,7 +178,7 @@ h1 {
 
 @media (min-width: 768px) {
   h1 {
-    font-size: var(--text-7xl);
+    font-size: calc(var(--text-6xl) + 0.5rem); /* немного меньше для ноутбуков */
   }
 }
 
@@ -551,6 +551,31 @@ p {
   padding: 0 var(--space-4);
   min-height: 300px;
   align-items: start;
+}
+
+/* Ноутбуки/десктопы: больше воздуха и стабильная сетка футера */
+@media (min-width: 1024px) {
+  .footer {
+    padding: var(--space-20) 0 var(--space-8);
+  }
+  .footer-content {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--space-12);
+    align-items: start;
+    justify-items: start;
+  }
+}
+
+/* AI чат: увеличенная рабочая область на ноутбуках, плавность */
+.ai-chat {
+  max-height: 65vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+@media (min-width: 1024px) {
+  .ai-chat {
+    max-height: 70vh;
+  }
 }
 
 @media (min-width: 768px) {
