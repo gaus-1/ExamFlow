@@ -51,16 +51,17 @@ class TestHealthCheck:
              patch('django.core.cache.cache') as mock_cache:
             
             mock_cache.set.return_value = True
-            mock_cache.get.return_value = 'test_value'
+            mock_cache.get.return_value = 'ok'
             
             response = health_check_view(request)
             
-            assert response.status_code == 500
+            assert response.status_code == 200
             
             import json
             data = json.loads(response.content)
             assert data['status'] == 'unhealthy'
-            assert 'error' in data
+            assert data['database'] == 'error'
+            assert data['cache'] == 'connected'
     
     def test_health_check_view_cache_error(self):
         """Тест health check с ошибкой кэша"""

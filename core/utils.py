@@ -20,7 +20,7 @@ def generate_qr_code(url):
         img.save(buffer, "PNG")  # Исправлено: убран именованный параметр
         img_str = base64.b64encode(buffer.getvalue()).decode()
 
-        return "data:image/png;base64, {img_str}"
+        return f"data:image/png;base64,{img_str}"
     except Exception as e:
         # Возвращаем заглушку в случае ошибки
-        return "data:text/plain;base64, {base64.b64encode('QR Error: {str(e)}'.encode()).decode()}"
+        return f"data:text/plain;base64,{base64.b64encode(f'QR Error: {str(e)}'.encode()).decode()}"
