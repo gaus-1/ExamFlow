@@ -96,7 +96,8 @@ def api_chat(request):
         from .context_manager import WebContextManager
         
         data = json.loads(request.body)
-        prompt = data.get('prompt', '').strip()
+        # Поддерживаем оба формата: {prompt: ...} и {query: ...}
+        prompt = (data.get('prompt') or data.get('query') or '').strip()
         if not prompt:
             return JsonResponse({'error': 'Пустой запрос'}, status=400)
 
@@ -161,6 +162,7 @@ def api_chat(request):
 
         return JsonResponse({
             'response': text,
+            'answer': text,
             'provider': result.get('provider', 'local'),
             'cached': result.get('cached', False),
             'tokens_used': result.get('tokens_used', 0),

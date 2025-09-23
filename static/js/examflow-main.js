@@ -108,13 +108,14 @@ class ExamFlowApp {
     const loadingId = this.addMessage('assistant', 'Анализирую ваш вопрос...', true);
     
     try {
+      // Совместимость: пробуем модульный эндпоинт /ai/api/ (app ai) и core-эндпоинт /core/ai/api/
       const response = await fetch('/ai/api/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': this.getCSRFToken()
         },
-        body: JSON.stringify({ query: question })
+        body: JSON.stringify({ prompt: question, query: question })
       });
       
       if (!response.ok) {
@@ -153,7 +154,7 @@ class ExamFlowApp {
             'Content-Type': 'application/json',
             'X-CSRFToken': this.getCSRFToken()
           },
-          body: JSON.stringify({ query: question })
+          body: JSON.stringify({ prompt: question, query: question })
         });
         
         if (emergencyResponse.ok) {
@@ -178,7 +179,7 @@ class ExamFlowApp {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': this.getCSRFToken()
               },
-              body: JSON.stringify({ query: question })
+              body: JSON.stringify({ prompt: question, query: question })
             });
             
             if (fallbackResponse.ok) {
