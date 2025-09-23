@@ -23,25 +23,31 @@ def health_check_view(request):
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
         
+        database_status = 'connected'
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        database_status = 'error'
+    
+    try:
         # Check cache connection
         cache.set('health_check', 'ok', 10)
         cache_status = cache.get('health_check') == 'ok'
-        
-        status = {
-            'status': 'healthy',
-            'database': 'connected',
-            'cache': 'connected' if cache_status else 'error',
-            'timestamp': str(datetime.now())
-        }
-        
-        return JsonResponse(status, status=200)
-        
+        cache_status_text = 'connected' if cache_status else 'error'
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return JsonResponse({
-            'status': 'unhealthy',
-            'error': str(e)
-        }, status=500)
+        logger.error(f"Cache health check failed: {e}")
+        cache_status_text = 'error'
+    
+    # Determine overall status
+    overall_status = 'healthy' if database_status == 'connected' else 'unhealthy'
+    
+    status = {
+        'status': overall_status,
+        'database': database_status,
+        'cache': cache_status_text,
+        'timestamp': str(datetime.now())
+    }
+    
+    return JsonResponse(status, status=200)
 
 
 @require_http_methods(["GET"])

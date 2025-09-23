@@ -70,7 +70,7 @@ class TestHealthCheck:
         request = factory.get('/health/')
         
         with patch('django.db.connection.cursor') as mock_cursor, \
-             patch('django.core.cache.cache', side_effect=Exception('Cache Error')):
+             patch('django.core.cache.cache.set', side_effect=Exception('Cache Error')):
             
             mock_cursor.return_value.__enter__.return_value.execute = Mock()
             
