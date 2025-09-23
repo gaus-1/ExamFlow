@@ -28,8 +28,7 @@ class TestCoreModels(TestCase):
         
         # Создаем профиль пользователя
         self.profile = UserProfile.objects.create( # type: ignore
-            user=self.user,
-            subscription='free'
+            user=self.user
         )
         
         # Создаем предмет
@@ -44,7 +43,7 @@ class TestCoreModels(TestCase):
         # Создаем задание
         self.task = Task.objects.create( # type: ignore
             title='Тестовое задание',
-            description='Решите уравнение x + 1 = 2',
+            text='Решите уравнение x + 1 = 2',
             subject=self.subject,
             difficulty=1
         )
@@ -112,11 +111,9 @@ class TestCoreModels(TestCase):
         """Тест создания профиля пользователя"""
         profile = UserProfile.objects.create( # type: ignore
             user=self.user,
-            subscription='premium'
         )
         
         assert profile.user == self.user
-        assert profile.subscription == 'premium'
     
     def test_user_profile_str_method(self):
         """Тест метода __str__ для UserProfile"""
@@ -271,3 +268,170 @@ class TestCoreModels(TestCase):
         )
         
         assert str(source_map) == 'Тестовый источник'
+    
+    def test_task_check_answer_correct(self):
+        """Тест проверки правильного ответа"""
+        task = Task.objects.create( # type: ignore
+            title='Тестовое задание',
+            text='Решите уравнение x + 1 = 2',
+            subject=self.subject,
+            difficulty=1,
+            answer='1'
+        )
+        
+        assert task.check_answer('1') is True
+        assert task.check_answer(' 1 ') is True
+        assert task.check_answer('1.0') is False  # Строгое сравнение
+    
+    def test_task_check_answer_incorrect(self):
+        """Тест проверки неправильного ответа"""
+        task = Task.objects.create( # type: ignore
+            title='Тестовое задание',
+            text='Решите уравнение x + 1 = 2',
+            subject=self.subject,
+            difficulty=1,
+            answer='1'
+        )
+        
+        assert task.check_answer('2') is False
+        assert task.check_answer('') is False
+    
+    def test_task_check_answer_no_answer(self):
+        """Тест проверки ответа для задачи без правильного ответа"""
+        task = Task.objects.create( # type: ignore
+            title='Тестовое задание',
+            text='Решите уравнение x + 1 = 2',
+            subject=self.subject,
+            difficulty=1
+        )
+        
+        assert task.check_answer('1') is False
+    
+    def test_task_check_answer_case_insensitive(self):
+        """Тест проверки ответа без учета регистра"""
+        task = Task.objects.create( # type: ignore
+            title='Тестовое задание',
+            description='Назовите столицу России',
+            subject=self.subject,
+            difficulty=1,
+            answer='Москва'
+        )
+        
+        assert task.check_answer('москва') is True
+        assert task.check_answer('МОСКВА') is True
+        assert task.check_answer('Москва') is True
+    
+    def test_user_progress_relationships(self):
+        """Тест связей UserProgress"""
+        progress = UserProgress.objects.create( # type: ignore
+            user=self.user,
+            task=self.task,
+            user_answer='1',
+            is_correct=True,
+            attempts=2,
+            time_spent=120
+        )
+        
+        assert progress.user == self.user
+        assert progress.task == self.task
+        assert progress.user_answer == '1'
+        assert progress.is_correct is True
+        assert progress.attempts == 2
+        assert progress.time_spent == 120
+    
+    def test_subject_choices(self):
+        """Тест choices для Subject"""
+        subject = Subject.objects.create( # type: ignore
+            name='Тестовый предмет',
+            description='Описание',
+            exam_type='oge'
+        )
+        
+        assert subject.get_exam_type_display() == 'ОГЭ'
+    
+    def test_daily_challenge_choices(self):
+        """Тест choices для DailyChallenge"""
+        challenge = DailyChallenge.objects.create( # type: ignore
+            title='Тестовый вызов',
+            description='Описание',
+            challenge_type='russian'
+        )
+        
+        assert challenge.get_challenge_type_display() == 'Русский язык'
+    
+    def test_user_challenge_relationships(self):
+        """Тест связей UserChallenge"""
+        challenge = DailyChallenge.objects.create( # type: ignore
+            title='Тестовый вызов',
+            description='Описание',
+            challenge_type='math',
+            target_value=100
+        )
+        
+        user_challenge = UserChallenge.objects.create( # type: ignore
+            user=self.user,
+            challenge=challenge,
+            current_progress=50
+        )
+        
+        assert user_challenge.user == self.user
+        assert user_challenge.challenge == challenge
+        assert user_challenge.current_progress == 50
+        assert user_challenge.progress_percentage == 50.0
+    
+    def test_user_challenge_zero_target(self):
+        """Тест UserChallenge с нулевым target_value"""
+        challenge = DailyChallenge.objects.create( # type: ignore
+            title='Тестовый вызов',
+            description='Описание',
+            challenge_type='math',
+            target_value=0
+        )
+        
+        user_challenge = UserChallenge.objects.create( # type: ignore
+            user=self.user,
+            challenge=challenge,
+            current_progress=50
+        )
+        
+        # При target_value=0 должно возвращать 0
+        assert user_challenge.progress_percentage == 0.0
+    
+    def test_chat_session_message_limit(self):
+        """Тест ограничения количества сообщений в ChatSession"""
+        session = ChatSession.objects.create( # type: ignore
+            user=self.user,
+            subject=self.subject
+        )
+        
+        # Добавляем много сообщений
+        for i in range(50):
+            session.add_message('user', f'Сообщение {i}')
+            session.add_message('ai', f'Ответ {i}')
+        
+        # Должно быть ограничение на количество сообщений
+        assert len(session.messages) <= 50  # Или какое-то разумное ограничение
+    
+    def test_fipi_data_choices(self):
+        """Тест choices для FIPIData"""
+        fipi_data = FIPIData.objects.create( # type: ignore
+            title='Тестовые данные',
+            content='Содержимое',
+            data_type='task',
+            exam_type='ege',
+            difficulty=2
+        )
+        
+        assert fipi_data.get_data_type_display() == 'Задание'
+        assert fipi_data.get_exam_type_display() == 'ЕГЭ'
+        assert fipi_data.get_difficulty_display() == 'Средняя'
+    
+    def test_fipi_source_map_update_frequency(self):
+        """Тест update_frequency для FIPISourceMap"""
+        source_map = FIPISourceMap.objects.create( # type: ignore
+            source_name='Тестовый источник',
+            source_url='https://example.com',
+            update_frequency='daily'
+        )
+        
+        assert source_map.get_update_frequency_display() == 'Ежедневно'
