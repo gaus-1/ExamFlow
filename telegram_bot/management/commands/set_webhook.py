@@ -21,7 +21,7 @@ class Command(BaseCommand):
         token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
         
         if not token:
-            self.stdout.write(self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен'))
+            self.stdout.write(self.style.ERROR('❌ TELEGRAM_BOT_TOKEN не настроен')) # type: ignore
             return
             
         # Определяем URL
@@ -52,12 +52,12 @@ class Command(BaseCommand):
             if response.status_code == 200:
                 data = response.json()
                 if data.get('ok'):
-                    self.stdout.write(self.style.SUCCESS('✅ Webhook установлен успешно!'))
+                    self.stdout.write(self.style.SUCCESS('✅ Webhook установлен успешно!')) # type: ignore
                     self.stdout.write(f'📍 URL: {webhook_url}')
                 else:
-                    self.stdout.write(self.style.ERROR(f'❌ Ошибка: {data.get("description")}'))
+                    self.stdout.write(self.style.ERROR(f'❌ Ошибка: {data.get("description")}')) # type: ignore     
             else:
-                self.stdout.write(self.style.ERROR(f'❌ HTTP {response.status_code}: {response.text}'))
+                self.stdout.write(self.style.ERROR(f'❌ HTTP {response.status_code}: {response.text}')) # type: ignore
                 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'❌ Ошибка установки webhook: {e}'))
+            self.stdout.write(self.style.ERROR(f'❌ Ошибка установки webhook: {e}')) # type: ignore
