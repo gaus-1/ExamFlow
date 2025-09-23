@@ -18,7 +18,7 @@ class TestLearningModels(TestCase):
         from telegram_auth.models import TelegramUser
         
         # Создаем пользователя
-        self.user = TelegramUser.objects.create_user(
+        self.user = TelegramUser.objects.create(
             telegram_id=123456789,
             telegram_username='testuser'
         )
@@ -56,7 +56,7 @@ class TestLearningModels(TestCase):
         
         task = Task.objects.create( # type: ignore
             title='Новое задание',
-            content='Решите систему уравнений',
+            description='Решите систему уравнений',
             subject=self.subject,
             difficulty=2
         )
