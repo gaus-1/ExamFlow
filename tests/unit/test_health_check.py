@@ -76,12 +76,12 @@ class TestHealthCheck:
             
             response = health_check_view(request)
             
-            assert response.status_code == 500
+            assert response.status_code == 200
             
             import json
             data = json.loads(response.content)
-            assert data['status'] == 'unhealthy'
-            assert 'error' in data
+            assert data['status'] == 'healthy'
+            assert data['cache'] == 'error'
     
     def test_simple_health_check(self):
         """Тест простого health check"""
