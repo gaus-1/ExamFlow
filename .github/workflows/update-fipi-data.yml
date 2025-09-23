@@ -59,9 +59,10 @@ jobs:
           
           python manage.py shell -c "
           from learning.models import Subject, Task, Topic
-          print(f'**Предметов:** {Subject.objects.count()}' >> open('UPDATE_REPORT.md', 'a'))
-          print(f'**Тем:** {Topic.objects.count()}' >> open('UPDATE_REPORT.md', 'a'))
-          print(f'**Заданий:** {Task.objects.count()}' >> open('UPDATE_REPORT.md', 'a'))
+          with open('UPDATE_REPORT.md', 'a') as f:
+              f.write(f'**Предметов:** {Subject.objects.count()}\n')
+              f.write(f'**Тем:** {Topic.objects.count()}\n')
+              f.write(f'**Заданий:** {Task.objects.count()}\n')
           "
           
       - name: 🔍 Проверка качества данных
@@ -109,7 +110,7 @@ jobs:
           
       - name: 🚀 Пуш изменений
         run: |
-          git push origin master
+          git push origin main
           
       - name: 📧 Уведомление о завершении
         if: always()
