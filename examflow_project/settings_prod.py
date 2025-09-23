@@ -29,14 +29,39 @@ X_FRAME_OPTIONS = 'DENY'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # noqa: F405
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Настройки базы данных для продакшена
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+# Настройки базы данных для продакшена с поддержкой SQLite fallback
+USE_SQLITE_FALLBACK = os.getenv('USE_SQLITE_FALLBACK', 'false').lower() == 'true'
+database_url = os.getenv('DATABASE_URL')
+
+if USE_SQLITE_FALLBACK:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/tmp/examflow_render.db',
+            'OPTIONS': {
+                'timeout': 30,
+            },
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+    # Если DATABASE_URL пуст, также откатываемся на SQLite, чтобы сервис поднялся
+    if not database_url:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': '/tmp/examflow_render.db',
+                'OPTIONS': {
+                    'timeout': 30,
+                },
+            }
+        }
 
 # Настройки логирования для продакшена
 class MaskSecretsFilter:
@@ -89,16 +114,26 @@ LOGGING = {
     },
     }
 
-# Настройки кеширования для продакшена
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://localhost:6379/0'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+# Настройки кеширования для продакшена (условно Redis или локальная память)
+USE_REDIS_CACHE = os.getenv('USE_REDIS_CACHE', '0') == '1'
+REDIS_URL = os.getenv('REDIS_URL', '')
+if USE_REDIS_CACHE and REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
         }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'examflow-local-cache',
+        }
+    }
 
 # Настройки сессий для продакшена
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
