@@ -35,26 +35,18 @@ def personalization_dashboard(request):
 def my_analytics(request):
     """Детальная аналитика пользователя"""
     try:
-        # Получаем аналитику
-        analyzer = UserBehaviorAnalyzer(request.user.id)
-        preferences = analyzer.get_user_preferences()
-        patterns = analyzer.get_study_patterns()
-
-        # Получаем прогресс
-        user_insights = get_user_insights(request.user.id)
-        progress_summary = user_insights.get('progress_summary', {})
-
+        dashboard_service = DashboardService(request.user)
+        user_insights = dashboard_service.get_user_insights()
+        
         context = {
-            'preferences': preferences,
-            'patterns': patterns,
-            'progress_summary': progress_summary,
+            'user_insights': user_insights,
             'page_title': 'Моя аналитика - ExamFlow'
         }
 
         return render(request, 'core/my_analytics.html', context)
 
     except Exception as e:
-        logger.error("Ошибка в my_analytics: {e}")
+        logger.error(f"Ошибка в my_analytics: {e}")
         messages.error(request, "Произошла ошибка при загрузке аналитики")
         return redirect('home')
 
@@ -81,19 +73,17 @@ def my_recommendations(request):
 def study_plan_view(request):
     """Персональный план обучения"""
     try:
-        # Получаем план обучения
-        recommender = PersonalizedRecommendations(request.user.id)
-        study_plan = recommender.get_study_plan()
-
+        dashboard_service = DashboardService(request.user)
+        
         context = {
-            'study_plan': study_plan,
+            'study_plan': dashboard_service.get_study_plan(),
             'page_title': 'План обучения - ExamFlow'
         }
 
         return render(request, 'core/study_plan.html', context)
 
     except Exception as e:
-        logger.error("Ошибка в study_plan_view: {e}")
+        logger.error(f"Ошибка в study_plan_view: {e}")
         messages.error(request, "Произошла ошибка при загрузке плана обучения")
         return redirect('home')
 
@@ -160,13 +150,8 @@ def api_weak_topics(request):
 @ratelimit(key='user', rate='30/m', block=True)
 def api_user_preferences(request):
     """API для получения предпочтений пользователя"""
-    try:
-        analyzer = UserBehaviorAnalyzer(request.user.id)
-        preferences = analyzer.get_user_preferences()
-        return JsonResponse({'preferences': preferences})
-    except Exception as e:
-        logger.error("Ошибка в api_user_preferences: {e}")
-        return JsonResponse({'error': 'Ошибка загрузки предпочтений'}, status=500)
+    api_service = APIService(StandardAPIResponseBuilder())
+    return api_service.handle_user_insights_request(request.user)
 
 @csrf_exempt
 @require_http_methods(["GET"])
