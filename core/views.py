@@ -2,14 +2,15 @@
 Представления для системы персонализации ExamFlow
 """
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
 import logging
-from django_ratelimit.decorators import ratelimit
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 
 from .personalization_system import (
     get_user_insights,
