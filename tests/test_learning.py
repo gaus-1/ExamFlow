@@ -4,6 +4,7 @@
 
 from django.test import TestCase, Client
 from core.models import Subject, Task, UserProgress
+from telegram_auth.models import TelegramUser
 
 class TestLearning(TestCase):
     """Тесты модуля обучения"""
@@ -13,10 +14,11 @@ class TestLearning(TestCase):
         self.client = Client()
 
         # Создаем тестового пользователя
-        self.user = User.objects.create_user( # type: ignore
+        self.user = TelegramUser.objects.create( # type: ignore
+            telegram_id=12345,
             username='testuser',
-            email='test@example.com',
-            password='testpassword123'
+            first_name='Test',
+            last_name='User'
         )
 
         # Создаем тестовые данные

@@ -177,7 +177,7 @@ class TestDatabaseRelationships:
         
         task = Task.objects.create( # type: ignore
             title='Тестовое задание',
-            content='Содержание задания',
+            description='Содержание задания',
             answer='ответ',
             subject=math_subject
         )
@@ -367,7 +367,7 @@ class TestDatabaseIndexes:
         
         task = Task.objects.create( # type: ignore  
             title='Индексное задание',
-            content='Содержание',
+            description='Содержание',
             answer='ответ',
             subject=math_subject
         )
@@ -422,7 +422,7 @@ class TestDatabaseValidation:
         # Валидная сложность
         task = Task.objects.create( # type: ignore
             title='Валидное задание',
-            content='Содержание',
+            description='Содержание',
             answer='ответ',
             subject=math_subject,
             difficulty=2
@@ -432,7 +432,7 @@ class TestDatabaseValidation:
         # Сложность вне диапазона (если есть ограничения)
         task2 = Task.objects.create( # type: ignore
             title='Задание с высокой сложностью',
-            content='Содержание',
+            description='Содержание',
             answer='ответ',
             subject=math_subject,
             difficulty=10  # Если есть ограничение на 1-5

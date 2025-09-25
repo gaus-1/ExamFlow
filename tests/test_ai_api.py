@@ -5,6 +5,7 @@ Unit тесты для AI API
 import json
 from django.test import TestCase, Client
 from unittest.mock import patch, MagicMock
+from telegram_auth.models import TelegramUser
 
 class TestAIAssistantAPI(TestCase):
     """Тесты для AI Assistant API"""
@@ -12,9 +13,11 @@ class TestAIAssistantAPI(TestCase):
     def setUp(self):
         """Настройка тестов"""
         self.client = Client()
-        self.user = User.objects.create_user( # type: ignore
+        self.user = TelegramUser.objects.create( # type: ignore
+            telegram_id=12345,
             username='testuser',
-            password='testpass123'
+            first_name='Test',
+            last_name='User'
         )
 
     @patch('ai.api.model')
@@ -122,9 +125,11 @@ class TestUserProfileAPI(TestCase):
     def setUp(self):
         """Настройка тестов"""
         self.client = Client()
-        self.user = User.objects.create_user( # type: ignore
+        self.user = TelegramUser.objects.create( # type: ignore
+            telegram_id=12345,
             username='testuser',
-            password='testpass123'
+            first_name='Test',
+            last_name='User'
         )
         self.client.login(username='testuser', password='testpass123')
 
