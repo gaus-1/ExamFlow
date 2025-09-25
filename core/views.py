@@ -12,11 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 
-from .personalization_system import (
-    get_user_insights,
-    PersonalizedRecommendations,
-    UserBehaviorAnalyzer
-)
+from .services.dashboard_service import DashboardService
+from .services.api_service import APIService, StandardAPIResponseBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -24,27 +21,13 @@ logger = logging.getLogger(__name__)
 def personalization_dashboard(request):
     """Дашборд персонализации с аналитикой и рекомендациями"""
     try:
-        # Получаем персональные данные пользователя
-        user_insights = get_user_insights(request.user.id)
-
-        # Получаем рекомендации
-        recommender = PersonalizedRecommendations(request.user.id)
-        recommended_tasks = recommender.get_recommended_tasks(6)
-        study_plan = recommender.get_study_plan()
-        weak_topics = recommender.get_weak_topics()
-
-        context = {
-            'user_insights': user_insights,
-            'recommended_tasks': recommended_tasks,
-            'study_plan': study_plan,
-            'weak_topics': weak_topics,
-            'page_title': 'Персонализация - ExamFlow'
-        }
-
+        dashboard_service = DashboardService(request.user)
+        context = dashboard_service.build_dashboard_context()
+        
         return render(request, 'core/personalization_dashboard.html', context)
 
     except Exception as e:
-        logger.error("Ошибка в personalization_dashboard: {e}")
+        logger.error(f"Ошибка в personalization_dashboard: {e}")
         messages.error(request, "Произошла ошибка при загрузке персонализации")
         return redirect('home')
 
@@ -79,21 +62,18 @@ def my_analytics(request):
 def my_recommendations(request):
     """Персональные рекомендации"""
     try:
-        # Получаем рекомендации
-        recommender = PersonalizedRecommendations(request.user.id)
-        recommended_tasks = recommender.get_recommended_tasks(10)
-        weak_topics = recommender.get_weak_topics()
-
+        dashboard_service = DashboardService(request.user)
+        
         context = {
-            'recommended_tasks': recommended_tasks,
-            'weak_topics': weak_topics,
+            'recommended_tasks': dashboard_service.get_recommended_tasks(10),
+            'weak_topics': dashboard_service.get_weak_topics(),
             'page_title': 'Мои рекомендации - ExamFlow'
         }
 
         return render(request, 'core/my_recommendations.html', context)
 
     except Exception as e:
-        logger.error("Ошибка в my_recommendations: {e}")
+        logger.error(f"Ошибка в my_recommendations: {e}")
         messages.error(request, "Произошла ошибка при загрузке рекомендаций")
         return redirect('home')
 
@@ -121,19 +101,17 @@ def study_plan_view(request):
 def weak_topics_view(request):
     """Анализ слабых тем"""
     try:
-        # Получаем слабые темы
-        recommender = PersonalizedRecommendations(request.user.id)
-        weak_topics = recommender.get_weak_topics()
-
+        dashboard_service = DashboardService(request.user)
+        
         context = {
-            'weak_topics': weak_topics,
+            'weak_topics': dashboard_service.get_weak_topics(),
             'page_title': 'Слабые темы - ExamFlow'
         }
 
         return render(request, 'core/weak_topics.html', context)
 
     except Exception as e:
-        logger.error("Ошибка в weak_topics_view: {e}")
+        logger.error(f"Ошибка в weak_topics_view: {e}")
         messages.error(request, "Произошла ошибка при загрузке слабых тем")
         return redirect('home')
 
@@ -143,12 +121,8 @@ def weak_topics_view(request):
 @ratelimit(key='user', rate='30/m', block=True)
 def api_user_insights(request):
     """API для получения персональных данных пользователя"""
-    try:
-        user_insights = get_user_insights(request.user.id)
-        return JsonResponse(user_insights)
-    except Exception as e:
-        logger.error("Ошибка в api_user_insights: {e}")
-        return JsonResponse({'error': 'Ошибка загрузки данных'}, status=500)
+    api_service = APIService(StandardAPIResponseBuilder())
+    return api_service.handle_user_insights_request(request.user)
 
 @login_required
 @require_http_methods(["GET"])
@@ -157,38 +131,29 @@ def api_recommended_tasks(request):
     """API для получения рекомендуемых задач"""
     try:
         limit = int(request.GET.get('limit', 6))
-        recommender = PersonalizedRecommendations(request.user.id)
-        tasks = recommender.get_recommended_tasks(limit)
-        return JsonResponse({'tasks': tasks})
-    except Exception as e:
-        logger.error("Ошибка в api_recommended_tasks: {e}")
-        return JsonResponse({'error': 'Ошибка загрузки рекомендаций'}, status=500)
+        api_service = APIService(StandardAPIResponseBuilder())
+        return api_service.handle_recommendations_request(request.user, limit)
+    except ValueError:
+        api_service = APIService(StandardAPIResponseBuilder())
+        return api_service.response_builder.build_error_response(
+            "Некорректный параметр limit", 400
+        )
 
 @login_required
 @require_http_methods(["GET"])
 @ratelimit(key='user', rate='30/m', block=True)
 def api_study_plan(request):
     """API для получения плана обучения"""
-    try:
-        recommender = PersonalizedRecommendations(request.user.id)
-        plan = recommender.get_study_plan()
-        return JsonResponse({'plan': plan})
-    except Exception as e:
-        logger.error("Ошибка в api_study_plan: {e}")
-        return JsonResponse({'error': 'Ошибка загрузки плана'}, status=500)
+    api_service = APIService(StandardAPIResponseBuilder())
+    return api_service.handle_study_plan_request(request.user)
 
 @login_required
 @require_http_methods(["GET"])
 @ratelimit(key='user', rate='30/m', block=True)
 def api_weak_topics(request):
     """API для получения слабых тем"""
-    try:
-        recommender = PersonalizedRecommendations(request.user.id)
-        topics = recommender.get_weak_topics()
-        return JsonResponse({'topics': topics})
-    except Exception as e:
-        logger.error("Ошибка в api_weak_topics: {e}")
-        return JsonResponse({'error': 'Ошибка загрузки слабых тем'}, status=500)
+    api_service = APIService(StandardAPIResponseBuilder())
+    return api_service.handle_weak_topics_request(request.user)
 
 @login_required
 @require_http_methods(["GET"])
