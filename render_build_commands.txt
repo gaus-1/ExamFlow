@@ -1,0 +1,18 @@
+# ИСПРАВЛЕННЫЕ команды для Render
+
+## Build Command:
+pip install -r requirements-render.txt && python manage.py collectstatic --noinput
+
+## Start Command:
+gunicorn examflow_project.wsgi:application --bind 0.0.0.0:$PORT
+
+## Альтернативные команды (если первая не работает):
+
+### Build Command (упрощенная):
+pip install -r requirements-render.txt
+
+### Start Command (с миграциями):
+python manage.py migrate && gunicorn examflow_project.wsgi:application --bind 0.0.0.0:$PORT
+
+### Start Command (только Django):
+python manage.py runserver 0.0.0.0:$PORT

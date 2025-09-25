@@ -1,0 +1,40 @@
+# Переменные окружения для нового Render сервиса
+# Скопируйте эти переменные в Environment Variables нового сервиса
+
+# Основные настройки Django
+SECRET_KEY=0#$7i40s#%1i&-8$q14f=195_c-4-inwy*-73*xf=t!v_7v=(t
+DEBUG=False
+DJANGO_SETTINGS_MODULE=examflow_project.settings
+
+# База данных (используем ту же PostgreSQL)
+DATABASE_URL=postgresql://examflow_db_user:b6ltQLqpMIwfUoX7wBwvgTcpOunPAhdl@dpg-d2dn09ali9vc73b2lg7g-a.oregon-postgres.render.com/examflow_db?sslmode=require
+
+# Redis (используем тот же Redis)
+REDIS_URL=rediss://red-d2qldkje5dus73c73tr0:zccbozd9aZ5sbiSSZ8xZaJpW9qM3BnOz@oregon-keyvalue.render.com:6379
+
+# Домены и URL
+ALLOWED_HOSTS=examflow.ru,www.examflow.ru,examflow-new.onrender.com
+SITE_URL=https://examflow.ru
+WEBSITE_URL=https://examflow.ru
+PUBLIC_BASE_URL=https://examflow.ru
+
+# API ключи
+TELEGRAM_BOT_TOKEN=8314335876:AAGzzX6US0xx5PGJ5pVnNJFh7KYeqdSOwLg
+GEMINI_API_KEY=AIzaSyCvi8Mm5paqqV-bakd2N897MgUEvJyWw44
+
+# Telegram админ
+ADMIN_CHAT_ID=963126718
+ADMIN_USERNAMES=SavinVE
+
+# Render настройки
+RENDER=true
+PORT=10000
+PYTHON_VERSION=3.11.0
+
+# Кэш и база данных
+USE_REDIS_CACHE=0
+USE_SQLITE_FALLBACK=true
+
+# Дополнительные настройки
+KEY=REDIS_URL
+VALUE=rediss://red-d2qldkje5dus73c73tr0:zccbozd9aZ5sbiSSZ8xZaJpW9qM3BnOz@oregon-keyvalue.render.com:6379

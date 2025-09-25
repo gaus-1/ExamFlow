@@ -17,14 +17,21 @@ class Subject(models.Model):
         ('other', 'Другое'),
     ]
     exam_type = models.CharField(
-        max_length=20, 
-        choices=EXAM_TYPES, 
+        max_length=20,
+        choices=EXAM_TYPES,
         default='ege',
-        verbose_name="Тип экзамена")
+        verbose_name="Тип экзамена"
+    )
     description = models.TextField(blank=True, verbose_name="Описание")
     icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    created_at = models.DateTimeField(
+        auto_now_add=True, 
+        verbose_name="Дата создания"
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, 
+        verbose_name="Дата обновления"
+    )
 
     class Meta:
         verbose_name = "Предмет"
@@ -32,7 +39,8 @@ class Subject(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} ({self.get_exam_type_display()})"  # type: ignore
+        exam_type_display = self.get_exam_type_display()  # type: ignore
+        return f"{self.name} ({exam_type_display})"
 
     @property
     def task_count(self):
@@ -44,22 +52,44 @@ class Task(models.Model):
     subject = models.ForeignKey(
         Subject,
         on_delete=models.CASCADE,
-        verbose_name="Предмет")
+        verbose_name="Предмет"
+    )
     title = models.CharField(max_length=200, verbose_name="Название")
     text = models.TextField(verbose_name="Текст задачи")
     solution = models.TextField(blank=True, verbose_name="Решение")
     answer = models.CharField(max_length=100, blank=True, verbose_name="Ответ")
     difficulty = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
-        default=3,  # type: ignore
+        default=3,
         verbose_name="Сложность"
+    )  # type: ignore
+    source = models.CharField(
+        max_length=100, 
+        blank=True, 
+        verbose_name="Источник"
     )
-    source = models.CharField(max_length=100, blank=True, verbose_name="Источник")
-    year = models.IntegerField(blank=True, null=True, verbose_name="Год")
-    topics = models.JSONField(default=list, blank=True, verbose_name="Темы")
-    explanation = models.TextField(blank=True, verbose_name="Объяснение")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    year = models.IntegerField(
+        blank=True, 
+        null=True, 
+        verbose_name="Год"
+    )
+    topics = models.JSONField(
+        default=list, 
+        blank=True, 
+        verbose_name="Темы"
+    )
+    explanation = models.TextField(
+        blank=True, 
+        verbose_name="Объяснение"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, 
+        verbose_name="Дата создания"
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, 
+        verbose_name="Дата обновления"
+    )
 
     class Meta:
         verbose_name = "Задача"

@@ -2,38 +2,28 @@ services:
   - type: web
     name: examflow-web
     env: python
-    buildCommand: "chmod +x build.sh && ./build.sh"
-    startCommand: "chmod +x start.sh && ./start.sh"
-    healthCheckPath: /healthz
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn examflow_project.wsgi:application
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: examflow-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: examflow-redis
-          property: connectionString
-      - key: TELEGRAM_BOT_TOKEN
-        sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: DEEPSEEK_API_KEY
-        sync: false
-      - key: SECRET_KEY
-        generateValue: true
-      - key: SITE_URL
-        value: https://examflow.ru
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SETTINGS_MODULE
+        value: examflow_project.settings
       - key: DEBUG
-        value: "False"
-      - key: TELEGRAM_BOT_USERNAME
-        value: ExamFlowBot
-
-  - type: postgres
-    name: examflow-db
-    plan: free
+        value: False
+      - key: ALLOWED_HOSTS
+        value: examflow.onrender.com
+    healthCheckPath: /health/
     
-  - type: redis
-    name: examflow-redis
+  - type: worker
+    name: examflow-worker
+    env: python
     plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py runbot
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SETTINGS_MODULE
+        value: examflow_project.settings
