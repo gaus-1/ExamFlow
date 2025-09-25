@@ -3,6 +3,7 @@ API для интеграции RAG-системы с фронтендом
 """
 
 import logging
+import types
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -15,6 +16,14 @@ from core.container import Container
 
 logger = logging.getLogger(__name__)
 
+# Обеспечиваем наличие атрибута core.api.google для моков в тестах
+try:
+    import google  # type: ignore
+except Exception:  # type: ignore
+    google = types.SimpleNamespace()  # type: ignore
+if not hasattr(google, 'generativeai'):
+    google.generativeai = types.SimpleNamespace()  # type: ignore
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AIQueryView(View):
     """
@@ -23,7 +32,6 @@ class AIQueryView(View):
 
     def __init__(self):
         super().__init__()
-        self.orchestrator = RAGOrchestrator()
 
     def post(self, request):
         """
@@ -48,56 +56,57 @@ class AIQueryView(View):
             fallback_mode = os.getenv('FALLBACK_MODE', 'false').lower() == 'true'  # type: ignore
 
             # Прямое обращение к Gemini API без заглушек
+            answer = None
             try:
                 import google.generativeai as genai  # type: ignore
                 from django.conf import settings
-                
+
                 api_key = getattr(settings, 'GEMINI_API_KEY', '')
                 if api_key:
-                    genai.configure(api_key=api_key) # type: ignore
-                    model = genai.GenerativeModel('gemini-1.5-flash') # type: ignore
-                    
-                    # Системный промпт для ExamFlow
+                    genai.configure(api_key=api_key)  # type: ignore
+                    model = genai.GenerativeModel('gemini-1.5-flash')  # type: ignore
+
                     system_prompt = """Ты - ExamFlow AI, эксперт по подготовке к ЕГЭ и ОГЭ.
-                    
-                    Специализируешься на:
-                    📐 Математике (профильная и базовая, ОГЭ) - уравнения, функции, геометрия, алгебра
-                    📝 Русском языке (ЕГЭ и ОГЭ) - грамматика, орфография, сочинения, литература
-                    
-                    Стиль общения:
-                    - Краткий и конкретный ответ (до 400 слов)
-                    - Пошаговые решения для математики
-                    - Примеры и образцы для русского языка
-                    - НЕ упоминай провайдера ИИ
-                    """
-                    
+
+Специализируешься на:
+📐 Математике (профильная и базовая, ОГЭ) - уравнения, функции, геометрия, алгебра
+📝 Русском языке (ЕГЭ и ОГЭ) - грамматика, орфография, сочинения, литература
+
+Стиль общения:
+- Краткий и конкретный ответ (до 400 слов)
+- Пошаговые решения для математики
+- Примеры и образцы для русского языка
+- НЕ упоминай провайдера ИИ
+"""
+
                     full_prompt = f"{system_prompt}\n\nВопрос: {query}"
                     response = model.generate_content(full_prompt)
-                    
-                    if response.text:
+                    if getattr(response, 'text', None):
                         answer = response.text.strip()
-                    else:
-                        answer = "Не удалось получить ответ. Попробуйте переформулировать вопрос."
-                else:
-                    answer = "API ключ не настроен. Обратитесь к администратору."
-                    
             except Exception as e:
                 logger.error(f"Ошибка Gemini API: {e}")
-                answer = "Сервис временно недоступен. Попробуйте позже."
+                answer = 'Извините, произошла ошибка'
 
             # Получаем источники через RAG (только если не fallback режим)
             sources = []
             if not fallback_mode:
                 try:
-                    rag_result = self.orchestrator.process_query(query, user_id)
-                    sources = rag_result.get('sources', [])
+                    orchestrator = RAGOrchestrator()
+                    rag_result = orchestrator.process_query(query, user_id)
+                    if isinstance(rag_result, str):
+                        answer = rag_result
+                    elif isinstance(rag_result, dict):
+                        sources = rag_result.get('sources', [])
+                        content = rag_result.get('answer') or rag_result.get('content')
+                        if content:
+                            answer = content
                 except Exception:
-                    sources = []
+                    answer = 'Извините, произошла ошибка'
 
             logger.info(f"Запрос обработан успешно для пользователя {user_id}")
             return JsonResponse({
                 'success': True,
-                'answer': answer,
+                'answer': answer or 'Сервис временно недоступен. Попробуйте позже.',
                 'sources': sources
             })
 
@@ -105,7 +114,7 @@ class AIQueryView(View):
             return JsonResponse({
                 'success': False,
                 'error': 'Неверный JSON',
-                'answer': 'Произошла ошибка при обработке запроса.'
+                'answer': 'Извините, произошла ошибка'
             }, status=200)
         except Exception as e:
             logger.error(f"Ошибка в AIQueryView: {e}")
@@ -154,31 +163,82 @@ class VectorStoreStatsView(View):
     API для получения статистики векторного хранилища
     """
 
-    def get(self, request):
+    def get(self, request, document_id=None):  # type: ignore[override]
         """
-        Возвращает статистику векторного хранилища
+        Если передан document_id — отдает документ; иначе — статистику
         """
         try:
             vector_store = VectorStore()
-            stats = vector_store.get_stats() # type: ignore
-
-            return JsonResponse({
-                'status': 'success',
-                'data': stats
-            })
+            if document_id:
+                doc = vector_store.get_document(document_id)  # type: ignore
+                if not doc:
+                    return JsonResponse({'error': 'Document not found'}, status=404)
+                return JsonResponse({'success': True, 'document': doc})
+            stats = vector_store.get_stats()  # type: ignore
+            return JsonResponse({'success': True, 'data': stats})
 
         except Exception as e:
             logger.error(f"Ошибка при получении статистики: {e}")
-            return JsonResponse({
-                'status': 'error',
-                'error': str(e)
-            }, status=500)
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    def post(self, request):
+        """Добавляет документ в векторное хранилище"""
+        try:
+            data = json.loads(request.body)
+        except Exception:
+            return JsonResponse({'error': 'Неверный JSON'}, status=400)
+
+        title = data.get('title')
+        content = data.get('content')
+        metadata = data.get('metadata', {})
+        if not content:
+            return JsonResponse({'error': 'Content is required'}, status=400)
+        try:
+            vector_store = VectorStore()
+            doc_id = vector_store.add_document(title=title, content=content, metadata=metadata)  # type: ignore
+            return JsonResponse({'success': True, 'document_id': doc_id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def delete(self, request, document_id):  # type: ignore[override]
+        """Удаляет документ из векторного хранилища"""
+        try:
+            vector_store = VectorStore()
+            ok = vector_store.delete_document(document_id)  # type: ignore
+            if not ok:
+                return JsonResponse({'error': 'Document not found'}, status=404)
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SearchView(View):
     """
     API для семантического поиска
     """
+
+    def get(self, request):
+        """
+        Выполняет семантический поиск (GET)
+        """
+        try:
+            query = (request.GET.get('query') or '').strip()
+            limit = int(request.GET.get('limit') or 5)
+
+            if not query:
+                return JsonResponse({'error': 'Пустой запрос поиска'}, status=400)
+
+            vector_store = VectorStore()
+            results = vector_store.search(query, limit=limit)
+            return JsonResponse({
+                'status': 'success',
+                'query': query,
+                'results': results,
+                'total': len(results)
+            })
+        except Exception as e:
+            logger.error(f"Ошибка при поиске (GET): {e}")
+            return JsonResponse({'error': str(e)}, status=500)
 
     def post(self, request):
         """
@@ -277,16 +337,58 @@ def get_random_task(request):
     return JsonResponse({'error': 'API deprecated'}, status=410)
 
 def get_subjects(request):
-    """Legacy API - returns subjects"""
-    return JsonResponse({'error': 'API deprecated'}, status=410)
+    """Возвращает список предметов"""
+    try:
+        from learning.models import Subject  # type: ignore
+        subjects = list(
+            Subject.objects.values('id', 'name', 'exam_type', 'code')  # type: ignore
+        )
+        return JsonResponse(subjects, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 def get_tasks_by_subject(request, subject_id):
-    """Legacy API - returns tasks by subject"""
-    return JsonResponse({'error': 'API deprecated'}, status=410)
+    """Возвращает задания по предмету"""
+    try:
+        from learning.models import Task  # type: ignore
+        tasks = list(Task.objects.filter(subject_id=subject_id).values(  # type: ignore
+            'id', 'title', 'description', 'subject_id'
+        ))
+        # Приводим ключи к ожидаемым названиям
+        for t in tasks:
+            t['content'] = t.pop('description', '') or ''
+            t['subject'] = t.pop('subject_id')
+        return JsonResponse(tasks, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 def get_task_by_id(request, task_id):
-    """Legacy API - returns task by ID"""
-    return JsonResponse({'error': 'API deprecated'}, status=410)
+    """Возвращает задание по ID"""
+    try:
+        from learning.models import Task  # type: ignore
+        task = Task.objects.filter(id=task_id).values(  # type: ignore
+            'id', 'title', 'description', 'subject_id'
+        ).first()
+        if not task:
+            return JsonResponse({'error': 'Not found'}, status=404)
+        task['content'] = task.pop('description', '') or ''
+        task['subject'] = task.pop('subject_id')
+        return JsonResponse(task)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def get_subject_detail(request, subject_id):
+    """Возвращает информацию о предмете"""
+    try:
+        from learning.models import Subject  # type: ignore
+        subject = Subject.objects.filter(id=subject_id).values(  # type: ignore
+            'id', 'name', 'exam_type', 'code'
+        ).first()
+        if not subject:
+            return JsonResponse({'error': 'Not found'}, status=404)
+        return JsonResponse(subject)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 def search_tasks(request):
     """Legacy API - searches tasks"""

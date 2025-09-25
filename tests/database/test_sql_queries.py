@@ -54,7 +54,7 @@ class TestSQLQueries(TransactionTestCase):
         for i in range(20):
             task = Task.objects.create( # type: ignore
                 title=f'Задание {i+1}',
-                content=f'Содержание задания {i+1}',
+                description=f'Содержание задания {i+1}',
                 answer=f'Ответ {i+1}',
                 subject=self.math_subject if i % 2 == 0 else self.russian_subject,
                 difficulty=i % 3 + 1
@@ -350,7 +350,7 @@ class TestDatabaseTransactions(TransactionTestCase):
                 # Создаем задание
                 Task.objects.create( # type: ignore
                     title='Тестовое задание',
-                    content='Содержание',
+                    description='Содержание',
                     answer='Ответ',
                     subject=Subject.objects.first(), # type: ignore
                     difficulty=1
@@ -376,7 +376,7 @@ class TestDatabaseTransactions(TransactionTestCase):
             # Внешняя транзакция
             task1 = Task.objects.create( # type: ignore
                 title='Задание 1',
-                content='Содержание 1',
+                description='Содержание 1',
                 answer='Ответ 1',
                 subject=Subject.objects.first(), # type: ignore
                 difficulty=1
@@ -387,7 +387,7 @@ class TestDatabaseTransactions(TransactionTestCase):
                     # Внутренняя транзакция
                     task2 = Task.objects.create( # type: ignore
                         title='Задание 2',
-                        content='Содержание 2',
+                        description='Содержание 2',
                         answer='Ответ 2',
                         subject=Subject.objects.first(), # type: ignore
                         difficulty=2

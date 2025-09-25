@@ -40,10 +40,10 @@ class TelegramUser(AbstractUser):
     objects = TelegramUserManager()
 
     # Убираем стандартные поля Django User, которые нам не нужны
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(blank=True)
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
+    username = models.CharField(max_length=150, unique=False, blank=True, default="")
+    email = models.EmailField(blank=True, default="")
+    first_name = models.CharField(max_length=150, blank=True, default="")
+    last_name = models.CharField(max_length=150, blank=True, default="")
 
     # Telegram поля
     telegram_id = models.BigIntegerField(unique=True, verbose_name="Telegram ID")
@@ -77,8 +77,8 @@ class TelegramUser(AbstractUser):
     last_login = models.DateTimeField(null=True, blank=True, verbose_name="Last Login")
 
     # Настройки пользователя
-    is_active = models.BooleanField(default=True, verbose_name="Is Active")
-    is_premium = models.BooleanField(default=False, verbose_name="Is Premium")
+    is_active = models.BooleanField(default=True, verbose_name="Is Active") # type: ignore
+    is_premium = models.BooleanField(default=False, verbose_name="Is Premium") # type: ignore
 
     # Используем telegram_id как уникальное поле для входа
     USERNAME_FIELD = 'telegram_id'
@@ -123,7 +123,7 @@ class TelegramAuthSession(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     expires_at = models.DateTimeField(verbose_name="Expires At")
-    is_active = models.BooleanField(default=True, verbose_name="Is Active")
+    is_active = models.BooleanField(default=True, verbose_name="Is Active") # type: ignore
     ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name="IP Address")
     user_agent = models.TextField(blank=True, verbose_name="User Agent")
 
@@ -133,7 +133,7 @@ class TelegramAuthSession(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Session for {self.user.display_name} ({self.created_at.strftime('%d.%m.%Y %H:%M')})"
+        return f"Session for {self.user.display_name} ({self.created_at.strftime('%d.%m.%Y %H:%M')})" # type: ignore
 
     @property
     def is_expired(self):
@@ -158,4 +158,4 @@ class TelegramAuthLog(models.Model):
 
     def __str__(self):
         status = "Success" if self.success else "Failed"
-        return f"Auth {status} for {self.telegram_id} ({self.created_at.strftime('%d.%m.%Y %H:%M')})"
+        return f"Auth {status} for {self.telegram_id} ({self.created_at.strftime('%d.%m.%Y %H:%M')})" # type: ignore

@@ -226,7 +226,7 @@ class TestCoreModels(TestCase):
         """Тест создания FIPI данных"""
         fipi_data = FIPIData.objects.create( # type: ignore
             title='Тестовые данные FIPI',
-            content='Содержимое данных',
+            description='Содержимое данных',
             data_type='task',
             exam_type='ege',
             difficulty=1
@@ -242,7 +242,7 @@ class TestCoreModels(TestCase):
         """Тест метода __str__ для FIPIData"""
         fipi_data = FIPIData.objects.create( # type: ignore
             title='Тестовые данные FIPI',
-            content='Содержимое данных',
+            description='Содержимое данных',
             data_type='task'
         )
         
@@ -416,7 +416,7 @@ class TestCoreModels(TestCase):
         """Тест choices для FIPIData"""
         fipi_data = FIPIData.objects.create( # type: ignore
             title='Тестовые данные',
-            content='Содержимое',
+            description='Содержимое',
             data_type='task',
             exam_type='ege',
             difficulty=2
