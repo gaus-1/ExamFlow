@@ -16,7 +16,7 @@ class TestLearningModelsSimple(TestCase):
         subject = Subject.objects.create( # type: ignore
             name='Математика',
             description='Математика для ЕГЭ',
-            exam_type='ege'
+            exam_type='other'
         )
         
         self.assertEqual(subject.name, 'Математика')
@@ -30,7 +30,7 @@ class TestLearningModelsSimple(TestCase):
         subject = Subject.objects.create( # type: ignore
             name='Русский язык',
             description='Русский язык для ЕГЭ',
-            exam_type='ege'
+            exam_type='other'
         )
         
         expected_str = f'{subject.name} ({subject.exam_type})'
@@ -41,7 +41,7 @@ class TestLearningModelsSimple(TestCase):
         subject = Subject.objects.create( # type: ignore
             name='Математика',
             description='Математика для ЕГЭ',
-            exam_type='ege'
+            exam_type='other'
         )
         
         task = Task.objects.create( # type: ignore
@@ -63,7 +63,7 @@ class TestLearningModelsSimple(TestCase):
         subject = Subject.objects.create( # type: ignore
             name='Математика',
             description='Математика для ЕГЭ',
-            exam_type='ege'
+            exam_type='other'
         )
         
         task = Task.objects.create( # type: ignore
@@ -81,7 +81,7 @@ class TestLearningModelsSimple(TestCase):
         subject = Subject.objects.create( # type: ignore
             name='Математика',
             description='Математика для ЕГЭ',
-            exam_type='ege'
+            exam_type='other'
         )
         
         task = Task.objects.create( # type: ignore
@@ -101,7 +101,7 @@ class TestLearningModelsSimple(TestCase):
         subject = Subject.objects.create( # type: ignore
             name='Математика',
             description='Математика для ЕГЭ',
-            exam_type='ege'
+            exam_type='other'
         )
         
         task = Task.objects.create( # type: ignore  

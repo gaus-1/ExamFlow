@@ -5,7 +5,7 @@
 
 import pytest
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
+from telegram_auth.models import TelegramUser
 from django.urls import reverse
 from unittest.mock import Mock, patch
 import json
