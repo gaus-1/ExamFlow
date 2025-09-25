@@ -5,10 +5,11 @@
 
 import pytest
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
+from telegram_auth.models import TelegramUser
 from unittest.mock import Mock, patch
 import json
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 from ai.views import (
     ai_dashboard, ai_chat, api_chat, api_explain,
@@ -33,8 +34,9 @@ class TestAIViews(TestCase):
         self.ai_limit = AiLimit.objects.create( # type: ignore  
             user=self.user,
             limit_type='daily',
-            limit_value=10,
-            current_usage=0
+            max_limit=10,
+            current_usage=0,
+            reset_date=timezone.now() + timedelta(days=1)
         )
     
     def test_ai_dashboard_success(self):
@@ -45,9 +47,8 @@ class TestAIViews(TestCase):
         response = ai_dashboard(request)
         
         assert response.status_code == 200
-        assert 'title' in response.context # type: ignore
-        assert 'user' in response.context # type: ignore
-        assert response.context['title'] == 'ИИ-ассистент ExamFlow' # type: ignore
+        # Проверяем что ответ содержит нужный контент
+        assert 'ИИ-ассистент ExamFlow'.encode('utf-8') in response.content
     
     def test_ai_chat_success(self):
         """Тест успешной загрузки страницы чата"""

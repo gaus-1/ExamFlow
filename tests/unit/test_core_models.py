@@ -228,7 +228,7 @@ class TestCoreModels(TestCase):
             title='Тестовые данные FIPI',
             description='Содержимое данных',
             data_type='task',
-            exam_type='ege',
+            exam_type='other',
             difficulty=1
         )
         
@@ -418,7 +418,7 @@ class TestCoreModels(TestCase):
             title='Тестовые данные',
             description='Содержимое',
             data_type='task',
-            exam_type='ege',
+            exam_type='other',
             difficulty=2
         )
         

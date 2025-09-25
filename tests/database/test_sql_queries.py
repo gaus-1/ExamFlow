@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.contrib.auth import get_user_model
 from learning.models import Subject, Task, UserProgress
 from core.models import UserProfile
+from telegram_auth.models import TelegramUser
 import logging
 
 logger = logging.getLogger(__name__)
@@ -24,29 +25,29 @@ class TestSQLQueries(TransactionTestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         # Создаем тестовых пользователей
-        self.user1 = User.objects.create_user(
+        self.user1 = TelegramUser.objects.create(
+            telegram_id=11111,
             username='testuser1',
-            email='test1@example.com',
-            password='testpass123'
+            first_name='Test1',
+            last_name='User1'
         )
         
-        self.user2 = User.objects.create_user(
+        self.user2 = TelegramUser.objects.create(
+            telegram_id=22222,
             username='testuser2',
-            email='test2@example.com',
-            password='testpass123'
+            first_name='Test2',
+            last_name='User2'
         )
         
-        # Создаем предметы
-        self.math_subject = Subject.objects.create( # type: ignore
+        # Используем существующий предмет или создаем без exam_type
+        self.math_subject, created = Subject.objects.get_or_create( # type: ignore
             name='Математика',
-            code='MATH',
-            exam_type='ege'
+            defaults={'code': 'MATH'}
         )
         
-        self.russian_subject = Subject.objects.create( # type: ignore
+        self.russian_subject, created = Subject.objects.get_or_create( # type: ignore
             name='Русский язык',
-            code='RUS',
-            exam_type='ege'
+            defaults={'code': 'RUS'}
         )
         
         # Создаем задания
@@ -407,7 +408,7 @@ class TestDatabaseTransactions(TransactionTestCase):
     def test_select_for_update(self):
         """Тест блокировки строк для обновления"""
         if not Subject.objects.exists(): # type: ignore
-            Subject.objects.create(name='Тест', code='TEST', exam_type='ege') # type: ignore
+            Subject.objects.create(name='Тест', code='TEST', exam_type='other') # type: ignore
         
         subject = Subject.objects.first() # type: ignore
         

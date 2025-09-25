@@ -5,7 +5,7 @@
 
 import pytest
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
+from telegram_auth.models import TelegramUser
 from django.urls import reverse
 from django.contrib.messages.storage.fallback import FallbackStorage
 from unittest.mock import Mock, patch
@@ -27,7 +27,7 @@ class TestCoreViews(TestCase):
     def setUp(self):
         """Настройка тестовых данных"""
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(
+        self.user = User.objects.create_user( # type: ignore
             username='testuser',
             email='test@example.com',
             password='testpass123'

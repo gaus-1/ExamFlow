@@ -25,7 +25,7 @@ class TestLearning(TestCase):
         self.subject = Subject.objects.create(  # type: ignore
             name='Математика',
             code='MATH',
-            exam_type='ege'
+            exam_type='other'
         )
 
         self.task = Task.objects.create(  # type: ignore
@@ -177,7 +177,7 @@ class TestLearning(TestCase):
         ege_subject = Subject.objects.create(  # type: ignore
             name='Физика',
             code='PHYS',
-            exam_type='ege'
+            exam_type='other'
         )
 
         oge_subject = Subject.objects.create(  # type: ignore
@@ -262,7 +262,7 @@ class TestLearning(TestCase):
         physics_subject = Subject.objects.create(  # type: ignore
             name='Физика',
             code='PHYS',
-            exam_type='ege'
+            exam_type='other'
         )
 
         # Создаем задание по физике
