@@ -4,20 +4,29 @@
 Только основные функции без сложных зависимостей
 """
 
-import os
-import sys
 import asyncio
 import logging
+import os
+import sys
+
 import django
 
 # Настройка Django
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 django.setup()
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
 from django.conf import settings
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
+
 from core.container import Container
 
 logger = logging.getLogger(__name__)
@@ -25,15 +34,16 @@ logger = logging.getLogger(__name__)
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()],
 )
+
 
 class SimpleExamFlowBot:
     """Упрощенная версия ExamFlow бота"""
 
     def __init__(self):
-        self.token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+        self.token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
         if not self.token:
             raise ValueError("TELEGRAM_BOT_TOKEN не найден")
 
@@ -42,7 +52,7 @@ class SimpleExamFlowBot:
         keyboard = [
             [InlineKeyboardButton("📚 Предметы", callback_data="subjects")],
             [InlineKeyboardButton("🤖 Спросить ИИ", callback_data="ai_help")],
-            [InlineKeyboardButton("📊 Статистика", callback_data="stats")]
+            [InlineKeyboardButton("📊 Статистика", callback_data="stats")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -57,30 +67,50 @@ class SimpleExamFlowBot:
 Выберите действие:"""
 
         if update.message:
-            await update.message.reply_text(welcome_text, reply_markup=reply_markup, parse_mode='Markdown')
+            await update.message.reply_text(
+                welcome_text, reply_markup=reply_markup, parse_mode="Markdown"
+            )
         elif update.callback_query:
-            await update.callback_query.edit_message_text(welcome_text, reply_markup=reply_markup, parse_mode='Markdown')
+            await update.callback_query.edit_message_text(
+                welcome_text, reply_markup=reply_markup, parse_mode="Markdown"
+            )
 
-    async def subjects_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def subjects_handler(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         """Обработчик предметов"""
         try:
             from learning.models import Subject
+
             subjects = Subject.objects.filter(is_archived=False)[:6]  # type: ignore
 
             if not subjects:
                 text = "📚 Предметы пока не загружены. Попробуйте позже."
-                keyboard = [[InlineKeyboardButton("🏠 Главное меню", callback_data="start")]]
+                keyboard = [
+                    [InlineKeyboardButton("🏠 Главное меню", callback_data="start")]
+                ]
             else:
                 text = f"📚 **Доступные предметы ({subjects.count()}):**\n\nВыберите предмет для изучения:"
                 keyboard = []
                 for subject in subjects:
-                    keyboard.append([InlineKeyboardButton(f"📖 {subject.name}", callback_data=f"subject_{subject.id}")])
-                keyboard.append([InlineKeyboardButton("🏠 Главное меню", callback_data="start")])
+                    keyboard.append(
+                        [
+                            InlineKeyboardButton(
+                                f"📖 {subject.name}",
+                                callback_data=f"subject_{subject.id}",
+                            )
+                        ]
+                    )
+                keyboard.append(
+                    [InlineKeyboardButton("🏠 Главное меню", callback_data="start")]
+                )
 
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             if update.callback_query:
-                await update.callback_query.edit_message_text(text, reply_markup=reply_markup, parse_mode='Markdown')
+                await update.callback_query.edit_message_text(
+                    text, reply_markup=reply_markup, parse_mode="Markdown"
+                )
                 await update.callback_query.answer()
 
         except Exception as e:
@@ -91,19 +121,23 @@ class SimpleExamFlowBot:
         """Обработчик AI помощи"""
         try:
             ai_orchestrator = Container.ai_orchestrator()
-            response = ai_orchestrator.ask("Привет! Я готов помочь с подготовкой к экзаменам.")
+            response = ai_orchestrator.ask(
+                "Привет! Я готов помочь с подготовкой к экзаменам."
+            )
 
             text = f"🤖 **ИИ-Ассистент ExamFlow**\n\n{response.get('answer', 'Готов помочь!')}\n\n💡 Задайте любой вопрос или выберите действие:"
 
             keyboard = [
                 [InlineKeyboardButton("❓ Задать вопрос", callback_data="ai_question")],
                 [InlineKeyboardButton("📝 Объяснить тему", callback_data="ai_explain")],
-                [InlineKeyboardButton("🏠 Главное меню", callback_data="start")]
+                [InlineKeyboardButton("🏠 Главное меню", callback_data="start")],
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             if update.callback_query:
-                await update.callback_query.edit_message_text(text, reply_markup=reply_markup, parse_mode='Markdown')
+                await update.callback_query.edit_message_text(
+                    text, reply_markup=reply_markup, parse_mode="Markdown"
+                )
                 await update.callback_query.answer()
 
         except Exception as e:
@@ -128,18 +162,24 @@ class SimpleExamFlowBot:
 
 🎯 Система работает стабильно!"""
 
-            keyboard = [[InlineKeyboardButton("🏠 Главное меню", callback_data="start")]]
+            keyboard = [
+                [InlineKeyboardButton("🏠 Главное меню", callback_data="start")]
+            ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
             if update.callback_query:
-                await update.callback_query.edit_message_text(text, reply_markup=reply_markup, parse_mode='Markdown')
+                await update.callback_query.edit_message_text(
+                    text, reply_markup=reply_markup, parse_mode="Markdown"
+                )
                 await update.callback_query.answer()
 
         except Exception as e:
             logger.error(f"Ошибка в stats_handler: {e}")
             await self.error_response(update, "Ошибка загрузки статистики")
 
-    async def text_message_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def text_message_handler(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         """Обработчик текстовых сообщений"""
         if not update.message or not update.message.text:
             return
@@ -147,7 +187,7 @@ class SimpleExamFlowBot:
         text = update.message.text
 
         # Если это команда, игнорируем
-        if text.startswith('/'):
+        if text.startswith("/"):
             return
 
         # Обрабатываем как вопрос к ИИ
@@ -155,7 +195,9 @@ class SimpleExamFlowBot:
             ai_orchestrator = Container.ai_orchestrator()
             response = ai_orchestrator.ask(text)
 
-            answer = response.get('answer', 'Извините, не могу ответить на этот вопрос.')
+            answer = response.get(
+                "answer", "Извините, не могу ответить на этот вопрос."
+            )
 
             # Ограничиваем длину ответа
             if len(answer) > 4000:
@@ -165,7 +207,9 @@ class SimpleExamFlowBot:
 
         except Exception as e:
             logger.error(f"Ошибка в text_message_handler: {e}")
-            await update.message.reply_text("❌ ИИ временно недоступен. Попробуйте позже.")
+            await update.message.reply_text(
+                "❌ ИИ временно недоступен. Попробуйте позже."
+            )
 
     async def error_response(self, update: Update, message: str):
         """Отправка сообщения об ошибке"""
@@ -177,7 +221,9 @@ class SimpleExamFlowBot:
         except Exception as e:
             logger.error(f"Ошибка отправки error_response: {e}")
 
-    async def unknown_callback_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def unknown_callback_handler(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         """Обработчик неизвестных callback"""
         if update.callback_query:
             await update.callback_query.answer("❓ Неизвестная команда")
@@ -186,20 +232,26 @@ class SimpleExamFlowBot:
     def setup_handlers(self, app: Application):
         """Настройка обработчиков"""
         # Команды
-        app.add_handler(CommandHandler('start', self.start_command))
-        app.add_handler(CommandHandler('help', self.start_command))
+        app.add_handler(CommandHandler("start", self.start_command))
+        app.add_handler(CommandHandler("help", self.start_command))
 
         # Callback queries
-        app.add_handler(CallbackQueryHandler(self.start_command, pattern=r'^start$'))
-        app.add_handler(CallbackQueryHandler(self.subjects_handler, pattern=r'^subjects$'))
-        app.add_handler(CallbackQueryHandler(self.ai_help_handler, pattern=r'^ai_help$'))
-        app.add_handler(CallbackQueryHandler(self.stats_handler, pattern=r'^stats$'))
+        app.add_handler(CallbackQueryHandler(self.start_command, pattern=r"^start$"))
+        app.add_handler(
+            CallbackQueryHandler(self.subjects_handler, pattern=r"^subjects$")
+        )
+        app.add_handler(
+            CallbackQueryHandler(self.ai_help_handler, pattern=r"^ai_help$")
+        )
+        app.add_handler(CallbackQueryHandler(self.stats_handler, pattern=r"^stats$"))
 
         # Неизвестные callback
         app.add_handler(CallbackQueryHandler(self.unknown_callback_handler))
 
         # Текстовые сообщения
-        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.text_message_handler))
+        app.add_handler(
+            MessageHandler(filters.TEXT & ~filters.COMMAND, self.text_message_handler)
+        )
 
         logger.info("Все обработчики настроены")
 
@@ -230,8 +282,8 @@ class SimpleExamFlowBot:
             logger.info("Бот успешно запущен и работает!")
 
             # Ждем завершения
-            import signal
             import asyncio
+            import signal
 
             # Создаем событие для graceful shutdown
             stop_event = asyncio.Event()
@@ -251,10 +303,12 @@ class SimpleExamFlowBot:
             await app.stop()
             await app.shutdown()
 
+
 async def main():
     """Главная функция"""
     bot = SimpleExamFlowBot()
     await bot.run()
+
 
 if __name__ == "__main__":
     try:

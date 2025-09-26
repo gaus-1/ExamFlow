@@ -6,14 +6,17 @@
 для разработчиков и тестирования.
 """
 
-from .models import UserThemePreference, ThemeUsage, ThemeCustomization
 import os
+
 import django
 from django.contrib.auth.models import User
 
+from .models import ThemeCustomization, ThemeUsage, UserThemePreference
+
 # Настройка Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 django.setup()
+
 
 def demo_theme_management():
     """Демонстрация управления темами"""
@@ -21,17 +24,17 @@ def demo_theme_management():
     print("=" * 60)
 
     # Создаем тестового пользователя
-    user, created = User.objects.get_or_create( # type: ignore
-        username='demo_user',
+    user, created = User.objects.get_or_create(  # type: ignore
+        username="demo_user",
         defaults={
-            'email': 'demo@examflow.ru',
-            'first_name': 'Демо',
-            'last_name': 'Пользователь'
-        }
+            "email": "demo@examflow.ru",
+            "first_name": "Демо",
+            "last_name": "Пользователь",
+        },
     )
 
     if created:
-        user.set_password('demo123')
+        user.set_password("demo123")
         user.save()
         print(f"✅ Создан тестовый пользователь: {user.username}")
     else:
@@ -44,9 +47,8 @@ def demo_theme_management():
     print("-" * 40)
 
     # Создаем предпочтение темы
-    preference, created = UserThemePreference.objects.get_or_create( # type: ignore
-        user=user,
-        defaults={'theme': 'school'}
+    preference, created = UserThemePreference.objects.get_or_create(  # type: ignore
+        user=user, defaults={"theme": "school"}
     )
 
     if created:
@@ -56,7 +58,7 @@ def demo_theme_management():
 
     # Переключаем тему
     old_theme = preference.theme
-    new_theme = 'adult' if old_theme == 'school' else 'school'
+    new_theme = "adult" if old_theme == "school" else "school"
     preference.theme = new_theme
     preference.save()
 
@@ -74,10 +76,7 @@ def demo_theme_management():
     usage_data = []
 
     for data in usage_data:
-        created_usage = ThemeUsage.objects.create( # type: ignore
-            user=user,
-            **data
-        )
+        created_usage = ThemeUsage.objects.create(user=user, **data)  # type: ignore
         print(f"✅ Создана запись использования: {created_usage.get_theme_display()}")
         print(f"   Время сессии: {created_usage.get_session_duration_minutes()} мин")
         print(f"   Просмотрено страниц: {created_usage.page_views}")
@@ -89,34 +88,28 @@ def demo_theme_management():
     print("-" * 40)
 
     # Создаем кастомные настройки
-    custom_colors = {
-        'primary': '#FF6B6B',
-        'secondary': '#4ECDC4',
-        'accent': '#45B7D1'
-    }
+    custom_colors = {"primary": "#FF6B6B", "secondary": "#4ECDC4", "accent": "#45B7D1"}
 
-    custom_fonts = {
-        'main': 'Roboto',
-        'heading': 'Montserrat',
-        'mono': 'JetBrains Mono'
-    }
+    custom_fonts = {"main": "Roboto", "heading": "Montserrat", "mono": "JetBrains Mono"}
 
-    customization, created = ThemeCustomization.objects.get_or_create( # type: ignore
+    customization, created = ThemeCustomization.objects.get_or_create(  # type: ignore
         user=user,
-        theme='school',
+        theme="school",
         defaults={
-            'custom_colors': custom_colors,
-            'custom_fonts': custom_fonts,
-            'is_active': True
-        }
+            "custom_colors": custom_colors,
+            "custom_fonts": custom_fonts,
+            "is_active": True,
+        },
     )
 
     if created:
         print(
-            f"✅ Созданы пользовательские настройки для темы: {customization.get_theme_display()}")
+            f"✅ Созданы пользовательские настройки для темы: {customization.get_theme_display()}"
+        )
     else:
         print(
-            f"📝 Обновлены пользовательские настройки для темы: {customization.get_theme_display()}")
+            f"📝 Обновлены пользовательские настройки для темы: {customization.get_theme_display()}"
+        )
 
     print(f"   Кастомные цвета: {len(customization.custom_colors)} цветов")
     print(f"   Кастомные шрифты: {len(customization.custom_fonts)} шрифтов")
@@ -127,9 +120,9 @@ def demo_theme_management():
     print("4️⃣ СТАТИСТИКА ИСПОЛЬЗОВАНИЯ ТЕМ")
     print("-" * 40)
 
-    total_usage = ThemeUsage.objects.filter(user=user) # type: ignore
-    school_usage = total_usage.filter(theme='school')
-    adult_usage = total_usage.filter(theme='adult')
+    total_usage = ThemeUsage.objects.filter(user=user)  # type: ignore
+    school_usage = total_usage.filter(theme="school")
+    adult_usage = total_usage.filter(theme="adult")
 
     print(f"📊 Общая статистика для пользователя {user.username}:")
     print(f"   Всего записей: {total_usage.count()}")
@@ -162,7 +155,7 @@ def demo_theme_management():
     print(f"   Можно переключить: {preference.can_switch_theme()}")
 
     # Методы ThemeUsage
-    latest_usage = ThemeUsage.objects.filter(user=user).latest('created_at') # type: ignore
+    latest_usage = ThemeUsage.objects.filter(user=user).latest("created_at")  # type: ignore
     print("📈 Методы ThemeUsage:")
     print(f"   Последнее использование: {latest_usage.get_theme_display()}")
     print(f"   Время сессии: {latest_usage.get_session_duration_minutes()} мин")
@@ -172,12 +165,14 @@ def demo_theme_management():
         print("🎨 Методы ThemeCustomization:")
         print(f"   Есть кастомизация: {customization.has_customizations()}")
         print(
-            f"   Основной цвет: {customization.get_custom_color('primary', '#000000')}")
+            f"   Основной цвет: {customization.get_custom_color('primary', '#000000')}"
+        )
         print(f"   Основной шрифт: {customization.get_custom_font('main', 'Arial')}")
 
     print()
     print("🎉 Демонстрация завершена!")
     print("=" * 60)
+
 
 def demo_api_endpoints():
     """Демонстрация API endpoints"""
@@ -195,7 +190,7 @@ def demo_api_endpoints():
     print("  # Переключение на взрослую тему")
     print("  curl -X POST /themes/api/switch/ \\")
     print("       -H 'Content-Type: application/json' \\")
-    print("       -d '{\"theme\": \"adult\"}'")
+    print('       -d \'{"theme": "adult"}\'')
 
     print()
     print("  # Получение текущей темы")
@@ -208,7 +203,8 @@ def demo_api_endpoints():
     print()
     print("=" * 60)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         demo_theme_management()
         print()
@@ -216,4 +212,5 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"❌ Ошибка при выполнении демонстрации: {e}")
         import traceback
+
         traceback.print_exc()

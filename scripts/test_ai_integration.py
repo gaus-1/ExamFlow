@@ -4,25 +4,28 @@
 Проверяет работу ИИ на сайте, в API и в Telegram боте
 """
 
-import os
-import sys
-import requests
 import json
+import os
 import re
+import sys
 import time
+
+import requests
 
 # Настройка Django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 
 try:
     import django
+
     django.setup()
 
-    from ai.orchestrator import AIOrchestrator
-    from ai.clients.gemini_client import GeminiClient
-    from core.container import Container
     from django.conf import settings
+
+    from ai.clients.gemini_client import GeminiClient
+    from ai.orchestrator import AIOrchestrator
+    from core.container import Container
 except ImportError as e:
     print(f"⚠️  Django не настроен: {e}")
     AIOrchestrator = None
@@ -30,8 +33,9 @@ except ImportError as e:
     Container = None
     settings = None
 
+
 class AITester:
-    def __init__(self, base_url='http://localhost:8000'):
+    def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
         self.session = requests.Session()
         self.results = []
@@ -73,7 +77,9 @@ class AITester:
 
             # Проверяем JavaScript
             js_found = "examflow-main.js" in html
-            self.log_result("JavaScript", js_found, "загружен" if js_found else "отсутствует")
+            self.log_result(
+                "JavaScript", js_found, "загружен" if js_found else "отсутствует"
+            )
 
         except Exception as e:
             self.log_result("Сайт AI интерфейс", False, str(e))
@@ -85,7 +91,9 @@ class AITester:
         try:
             # Получаем CSRF токен
             response = self.session.get(self.base_url)
-            csrf_match = re.search(r'csrfmiddlewaretoken[^>]*value=["\']([^"\']*)["\']', response.text)
+            csrf_match = re.search(
+                r'csrfmiddlewaretoken[^>]*value=["\']([^"\']*)["\']', response.text
+            )
 
             if not csrf_match:
                 self.log_result("CSRF токен", False, "не найден")
@@ -98,33 +106,39 @@ class AITester:
             test_prompts = [
                 "Привет! Как дела?",
                 "Что такое производная?",
-                "Как решать квадратные уравнения?"
+                "Как решать квадратные уравнения?",
             ]
 
             for i, prompt in enumerate(test_prompts, 1):
                 try:
                     ai_response = self.session.post(
                         f"{self.base_url}/ai/api/",
-                        json={'prompt': prompt},
+                        json={"prompt": prompt},
                         headers={
-                            'X-CSRFToken': csrf_token,
-                            'Content-Type': 'application/json'
+                            "X-CSRFToken": csrf_token,
+                            "Content-Type": "application/json",
                         },
-                        timeout=30
+                        timeout=30,
                     )
 
                     if ai_response.status_code == 200:
                         try:
                             data = ai_response.json()
-                            if 'answer' in data and data['answer']:
-                                answer_preview = data['answer'][:50] + "..."
-                                self.log_result(f"AI запрос {i}", True, f"ответ: {answer_preview}")
+                            if "answer" in data and data["answer"]:
+                                answer_preview = data["answer"][:50] + "..."
+                                self.log_result(
+                                    f"AI запрос {i}", True, f"ответ: {answer_preview}"
+                                )
                             else:
                                 self.log_result(f"AI запрос {i}", False, "пустой ответ")
                         except json.JSONDecodeError:
-                            self.log_result(f"AI запрос {i}", False, "некорректный JSON")
+                            self.log_result(
+                                f"AI запрос {i}", False, "некорректный JSON"
+                            )
                     else:
-                        self.log_result(f"AI запрос {i}", False, f"HTTP {ai_response.status_code}")
+                        self.log_result(
+                            f"AI запрос {i}", False, f"HTTP {ai_response.status_code}"
+                        )
 
                 except Exception as e:
                     self.log_result(f"AI запрос {i}", False, str(e))
@@ -151,9 +165,11 @@ class AITester:
                 # Тестируем прямой вызов
                 try:
                     response = ai_orchestrator.ask("Тест прямого вызова")  # type: ignore
-                    if response and isinstance(response, dict) and 'answer' in response:
-                        answer_preview = response['answer'][:50] + "..."
-                        self.log_result("Прямой AI вызов", True, f"ответ: {answer_preview}")
+                    if response and isinstance(response, dict) and "answer" in response:
+                        answer_preview = response["answer"][:50] + "..."
+                        self.log_result(
+                            "Прямой AI вызов", True, f"ответ: {answer_preview}"
+                        )
                     else:
                         self.log_result("Прямой AI вызов", False, "некорректный ответ")
                 except Exception as e:
@@ -173,20 +189,18 @@ class AITester:
             from telegram_bot.services.ai_dialogs import get_ai_response
 
             # Тестируем AI сервис бота
-            test_queries = [
-                "Привет!",
-                "Что такое интеграл?",
-                "Помоги с математикой"
-            ]
+            test_queries = ["Привет!", "Что такое интеграл?", "Помоги с математикой"]
 
             for i, query in enumerate(test_queries, 1):
                 try:
-                    response = get_ai_response(query, task_type='chat')
-                    if response and not response.startswith('Ошибка'):
+                    response = get_ai_response(query, task_type="chat")
+                    if response and not response.startswith("Ошибка"):
                         preview = response[:50] + "..."
                         self.log_result(f"Бот AI запрос {i}", True, f"ответ: {preview}")
                     else:
-                        self.log_result(f"Бот AI запрос {i}", False, response or "пустой ответ")
+                        self.log_result(
+                            f"Бот AI запрос {i}", False, response or "пустой ответ"
+                        )
                 except Exception as e:
                     self.log_result(f"Бот AI запрос {i}", False, str(e))
 
@@ -204,15 +218,17 @@ class AITester:
         try:
             if settings:
                 # Проверяем наличие API ключей
-                gemini_key = getattr(settings, 'GEMINI_API_KEY', None)
-                if gemini_key and gemini_key != '<set-in-env>':
+                gemini_key = getattr(settings, "GEMINI_API_KEY", None)
+                if gemini_key and gemini_key != "<set-in-env>":
                     self.log_result("GEMINI_API_KEY", True, "настроен")
                 else:
                     self.log_result("GEMINI_API_KEY", False, "не настроен")
 
                 # Проверяем другие настройки
-                debug = getattr(settings, 'DEBUG', False)
-                self.log_result("DEBUG режим", debug, "включен" if debug else "выключен")
+                debug = getattr(settings, "DEBUG", False)
+                self.log_result(
+                    "DEBUG режим", debug, "включен" if debug else "выключен"
+                )
 
             else:
                 self.log_result("Django settings", False, "не доступны")
@@ -253,11 +269,14 @@ class AITester:
         if failed == 0:
             print("🎉 ВСЕ AI КОМПОНЕНТЫ РАБОТАЮТ КОРРЕКТНО!")
         elif failed <= 2:
-            print("⚠️  Есть незначительные проблемы, но основная функциональность работает.")
+            print(
+                "⚠️  Есть незначительные проблемы, но основная функциональность работает."
+            )
         else:
             print("🔧 Требуются серьезные исправления AI системы.")
 
         return failed <= 2
+
 
 def main():
     """Главная функция"""
@@ -270,6 +289,7 @@ def main():
         print("\n🔧 Необходимо исправить проблемы с AI.")
 
     return success
+
 
 if __name__ == "__main__":
     main()

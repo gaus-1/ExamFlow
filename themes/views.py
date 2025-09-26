@@ -1,8 +1,10 @@
+import json
+
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-import json
+from django.views.decorators.http import require_http_methods
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -23,24 +25,27 @@ def switch_theme(request):
     try:
         # Парсим JSON из запроса
         data = json.loads(request.body)
-        theme = data.get('theme')
+        theme = data.get("theme")
 
         # Проверяем валидность темы
-        valid_themes = ['school', 'adult']
+        valid_themes = ["school", "adult"]
         if theme not in valid_themes:
-            return JsonResponse({
-                'success': False,
-                'message': 'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
-            }, status=400)
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": 'Неверная тема. Допустимые значения: {", ".join(valid_themes)}',
+                },
+                status=400,
+            )
 
         # Если пользователь авторизован, сохраняем выбор в профиле
         if request.user.is_authenticated:
             try:
                 # Создаем или обновляем предпочтение пользователя
                 from .models import UserThemePreference
+
                 preference, created = UserThemePreference.objects.get_or_create(  # type: ignore
-                    user=request.user,
-                    defaults={'theme': theme}
+                    user=request.user, defaults={"theme": theme}
                 )
                 if not created:
                     preference.theme = theme
@@ -48,35 +53,36 @@ def switch_theme(request):
 
                 # Создаем запись об использовании темы
                 from .models import ThemeUsage
+
                 ThemeUsage.objects.create(  # type: ignore
-                    user=request.user,
-                    theme=theme,
-                    session_duration=0,
-                    page_views=1
+                    user=request.user, theme=theme, session_duration=0, page_views=1
                 )
 
                 print(
-                    "Пользователь {request.user.username} переключился на тему: {theme}")
+                    "Пользователь {request.user.username} переключился на тему: {theme}"
+                )
             except Exception:
                 print("Ошибка сохранения темы в профиль: {e}")
 
         # Возвращаем успешный ответ
-        return JsonResponse({
-            'success': True,
-            'theme': theme,
-            'message': 'Дизайн успешно переключен на "{theme}"'
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "theme": theme,
+                "message": 'Дизайн успешно переключен на "{theme}"',
+            }
+        )
 
     except json.JSONDecodeError:
-        return JsonResponse({
-            'success': False,
-            'message': 'Неверный формат JSON'
-        }, status=400)
+        return JsonResponse(
+            {"success": False, "message": "Неверный формат JSON"}, status=400
+        )
     except Exception:
-        return JsonResponse({
-            'success': False,
-            'message': 'Внутренняя ошибка сервера: {str(e)}'
-        }, status=500)
+        return JsonResponse(
+            {"success": False, "message": "Внутренняя ошибка сервера: {str(e)}"},
+            status=500,
+        )
+
 
 @require_http_methods(["GET"])
 def get_current_theme(request):
@@ -91,39 +97,43 @@ def get_current_theme(request):
     """
     try:
         # По умолчанию тема "school"
-        theme = 'school'
+        theme = "school"
 
         # Если пользователь авторизован, можно получить из профиля
         if request.user.is_authenticated:
             try:
                 # Получаем тему из профиля пользователя
                 from .models import UserThemePreference
+
                 try:
                     preference = UserThemePreference.objects.get(
-                        user=request.user)  # type: ignore
+                        user=request.user
+                    )  # type: ignore
                     theme = preference.theme
                 except UserThemePreference.DoesNotExist:  # type: ignore
                     # Если предпочтения нет, создаем с дефолтной темой
                     preference = UserThemePreference.objects.create(  # type: ignore
-                        user=request.user,
-                        theme='school'
+                        user=request.user, theme="school"
                     )
                     theme = preference.theme
             except Exception:
                 print("Ошибка получения темы из профиля: {e}")
-                theme = 'school'
+                theme = "school"
 
-        return JsonResponse({
-            'success': True,
-            'theme': theme,
-            'user_authenticated': request.user.is_authenticated
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "theme": theme,
+                "user_authenticated": request.user.is_authenticated,
+            }
+        )
 
     except Exception:
-        return JsonResponse({
-            'success': False,
-            'message': 'Внутренняя ошибка сервера: {str(e)}'
-        }, status=500)
+        return JsonResponse(
+            {"success": False, "message": "Внутренняя ошибка сервера: {str(e)}"},
+            status=500,
+        )
+
 
 @require_http_methods(["GET"])
 def preview_theme(request, theme):
@@ -143,54 +153,54 @@ def preview_theme(request, theme):
     """
     try:
         # Проверяем валидность темы
-        valid_themes = ['school', 'adult']
+        valid_themes = ["school", "adult"]
         if theme not in valid_themes:
-            return JsonResponse({
-                'success': False,
-                'message': 'Неверная тема. Допустимые значения: {", ".join(valid_themes)}'
-            }, status=400)
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": 'Неверная тема. Допустимые значения: {", ".join(valid_themes)}',
+                },
+                status=400,
+            )
 
         # Данные для предварительного просмотра
         preview_data = {
-            'school': {
-                'colors': {
-                    'primary': '#22C55E',
-                    'secondary': '#3B82F6',
-                    'accent': '#8B5CF6',
-                    'background': '#F8FAFC'
+            "school": {
+                "colors": {
+                    "primary": "#22C55E",
+                    "secondary": "#3B82F6",
+                    "accent": "#8B5CF6",
+                    "background": "#F8FAFC",
                 },
-                'fonts': {
-                    'heading': 'Inter, sans-seri',
-                    'body': 'Inter, sans-seri'
-                },
-                'style': 'Яркий и энергичный дизайн для школьников'
+                "fonts": {"heading": "Inter, sans-seri", "body": "Inter, sans-seri"},
+                "style": "Яркий и энергичный дизайн для школьников",
             },
-            'adult': {
-                'colors': {
-                    'primary': '#1E40AF',
-                    'secondary': '#475569',
-                    'accent': '#0891B2',
-                    'background': '#F8FAFC'
+            "adult": {
+                "colors": {
+                    "primary": "#1E40AF",
+                    "secondary": "#475569",
+                    "accent": "#0891B2",
+                    "background": "#F8FAFC",
                 },
-                'fonts': {
-                    'heading': 'Inter, sans-seri',
-                    'body': 'Inter, sans-seri'
-                },
-                'style': 'Сдержанный профессиональный дизайн для взрослых'
-            }
+                "fonts": {"heading": "Inter, sans-seri", "body": "Inter, sans-seri"},
+                "style": "Сдержанный профессиональный дизайн для взрослых",
+            },
         }
 
-        return JsonResponse({
-            'success': True,
-            'theme': theme,
-            'preview_data': preview_data.get(theme, {})
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "theme": theme,
+                "preview_data": preview_data.get(theme, {}),
+            }
+        )
 
     except Exception:
-        return JsonResponse({
-            'success': False,
-            'message': 'Внутренняя ошибка сервера: {str(e)}'
-        }, status=500)
+        return JsonResponse(
+            {"success": False, "message": "Внутренняя ошибка сервера: {str(e)}"},
+            status=500,
+        )
+
 
 def test_themes(request):
     """
@@ -199,4 +209,4 @@ def test_themes(request):
     Показывает демонстрацию всех элементов дизайна
     и позволяет протестировать переключение между темами
     """
-    return render(request, 'themes/test_themes.html')
+    return render(request, "themes/test_themes.html")

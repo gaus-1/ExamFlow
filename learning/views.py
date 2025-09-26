@@ -10,18 +10,22 @@
 - Отображение прогресса
 """
 
-import time
+import logging
 import random
-from django.shortcuts import render, get_object_or_404, redirect
+import time
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.contrib import messages
-import logging
-from learning.models import Subject, Task  # type: ignore
+from django.shortcuts import get_object_or_404, redirect, render
+
 from core.models import UserProgress  # type: ignore
+from learning.models import Subject, Task  # type: ignore
+
 # import core.seo as seo_utils  # Модуль удален
 
 logger = logging.getLogger(__name__)
+
 
 def home(request):
     """
@@ -38,7 +42,8 @@ def home(request):
     # Получаем статистику с обработкой ошибок БД
     try:
         base_qs = Subject.objects.filter(  # type: ignore
-            is_archived=False, is_primary=True)  # type: ignore
+            is_archived=False, is_primary=True
+        )  # type: ignore
         subjects_count = base_qs.count()  # type: ignore
         tasks_count = Task.objects.count()  # type: ignore
     except Exception as e:
@@ -51,9 +56,9 @@ def home(request):
     # Фокус: только математика и русский; безопасный запасной вариант
     try:
         if base_qs.exists():  # type: ignore
-            math_qs = base_qs.filter(name__icontains='математ')  # type: ignore
-            rus_qs = base_qs.filter(name__icontains='русск')  # type: ignore
-            subjects = math_qs.union(rus_qs).order_by('name')  # type: ignore
+            math_qs = base_qs.filter(name__icontains="математ")  # type: ignore
+            rus_qs = base_qs.filter(name__icontains="русск")  # type: ignore
+            subjects = math_qs.union(rus_qs).order_by("name")  # type: ignore
         else:
             subjects = base_qs  # type: ignore
     except Exception as e:
@@ -61,14 +66,15 @@ def home(request):
         subjects = base_qs  # type: ignore
 
     context = {
-        'subjects_count': subjects_count,
-        'tasks_count': tasks_count,
-        'subjects': subjects,
-        'timestamp': int(time.time()),
+        "subjects_count": subjects_count,
+        "tasks_count": tasks_count,
+        "subjects": subjects,
+        "timestamp": int(time.time()),
     }
 
     # SEO - базовые мета-теги встроены в шаблон
-    return render(request, 'index_modern.html', context)
+    return render(request, "index_modern.html", context)
+
 
 def subjects_list(request):
     """
@@ -82,30 +88,31 @@ def subjects_list(request):
     # Получаем предметы c фокусом; безопасный fallback
     try:
         subjects = Subject.objects.filter(  # type: ignore
-            is_archived=False,
-            is_primary=True).order_by('name')  # type: ignore
+            is_archived=False, is_primary=True
+        ).order_by(
+            "name"
+        )  # type: ignore
     except Exception:
-        subjects = Subject.objects.all().order_by('name')  # type: ignore
+        subjects = Subject.objects.all().order_by("name")  # type: ignore
 
     # Добавляем прогресс для авторизованных пользователей
     if request.user.is_authenticated:
         for subject in subjects:
             # Считаем решенные задания для предмета
             solved_tasks = UserProgress.objects.filter(  # type: ignore
-                user=request.user,
-                task__subject=subject,
-                is_correct=True
+                user=request.user, task__subject=subject, is_correct=True
             ).count()
             subject.user_progress = solved_tasks
 
     # Добавляем количество заданий для каждого предмета
     for subject in subjects:
         subject.task_count = Task.objects.filter(subject=subject).count()  # type: ignore
-    
+
     context = {
-        'subjects': subjects,
+        "subjects": subjects,
     }
-    return render(request, 'learning/subjects_list.html', context)
+    return render(request, "learning/subjects_list.html", context)
+
 
 def subject_detail(request, subject_id):
     """
@@ -121,20 +128,27 @@ def subject_detail(request, subject_id):
     except Exception as e:
         logger.error(f"Ошибка получения предмета {subject_id}: {e}")
         # Fallback данные для предмета
-        if subject_id in ['1', '4']:  # Математика или Русский
-            subject_name = 'Математика (профильная)' if subject_id == '1' else 'Русский язык (ЕГЭ)'
-            subject = type('Subject', (), {
-                'id': subject_id,
-                'name': subject_name,
-                'description': f'Подготовка к ЕГЭ по предмету {subject_name}',
-                'exam_type': 'ЕГЭ'
-            })()
+        if subject_id in ["1", "4"]:  # Математика или Русский
+            subject_name = (
+                "Математика (профильная)" if subject_id == "1" else "Русский язык (ЕГЭ)"
+            )
+            subject = type(
+                "Subject",
+                (),
+                {
+                    "id": subject_id,
+                    "name": subject_name,
+                    "description": f"Подготовка к ЕГЭ по предмету {subject_name}",
+                    "exam_type": "ЕГЭ",
+                },
+            )()
         else:
             # Перенаправляем на главную при неизвестном предмете
-            return redirect('learning:home')
+            return redirect("learning:home")
     # Получаем темы для предмета с обработкой ошибок
     try:
         from .models import Topic
+
         topics = Topic.objects.filter(subject=subject)  # type: ignore
     except Exception as e:
         logger.error(f"Ошибка получения тем: {e}")
@@ -146,24 +160,19 @@ def subject_detail(request, subject_id):
         try:
             total_tasks = Task.objects.filter(subject=subject).count()  # type: ignore
             solved_tasks = UserProgress.objects.filter(  # type: ignore
-                user=request.user,
-                task__subject=subject,
-                is_correct=True
+                user=request.user, task__subject=subject, is_correct=True
             ).count()
 
             user_stats = {
-                'total_tasks': total_tasks,
-                'solved_tasks': solved_tasks,
-                'progress_percent': round(
-                    (solved_tasks / total_tasks * 100) if total_tasks > 0 else 0, 1)
+                "total_tasks": total_tasks,
+                "solved_tasks": solved_tasks,
+                "progress_percent": round(
+                    (solved_tasks / total_tasks * 100) if total_tasks > 0 else 0, 1
+                ),
             }
         except Exception as e:
             logger.error(f"Ошибка получения статистики: {e}")
-            user_stats = {
-                'total_tasks': 0,
-                'solved_tasks': 0,
-                'progress_percent': 0
-            }
+            user_stats = {"total_tasks": 0, "solved_tasks": 0, "progress_percent": 0}
 
         # Прогресс по темам (временно отключено)
 
@@ -174,30 +183,36 @@ def subject_detail(request, subject_id):
         logger.error(f"Ошибка получения заданий: {e}")
         # Fallback задания
         tasks = [
-            type('Task', (), {
-                'id': 1,
-                'title': f'Пример задания по предмету {getattr(subject, "name", "неизвестный предмет")}',  # type: ignore
-                'description': 'Это демонстрационное задание для показа функциональности',
-                'difficulty': 2,
-                'answer': 'Пример ответа'
-            })()
+            type(
+                "Task",
+                (),
+                {
+                    "id": 1,
+                    "title": f'Пример задания по предмету {getattr(subject, "name", "неизвестный предмет")}',  # type: ignore
+                    "description": "Это демонстрационное задание для показа функциональности",
+                    "difficulty": 2,
+                    "answer": "Пример ответа",
+                },
+            )()
         ]
 
     ctx = {
-        'subject': subject,
-        'topics': topics,
-        'tasks': tasks,
-        'user_stats': user_stats,
+        "subject": subject,
+        "topics": topics,
+        "tasks": tasks,
+        "user_stats": user_stats,
     }
     # SEO мета-теги встроены в базовый шаблон
-    return render(request, 'learning/subject_detail.html', ctx)
+    return render(request, "learning/subject_detail.html", ctx)
+
 
 def topic_detail(request, topic_id):
     """
     Детальная страница темы (временно отключено)
     """
     # Временно перенаправляем на список предметов
-    return redirect('learning:subjects_list')
+    return redirect("learning:subjects_list")
+
 
 def task_detail(request, task_id):
     """
@@ -215,14 +230,15 @@ def task_detail(request, task_id):
     user_progress = None
     if request.user.is_authenticated:
         user_progress = UserProgress.objects.filter(  # type: ignore
-            user=request.user,
-            task=task
+            user=request.user, task=task
         ).first()
 
-    return render(request, 'learning/task_detail.html', {
-        'task': task,
-        'user_progress': user_progress
-    })
+    return render(
+        request,
+        "learning/task_detail.html",
+        {"task": task, "user_progress": user_progress},
+    )
+
 
 @login_required
 def solve_task(request, task_id):
@@ -231,14 +247,14 @@ def solve_task(request, task_id):
 
     Принимает ответ пользователя и возвращает результат проверки
     """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Метод не поддерживается'}, status=405)
+    if request.method != "POST":
+        return JsonResponse({"error": "Метод не поддерживается"}, status=405)
 
     task = get_object_or_404(Task, id=task_id)
-    user_answer = request.POST.get('answer', '').strip()
+    user_answer = request.POST.get("answer", "").strip()
 
     if not user_answer:
-        return JsonResponse({'error': 'Ответ не может быть пустым'}, status=400)
+        return JsonResponse({"error": "Ответ не может быть пустым"}, status=400)
 
     # Проверяем правильность ответа
     is_correct = task.check_answer(user_answer)
@@ -247,11 +263,7 @@ def solve_task(request, task_id):
     progress, created = UserProgress.objects.get_or_create(  # type: ignore
         user=request.user,
         task=task,
-        defaults={
-            'user_answer': user_answer,
-            'is_correct': is_correct,
-            'attempts': 1
-        }
+        defaults={"user_answer": user_answer, "is_correct": is_correct, "attempts": 1},
     )
 
     if not created:
@@ -261,12 +273,17 @@ def solve_task(request, task_id):
         progress.attempts += 1
         progress.save()
 
-    return JsonResponse({
-        'is_correct': is_correct,
-        'correct_answer': task.answer,
-        'explanation': task.explanation or 'Объяснение пока не добавлено.',
-        'message': 'Правильно! 🎉' if is_correct else 'Неправильно. Попробуйте еще раз! 🤔'
-    })
+    return JsonResponse(
+        {
+            "is_correct": is_correct,
+            "correct_answer": task.answer,
+            "explanation": task.explanation or "Объяснение пока не добавлено.",
+            "message": (
+                "Правильно! 🎉" if is_correct else "Неправильно. Попробуйте еще раз! 🤔"
+            ),
+        }
+    )
+
 
 def random_task(request, subject_id=None):
     """
@@ -284,16 +301,15 @@ def random_task(request, subject_id=None):
     # Исключаем уже решенные задания для авторизованных пользователей
     if request.user.is_authenticated:
         solved_task_ids = UserProgress.objects.filter(  # type: ignore
-            user=request.user,
-            is_correct=True
-        ).values_list('task_id', flat=True)
+            user=request.user, is_correct=True
+        ).values_list("task_id", flat=True)
         tasks_query = tasks_query.exclude(id__in=solved_task_ids)
 
     tasks_list = list(tasks_query)
 
     if not tasks_list:
-        messages.warning(request, 'Все доступные задания уже решены!')
-        return redirect('learning:subjects_list')
+        messages.warning(request, "Все доступные задания уже решены!")
+        return redirect("learning:subjects_list")
 
     random_task = random.choice(tasks_list)
-    return redirect('learning:task_detail', task_id=random_task.id)
+    return redirect("learning:task_detail", task_id=random_task.id)

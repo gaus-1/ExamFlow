@@ -43,7 +43,6 @@ def main() -> None:
     except Exception as e:
         print(f"Ошибка при создании тестовой БД: {e}")
 
+
 if __name__ == "__main__":
     main()
-
-

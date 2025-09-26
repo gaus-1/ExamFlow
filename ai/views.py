@@ -1,19 +1,22 @@
-from .models import AiLimit  # для получения лимитов
-from django.shortcuts import render
-from django.contrib.admin.views.decorators import staff_member_required
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from django.utils import timezone
 import json
 import logging
-from django_ratelimit.decorators import ratelimit
 import re
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
+
+from .models import AiLimit  # для получения лимитов
 
 logger = logging.getLogger(__name__)
 
 # Сервис ИИ: провайдеры, кэш и лимиты
 ai_service = None
+
 
 def get_ai_service():
     """Получает или создает экземпляр AiService"""
@@ -21,6 +24,7 @@ def get_ai_service():
     if ai_service is None:
         try:
             from .services import AiService
+
             ai_service = AiService()
             logger.info("AiService успешно создан")
         except Exception:
@@ -28,78 +32,86 @@ def get_ai_service():
             return None
     return ai_service
 
+
 # ========================================
 # ОСНОВНЫЕ СТРАНИЦЫ ИИ
 # ========================================
 
+
 def ai_dashboard(request):
     """Главная страница ИИ-ассистента"""
     context = {
-        'title': 'ИИ-ассистент ExamFlow',
-        'user': request.user,
+        "title": "ИИ-ассистент ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/dashboard.html', context)
+    return render(request, "ai/dashboard.html", context)
+
 
 def ai_chat(request):
     """Страница чата с ИИ"""
     try:
         context = {
-            'title': 'Чат с ИИ - ExamFlow',
-            'user': request.user,
+            "title": "Чат с ИИ - ExamFlow",
+            "user": request.user,
         }
-        return render(request, 'ai/chat.html', context)
+        return render(request, "ai/chat.html", context)
     except Exception:  # type: ignore
         # Мягкий fallback: не отдаём 500, показываем информативную страницу
         logger.error("Ошибка рендера страницы чата: {e}")
         context = {
-            'title': 'Чат с ИИ - ExamFlow',
-            'user': request.user,
-            'error_message': 'Временная ошибка загрузки чата ИИ. Повторите попытку через минуту.',
+            "title": "Чат с ИИ - ExamFlow",
+            "user": request.user,
+            "error_message": "Временная ошибка загрузки чата ИИ. Повторите попытку через минуту.",
         }
-        return render(request, 'ai/chat.html', context)
+        return render(request, "ai/chat.html", context)
+
 
 def ai_explain(request):
     """Страница объяснения тем ИИ"""
     context = {
-        'title': 'Объяснение тем - ExamFlow',
-        'user': request.user,
+        "title": "Объяснение тем - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/explain.html', context)
+    return render(request, "ai/explain.html", context)
+
 
 def ai_search(request):
     """Страница поиска заданий ИИ"""
     context = {
-        'title': 'Поиск заданий - ExamFlow',
-        'user': request.user,
+        "title": "Поиск заданий - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/search.html', context)
+    return render(request, "ai/search.html", context)
+
 
 def ai_generate(request):
     """Страница генерации заданий ИИ"""
     context = {
-        'title': 'Генерация заданий - ExamFlow',
-        'user': request.user,
+        "title": "Генерация заданий - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/generate.html', context)
+    return render(request, "ai/generate.html", context)
+
 
 # ========================================
 # API ДЛЯ ИИ
 # ========================================
 
+
 @csrf_exempt
 @require_http_methods(["POST"])
-@ratelimit(key='ip', rate='20/m', block=True)
+@ratelimit(key="ip", rate="20/m", block=True)
 def api_chat(request):
     """API для чата с ИИ с памятью контекста"""
     try:
         # Импортируем менеджер контекста
         from .context_manager import WebContextManager
-        
+
         data = json.loads(request.body)
         # Поддерживаем оба формата: {prompt: ...} и {query: ...}
-        prompt = (data.get('prompt') or data.get('query') or '').strip()
+        prompt = (data.get("prompt") or data.get("query") or "").strip()
         if not prompt:
-            return JsonResponse({'error': 'Пустой запрос'}, status=400)
+            return JsonResponse({"error": "Пустой запрос"}, status=400)
 
         # Гарантируем наличие session_id для гостей
         if not request.session.session_key:
@@ -108,27 +120,28 @@ def api_chat(request):
 
         # Инициализируем менеджер контекста
         context_manager = WebContextManager()
-        
+
         # Формируем промпт с контекстом
         prompt_with_context = context_manager.format_context_for_ai(session_id, prompt)
 
         ai_service_instance = get_ai_service()
         if ai_service_instance is None:
-            return JsonResponse({'error': 'ИИ временно недоступен'}, status=503)
+            return JsonResponse({"error": "ИИ временно недоступен"}, status=503)
 
         result = ai_service_instance.ask(
             prompt=prompt_with_context,  # Используем промпт с контекстом
             user=request.user if request.user.is_authenticated else None,
-            session_id=session_id)
-        if 'error' in result:
-            return JsonResponse({'error': result['error']}, status=429)
+            session_id=session_id,
+        )
+        if "error" in result:
+            return JsonResponse({"error": result["error"]}, status=429)
 
-        text = result.get('response', '') or ''
-        
+        text = result.get("response", "") or ""
+
         # Сохраняем диалог в контекст
         context_manager.add_message(session_id, prompt, is_user=True)
         context_manager.add_message(session_id, text, is_user=False)
-        
+
         # Источники: извлекаем URL из текста ответа (если присутствуют)
         url_pattern = re.compile(r"https?://\S+", re.IGNORECASE)
         found_urls = url_pattern.findall(text)
@@ -138,44 +151,33 @@ def api_chat(request):
             if url in seen:
                 continue
             seen.add(url)
-            sources.append({
-                'id': idx,
-                'title': url,
-                'url': url
-            })
+            sources.append({"id": idx, "title": url, "url": url})
 
         # Follow-ups: простые действия в экосистеме
         followups = [
-            {
-                'label': 'Показать задания по предметам',
-                'href': '/learning/subjects/'
-            },
-            {
-                'label': 'Случайное задание',
-                'href': '/learning/random/'
-            },
-            {
-                'label': 'Задать уточняющий вопрос',
-                'action': 'refocus-input'
-            }
+            {"label": "Показать задания по предметам", "href": "/learning/subjects/"},
+            {"label": "Случайное задание", "href": "/learning/random/"},
+            {"label": "Задать уточняющий вопрос", "action": "refocus-input"},
         ]
 
-        return JsonResponse({
-            'response': text,
-            'answer': text,
-            'provider': result.get('provider', 'local'),
-            'cached': result.get('cached', False),
-            'tokens_used': result.get('tokens_used', 0),
-            'cost': 0.0,
-            'sources': sources,
-            'followups': followups
-        })
+        return JsonResponse(
+            {
+                "response": text,
+                "answer": text,
+                "provider": result.get("provider", "local"),
+                "cached": result.get("cached", False),
+                "tokens_used": result.get("tokens_used", 0),
+                "cost": 0.0,
+                "sources": sources,
+                "followups": followups,
+            }
+        )
 
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Неверный JSON'}, status=400)
+        return JsonResponse({"error": "Неверный JSON"}, status=400)
     except Exception:
         logger.error("Ошибка в API чата: {e}")
-        return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+        return JsonResponse({"error": "Внутренняя ошибка сервера"}, status=500)
 
 
 @csrf_exempt
@@ -184,130 +186,136 @@ def clear_context(request):
     """API для очистки контекста диалога"""
     try:
         from .context_manager import WebContextManager
-        
+
         # Гарантируем наличие session_id
         if not request.session.session_key:
             request.session.save()
         session_id = request.session.session_key
-        
+
         context_manager = WebContextManager()
         success = context_manager.clear_context(session_id)
-        
-        return JsonResponse({
-            'success': success,
-            'message': 'Контекст диалога очищен' if success else 'Ошибка очистки контекста'
-        })
-        
+
+        return JsonResponse(
+            {
+                "success": success,
+                "message": (
+                    "Контекст диалога очищен" if success else "Ошибка очистки контекста"
+                ),
+            }
+        )
+
     except Exception as e:
         logger.error(f"Ошибка очистки контекста: {e}")
-        return JsonResponse({
-            'success': False,
-            'error': 'Ошибка сервера'
-        }, status=500)
+        return JsonResponse({"success": False, "error": "Ошибка сервера"}, status=500)
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
-@ratelimit(key='ip', rate='30/m', block=True)
+@ratelimit(key="ip", rate="30/m", block=True)
 def api_explain(request):
     """API для объяснения тем ИИ"""
     try:
         data = json.loads(request.body)
-        topic = data.get('topic', '')
+        topic = data.get("topic", "")
 
         if not topic:
-            return JsonResponse({'error': 'Не указана тема'}, status=400)
+            return JsonResponse({"error": "Не указана тема"}, status=400)
 
         # TODO: Реализовать логику объяснения
         explanation = "Объяснение темы '{topic}' находится в разработке. Скоро здесь будет подробное объяснение с примерами."
 
-        return JsonResponse({
-            'explanation': explanation,
-            'tokens_used': len(topic.split()),
-            'cost': 0.0
-        })
+        return JsonResponse(
+            {"explanation": explanation, "tokens_used": len(topic.split()), "cost": 0.0}
+        )
 
     except Exception:
         logger.error("Ошибка в API объяснения: {e}")
-        return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+        return JsonResponse({"error": "Внутренняя ошибка сервера"}, status=500)
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
-@ratelimit(key='ip', rate='30/m', block=True)
+@ratelimit(key="ip", rate="30/m", block=True)
 def api_search(request):
     """API для поиска заданий ИИ"""
     try:
         data = json.loads(request.body)
-        query = data.get('query', '')
+        query = data.get("query", "")
 
         if not query:
-            return JsonResponse({'error': 'Пустой поисковый запрос'}, status=400)
+            return JsonResponse({"error": "Пустой поисковый запрос"}, status=400)
 
         # TODO: Реализовать логику поиска
         results = [
             {
-                'id': 1,
-                'title': f'Задание по запросу "{query}"',
-                'description': 'Описание задания находится в разработке',
-                'subject': 'Математика',
-                'difficulty': 'Средний'
+                "id": 1,
+                "title": f'Задание по запросу "{query}"',
+                "description": "Описание задания находится в разработке",
+                "subject": "Математика",
+                "difficulty": "Средний",
             }
         ]
 
-        return JsonResponse({
-            'results': results,
-            'total': len(results),
-            'tokens_used': len(query.split()),
-            'cost': 0.0
-        })
+        return JsonResponse(
+            {
+                "results": results,
+                "total": len(results),
+                "tokens_used": len(query.split()),
+                "cost": 0.0,
+            }
+        )
 
     except Exception:
         logger.error("Ошибка в API поиска: {e}")
-        return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+        return JsonResponse({"error": "Внутренняя ошибка сервера"}, status=500)
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
-@ratelimit(key='ip', rate='15/m', block=True)
+@ratelimit(key="ip", rate="15/m", block=True)
 def api_generate(request):
     """API для генерации заданий ИИ"""
     try:
         data = json.loads(request.body)
-        topic = data.get('topic', '')
+        topic = data.get("topic", "")
 
         if not topic:
-            return JsonResponse({'error': 'Не указана тема'}, status=400)
+            return JsonResponse({"error": "Не указана тема"}, status=400)
 
         # TODO: Реализовать логику генерации
         generated_task = {
-            'title': 'Сгенерированное задание по теме "{topic}"',
-            'content': 'Содержание задания по теме "{topic}" с уровнем сложности "{difficulty}" находится в разработке.',
-            'answer': 'Ответ будет доступен после реализации функционала',
-            'explanation': 'Подробное объяснение решения будет добавлено позже'}
+            "title": 'Сгенерированное задание по теме "{topic}"',
+            "content": 'Содержание задания по теме "{topic}" с уровнем сложности "{difficulty}" находится в разработке.',
+            "answer": "Ответ будет доступен после реализации функционала",
+            "explanation": "Подробное объяснение решения будет добавлено позже",
+        }
 
-        return JsonResponse({
-            'task': generated_task,
-            'tokens_used': len(topic.split()),
-            'cost': 0.0
-        })
+        return JsonResponse(
+            {"task": generated_task, "tokens_used": len(topic.split()), "cost": 0.0}
+        )
 
     except Exception:
         logger.error("Ошибка в API генерации: {e}")
-        return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+        return JsonResponse({"error": "Внутренняя ошибка сервера"}, status=500)
+
 
 # ========================================
 # УПРАВЛЕНИЕ ЛИМИТАМИ
 # ========================================
 
+
 def ai_limits(request):
     """Страница управления лимитами ИИ"""
     context = {
-        'title': 'Лимиты ИИ - ExamFlow',
-        'user': request.user,
+        "title": "Лимиты ИИ - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/limits.html', context)
+    return render(request, "ai/limits.html", context)
+
 
 @csrf_exempt
 @require_http_methods(["GET"])
-@ratelimit(key='ip', rate='60/m', block=True)
+@ratelimit(key="ip", rate="60/m", block=True)
 def api_limits(request):
     """API для получения лимитов пользователя"""
     try:
@@ -321,12 +329,12 @@ def api_limits(request):
         limit, _ = AiLimit.objects.get_or_create(  # type: ignore
             user=request.user if is_auth else None,
             session_id=session_id,
-            limit_type='daily',
+            limit_type="daily",
             defaults={
-                'current_usage': 0,
-                'max_limit': max_daily,
-                'reset_date': timezone.now().date(),  # type: ignore
-            }
+                "current_usage": 0,
+                "max_limit": max_daily,
+                "reset_date": timezone.now().date(),  # type: ignore
+            },
         )
         # Синхронизируем максимальный лимит на случай смены статуса
         if limit.max_limit != max_daily:
@@ -334,29 +342,34 @@ def api_limits(request):
             limit.save()
 
         remaining = max(0, limit.max_limit - limit.current_usage)
-        return JsonResponse({
-            'daily': {
-                'used': limit.current_usage,
-                'max': limit.max_limit,
-                'remaining': remaining
+        return JsonResponse(
+            {
+                "daily": {
+                    "used": limit.current_usage,
+                    "max": limit.max_limit,
+                    "remaining": remaining,
+                }
             }
-        })
+        )
 
     except Exception:
         logger.error("Ошибка в API лимитов: {e}")
-        return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+        return JsonResponse({"error": "Внутренняя ошибка сервера"}, status=500)
+
 
 # ========================================
 # ГОЛОСОВОЙ ПОМОЩНИК
 # ========================================
 
+
 def voice_assistant(request):
     """Страница голосового помощника"""
     context = {
-        'title': 'Голосовой помощник - ExamFlow',
-        'user': request.user,
+        "title": "Голосовой помощник - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/voice.html', context)
+    return render(request, "ai/voice.html", context)
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -364,42 +377,47 @@ def api_voice(request):
     """API для голосового помощника"""
     try:
         data = json.loads(request.body)
-        audio_data = data.get('audio', '')
-        command = data.get('command', '')
+        audio_data = data.get("audio", "")
+        command = data.get("command", "")
 
         if not audio_data and not command:
-            return JsonResponse({'error': 'Не указаны аудио данные или команда'}, status=400)
+            return JsonResponse(
+                {"error": "Не указаны аудио данные или команда"}, status=400
+            )
 
         # TODO: Реализовать логику голосового помощника
         response = {
-            'text': f'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
-            'audio_url': None
+            "text": f'Голосовой помощник получил команду: "{command}". Функционал находится в разработке.',
+            "audio_url": None,
         }
 
         return JsonResponse(response)
 
     except Exception:
         logger.error("Ошибка в API голосового помощника: {e}")
-        return JsonResponse({'error': 'Внутренняя ошибка сервера'}, status=500)
+        return JsonResponse({"error": "Внутренняя ошибка сервера"}, status=500)
+
 
 # ========================================
 # АДМИНИСТРАТИВНЫЕ ФУНКЦИИ
 # ========================================
 
+
 @staff_member_required
 def admin_providers(request):
     """Административная страница управления провайдерами ИИ"""
     context = {
-        'title': 'Управление провайдерами ИИ - ExamFlow',
-        'user': request.user,
+        "title": "Управление провайдерами ИИ - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/admin/providers.html', context)
+    return render(request, "ai/admin/providers.html", context)
+
 
 @staff_member_required
 def admin_templates(request):
     """Административная страница управления шаблонами промптов"""
     context = {
-        'title': 'Управление шаблонами промптов - ExamFlow',
-        'user': request.user,
+        "title": "Управление шаблонами промптов - ExamFlow",
+        "user": request.user,
     }
-    return render(request, 'ai/admin/templates.html', context)
+    return render(request, "ai/admin/templates.html", context)

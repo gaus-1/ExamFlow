@@ -1,15 +1,21 @@
 from __future__ import annotations
 
 from typing import Any
+
 from core.container import Container
 
 try:
     from telegram_bot.bot_handlers import (
-        db_save_progress as _legacy_save_progress,  # type: ignore
-        db_update_rating_points as _legacy_update_rating_points,  # type: ignore
         db_get_profile_progress as _legacy_get_profile_progress,  # type: ignore
     )
+    from telegram_bot.bot_handlers import (
+        db_save_progress as _legacy_save_progress,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_update_rating_points as _legacy_update_rating_points,  # type: ignore
+    )
 except Exception:
+
     def _legacy_save_progress(user, task, user_answer: str, is_correct: bool):  # type: ignore
         return None
 

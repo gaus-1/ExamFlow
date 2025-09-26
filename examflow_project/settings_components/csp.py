@@ -1,7 +1,15 @@
-CSP_DEFAULT_SRC = ("'self'", )
+CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'")
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
-CSP_IMG_SRC = ("'self'", 'data:', )
-CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com", "https://fonts.googleapis.com", "https://fonts.gstatic.com")
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://generativelanguage.googleapis.com",
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
+)
 CSP_FONT_SRC = ("'self'", "https://fonts.googleapis.com", "https://fonts.gstatic.com")
-CSP_FRAME_ANCESTORS = ("'none'", )
+CSP_FRAME_ANCESTORS = ("'none'",)

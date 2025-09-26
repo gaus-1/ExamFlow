@@ -4,13 +4,15 @@
 Проверяет загрузку ресурсов, адаптивность и функциональность
 """
 
-import requests
 import re
 import time
 from urllib.parse import urljoin
 
+import requests
+
+
 class FrontendTester:
-    def __init__(self, base_url='http://localhost:8000'):
+    def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
         self.session = requests.Session()
         self.results = []
@@ -30,7 +32,9 @@ class FrontendTester:
                 return response.text
             else:
                 print(f"❌ Ошибка загрузки: {response.status_code}")
-                self.results.append(("page_load", False, f"HTTP {response.status_code}"))
+                self.results.append(
+                    ("page_load", False, f"HTTP {response.status_code}")
+                )
                 return None
 
         except Exception as e:
@@ -54,7 +58,7 @@ class FrontendTester:
 
         for css_link in css_links:
             try:
-                if css_link.startswith('/'):
+                if css_link.startswith("/"):
                     full_url = urljoin(self.base_url, css_link)
                 else:
                     full_url = css_link
@@ -71,10 +75,14 @@ class FrontendTester:
 
         if success_count == total_count and total_count > 0:
             print(f"✅ Все CSS ресурсы загружены ({success_count}/{total_count})")
-            self.results.append(("css_resources", True, f"{success_count}/{total_count}"))
+            self.results.append(
+                ("css_resources", True, f"{success_count}/{total_count}")
+            )
         else:
             print(f"❌ Проблемы с CSS ({success_count}/{total_count})")
-            self.results.append(("css_resources", False, f"{success_count}/{total_count}"))
+            self.results.append(
+                ("css_resources", False, f"{success_count}/{total_count}")
+            )
 
     def test_js_resources(self, html_content):
         """Проверяет загрузку JavaScript ресурсов"""
@@ -92,7 +100,7 @@ class FrontendTester:
 
         for js_link in js_links:
             try:
-                if js_link.startswith('/'):
+                if js_link.startswith("/"):
                     full_url = urljoin(self.base_url, js_link)
                 else:
                     full_url = js_link
@@ -109,10 +117,14 @@ class FrontendTester:
 
         if success_count == total_count and total_count > 0:
             print(f"✅ Все JS ресурсы загружены ({success_count}/{total_count})")
-            self.results.append(("js_resources", True, f"{success_count}/{total_count}"))
+            self.results.append(
+                ("js_resources", True, f"{success_count}/{total_count}")
+            )
         else:
             print(f"❌ Проблемы с JS ({success_count}/{total_count})")
-            self.results.append(("js_resources", False, f"{success_count}/{total_count}"))
+            self.results.append(
+                ("js_resources", False, f"{success_count}/{total_count}")
+            )
 
     def test_key_elements(self, html_content):
         """Проверяет наличие ключевых элементов"""
@@ -123,14 +135,14 @@ class FrontendTester:
             return
 
         elements = [
-            ('AI интерфейс', r'ai-input'),
-            ('Навигация', r'nav-link'),
-            ('Кнопки', r'btn btn-primary'),
-            ('Логотип', r'logo'),
-            ('Футер', r'footer'),
-            ('Мета-теги', r'<meta.*description'),
-            ('Telegram ссылка', r't\.me/examflow_bot'),
-            ('CSRF токен', r'csrfmiddlewaretoken'),
+            ("AI интерфейс", r"ai-input"),
+            ("Навигация", r"nav-link"),
+            ("Кнопки", r"btn btn-primary"),
+            ("Логотип", r"logo"),
+            ("Футер", r"footer"),
+            ("Мета-теги", r"<meta.*description"),
+            ("Telegram ссылка", r"t\.me/examflow_bot"),
+            ("CSRF токен", r"csrfmiddlewaretoken"),
         ]
 
         success_count = 0
@@ -144,10 +156,14 @@ class FrontendTester:
         total_count = len(elements)
         if success_count == total_count:
             print(f"✅ Все ключевые элементы найдены ({success_count}/{total_count})")
-            self.results.append(("key_elements", True, f"{success_count}/{total_count}"))
+            self.results.append(
+                ("key_elements", True, f"{success_count}/{total_count}")
+            )
         else:
             print(f"❌ Отсутствуют элементы ({success_count}/{total_count})")
-            self.results.append(("key_elements", False, f"{success_count}/{total_count}"))
+            self.results.append(
+                ("key_elements", False, f"{success_count}/{total_count}")
+            )
 
     def test_ai_api(self):
         """Тестирует AI API"""
@@ -156,7 +172,9 @@ class FrontendTester:
         try:
             # Получаем CSRF токен
             response = self.session.get(self.base_url)
-            csrf_match = re.search(r'csrfmiddlewaretoken[^>]*value=["\']([^"\']*)["\']', response.text)
+            csrf_match = re.search(
+                r'csrfmiddlewaretoken[^>]*value=["\']([^"\']*)["\']', response.text
+            )
 
             if not csrf_match:
                 print("❌ CSRF токен не найден")
@@ -167,18 +185,15 @@ class FrontendTester:
 
             # Тестируем AI запрос
             ai_response = self.session.post(
-                urljoin(self.base_url, '/ai/api/'),
-                json={'prompt': 'Тест AI интерфейса'},
-                headers={
-                    'X-CSRFToken': csrf_token,
-                    'Content-Type': 'application/json'
-                },
-                timeout=30
+                urljoin(self.base_url, "/ai/api/"),
+                json={"prompt": "Тест AI интерфейса"},
+                headers={"X-CSRFToken": csrf_token, "Content-Type": "application/json"},
+                timeout=30,
             )
 
             if ai_response.status_code == 200:
                 data = ai_response.json()
-                if 'answer' in data:
+                if "answer" in data:
                     print("✅ AI API работает корректно")
                     self.results.append(("ai_api", True, "API responds"))
                 else:
@@ -186,7 +201,9 @@ class FrontendTester:
                     self.results.append(("ai_api", False, "Invalid response format"))
             else:
                 print(f"❌ AI API: HTTP {ai_response.status_code}")
-                self.results.append(("ai_api", False, f"HTTP {ai_response.status_code}"))
+                self.results.append(
+                    ("ai_api", False, f"HTTP {ai_response.status_code}")
+                )
 
         except Exception as e:
             print(f"❌ Ошибка AI API: {e}")
@@ -197,10 +214,10 @@ class FrontendTester:
         print("🧪 Тестирую адаптивные breakpoints...")
 
         breakpoints = [
-            ('Mobile', 375),
-            ('Tablet', 768),
-            ('Desktop', 1024),
-            ('Large', 1440)
+            ("Mobile", 375),
+            ("Tablet", 768),
+            ("Desktop", 1024),
+            ("Large", 1440),
         ]
 
         success_count = 0
@@ -208,7 +225,7 @@ class FrontendTester:
             try:
                 # Симулируем различные разрешения через User-Agent
                 headers = {
-                    'User-Agent': f'Mozilla/5.0 (Test Device; {width}px) ExamFlowTester/1.0'
+                    "User-Agent": f"Mozilla/5.0 (Test Device; {width}px) ExamFlowTester/1.0"
                 }
 
                 response = self.session.get(self.base_url, headers=headers, timeout=5)
@@ -236,14 +253,18 @@ class FrontendTester:
 
         try:
             # Проверяем страницу входа через Telegram
-            auth_response = self.session.get(urljoin(self.base_url, '/auth/telegram/login/'), timeout=5)
+            auth_response = self.session.get(
+                urljoin(self.base_url, "/auth/telegram/login/"), timeout=5
+            )
 
             if auth_response.status_code == 200:
                 print("✅ Страница Telegram авторизации доступна")
                 self.results.append(("telegram_auth", True, "Auth page accessible"))
             else:
                 print(f"❌ Telegram авторизация: HTTP {auth_response.status_code}")
-                self.results.append(("telegram_auth", False, f"HTTP {auth_response.status_code}"))
+                self.results.append(
+                    ("telegram_auth", False, f"HTTP {auth_response.status_code}")
+                )
 
         except Exception as e:
             print(f"❌ Ошибка Telegram интеграции: {e}")
@@ -292,6 +313,7 @@ class FrontendTester:
 
         return failed == 0
 
+
 def main():
     tester = FrontendTester()
     success = tester.run_all_tests()
@@ -300,6 +322,7 @@ def main():
         print("\n🚀 Фронтенд готов к продакшену!")
     else:
         print("\n🔧 Требуются дополнительные исправления.")
+
 
 if __name__ == "__main__":
     main()

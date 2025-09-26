@@ -7,40 +7,42 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def install_performance_tools():
     """Устанавливает инструменты для оптимизации"""
     print("⚡ Устанавливаем инструменты производительности...")
 
     tools = [
-        'django-compressor',
-        'Pillow',
-        'django-debug-toolbar',
-        'memory-profiler',
-        'django-extensions'
+        "django-compressor",
+        "Pillow",
+        "django-debug-toolbar",
+        "memory-profiler",
+        "django-extensions",
     ]
 
     for tool in tools:
         try:
-            subprocess.run([sys.executable, '-m', 'pip', 'install', tool], check=True)
+            subprocess.run([sys.executable, "-m", "pip", "install", tool], check=True)
             print("✅ {tool} установлен")
         except subprocess.CalledProcessError:
             print("❌ Ошибка установки {tool}")
+
 
 def optimize_static_files():
     """Оптимизирует статические файлы"""
     print("📁 Оптимизируем статические файлы...")
 
-    settings_file = Path('examflow_project/settings.py')
+    settings_file = Path("examflow_project/settings.py")
     if not settings_file.exists():
         print("❌ Файл settings.py не найден")
         return
 
     # Читаем настройки
-    with open(settings_file, 'r', encoding='utf-8') as f:
+    with open(settings_file, encoding="utf-8") as f:
         content = f.read()
 
     # Добавляем настройки сжатия
-    compression_config = '''
+    compression_config = """
 # Сжатие статических файлов
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -63,48 +65,46 @@ STATICFILES_DIRS = [
 # Настройки WhiteNoise
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = True
-'''
+"""
 
-    if 'STATICFILES_STORAGE' not in content:
+    if "STATICFILES_STORAGE" not in content:
         content = content.replace(
-            'STATICFILES_DIRS = [',
-            compression_config + '\nSTATICFILES_DIRS = ['
+            "STATICFILES_DIRS = [", compression_config + "\nSTATICFILES_DIRS = ["
         )
 
-        with open(settings_file, 'w', encoding='utf-8') as f:
+        with open(settings_file, "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Настройки сжатия добавлены")
     else:
         print("✅ Настройки сжатия уже существуют")
+
 
 def add_lazy_loading():
     """Добавляет lazy loading для изображений"""
     print("🖼️ Добавляем lazy loading...")
 
     # Обновляем base.html
-    base_template = Path('templates/base.html')
+    base_template = Path("templates/base.html")
     if base_template.exists():
-        with open(base_template, 'r', encoding='utf-8') as f:
+        with open(base_template, encoding="utf-8") as f:
             content = f.read()
 
         # Добавляем lazy loading к изображениям
-        content = content.replace(
-            '<img src=',
-            '<img loading="lazy" src='
-        )
+        content = content.replace("<img src=", '<img loading="lazy" src=')
 
-        with open(base_template, 'w', encoding='utf-8') as f:
+        with open(base_template, "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Lazy loading добавлен")
     else:
         print("⚠️ Шаблон base.html не найден")
+
 
 def optimize_images():
     """Оптимизирует изображения"""
     print("🖼️ Оптимизируем изображения...")
 
     # Создаем скрипт оптимизации изображений
-    image_optimizer = Path('core/utils/image_optimizer.py')
+    image_optimizer = Path("core/utils/image_optimizer.py")
     image_optimizer.parent.mkdir(parents=True, exist_ok=True)
 
     optimizer_content = '''"""
@@ -175,25 +175,26 @@ if __name__ == "__main__":
     optimize_all_images()
 '''
 
-    with open(image_optimizer, 'w', encoding='utf-8') as f:
+    with open(image_optimizer, "w", encoding="utf-8") as f:
         f.write(optimizer_content)
 
     print("✅ Скрипт оптимизации изображений создан")
+
 
 def add_caching():
     """Добавляет кэширование"""
     print("💾 Настраиваем кэширование...")
 
-    settings_file = Path('examflow_project/settings.py')
+    settings_file = Path("examflow_project/settings.py")
     if not settings_file.exists():
         print("❌ Файл settings.py не найден")
         return
 
-    with open(settings_file, 'r', encoding='utf-8') as f:
+    with open(settings_file, encoding="utf-8") as f:
         content = f.read()
 
     # Добавляем настройки кэширования
-    cache_config = '''
+    cache_config = """
 # Настройки кэширования
 CACHES = {
     'default': {
@@ -213,29 +214,29 @@ SESSION_CACHE_ALIAS = 'default'
 
 # Кэширование статики
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-'''
+"""
 
-    if 'CACHES = {' not in content:
+    if "CACHES = {" not in content:
         content = content.replace(
-            'INSTALLED_APPS = [',
-            cache_config + '\nINSTALLED_APPS = ['
+            "INSTALLED_APPS = [", cache_config + "\nINSTALLED_APPS = ["
         )
 
-        with open(settings_file, 'w', encoding='utf-8') as f:
+        with open(settings_file, "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Настройки кэширования добавлены")
     else:
         print("✅ Настройки кэширования уже существуют")
+
 
 def add_database_optimization():
     """Добавляет оптимизацию базы данных"""
     print("🗄️ Оптимизируем базу данных...")
 
     # Создаем management команду для оптимизации БД
-    management_dir = Path('core/management/commands')
+    management_dir = Path("core/management/commands")
     management_dir.mkdir(parents=True, exist_ok=True)
 
-    optimize_db_file = management_dir / 'optimize_database.py'
+    optimize_db_file = management_dir / "optimize_database.py"
 
     optimize_content = '''"""
 Команда для оптимизации базы данных
@@ -280,16 +281,17 @@ class Command(BaseCommand):
         self.stdout.write('🎉 Оптимизация базы данных завершена!')
 '''
 
-    with open(optimize_db_file, 'w', encoding='utf-8') as f:
+    with open(optimize_db_file, "w", encoding="utf-8") as f:
         f.write(optimize_content)
 
     print("✅ Команда оптимизации БД создана")
+
 
 def create_performance_monitor():
     """Создает мониторинг производительности"""
     print("📊 Создаем мониторинг производительности...")
 
-    monitor_file = Path('core/utils/performance_monitor.py')
+    monitor_file = Path("core/utils/performance_monitor.py")
     monitor_file.parent.mkdir(parents=True, exist_ok=True)
 
     monitor_content = '''"""
@@ -364,17 +366,18 @@ def log_slow_queries():
             logger.warning("  {query['time']}s: {query['sql']}")
 '''
 
-    with open(monitor_file, 'w', encoding='utf-8') as f:
+    with open(monitor_file, "w", encoding="utf-8") as f:
         f.write(monitor_content)
 
     print("✅ Мониторинг производительности создан")
+
 
 def run_performance_tests():
     """Запускает тесты производительности"""
     print("🧪 Запускаем тесты производительности...")
 
     # Создаем простой тест производительности
-    test_file = Path('tests/test_performance.py')
+    test_file = Path("tests/test_performance.py")
     test_file.parent.mkdir(parents=True, exist_ok=True)
 
     test_content = '''"""
@@ -410,10 +413,11 @@ class PerformanceTests(TestCase):
         self.assertLess(end_time - start_time, 5.0)  # Менее 5 секунд
 '''
 
-    with open(test_file, 'w', encoding='utf-8') as f:
+    with open(test_file, "w", encoding="utf-8") as f:
         f.write(test_content)
 
     print("✅ Тесты производительности созданы")
+
 
 def main():
     """Основная функция"""
@@ -449,6 +453,7 @@ def main():
     print("2. Запустите: python manage.py collectstatic")
     print("3. Протестируйте производительность")
     print("4. Проверьте логи на медленные операции")
+
 
 if __name__ == "__main__":
     main()

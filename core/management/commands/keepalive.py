@@ -2,12 +2,14 @@
 Команда для поддержания активности всех компонентов ExamFlow 2.0
 """
 
-import requests
-import time
 import logging
-from django.core.management.base import BaseCommand
+import time
+
+import requests
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.db import connection
+
 # Убираем импорт application - он не нужен для keepalive
 # from telegram_bot.bot_main import application
 # import asyncio
@@ -15,16 +17,16 @@ from django.db import connection
 
 logger = logging.getLogger(__name__)
 
+
 class KeepaliveService:
     """Сервис для поддержания активности всех компонентов"""
 
     def __init__(self):
         self.website_url = getattr(
-            settings,
-            'WEBSITE_URL',
-            'https://examflow.onrender.com')
+            settings, "WEBSITE_URL", "https://examflow.onrender.com"
+        )
         self.health_url = "{self.website_url}/health/"
-        self.bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+        self.bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
         self.telegram_api_url = "https://api.telegram.org/bot{self.bot_token}/getMe"
 
     def check_website(self):
@@ -63,16 +65,16 @@ class KeepaliveService:
             response = requests.get(self.telegram_api_url, timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                if data.get('ok'):
+                if data.get("ok"):
                     logger.info("✅ Telegram бот активен")
                     return True
                 else:
                     logger.warning(
-                        "⚠️ Telegram бот не отвечает: {data.get('description')}")
+                        "⚠️ Telegram бот не отвечает: {data.get('description')}"
+                    )
                     return False
             else:
-                logger.warning(
-                    "⚠️ Telegram API отвечает с кодом {response.status_code}")
+                logger.warning("⚠️ Telegram API отвечает с кодом {response.status_code}")
                 return False
         except Exception:
             logger.error("❌ Ошибка проверки Telegram бота: {e}")
@@ -99,7 +101,8 @@ class KeepaliveService:
                 cursor.execute("SELECT COUNT(*) FROM core_unifiedprofile")
                 result = cursor.fetchone()
                 logger.info(
-                    "✅ База данных разбужена, профилей: {result[0] if result else 0}")
+                    "✅ База данных разбужена, профилей: {result[0] if result else 0}"
+                )
                 return True
         except Exception:
             logger.error("❌ Ошибка пробуждения базы данных: {e}")
@@ -130,7 +133,8 @@ class KeepaliveService:
                 # Логируем статус
                 status = "✅" if all([website_ok, database_ok, bot_ok]) else "⚠️"
                 logger.info(
-                    "{status} Статус компонентов: Сайт={website_ok}, БД={database_ok}, Бот={bot_ok}")
+                    "{status} Статус компонентов: Сайт={website_ok}, БД={database_ok}, Бот={bot_ok}"
+                )
 
                 # Ждем до следующей проверки
                 time.sleep(interval)
@@ -142,44 +146,45 @@ class KeepaliveService:
                 logger.error("❌ Ошибка в keepalive цикле: {e}")
                 time.sleep(60)  # Ждем минуту перед повторной попыткой
 
+
 class Command(BaseCommand):
-    help = 'Поддерживает активность всех компонентов ExamFlow 2.0'
+    help = "Поддерживает активность всех компонентов ExamFlow 2.0"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--interval',
+            "--interval",
             type=int,
             default=300,
-            help='Интервал проверки в секундах (по умолчанию 300)'
+            help="Интервал проверки в секундах (по умолчанию 300)",
         )
         parser.add_argument(
-            '--once',
-            action='store_true',
-            help='Выполнить проверку один раз и завершить'
+            "--once",
+            action="store_true",
+            help="Выполнить проверку один раз и завершить",
         )
         parser.add_argument(
-            '--component',
-            choices=['website', 'database', 'bot', 'all'],
-            default='all',
-            help='Проверить только указанный компонент'
+            "--component",
+            choices=["website", "database", "bot", "all"],
+            default="all",
+            help="Проверить только указанный компонент",
         )
 
     def handle(self, *args, **options):
         keepalive = KeepaliveService()
 
-        if options['once']:
+        if options["once"]:
             # Однократная проверка
             self.stdout.write("🔍 Выполняем однократную проверку компонентов...")
 
-            if options['component'] == 'website' or options['component'] == 'all':
+            if options["component"] == "website" or options["component"] == "all":
                 website_ok = keepalive.check_website()
                 self.stdout.write("Сайт: {'✅' if website_ok else '❌'}")
 
-            if options['component'] == 'database' or options['component'] == 'all':
+            if options["component"] == "database" or options["component"] == "all":
                 database_ok = keepalive.check_database()
                 self.stdout.write("База данных: {'✅' if database_ok else '❌'}")
 
-            if options['component'] == 'bot' or options['component'] == 'all':
+            if options["component"] == "bot" or options["component"] == "all":
                 bot_ok = keepalive.check_bot()
                 self.stdout.write("Telegram бот: {'✅' if bot_ok else '❌'}")
 
@@ -188,11 +193,13 @@ class Command(BaseCommand):
         else:
             # Непрерывный цикл
             self.stdout.write(
-                "🚀 Запуск keepalive сервиса с интервалом {options['interval']} секунд")
+                "🚀 Запуск keepalive сервиса с интервалом {options['interval']} секунд"
+            )
             self.stdout.write("Нажмите Ctrl+C для остановки")
 
             try:
-                keepalive.run_keepalive_cycle(options['interval'])
+                keepalive.run_keepalive_cycle(options["interval"])
             except KeyboardInterrupt:
-                self.stdout.write(self.style.WARNING(
-                    "Keepalive сервис остановлен"))  # type: ignore
+                self.stdout.write(
+                    self.style.WARNING("Keepalive сервис остановлен")
+                )  # type: ignore

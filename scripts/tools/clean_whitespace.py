@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+
 def ensure_two_blank_lines_before_toplevel(code: str) -> str:
     lines = code.splitlines()
     output: list[str] = []
@@ -31,6 +32,7 @@ def ensure_two_blank_lines_before_toplevel(code: str) -> str:
         text += "\n"
     return text
 
+
 def main() -> None:
     base = Path(__file__).resolve().parents[1] / "scripts"
     changed = []
@@ -49,6 +51,7 @@ def main() -> None:
             print(" -", c)
     else:
         print("no changes")
+
 
 if __name__ == "__main__":
     main()

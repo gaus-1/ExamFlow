@@ -4,28 +4,31 @@
 """
 
 import json
+import logging
 import threading
-from django.http import JsonResponse, HttpResponse
+
+from django.core.management import call_command
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.core.management import call_command
-from django.shortcuts import render
-import logging
 
 logger = logging.getLogger(__name__)
 
 # Глобальные переменные для отслеживания статуса
 _parsing_status = {
-    'running': False,
-    'progress': 0,
-    'message': 'Готов к запуску',
-    'last_update': None
+    "running": False,
+    "progress": 0,
+    "message": "Готов к запуску",
+    "last_update": None,
 }
+
 
 def admin_panel(request):
     """Административная панель управления"""
     try:
         from learning.models import Subject, Task
+
         subjects_count = Subject.objects.count()  # type: ignore
     except Exception:
         subjects_count = 0
@@ -36,12 +39,13 @@ def admin_panel(request):
         tasks_count = 0
 
     context = {
-        'subjects_count': subjects_count,
-        'tasks_count': tasks_count,
-        'parsing_status': _parsing_status,
+        "subjects_count": subjects_count,
+        "tasks_count": tasks_count,
+        "parsing_status": _parsing_status,
     }
 
-    return render(request, 'admin/parsing_panel.html', context)
+    return render(request, "admin/parsing_panel.html", context)
+
 
 @csrf_exempt
 @require_POST
@@ -49,116 +53,110 @@ def start_parsing(request):
     """API для запуска парсинга через веб-интерфейс"""
     global _parsing_status
 
-    if _parsing_status['running']:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Парсинг уже выполняется'
-        })
+    if _parsing_status["running"]:
+        return JsonResponse({"status": "error", "message": "Парсинг уже выполняется"})
 
     # Получаем параметры
-    data = json.loads(request.body.decode('utf-8')) if request.body else {}
-    quick_mode = data.get('quick', True)
-    with_voices = data.get('with_voices', False)
+    data = json.loads(request.body.decode("utf-8")) if request.body else {}
+    quick_mode = data.get("quick", True)
+    with_voices = data.get("with_voices", False)
 
     # Запускаем парсинг в фоновом потоке
     def run_parsing():
         global _parsing_status
 
         try:
-            _parsing_status.update({
-                'running': True,
-                'progress': 0,
-                'message': 'Запуск парсинга...'
-            })
+            _parsing_status.update(
+                {"running": True, "progress": 0, "message": "Запуск парсинга..."}
+            )
 
             logger.info("🚀 Запуск парсинга через веб-интерфейс")
 
             # Шаг 1: Миграции
-            _parsing_status.update({
-                'progress': 10,
-                'message': 'Применение миграций...'
-            })
-            call_command('migrate', verbosity=0)
+            _parsing_status.update(
+                {"progress": 10, "message": "Применение миграций..."}
+            )
+            call_command("migrate", verbosity=0)
 
             # Шаг 2: Базовые данные
-            _parsing_status.update({
-                'progress': 20,
-                'message': 'Загрузка базовых данных...'
-            })
-            call_command('load_sample_data', verbosity=0)
+            _parsing_status.update(
+                {"progress": 20, "message": "Загрузка базовых данных..."}
+            )
+            call_command("load_sample_data", verbosity=0)
 
             # Шаг 3: Парсинг ФИПИ
-            _parsing_status.update({
-                'progress': 30,
-                'message': 'Парсинг ФИПИ ({"быстрый" if quick_mode else "полный"} режим)...'
-            })
+            _parsing_status.update(
+                {
+                    "progress": 30,
+                    "message": 'Парсинг ФИПИ ({"быстрый" if quick_mode else "полный"} режим)...',
+                }
+            )
 
             if quick_mode:
-                call_command('parse_all_fipi', quick=True, verbosity=1)
+                call_command("parse_all_fipi", quick=True, verbosity=1)
             else:
-                call_command('parse_all_fipi', verbosity=1)
+                call_command("parse_all_fipi", verbosity=1)
 
-            _parsing_status.update({
-                'progress': 70,
-                'message': 'Настройка webhook...'
-            })
+            _parsing_status.update({"progress": 70, "message": "Настройка webhook..."})
 
             # Шаг 4: Webhook
             try:
-                call_command('setup_webhook', 'set', verbosity=0)
+                call_command("setup_webhook", "set", verbosity=0)
             except Exception:
                 logger.warning("Ошибка webhook: {str(e)}")
 
             # Шаг 5: Голосовые подсказки (опционально)
             if with_voices:
-                _parsing_status.update({
-                    'progress': 80,
-                    'message': 'Генерация голосовых подсказок...'
-                })
+                _parsing_status.update(
+                    {"progress": 80, "message": "Генерация голосовых подсказок..."}
+                )
                 try:
-                    call_command('generate_voices', limit=50, verbosity=0)
+                    call_command("generate_voices", limit=50, verbosity=0)
                 except Exception:
                     logger.warning("Ошибка генерации голоса: {str(e)}")
 
             # Финиш
             from learning.models import Subject, Task
+
             subjects_count = Subject.objects.count()  # type: ignore
             tasks_count = Task.objects.count()  # type: ignore
 
-            _parsing_status.update({
-                'running': False,
-                'progress': 100,
-                'message': 'Парсинг завершен! {subjects_count} предметов, {tasks_count} заданий'
-            })
+            _parsing_status.update(
+                {
+                    "running": False,
+                    "progress": 100,
+                    "message": "Парсинг завершен! {subjects_count} предметов, {tasks_count} заданий",
+                }
+            )
 
             logger.info(
-                "✅ Парсинг завершен: {subjects_count} предметов, {tasks_count} заданий")
+                "✅ Парсинг завершен: {subjects_count} предметов, {tasks_count} заданий"
+            )
 
         except Exception:
-            _parsing_status.update({
-                'running': False,
-                'progress': 0,
-                'message': 'Ошибка: {str(e)}'
-            })
+            _parsing_status.update(
+                {"running": False, "progress": 0, "message": "Ошибка: {str(e)}"}
+            )
             logger.error("❌ Ошибка парсинга: {str(e)}")
 
     # Запускаем в отдельном потоке
     thread = threading.Thread(target=run_parsing, daemon=True)
     thread.start()
 
-    return JsonResponse({
-        'status': 'success',
-        'message': 'Парсинг запущен в фоновом режиме'
-    })
+    return JsonResponse(
+        {"status": "success", "message": "Парсинг запущен в фоновом режиме"}
+    )
+
 
 def parsing_status(request):
     """API для получения статуса парсинга"""
     return JsonResponse(_parsing_status)
 
+
 @csrf_exempt
 def trigger_parsing(request):
     """Простой endpoint для запуска парсинга одним запросом"""
-    if request.method == 'GET':
+    if request.method == "GET":
         # Показываем простую форму
         html_content = """
         <!DOCTYPE html>
@@ -240,8 +238,8 @@ def trigger_parsing(request):
         </html>
         """
         return HttpResponse(
-            html_content.encode('utf-8'),
-            content_type='text/html; charset=utf-8')
+            html_content.encode("utf-8"), content_type="text/html; charset=utf-8"
+        )
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         return start_parsing(request)

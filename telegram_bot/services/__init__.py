@@ -3,12 +3,8 @@
 Применяют принципы SOLID для разделения ответственности
 """
 
-from .user_service import UserService
 from .ai_service import AIService
 from .progress_service import ProgressService
+from .user_service import UserService
 
-__all__ = [
-    'UserService',
-    'AIService', 
-    'ProgressService'
-]
+__all__ = ["UserService", "AIService", "ProgressService"]

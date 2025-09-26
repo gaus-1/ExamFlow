@@ -4,19 +4,22 @@
 Проверяет заголовки, SSL, зависимости и настройки
 """
 
-import requests
 import subprocess
 import sys
 from pathlib import Path
 
+import requests
+
+
 # Цвета для вывода
 class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+
 
 def print_status(message, status="INFO"):
     """Выводит сообщение с цветом в зависимости от статуса"""
@@ -30,6 +33,7 @@ def print_status(message, status="INFO"):
         print("{Colors.BLUE}ℹ️  {message}{Colors.ENDC}")
     else:
         print("{message}")
+
 
 def check_ssl_certificate(url):
     """Проверяет SSL сертификат"""
@@ -48,6 +52,7 @@ def check_ssl_certificate(url):
         print_status("Ошибка проверки SSL: {e}", "ERROR")
         return False
 
+
 def check_security_headers(url):
     """Проверяет заголовки безопасности"""
     try:
@@ -55,15 +60,15 @@ def check_security_headers(url):
         headers = response.headers
 
         security_headers = {
-            'Strict-Transport-Security': 'HSTS',
-            'Content-Security-Policy': 'CSP',
-            'X-Content-Type-Options': 'X-Content-Type-Options',
-            'X-Frame-Options': 'X-Frame-Options',
-            'X-XSS-Protection': 'X-XSS-Protection',
-            'Referrer-Policy': 'Referrer-Policy',
-            'Permissions-Policy': 'Permissions-Policy',
-            'Cross-Origin-Opener-Policy': 'COOP',
-            'Cross-Origin-Embedder-Policy': 'COEP'
+            "Strict-Transport-Security": "HSTS",
+            "Content-Security-Policy": "CSP",
+            "X-Content-Type-Options": "X-Content-Type-Options",
+            "X-Frame-Options": "X-Frame-Options",
+            "X-XSS-Protection": "X-XSS-Protection",
+            "Referrer-Policy": "Referrer-Policy",
+            "Permissions-Policy": "Permissions-Policy",
+            "Cross-Origin-Opener-Policy": "COOP",
+            "Cross-Origin-Embedder-Policy": "COEP",
         }
 
         print_status("Проверка заголовков безопасности:", "INFO")
@@ -78,6 +83,7 @@ def check_security_headers(url):
         print_status("Ошибка проверки заголовков: {e}", "ERROR")
         return False
 
+
 def check_dependencies():
     """Проверяет зависимости на уязвимости"""
     try:
@@ -85,8 +91,12 @@ def check_dependencies():
 
         # Проверяем наличие safety
         try:
-            subprocess.run([sys.executable, "-m", "safety", "check"],
-                         capture_output=True, text=True, check=True)
+            subprocess.run(
+                [sys.executable, "-m", "safety", "check"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
             print_status("  Safety: проверка завершена", "SUCCESS")
         except subprocess.CalledProcessError:
             print_status("  Safety: найдены уязвимости", "WARNING")
@@ -104,6 +114,7 @@ def check_dependencies():
     except Exception:
         print_status("Ошибка проверки зависимостей: {e}", "ERROR")
         return False
+
 
 def check_django_settings():
     """Проверяет настройки Django на безопасность"""
@@ -123,13 +134,13 @@ def check_django_settings():
             content = settings_file.read_text()
 
             security_settings = [
-                'PERMISSIONS_POLICY',
-                'SECURE_REFERRER_POLICY',
-                'SECURE_CROSS_ORIGIN_OPENER_POLICY',
-                'SECURE_CROSS_ORIGIN_EMBEDDER_POLICY',
-                'SECURE_CONTENT_TYPE_NOSNIFF',
-                'SECURE_BROWSER_XSS_FILTER',
-                'X_FRAME_OPTIONS'
+                "PERMISSIONS_POLICY",
+                "SECURE_REFERRER_POLICY",
+                "SECURE_CROSS_ORIGIN_OPENER_POLICY",
+                "SECURE_CROSS_ORIGIN_EMBEDDER_POLICY",
+                "SECURE_CONTENT_TYPE_NOSNIFF",
+                "SECURE_BROWSER_XSS_FILTER",
+                "X_FRAME_OPTIONS",
             ]
 
             for setting in security_settings:
@@ -143,6 +154,7 @@ def check_django_settings():
         print_status("Ошибка проверки настроек Django: {e}", "ERROR")
         return False
 
+
 def check_telegram_bot():
     """Проверяет безопасность Telegram бота"""
     try:
@@ -151,7 +163,7 @@ def check_telegram_bot():
         bot_files = [
             "telegram_bot/bot_main.py",
             "telegram_bot/views.py",
-            "telegram_bot/bot_handlers.py"
+            "telegram_bot/bot_handlers.py",
         ]
 
         for file_path in bot_files:
@@ -161,10 +173,10 @@ def check_telegram_bot():
 
                 # Проверяем наличие проверок безопасности
                 security_checks = [
-                    'verify_webhook',
-                    'is_allowed_ip',
-                    'rate_limit',
-                    'input_validation'
+                    "verify_webhook",
+                    "is_allowed_ip",
+                    "rate_limit",
+                    "input_validation",
                 ]
 
                 for check in security_checks:
@@ -180,66 +192,73 @@ def check_telegram_bot():
         print_status("Ошибка проверки Telegram бота: {e}", "ERROR")
         return False
 
+
 def main():
     """Основная функция проверки"""
     print("{Colors.BOLD}🔒 ПРОВЕРКА БЕЗОПАСНОСТИ EXAMFLOW{Colors.ENDC}")
     print("=" * 50)
 
     # URL для проверки
-    urls = [
-        "https://examflow.ru",
-        "https://www.examflow.ru"
-    ]
+    urls = ["https://examflow.ru", "https://www.examflow.ru"]
 
     results = {
-        'ssl': [],
-        'headers': [],
-        'dependencies': False,
-        'django': False,
-        'telegram_bot': False
+        "ssl": [],
+        "headers": [],
+        "dependencies": False,
+        "django": False,
+        "telegram_bot": False,
     }
 
     # Проверяем SSL и заголовки для каждого URL
     for url in urls:
         print("\n{Colors.BOLD}Проверка {url}:{Colors.ENDC}")
-        results['ssl'].append(check_ssl_certificate(url))
-        results['headers'].append(check_security_headers(url))
+        results["ssl"].append(check_ssl_certificate(url))
+        results["headers"].append(check_security_headers(url))
 
     # Проверяем зависимости и настройки
     print("\n{Colors.BOLD}Проверка зависимостей и настроек:{Colors.ENDC}")
-    results['dependencies'] = check_dependencies()
-    results['django'] = check_django_settings()
-    results['telegram_bot'] = check_telegram_bot()
+    results["dependencies"] = check_dependencies()
+    results["django"] = check_django_settings()
+    results["telegram_bot"] = check_telegram_bot()
 
     # Итоговая оценка
     print("\n{Colors.BOLD}ИТОГОВАЯ ОЦЕНКА БЕЗОПАСНОСТИ:{Colors.ENDC}")
     print("=" * 50)
 
-    total_checks = len(results['ssl']) + len(results['headers']) + 3
-    passed_checks = sum(results['ssl']) + sum(results['headers']) + sum([
-        results['dependencies'], results['django'], results['telegram_bot']
-    ])
+    total_checks = len(results["ssl"]) + len(results["headers"]) + 3
+    passed_checks = (
+        sum(results["ssl"])
+        + sum(results["headers"])
+        + sum([results["dependencies"], results["django"], results["telegram_bot"]])
+    )
 
     security_score = (passed_checks / total_checks) * 100
 
     if security_score >= 90:
-        print_status("Общий балл безопасности: {security_score:.1f}% - ОТЛИЧНО", "SUCCESS")
+        print_status(
+            "Общий балл безопасности: {security_score:.1f}% - ОТЛИЧНО", "SUCCESS"
+        )
     elif security_score >= 70:
-        print_status("Общий балл безопасности: {security_score:.1f}% - ХОРОШО", "WARNING")
+        print_status(
+            "Общий балл безопасности: {security_score:.1f}% - ХОРОШО", "WARNING"
+        )
     else:
-        print_status("Общий балл безопасности: {security_score:.1f}% - ТРЕБУЕТ ВНИМАНИЯ", "ERROR")
+        print_status(
+            "Общий балл безопасности: {security_score:.1f}% - ТРЕБУЕТ ВНИМАНИЯ", "ERROR"
+        )
 
     print("\n{Colors.BOLD}Рекомендации:{Colors.ENDC}")
-    if not all(results['ssl']):
+    if not all(results["ssl"]):
         print_status("  Исправить SSL сертификаты", "ERROR")
-    if not all(results['headers']):
+    if not all(results["headers"]):
         print_status("  Добавить недостающие заголовки безопасности", "WARNING")
-    if not results['dependencies']:
+    if not results["dependencies"]:
         print_status("  Проверить зависимости на уязвимости", "WARNING")
-    if not results['django']:
+    if not results["django"]:
         print_status("  Настроить безопасность Django", "WARNING")
-    if not results['telegram_bot']:
+    if not results["telegram_bot"]:
         print_status("  Улучшить безопасность Telegram бота", "WARNING")
+
 
 if __name__ == "__main__":
     main()

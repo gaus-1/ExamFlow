@@ -3,20 +3,24 @@
 Главный скрипт для запуска всех оптимизаций ExamFlow
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
+
 
 def print_banner():
     """Выводит баннер"""
-    print("""
+    print(
+        """
 ╔══════════════════════════════════════════════════════════════╗
 ║                    🚀 EXAMFLOW OPTIMIZATION                 ║
 ║                                                              ║
 ║  Комплексная оптимизация производительности, безопасности   ║
 ║  и качества кода для ExamFlow 2.0                           ║
 ╚══════════════════════════════════════════════════════════════╝
-""")
+"""
+    )
+
 
 def check_requirements():
     """Проверяет требования"""
@@ -30,17 +34,19 @@ def check_requirements():
     # Проверяем Django
     try:
         import django
+
         print("✅ Django {django.get_version()}")
     except ImportError:
         print("❌ Django не установлен")
         sys.exit(1)
 
     # Проверяем наличие manage.py
-    if not Path('manage.py').exists():
+    if not Path("manage.py").exists():
         print("❌ manage.py не найден. Запустите из корня проекта")
         sys.exit(1)
 
     print("✅ Все требования выполнены")
+
 
 def run_optimization_script(script_name: str, description: str):
     """Запускает скрипт оптимизации"""
@@ -48,14 +54,18 @@ def run_optimization_script(script_name: str, description: str):
     print("🔄 {description}")
     print("{'='*60}")
 
-    script_path = Path('scripts/{script_name}')
+    script_path = Path("scripts/{script_name}")
     if not script_path.exists():
         print("❌ Скрипт {script_name} не найден")
         return False
 
     try:
-        result = subprocess.run([sys.executable, str(script_path)],
-                              capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            [sys.executable, str(script_path)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         print(result.stdout)
         if result.stderr:
             print("⚠️ Предупреждения: {result.stderr}")
@@ -66,11 +76,12 @@ def run_optimization_script(script_name: str, description: str):
         print("Ошибки: {e.stderr}")
         return False
 
+
 def create_optimization_summary():
     """Создает сводку оптимизаций"""
     print("\n📊 Создаем сводку оптимизаций...")
 
-    summary_content = '''# 📊 СВОДКА ОПТИМИЗАЦИЙ EXAMFLOW 2.0
+    summary_content = """# 📊 СВОДКА ОПТИМИЗАЦИЙ EXAMFLOW 2.0
 
 ## ✅ ВЫПОЛНЕННЫЕ ОПТИМИЗАЦИИ
 
@@ -170,12 +181,13 @@ def create_optimization_summary():
 
 ---
 *Сгенерировано автоматически системой оптимизации ExamFlow 2.0*
-'''
+"""
 
-    with open('OPTIMIZATION_SUMMARY.md', 'w', encoding='utf-8') as f:
+    with open("OPTIMIZATION_SUMMARY.md", "w", encoding="utf-8") as f:
         f.write(summary_content)
 
     print("✅ Сводка создана: OPTIMIZATION_SUMMARY.md")
+
 
 def main():
     """Основная функция"""
@@ -185,11 +197,10 @@ def main():
     check_requirements()
 
     # Создаем директорию для скриптов если её нет
-    Path('scripts').mkdir(exist_ok=True)
+    Path("scripts").mkdir(exist_ok=True)
 
     # Список оптимизаций
-    optimizations = [
-    ]
+    optimizations = []
 
     success_count = 0
     total_count = len(optimizations)
@@ -223,6 +234,7 @@ def main():
     print("2. Запустите: python manage.py collectstatic")
     print("3. Запустите: python manage.py test")
     print("4. Проверьте сайт: python manage.py runserver")
+
 
 if __name__ == "__main__":
     main()

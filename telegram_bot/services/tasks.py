@@ -1,25 +1,51 @@
 from __future__ import annotations
 
 from typing import Any
+
 from core.container import Container
 
 try:
     from telegram_bot.bot_handlers import (
-        db_get_all_subjects_with_tasks as _db_get_all_subjects_with_tasks,  # type: ignore
-        db_get_subject_ids as _db_get_subject_ids,  # type: ignore
-        db_get_subjects_by_ids as _db_get_subjects_by_ids,  # type: ignore
         db_count_tasks_for_subject as _db_count_tasks_for_subject,  # type: ignore
-        db_get_tasks_by_subject as _db_get_tasks_by_subject,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_all_subjects_with_tasks as _db_get_all_subjects_with_tasks,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         db_get_all_tasks as _db_get_all_tasks,  # type: ignore
-        db_get_subject_name_for_task as _db_get_subject_name_for_task,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         db_get_subject_by_id as _db_get_subject_by_id,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_subject_ids as _db_get_subject_ids,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         db_get_subject_name as _db_get_subject_name,  # type: ignore
-        db_set_current_task_id as _db_set_current_task_id,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_subject_name_for_task as _db_get_subject_name_for_task,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_subjects_by_ids as _db_get_subjects_by_ids,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         db_get_task_by_id as _db_get_task_by_id,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_tasks_by_subject as _db_get_tasks_by_subject,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_set_current_task_id as _db_set_current_task_id,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         get_current_task_id as _get_current_task_id,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         set_current_task_id as _set_current_task_id,  # type: ignore
     )
 except Exception:
+
     def _db_get_all_subjects_with_tasks():  # type: ignore
         return []
 
@@ -39,13 +65,13 @@ except Exception:
         return []
 
     def _db_get_subject_name_for_task(task):  # type: ignore
-        return ''
+        return ""
 
     def _db_get_subject_by_id(subject_id: int):  # type: ignore
         return None
 
     def _db_get_subject_name(subject_id: int) -> str:  # type: ignore
-        return ''
+        return ""
 
     def _db_set_current_task_id(user, task_id: int):  # type: ignore
         return None

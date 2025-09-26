@@ -8,24 +8,27 @@
 - Мониторинг системы
 """
 
-from django.shortcuts import render
+import json
+from datetime import timedelta
+
 from django.contrib.auth.decorators import user_passes_test
-from django.http import JsonResponse
 from django.db.models import Count, Q
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-import json
-from datetime import timedelta
-from learning.models import (
-    Subject, Task, UserProgress, UserRating
-)
+
 from core.models import UnifiedProfile
+from learning.models import Subject, Task, UserProgress, UserRating
+
 # Subscription model removed - using UnifiedProfile.is_premium instead
+
 
 def is_staff_or_superuser(user):
     """Проверяет, является ли пользователь администратором"""
     return user.is_staff or user.is_superuser
+
 
 @user_passes_test(is_staff_or_superuser)
 def dashboard(request):
@@ -39,18 +42,22 @@ def dashboard(request):
     - Конверсия подписок
     """
     # Общая статистика
-    total_users = User.objects.count() # type: ignore
+    total_users = User.objects.count()  # type: ignore
     total_tasks = Task.objects.count()  # type: ignore
     total_attempts = UserProgress.objects.count()  # type: ignore
-    active_users_today = User.objects.filter( # type: ignore
+    active_users_today = User.objects.filter(  # type: ignore
         last_login__date=timezone.now().date()
     ).count()
 
     # Статистика по предметам
-    subjects_stats = Subject.objects.annotate(  # type: ignore
-        tasks_count=Count('topics__tasks'),
-        attempts_count=Count('topics__tasks__userprogress')
-    ).filter(tasks_count__gt=0).order_by('-attempts_count')[:10]
+    subjects_stats = (
+        Subject.objects.annotate(  # type: ignore
+            tasks_count=Count("topics__tasks"),
+            attempts_count=Count("topics__tasks__userprogress"),
+        )
+        .filter(tasks_count__gt=0)
+        .order_by("-attempts_count")[:10]
+    )
 
     # Активность за последние 7 дней
     week_ago = timezone.now() - timedelta(days=7)
@@ -60,34 +67,35 @@ def dashboard(request):
         attempts = UserProgress.objects.filter(  # type: ignore
             created_at__date=date.date()
         ).count()
-        daily_activity.append({
-            'date': date.strftime('%Y-%m-%d'),
-            'attempts': attempts
-        })
+        daily_activity.append({"date": date.strftime("%Y-%m-%d"), "attempts": attempts})
 
     # Топ пользователи
-    top_users = UserRating.objects.select_related( # type: ignore
-        'user').order_by('-total_points')[:10]  # type: ignore
+    top_users = UserRating.objects.select_related("user").order_by(  # type: ignore
+        "-total_points"
+    )[
+        :10
+    ]  # type: ignore
 
     # Статистика подписок (используем UnifiedProfile.is_premium)
     subscriptions_stats = {
-        'total': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
-        'active': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
-        'expired': 0  # Пока не отслеживаем истечение подписок
+        "total": UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+        "active": UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+        "expired": 0,  # Пока не отслеживаем истечение подписок
     }
 
     context = {
-        'total_users': total_users,
-        'total_tasks': total_tasks,
-        'total_attempts': total_attempts,
-        'active_users_today': active_users_today,
-        'subjects_stats': subjects_stats,
-        'daily_activity': daily_activity,
-        'top_users': top_users,
-        'subscriptions_stats': subscriptions_stats,
+        "total_users": total_users,
+        "total_tasks": total_tasks,
+        "total_attempts": total_attempts,
+        "active_users_today": active_users_today,
+        "subjects_stats": subjects_stats,
+        "daily_activity": daily_activity,
+        "top_users": top_users,
+        "subscriptions_stats": subscriptions_stats,
     }
 
-    return render(request, 'analytics/dashboard.html', context)
+    return render(request, "analytics/dashboard.html", context)
+
 
 @user_passes_test(is_staff_or_superuser)
 def users_analytics(request):
@@ -105,56 +113,54 @@ def users_analytics(request):
     registrations = []
     for i in range(30):
         date = month_ago + timedelta(days=i)
-        count = User.objects.filter( # type: ignore
+        count = User.objects.filter(  # type: ignore
             date_joined__date=date.date()
         ).count()
-        registrations.append({
-            'date': date.strftime('%Y-%m-%d'),
-            'count': count
-        })
+        registrations.append({"date": date.strftime("%Y-%m-%d"), "count": count})
 
     # Активность пользователей
-    users_activity = User.objects.annotate( # type: ignore
-        attempts_count=Count('userprogress'),
-        correct_count=Count('userprogress', filter=Q(userprogress__is_correct=True)),
+    users_activity = User.objects.annotate(  # type: ignore
+        attempts_count=Count("userprogress"),
+        correct_count=Count("userprogress", filter=Q(userprogress__is_correct=True)),
     ).filter(attempts_count__gt=0)
 
     # Распределение по точности
     accuracy_distribution = {
-        '0-20%': 0,
-        '21-40%': 0,
-        '41-60%': 0,
-        '61-80%': 0,
-        '81-100%': 0
+        "0-20%": 0,
+        "21-40%": 0,
+        "41-60%": 0,
+        "61-80%": 0,
+        "81-100%": 0,
     }
 
     for user in users_activity:
         if user.attempts_count > 0:
             accuracy = (user.correct_count / user.attempts_count) * 100
             if accuracy <= 20:
-                accuracy_distribution['0-20%'] += 1
+                accuracy_distribution["0-20%"] += 1
             elif accuracy <= 40:
-                accuracy_distribution['21-40%'] += 1
+                accuracy_distribution["21-40%"] += 1
             elif accuracy <= 60:
-                accuracy_distribution['41-60%'] += 1
+                accuracy_distribution["41-60%"] += 1
             elif accuracy <= 80:
-                accuracy_distribution['61-80%'] += 1
+                accuracy_distribution["61-80%"] += 1
             else:
-                accuracy_distribution['81-100%'] += 1
+                accuracy_distribution["81-100%"] += 1
 
     # Telegram vs Web пользователи
-    telegram_users = User.objects.filter(username__startswith='tg_').count() # type: ignore
-    web_users = User.objects.exclude(username__startswith='tg_').count() # type: ignore
+    telegram_users = User.objects.filter(username__startswith="tg_").count()  # type: ignore
+    web_users = User.objects.exclude(username__startswith="tg_").count()  # type: ignore
 
     context = {
-        'registrations': registrations,
-        'total_active_users': users_activity.count(),
-        'accuracy_distribution': accuracy_distribution,
-        'telegram_users': telegram_users,
-        'web_users': web_users,
+        "registrations": registrations,
+        "total_active_users": users_activity.count(),
+        "accuracy_distribution": accuracy_distribution,
+        "telegram_users": telegram_users,
+        "web_users": web_users,
     }
 
-    return render(request, 'analytics/users.html', context)
+    return render(request, "analytics/users.html", context)
+
 
 @user_passes_test(is_staff_or_superuser)
 def tasks_analytics(request):
@@ -169,8 +175,8 @@ def tasks_analytics(request):
     """
     # Статистика по заданиям
     tasks_stats = Task.objects.annotate(  # type: ignore
-        attempts_count=Count('userprogress'),
-        correct_count=Count('userprogress', filter=Q(userprogress__is_correct=True))
+        attempts_count=Count("userprogress"),
+        correct_count=Count("userprogress", filter=Q(userprogress__is_correct=True)),
     ).filter(attempts_count__gt=0)
 
     # Самые сложные задания (низкий процент правильных ответов)
@@ -178,16 +184,18 @@ def tasks_analytics(request):
     for task in tasks_stats:
         if task.attempts_count >= 5:  # Минимум 5 попыток для статистики
             success_rate = (task.correct_count / task.attempts_count) * 100
-            difficult_tasks.append({
-                'task': task,
-                'success_rate': round(success_rate, 1),
-                'attempts': task.attempts_count
-            })
+            difficult_tasks.append(
+                {
+                    "task": task,
+                    "success_rate": round(success_rate, 1),
+                    "attempts": task.attempts_count,
+                }
+            )
 
-    difficult_tasks = sorted(difficult_tasks, key=lambda x: x['success_rate'])[:10]
+    difficult_tasks = sorted(difficult_tasks, key=lambda x: x["success_rate"])[:10]
 
     # Популярные задания
-    popular_tasks = tasks_stats.order_by('-attempts_count')[:10]
+    popular_tasks = tasks_stats.order_by("-attempts_count")[:10]
 
     # Статистика по предметам
     subjects_performance = []
@@ -198,31 +206,34 @@ def tasks_analytics(request):
 
         if subject_attempts > 0:
             subject_correct = UserProgress.objects.filter(  # type: ignore
-                task__topic__subject=subject,
-                is_correct=True
+                task__topic__subject=subject, is_correct=True
             ).count()
 
-            subjects_performance.append({
-                'subject': subject,
-                'attempts': subject_attempts,
-                'correct': subject_correct,
-                'success_rate': round((subject_correct / subject_attempts) * 100, 1)
-            })
+            subjects_performance.append(
+                {
+                    "subject": subject,
+                    "attempts": subject_attempts,
+                    "correct": subject_correct,
+                    "success_rate": round(
+                        (subject_correct / subject_attempts) * 100, 1
+                    ),
+                }
+            )
 
     subjects_performance = sorted(
-        subjects_performance,
-        key=lambda x: x['attempts'],
-        reverse=True)
+        subjects_performance, key=lambda x: x["attempts"], reverse=True
+    )
 
     context = {
-        'total_tasks': Task.objects.count(),  # type: ignore
-        'tasks_with_attempts': tasks_stats.count(),
-        'difficult_tasks': difficult_tasks,
-        'popular_tasks': popular_tasks,
-        'subjects_performance': subjects_performance,
+        "total_tasks": Task.objects.count(),  # type: ignore
+        "tasks_with_attempts": tasks_stats.count(),
+        "difficult_tasks": difficult_tasks,
+        "popular_tasks": popular_tasks,
+        "subjects_performance": subjects_performance,
     }
 
-    return render(request, 'analytics/tasks.html', context)
+    return render(request, "analytics/tasks.html", context)
+
 
 def api_stats(request):
     """
@@ -231,34 +242,37 @@ def api_stats(request):
     Возвращает основные метрики для внешних интеграций
     """
     stats = {
-        'users': {
-            'total': User.objects.count(), # type: ignore
-            'active_today': User.objects.filter( # type: ignore
+        "users": {
+            "total": User.objects.count(),  # type: ignore
+            "active_today": User.objects.filter(  # type: ignore
                 last_login__date=timezone.now().date()
             ).count(),
-            'telegram': User.objects.filter(username__startswith='tg_').count(), # type: ignore
-            'web': User.objects.exclude(username__startswith='tg_').count(), # type: ignore
+            "telegram": User.objects.filter(username__startswith="tg_").count(),  # type: ignore
+            "web": User.objects.exclude(username__startswith="tg_").count(),  # type: ignore
         },
-        'tasks': {
-            'total': Task.objects.count(),  # type: ignore
-            'attempts_today': UserProgress.objects.filter(  # type: ignore
+        "tasks": {
+            "total": Task.objects.count(),  # type: ignore
+            "attempts_today": UserProgress.objects.filter(  # type: ignore
                 created_at__date=timezone.now().date()
             ).count(),
-            'total_attempts': UserProgress.objects.count(),  # type: ignore
+            "total_attempts": UserProgress.objects.count(),  # type: ignore
         },
-        'subjects': {
-            'total': Subject.objects.count(),  # type: ignore
-            'with_tasks': Subject.objects.annotate(  # type: ignore
-                tasks_count=Count('topics__tasks')
-            ).filter(tasks_count__gt=0).count(),
+        "subjects": {
+            "total": Subject.objects.count(),  # type: ignore
+            "with_tasks": Subject.objects.annotate(  # type: ignore
+                tasks_count=Count("topics__tasks")
+            )
+            .filter(tasks_count__gt=0)
+            .count(),
         },
-        'subscriptions': {
-            'total': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
-            'active': UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
-        }
+        "subscriptions": {
+            "total": UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+            "active": UnifiedProfile.objects.filter(is_premium=True).count(),  # type: ignore
+        },
     }
 
     return JsonResponse(stats)
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -278,21 +292,19 @@ def update_user_profile(request):
         # Пока просто возвращаем успех
 
         response_data = {
-            'status': 'success',
-            'message': 'Профиль пользователя обновлен',
-            'timestamp': timezone.now().isoformat(),
-            'received_data': data
+            "status": "success",
+            "message": "Профиль пользователя обновлен",
+            "timestamp": timezone.now().isoformat(),
+            "received_data": data,
         }
 
         return JsonResponse(response_data, status=200)
 
     except json.JSONDecodeError:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Неверный формат JSON'
-        }, status=400)
+        return JsonResponse(
+            {"status": "error", "message": "Неверный формат JSON"}, status=400
+        )
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': f'Ошибка сервера: {str(e)}'
-        }, status=500)
+        return JsonResponse(
+            {"status": "error", "message": f"Ошибка сервера: {str(e)}"}, status=500
+        )

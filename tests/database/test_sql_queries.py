@@ -2,13 +2,15 @@
 Тесты SQL запросов для PostgreSQL
 """
 
+import logging
+
 import pytest
-from django.test import TransactionTestCase
-from django.db import connection, transaction
 from django.contrib.auth import get_user_model
+from django.db import connection, transaction
+from django.test import TransactionTestCase
+
 from learning.models import Subject, Task, UserProgress
 from telegram_auth.models import TelegramUser
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -19,60 +21,59 @@ User = get_user_model()
 @pytest.mark.sql
 class TestSQLQueries(TransactionTestCase):
     """Тесты SQL запросов и оптимизации"""
-    
+
     def setUp(self):
         """Настройка тестовых данных"""
         # Создаем тестовых пользователей
         self.user1 = TelegramUser.objects.create(
             telegram_id=11111,
-            username='testuser1',
-            first_name='Test1',
-            last_name='User1'
+            username="testuser1",
+            first_name="Test1",
+            last_name="User1",
         )
-        
+
         self.user2 = TelegramUser.objects.create(
             telegram_id=22222,
-            username='testuser2',
-            first_name='Test2',
-            last_name='User2'
+            username="testuser2",
+            first_name="Test2",
+            last_name="User2",
         )
-        
+
         # Используем существующий предмет или создаем без exam_type
-        self.math_subject, created = Subject.objects.get_or_create( # type: ignore
-            name='Математика',
-            defaults={'code': 'MATH'}
+        self.math_subject, created = Subject.objects.get_or_create(  # type: ignore
+            name="Математика", defaults={"code": "MATH"}
         )
-        
-        self.russian_subject, created = Subject.objects.get_or_create( # type: ignore
-            name='Русский язык',
-            defaults={'code': 'RUS'}
+
+        self.russian_subject, created = Subject.objects.get_or_create(  # type: ignore
+            name="Русский язык", defaults={"code": "RUS"}
         )
-        
+
         # Создаем задания
         self.tasks = []
         for i in range(20):
-            task = Task.objects.create( # type: ignore
-                title=f'Задание {i+1}',
-                description=f'Содержание задания {i+1}',
-                answer=f'Ответ {i+1}',
+            task = Task.objects.create(  # type: ignore
+                title=f"Задание {i+1}",
+                description=f"Содержание задания {i+1}",
+                answer=f"Ответ {i+1}",
                 subject=self.math_subject if i % 2 == 0 else self.russian_subject,
-                difficulty=i % 3 + 1
+                difficulty=i % 3 + 1,
             )
             self.tasks.append(task)
-        
+
         # Создаем прогресс пользователей
         for i, task in enumerate(self.tasks[:10]):
-            UserProgress.objects.create( # type: ignore
+            UserProgress.objects.create(  # type: ignore
                 user=self.user1,
                 task=task,
                 is_completed=i % 2 == 0,
-                user_answer=f'Ответ пользователя {i+1}'
+                user_answer=f"Ответ пользователя {i+1}",
             )
-    
+
     def test_subject_statistics_query(self):
         """Тест запроса статистики по предметам"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     s.name,
                     s.exam_type,
@@ -82,23 +83,25 @@ class TestSQLQueries(TransactionTestCase):
                 LEFT JOIN learning_task t ON s.id = t.subject_id
                 GROUP BY s.id, s.name, s.exam_type
                 ORDER BY task_count DESC
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 2  # Два предмета
-            
+
             # Проверяем, что математика имеет больше заданий
-            math_result = next(r for r in results if r[0] == 'Математика')
-            russian_result = next(r for r in results if r[0] == 'Русский язык')
-            
+            math_result = next(r for r in results if r[0] == "Математика")
+            russian_result = next(r for r in results if r[0] == "Русский язык")
+
             assert math_result[2] == 10  # 10 заданий по математике
             assert russian_result[2] == 10  # 10 заданий по русскому
-    
+
     def test_user_progress_analytics(self):
         """Тест аналитики прогресса пользователей"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     u.username,
                     COUNT(up.id) as total_tasks,
@@ -112,22 +115,24 @@ class TestSQLQueries(TransactionTestCase):
                 GROUP BY u.id, u.username
                 HAVING COUNT(up.id) > 0
                 ORDER BY completion_rate DESC
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 1  # Только один пользователь с прогрессом
             username, total, completed, rate = results[0]
-            
-            assert username == 'testuser1'
+
+            assert username == "testuser1"
             assert total == 10
             assert completed == 5  # Половина заданий выполнена
             assert rate == 50.0
-    
+
     def test_difficulty_distribution(self):
         """Тест распределения заданий по сложности"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     difficulty,
                     COUNT(*) as count,
@@ -135,20 +140,22 @@ class TestSQLQueries(TransactionTestCase):
                 FROM learning_task
                 GROUP BY difficulty
                 ORDER BY difficulty
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 3  # Три уровня сложности
-            
+
             # Проверяем, что все уровни представлены
             difficulties = [r[0] for r in results]
             assert set(difficulties) == {1, 2, 3}
-    
+
     def test_task_search_query(self):
         """Тест поискового запроса по заданиям"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     t.id,
                     t.title,
@@ -163,17 +170,20 @@ class TestSQLQueries(TransactionTestCase):
                     s.name ILIKE %s
                 ORDER BY t.difficulty, t.id
                 LIMIT 10
-            """, ['%задание%', '%задание%', '%математика%'])
-            
+            """,
+                ["%задание%", "%задание%", "%математика%"],
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) > 0
-            assert all('задание' in str(r[1]).lower() for r in results)
-    
+            assert all("задание" in str(r[1]).lower() for r in results)
+
     def test_user_activity_query(self):
         """Тест запроса активности пользователей"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     u.username,
                     u.date_joined,
@@ -184,21 +194,23 @@ class TestSQLQueries(TransactionTestCase):
                 LEFT JOIN learning_userprogress up ON u.id = up.user_id
                 GROUP BY u.id, u.username, u.date_joined
                 ORDER BY last_activity DESC NULLS LAST
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 2  # Два пользователя
-            
+
             # Проверяем, что пользователь с активностью идет первым
             active_user = results[0]
-            assert active_user[0] == 'testuser1'  # testuser1
+            assert active_user[0] == "testuser1"  # testuser1
             assert active_user[2] == 10  # 10 попыток
-    
+
     def test_subject_performance_query(self):
         """Тест запроса производительности по предметам"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     s.name,
                     s.exam_type,
@@ -214,21 +226,23 @@ class TestSQLQueries(TransactionTestCase):
                 LEFT JOIN learning_userprogress up ON t.id = up.task_id
                 GROUP BY s.id, s.name, s.exam_type
                 ORDER BY success_rate DESC
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 2
-            
+
             # Проверяем, что есть активность по математике
-            math_result = next(r for r in results if r[0] == 'Математика')
+            math_result = next(r for r in results if r[0] == "Математика")
             assert math_result[2] == 1  # 1 активный пользователь
             assert math_result[3] == 5  # 5 попыток по математике
-    
+
     def test_complex_join_query(self):
         """Тест сложного JOIN запроса"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     u.username,
                     s.name as subject_name,
@@ -245,43 +259,48 @@ class TestSQLQueries(TransactionTestCase):
                 LEFT JOIN learning_userprogress up ON u.id = up.user_id AND t.id = up.task_id
                 GROUP BY u.id, u.username, s.id, s.name
                 ORDER BY u.username, s.name
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 4  # 2 пользователя × 2 предмета
-            
+
             # Проверяем, что все комбинации пользователь-предмет присутствуют
             combinations = [(r[0], r[1]) for r in results]
             expected = [
-                ('testuser1', 'Математика'),
-                ('testuser1', 'Русский язык'),
-                ('testuser2', 'Математика'),
-                ('testuser2', 'Русский язык')
+                ("testuser1", "Математика"),
+                ("testuser1", "Русский язык"),
+                ("testuser2", "Математика"),
+                ("testuser2", "Русский язык"),
             ]
-            
+
             for expected_combo in expected:
                 assert expected_combo in combinations
-    
+
     def test_index_usage_query(self):
         """Тест использования индексов"""
         with connection.cursor() as cursor:
             # Проверяем, что запрос использует индексы
-            cursor.execute("EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM learning_task WHERE subject_id = %s", [self.math_subject.id])
-            
+            cursor.execute(
+                "EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM learning_task WHERE subject_id = %s",
+                [self.math_subject.id],
+            )
+
             explain_result = cursor.fetchall()
-            
+
             # Проверяем, что запрос выполнился быстро
             assert len(explain_result) > 0
-            
+
             # Проверяем, что используется индекс (если он есть)
-            explain_text = ' '.join([str(row) for row in explain_result])
+            explain_text = " ".join([str(row) for row in explain_result])
             # В реальном проекте здесь можно проверить наличие "Index Scan" или "Seq Scan"
-    
+
     def test_window_functions(self):
         """Тест оконных функций"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     username,
                     COUNT(up.id) as total_attempts,
@@ -293,21 +312,23 @@ class TestSQLQueries(TransactionTestCase):
                 LEFT JOIN learning_userprogress up ON u.id = up.user_id
                 GROUP BY u.id, u.username
                 ORDER BY total_attempts DESC
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 2
-            
+
             # Проверяем ранжирование
             first_user = results[0]
             assert first_user[2] == 1  # ROW_NUMBER = 1
             assert first_user[3] == 1  # RANK = 1
-    
+
     def test_aggregate_functions(self):
         """Тест агрегатных функций"""
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT 
                     s.name,
                     COUNT(t.id) as task_count,
@@ -319,15 +340,18 @@ class TestSQLQueries(TransactionTestCase):
                 FROM learning_subject s
                 LEFT JOIN learning_task t ON s.id = t.subject_id
                 GROUP BY s.id, s.name
-            """)
-            
+            """
+            )
+
             results = cursor.fetchall()
-            
+
             assert len(results) == 2
-            
+
             for result in results:
-                subject_name, count, min_diff, max_diff, avg_diff, stddev, median = result
-                
+                subject_name, count, min_diff, max_diff, avg_diff, stddev, median = (
+                    result
+                )
+
                 assert count == 10  # 10 заданий на предмет
                 assert min_diff == 1  # Минимальная сложность
                 assert max_diff == 3  # Максимальная сложность
@@ -339,81 +363,81 @@ class TestSQLQueries(TransactionTestCase):
 @pytest.mark.transaction
 class TestDatabaseTransactions(TransactionTestCase):
     """Тесты транзакций базы данных"""
-    
+
     def test_transaction_rollback(self):
         """Тест отката транзакции"""
-        initial_count = Task.objects.count() # type: ignore
-        
+        initial_count = Task.objects.count()  # type: ignore
+
         try:
             with transaction.atomic():
                 # Создаем задание
-                Task.objects.create( # type: ignore
-                    title='Тестовое задание',
-                    description='Содержание',
-                    answer='Ответ',
-                    subject=Subject.objects.first(), # type: ignore
-                    difficulty=1
+                Task.objects.create(  # type: ignore
+                    title="Тестовое задание",
+                    description="Содержание",
+                    answer="Ответ",
+                    subject=Subject.objects.first(),  # type: ignore
+                    difficulty=1,
                 )
-                
+
                 # Проверяем, что задание создано
-                assert Task.objects.count() == initial_count + 1 # type: ignore
-                
+                assert Task.objects.count() == initial_count + 1  # type: ignore
+
                 # Искусственно вызываем ошибку
                 raise Exception("Тестовая ошибка")
-                
+
         except Exception:
             pass
-        
+
         # Проверяем, что транзакция откатилась
-        assert Task.objects.count() == initial_count # type: ignore
-    
+        assert Task.objects.count() == initial_count  # type: ignore
+
     def test_nested_transactions(self):
         """Тест вложенных транзакций"""
-        initial_count = Task.objects.count() # type: ignore
-        
+        initial_count = Task.objects.count()  # type: ignore
+
         with transaction.atomic():
             # Внешняя транзакция
-            task1 = Task.objects.create( # type: ignore
-                title='Задание 1',
-                description='Содержание 1',
-                answer='Ответ 1',
-                subject=Subject.objects.first(), # type: ignore
-                difficulty=1
+            task1 = Task.objects.create(  # type: ignore
+                title="Задание 1",
+                description="Содержание 1",
+                answer="Ответ 1",
+                subject=Subject.objects.first(),  # type: ignore
+                difficulty=1,
             )
-            
+
             try:
                 with transaction.atomic():
                     # Внутренняя транзакция
-                    task2 = Task.objects.create( # type: ignore
-                        title='Задание 2',
-                        description='Содержание 2',
-                        answer='Ответ 2',
-                        subject=Subject.objects.first(), # type: ignore
-                        difficulty=2
+                    task2 = Task.objects.create(  # type: ignore
+                        title="Задание 2",
+                        description="Содержание 2",
+                        answer="Ответ 2",
+                        subject=Subject.objects.first(),  # type: ignore
+                        difficulty=2,
                     )
-                    
+
                     # Искусственно вызываем ошибку во внутренней транзакции
                     raise Exception("Ошибка во внутренней транзакции")
-                    
+
             except Exception:
                 # Внутренняя транзакция откатилась, но внешняя продолжается
                 pass
-            
+
             # Проверяем, что только первое задание создано
-            assert Task.objects.count() == initial_count + 1 # type: ignore
-            assert Task.objects.filter(id=task1.id).exists() # type: ignore
-    
+            assert Task.objects.count() == initial_count + 1  # type: ignore
+            assert Task.objects.filter(id=task1.id).exists()  # type: ignore
+
     def test_select_for_update(self):
         """Тест блокировки строк для обновления"""
-        if not Subject.objects.exists(): # type: ignore
-            Subject.objects.create(name='Тест', code='TEST', exam_type='other') # type: ignore
-        
-        subject = Subject.objects.first() # type: ignore
-        
+        if not Subject.objects.exists():  # type: ignore
+            Subject.objects.create(name="Тест", code="TEST", exam_type="other")  # type: ignore
+
+        subject = Subject.objects.first()  # type: ignore
+
         with transaction.atomic():
             # Блокируем строку для обновления
-            locked_subject = Subject.objects.select_for_update().get(id=subject.id) # type: ignore
-            
+            locked_subject = Subject.objects.select_for_update().get(id=subject.id)  # type: ignore
+
             # В другом потоке это должно заблокироваться
             # В реальном тесте здесь можно использовать threading
             assert locked_subject.id == subject.id

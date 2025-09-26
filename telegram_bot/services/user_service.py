@@ -6,10 +6,11 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Any, Dict
+from typing import Any
+
+from asgiref.sync import sync_to_async
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from asgiref.sync import sync_to_async
 
 from core.models import UnifiedProfile, UserProfile
 from learning.models import UserRating
@@ -29,10 +30,10 @@ class TelegramUserService:
     def get_or_create_user(telegram_user) -> tuple[Any, bool]:
         """
         Получить или создать пользователя Django с профилем.
-        
+
         Args:
             telegram_user: Объект пользователя Telegram
-            
+
         Returns:
             Кортеж (пользователь, создан_ли_новый)
         """
@@ -40,16 +41,15 @@ class TelegramUserService:
             user, created = User.objects.get_or_create(  # type: ignore
                 telegram_id=telegram_user.id,
                 defaults={
-                    'telegram_first_name': telegram_user.first_name or '',
-                    'telegram_last_name': telegram_user.last_name or '',
-                    'telegram_username': telegram_user.username or '',
-                }
+                    "telegram_first_name": telegram_user.first_name or "",
+                    "telegram_last_name": telegram_user.last_name or "",
+                    "telegram_username": telegram_user.username or "",
+                },
             )
 
             # Создаем профиль если нужно
             profile, profile_created = UserProfile.objects.get_or_create(  # type: ignore
-                user=user,
-                defaults={}
+                user=user, defaults={}
             )
 
             # Создаем рейтинг если нужно
@@ -66,13 +66,13 @@ class TelegramUserService:
 
     @staticmethod
     @sync_to_async
-    def get_user_profile(user) -> Optional[Any]:
+    def get_user_profile(user) -> Any | None:
         """
         Получает профиль пользователя.
-        
+
         Args:
             user: Django пользователь
-            
+
         Returns:
             Профиль пользователя или None
         """
@@ -89,7 +89,7 @@ class TelegramUserService:
     def update_user_activity(user) -> None:
         """
         Обновляет время последней активности пользователя.
-        
+
         Args:
             user: Django пользователь
         """
@@ -107,13 +107,13 @@ class TelegramUserService:
 
     @staticmethod
     @sync_to_async
-    def get_user_stats(user) -> Dict[str, Any]:
+    def get_user_stats(user) -> dict[str, Any]:
         """
         Получает статистику пользователя.
-        
+
         Args:
             user: Django пользователь
-            
+
         Returns:
             Словарь со статистикой
         """
@@ -133,19 +133,19 @@ class TelegramUserService:
                 level = 1
 
             return {
-                'progress_count': progress_count,
-                'total_points': points,
-                'level': level,
-                'tasks_solved': progress_count,  # Упрощение
+                "progress_count": progress_count,
+                "total_points": points,
+                "level": level,
+                "tasks_solved": progress_count,  # Упрощение
             }
 
         except Exception as e:
             logger.error(f"Ошибка получения статистики {user.id}: {e}")
             return {
-                'progress_count': 0,
-                'total_points': 0,
-                'level': 1,
-                'tasks_solved': 0,
+                "progress_count": 0,
+                "total_points": 0,
+                "level": 1,
+                "tasks_solved": 0,
             }
 
     @staticmethod
@@ -153,7 +153,7 @@ class TelegramUserService:
     def save_user_progress(user, task, answer: str, is_correct: bool) -> None:
         """
         Сохраняет прогресс пользователя по задаче.
-        
+
         Args:
             user: Django пользователь
             task: Задача
@@ -168,10 +168,10 @@ class TelegramUserService:
                 user=user,
                 task=task,
                 defaults={
-                    'user_answer': answer,
-                    'is_correct': is_correct,
-                    'completed_at': timezone.now(),
-                }
+                    "user_answer": answer,
+                    "is_correct": is_correct,
+                    "completed_at": timezone.now(),
+                },
             )
 
             if not created:
@@ -183,7 +183,9 @@ class TelegramUserService:
 
             # Обновляем рейтинг
             if is_correct:
-                TelegramUserService.update_user_rating(user, 10)  # 10 очков за правильный ответ
+                TelegramUserService.update_user_rating(
+                    user, 10
+                )  # 10 очков за правильный ответ
 
             logger.info(f"Сохранен прогресс пользователя {user.id} по задаче {task.id}")
 
@@ -195,7 +197,7 @@ class TelegramUserService:
     def update_user_rating(user, points: int) -> None:
         """
         Обновляет рейтинг пользователя.
-        
+
         Args:
             user: Django пользователь
             points: Количество очков для добавления

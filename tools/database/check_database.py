@@ -4,14 +4,17 @@
 """
 
 import os
+
 import django
 
 # Настройка Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 django.setup()
 
-from core.models import FIPIData, FIPISourceMap, DataChunk  # noqa: E402
-from authentication.models import UserProfile, Subscription  # noqa: E402
+from authentication.models import Subscription, UserProfile  # noqa: E402
+
+from core.models import DataChunk, FIPIData, FIPISourceMap  # noqa: E402
+
 
 def check_database():
     """Проверяет состояние базы данных"""
@@ -49,6 +52,7 @@ def check_database():
         print("❌ Ошибка при проверке базы данных: {e}")
         return False
 
+
 def check_ingestion_system():
     """Проверяет систему сбора данных"""
     print("\n=== ПРОВЕРКА СИСТЕМЫ СБОРА ===")
@@ -69,6 +73,7 @@ def check_ingestion_system():
         print("❌ Ошибка при проверке системы сбора: {e}")
         return False
 
+
 def check_premium_system():
     """Проверяет систему премиум-доступа"""
     print("\n=== ПРОВЕРКА ПРЕМИУМ-СИСТЕМЫ ===")
@@ -87,6 +92,7 @@ def check_premium_system():
     except Exception:
         print("❌ Ошибка при проверке премиум-системы: {e}")
         return False
+
 
 def main():
     """Основная функция"""
@@ -109,10 +115,13 @@ def main():
         print("\n📝 СЛЕДУЮЩИЕ ШАГИ:")
         print("1. Запустите: python manage.py init_fipi_source_map")
         print("2. Запустите: python manage.py manage_ingestion_engine start")
-        print("3. Добавьте задачи: python manage.py manage_ingestion_engine add-tasks --priority high")
+        print(
+            "3. Добавьте задачи: python manage.py manage_ingestion_engine add-tasks --priority high"
+        )
         print("4. Проверьте статус: python manage.py manage_ingestion_engine status")
     else:
         print("\n⚠️  Есть проблемы, требующие внимания")
+
 
 if __name__ == "__main__":
     main()

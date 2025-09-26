@@ -1,16 +1,19 @@
 # type: ignore
-from django.db import models
-from django.conf import settings
-from django.utils import timezone
 from datetime import timedelta
+
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
 
 class AiRequest(models.Model):
     """Модель для отслеживания запросов к ИИ"""
 
-    REQUEST_TYPES = [
-    ]
+    REQUEST_TYPES = []
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
     session_id = models.CharField(max_length=100, null=True, blank=True)
     request_type = models.CharField(max_length=50, choices=REQUEST_TYPES)
     prompt = models.TextField()
@@ -21,23 +24,25 @@ class AiRequest(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Запрос к ИИ'
-        verbose_name_plural = 'Запросы к ИИ'
-        ordering = ['-created_at']
+        verbose_name = "Запрос к ИИ"
+        verbose_name_plural = "Запросы к ИИ"
+        ordering = ["-created_at"]
 
     def __str__(self):
-        user_info = self.user.username if self.user else f'Гость ({self.session_id})'  # type: ignore
+        user_info = self.user.username if self.user else f"Гость ({self.session_id})"  # type: ignore
         return f'{user_info} - {self.get_request_type_display()} ({self.created_at.strftime("%d.%m.%Y %H:%M")})'  # type: ignore
+
 
 class AiLimit(models.Model):
     """Модель для управления лимитами ИИ"""
 
-    LIMIT_TYPES = [
-    ]
+    LIMIT_TYPES = []
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
     session_id = models.CharField(max_length=100, null=True, blank=True)
-    limit_type = models.CharField(max_length=20, choices=LIMIT_TYPES, default='daily')
+    limit_type = models.CharField(max_length=20, choices=LIMIT_TYPES, default="daily")
     current_usage = models.IntegerField(default=0)
     max_limit = models.IntegerField()
     reset_date = models.DateTimeField()
@@ -45,13 +50,13 @@ class AiLimit(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = 'Лимит ИИ'
-        verbose_name_plural = 'Лимиты ИИ'
-        unique_together = ['user', 'session_id', 'limit_type']
+        verbose_name = "Лимит ИИ"
+        verbose_name_plural = "Лимиты ИИ"
+        unique_together = ["user", "session_id", "limit_type"]
 
     def __str__(self):
-        user_info = self.user.username if self.user else f'Гость ({self.session_id})'  # type: ignore
-        return f'{user_info} - {self.get_limit_type_display()}: {self.current_usage}/{self.max_limit}'  # type: ignore
+        user_info = self.user.username if self.user else f"Гость ({self.session_id})"  # type: ignore
+        return f"{user_info} - {self.get_limit_type_display()}: {self.current_usage}/{self.max_limit}"  # type: ignore
 
     def is_exceeded(self):
         """Проверяет, превышен ли лимит"""
@@ -78,9 +83,9 @@ class AiLimit(models.Model):
     def calculate_next_reset_date(self):
         """Вычисляет следующую дату сброса"""
         now = timezone.now()
-        if self.limit_type == 'daily':
+        if self.limit_type == "daily":
             return now + timedelta(days=1)
-        elif self.limit_type == 'monthly':
+        elif self.limit_type == "monthly":
             return now + timedelta(days=30)
         else:  # total
             return now + timedelta(days=365)  # Год
@@ -92,11 +97,11 @@ class AiLimit(models.Model):
             self.reset_date = self.calculate_next_reset_date()
         super().save(*args, **kwargs)
 
+
 class AiProvider(models.Model):
     """Модель для управления провайдерами ИИ"""
 
-    PROVIDER_TYPES = [
-    ]
+    PROVIDER_TYPES = []
 
     name = models.CharField(max_length=100)
     provider_type = models.CharField(max_length=20, choices=PROVIDER_TYPES)
@@ -115,12 +120,12 @@ class AiProvider(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = 'Провайдер ИИ'
-        verbose_name_plural = 'Провайдеры ИИ'
-        ordering = ['priority', 'name']
+        verbose_name = "Провайдер ИИ"
+        verbose_name_plural = "Провайдеры ИИ"
+        ordering = ["priority", "name"]
 
     def __str__(self):
-        return f'{self.name} ({self.get_provider_type_display()})'  # type: ignore
+        return f"{self.name} ({self.get_provider_type_display()})"  # type: ignore
 
     def can_handle_request(self):
         """Проверяет, может ли провайдер обработать запрос"""
@@ -138,29 +143,30 @@ class AiProvider(models.Model):
         self.last_used = timezone.now()
         self.save()
 
+
 class AiPromptTemplate(models.Model):
     """Модель для шаблонов промптов"""
 
-    TEMPLATE_TYPES = [
-    ]
+    TEMPLATE_TYPES = []
 
     name = models.CharField(max_length=200)
     template_type = models.CharField(max_length=20, choices=TEMPLATE_TYPES)
     prompt_template = models.TextField()
-    variables = models.JSONField(default=dict,
-                                 help_text='Переменные для подстановки в шаблон')
+    variables = models.JSONField(
+        default=dict, help_text="Переменные для подстановки в шаблон"
+    )
     is_active = models.BooleanField(default=True)
     priority = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = 'Шаблон промпта'
-        verbose_name_plural = 'Шаблоны промптов'
-        ordering = ['priority', 'name']
+        verbose_name = "Шаблон промпта"
+        verbose_name_plural = "Шаблоны промптов"
+        ordering = ["priority", "name"]
 
     def __str__(self):
-        return f'{self.name} ({self.get_template_type_display()})'  # type: ignore
+        return f"{self.name} ({self.get_template_type_display()})"  # type: ignore
 
     def format_prompt(self, **kwargs):
         """Форматирует промпт с подстановкой переменных"""
@@ -169,6 +175,7 @@ class AiPromptTemplate(models.Model):
         except KeyError:
             # Если не хватает переменных, возвращаем исходный шаблон
             return self.prompt_template
+
 
 class AiResponse(models.Model):
     """Модель для кэширования ответов ИИ"""
@@ -183,9 +190,9 @@ class AiResponse(models.Model):
     usage_count = models.IntegerField(default=1)
 
     class Meta:
-        verbose_name = 'Ответ ИИ'
-        verbose_name_plural = 'Ответы ИИ'
-        ordering = ['-last_used']
+        verbose_name = "Ответ ИИ"
+        verbose_name_plural = "Ответы ИИ"
+        ordering = ["-last_used"]
 
     def __str__(self):
         return f'Ответ {self.id} ({self.created_at.strftime("%d.%m.%Y %H:%M")})'  # type: ignore

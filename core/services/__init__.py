@@ -3,11 +3,7 @@
 Применяют принципы SOLID для улучшения архитектуры
 """
 
-from .dashboard_service import DashboardService
 from .api_service import APIService, StandardAPIResponseBuilder
+from .dashboard_service import DashboardService
 
-__all__ = [
-    'DashboardService',
-    'APIService', 
-    'StandardAPIResponseBuilder'
-]
+__all__ = ["DashboardService", "APIService", "StandardAPIResponseBuilder"]

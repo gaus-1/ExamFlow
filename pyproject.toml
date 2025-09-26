@@ -1,7 +1,7 @@
 [tool.black]
 line-length = 88
 target-version = ['py311']
-exclude = ['migrations']
+exclude = '(migrations|\.venv|venv|node_modules)'
 
 [tool.isort]
 profile = "black"

@@ -5,18 +5,22 @@
 
 import secrets
 import string
+
 from django.core.management.utils import get_random_secret_key
+
 
 def generate_django_secret_key():
     """Генерирует SECRET_KEY используя Django утилиту"""
     return get_random_secret_key()
 
+
 def generate_custom_secret_key(length=64):
     """Генерирует кастомный SECRET_KEY заданной длины"""
     alphabet = string.ascii_letters + string.digits + string.punctuation
     # Убираем символы, которые могут вызвать проблемы в .env файле
-    alphabet = alphabet.replace('"', '').replace("'", '').replace('\\', '')
-    return ''.join(secrets.choice(alphabet) for _ in range(length))
+    alphabet = alphabet.replace('"', "").replace("'", "").replace("\\", "")
+    return "".join(secrets.choice(alphabet) for _ in range(length))
+
 
 def main():
     """Основная функция"""
@@ -53,6 +57,7 @@ def main():
     print("3. Или добавьте в .env файл локально")
     print()
     print("⚠️  ВАЖНО: Никогда не коммитьте реальные ключи в Git!")
+
 
 if __name__ == "__main__":
     main()
