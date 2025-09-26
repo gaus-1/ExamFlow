@@ -85,7 +85,7 @@ class VoiceService:
                 logger.info("Создан аудиофайл: {relative_path}")
                 return relative_path
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка генерации аудио: {str(e)}")
             return None
 
@@ -162,7 +162,7 @@ class VoiceService:
                 'solution_audio': solution_audio
             }
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка генерации аудио для задания {task.id}: {str(e)}")
             return None
 
@@ -186,7 +186,7 @@ class VoiceService:
             logger.info("Удалено старых аудиофайлов: {deleted_count}")
             return deleted_count
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка очистки аудиофайлов: {str(e)}")
             return 0
 
@@ -220,7 +220,7 @@ def generate_task_voices():
             import time
             time.sleep(1)
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка генерации аудио для {task.id}: {str(e)}")
             continue
 

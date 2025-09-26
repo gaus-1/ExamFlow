@@ -51,7 +51,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write('❌ Ошибка получения webhook: {webhook_info}')
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка проверки webhook: {e}')
 
         # Пытаемся настроить webhook
@@ -70,7 +70,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write('❌ Ошибка настройки webhook: {result}')
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка настройки webhook: {e}')
 
         # Проверяем доступность webhook endpoint
@@ -95,7 +95,7 @@ class Command(BaseCommand):
         except requests.exceptions.ConnectionError:
             self.stdout.write('❌ Ошибка соединения с webhook endpoint')
             self.stdout.write('   Возможно, сайт еще не запущен на Render')
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка проверки webhook endpoint: {e}')
 
         self.stdout.write('\n' + '=' * 50)

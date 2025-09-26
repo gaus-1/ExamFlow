@@ -43,7 +43,7 @@ class DatabaseKeepAlive:
                 logger.info("Соединение с базой данных установлено")
 
             return self.connection
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка подключения к базе данных: {e}")
             return None
 
@@ -68,7 +68,7 @@ class DatabaseKeepAlive:
                     logger.warning("Неожиданный результат пинга")
                     return False
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка при пинге базы данных: {e}")
             self.close_connection()
             return False
@@ -95,7 +95,7 @@ class DatabaseKeepAlive:
                     logger.info("Keep-alive запрос выполнен: {result[0]}")
                     return True
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка keep-alive запроса: {e}")
             return False
 
@@ -134,7 +134,7 @@ class DatabaseKeepAlive:
 
                 return True
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка проверки здоровья БД: {e}")
             return False
 
@@ -166,7 +166,7 @@ class DatabaseKeepAlive:
 
                 return True
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка оптимизации соединений: {e}")
             return False
 
@@ -176,7 +176,7 @@ class DatabaseKeepAlive:
             try:
                 self.connection.close()
                 logger.info("Соединение с базой данных закрыто")
-            except Exception as e:
+            except Exception:
                 logger.error("Ошибка при закрытии соединения: {e}")
             finally:
                 self.connection = None
@@ -219,7 +219,7 @@ class DatabaseKeepAlive:
 
         except KeyboardInterrupt:
             logger.info("Остановка по запросу пользователя")
-        except Exception as e:
+        except Exception:
             logger.error("Критическая ошибка: {e}")
         finally:
             self.close_connection()
@@ -255,7 +255,7 @@ class DatabaseKeepAlive:
 
             return True
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка тестирования: {e}")
             return False
 

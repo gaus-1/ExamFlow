@@ -57,7 +57,7 @@ class AutoUpdater:
             try:
                 schedule.run_pending()
                 time.sleep(60)  # Проверяем каждую минуту
-            except Exception as e:
+            except Exception:
                 logger.error("Ошибка в планировщике: {str(e)}")
                 time.sleep(300)  # При ошибке ждем 5 минут
 
@@ -81,7 +81,7 @@ class AutoUpdater:
             else:
                 logger.info("ℹ️ Новых материалов не найдено")
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка ежедневного обновления: {str(e)}")
             self._send_admin_notification(
                 "❌ Ошибка обновления ExamFlow\n"
@@ -116,7 +116,7 @@ class AutoUpdater:
                 "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
             )
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка еженедельного обновления: {str(e)}")
             self._send_admin_notification(
                 "❌ Ошибка еженедельного обновления\n"
@@ -153,7 +153,7 @@ class AutoUpdater:
                     # Пауза между генерациями
                     time.sleep(2)
 
-                except Exception as e:
+                except Exception:
                     logger.error("Ошибка генерации голоса для {task.id}: {str(e)}")
                     continue
 
@@ -166,7 +166,7 @@ class AutoUpdater:
                     "Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
                 )
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка генерации голосов: {str(e)}")
 
     def cleanup_old_data(self):
@@ -192,7 +192,7 @@ class AutoUpdater:
                 logger.info(
                     "🧹 Очистка: удалено аудио {deleted_audio}, деактивировано заданий {deactivated_count}")
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка очистки данных: {str(e)}")
 
     def _send_admin_notification(self, message):
@@ -222,7 +222,7 @@ class AutoUpdater:
                 logger.warning(
                     "⚠️ Ошибка отправки уведомления: {response.status_code}")
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка отправки уведомления: {str(e)}")
 
     def manual_update(self):
@@ -245,7 +245,7 @@ class AutoUpdater:
                 'samples': sample_tasks
             }
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка ручного обновления: {str(e)}")
             raise
 

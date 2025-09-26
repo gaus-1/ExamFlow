@@ -63,7 +63,7 @@ class PerformanceAnalyzer:
                         times.append(duration)
                         print(f"  ✅ Запрос выполнен за {duration:.2f}с")
                     else:
-                        print(f"  ❌ Некорректный ответ")
+                        print("  ❌ Некорректный ответ")
 
                 except Exception as e:
                     print(f"  ❌ Ошибка: {e}")

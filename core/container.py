@@ -128,7 +128,7 @@ class SimpleAIOrchestrator:
         except Exception as e:
             logger.error(f"Ошибка в SimpleAIOrchestrator: {e}")
             return {
-                'answer': f'Ошибка AI сервиса: попробуйте позже',
+                'answer': 'Ошибка AI сервиса: попробуйте позже',
                 'sources': [],
                 'error': str(e)
             }

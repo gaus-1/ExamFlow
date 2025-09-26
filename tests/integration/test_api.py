@@ -4,10 +4,8 @@ Integration тесты для API ExamFlow
 
 import pytest
 import json
-from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.test import APIClient
 
 User = get_user_model()
 

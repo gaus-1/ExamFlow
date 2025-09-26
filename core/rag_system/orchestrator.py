@@ -3,8 +3,7 @@ RAG Orchestrator - полноценная система поиска и пол�
 """
 
 import logging
-from typing import Dict, List, Any, Optional
-from django.db import models
+from typing import Dict, List, Any
 
 logger = logging.getLogger(__name__)
 

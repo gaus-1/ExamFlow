@@ -72,7 +72,7 @@ class Command(BaseCommand):
                         '❌ Ошибка установки webhook: {result.get("description", "Неизвестная ошибка")}')  # type: ignore
                 )
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             self.stdout.write(
                 self.style.ERROR('❌ Ошибка запроса: {str(e)}')  # type: ignore
             )
@@ -97,7 +97,7 @@ class Command(BaseCommand):
                         '❌ Ошибка удаления webhook: {result.get("description", "Неизвестная ошибка")}')  # type: ignore
                 )
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             self.stdout.write(
                 self.style.ERROR('❌ Ошибка запроса: {str(e)}')  # type: ignore
             )
@@ -136,7 +136,7 @@ class Command(BaseCommand):
                         '❌ Ошибка получения информации: {result.get("description", "Неизвестная ошибка")}')  # type: ignore
                 )
 
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             self.stdout.write(
                 self.style.ERROR('❌ Ошибка запроса: {str(e)}')  # type: ignore
             )

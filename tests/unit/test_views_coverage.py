@@ -3,11 +3,8 @@
 Простые тесты для покрытия views
 """
 
-import pytest
 from django.test import TestCase, RequestFactory
-from django.http import HttpRequest
 from unittest.mock import Mock, patch
-import json
 
 from learning.views import home, subjects_list
 from core.views import personalization_dashboard

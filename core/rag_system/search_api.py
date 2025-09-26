@@ -3,7 +3,6 @@ API для семантического поиска в RAG системе
 """
 
 import logging
-from typing import Dict, List, Any, Optional
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt

@@ -5,8 +5,6 @@
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
 import json
-from django.test import Client
-from django.urls import reverse
 
 
 @pytest.mark.bot

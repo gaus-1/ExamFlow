@@ -41,7 +41,7 @@ class Command(BaseCommand):
                 cursor.execute("SELECT 1")
                 cursor.fetchone()
             self.stdout.write('   ✅ База данных доступна')
-        except Exception as e:
+        except Exception:
             self.stdout.write('   ❌ Ошибка базы данных: {e}')
             return
 
@@ -55,7 +55,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write('   ❌ Бот не создан')
                 return
-        except Exception as e:
+        except Exception:
             self.stdout.write('   ❌ Ошибка создания бота: {e}')
             return
 
@@ -66,7 +66,7 @@ class Command(BaseCommand):
             bot_info = asyncio.run(bot.get_me())
             self.stdout.write(
                 '   ✅ Бот доступен: @{bot_info.username} (ID: {bot_info.id})')
-        except Exception as e:
+        except Exception:
             self.stdout.write('   ❌ Ошибка API бота: {e}')
             return
 
@@ -94,7 +94,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write('   ❌ Ошибка получения webhook: {webhook_info}')
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('   ❌ Ошибка проверки webhook: {e}')
 
         # 6. Проверяем доступность webhook endpoint
@@ -119,7 +119,7 @@ class Command(BaseCommand):
 
         except requests.exceptions.ConnectionError:
             self.stdout.write('   ❌ Ошибка соединения с webhook endpoint')
-        except Exception as e:
+        except Exception:
             self.stdout.write('   ❌ Ошибка проверки webhook endpoint: {e}')
 
         # 7. Тестируем отправку сообщения
@@ -149,7 +149,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write('   ❌ Ошибка API: HTTP {response.status_code}')
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('   ❌ Ошибка тестирования API: {e}')
 
         self.stdout.write('\n' + '=' * 60)

@@ -54,7 +54,7 @@ def create_scheduled_task():
             logger.error("❌ Ошибка создания задачи: {result.stderr}")
             return False
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при создании задачи: {e}")
         return False
 
@@ -74,7 +74,7 @@ def check_scheduled_task():
             logger.info("❌ Задача не найдена в планировщике")
             return False
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при проверке задачи: {e}")
         return False
 
@@ -94,7 +94,7 @@ def delete_scheduled_task():
             logger.error("❌ Ошибка удаления задачи: {result.stderr}")
             return False
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при удалении задачи: {e}")
         return False
 
@@ -123,7 +123,7 @@ pause
         logger.info("✅ Создан .bat файл: {batch_path}")
         return True
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при создании .bat файла: {e}")
         return False
 
@@ -158,7 +158,7 @@ Read-Host
         logger.info("✅ Создан PowerShell скрипт: {ps_path}")
         return True
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при создании PowerShell скрипта: {e}")
         return False
 
@@ -205,7 +205,7 @@ def main():
             create_batch_file()
             create_powershell_script()
 
-    except Exception as e:
+    except Exception:
         logger.error("Критическая ошибка: {e}")
         logger.info("Создаю альтернативные способы запуска...")
         create_batch_file()

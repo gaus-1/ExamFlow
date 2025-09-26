@@ -9,8 +9,7 @@ from django.contrib.auth.models import User
 
 from ..personalization_system import (
     get_user_insights,
-    PersonalizedRecommendations,
-    UserBehaviorAnalyzer
+    PersonalizedRecommendations
 )
 
 logger = logging.getLogger(__name__)

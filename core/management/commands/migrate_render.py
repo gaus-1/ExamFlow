@@ -5,8 +5,6 @@
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
-from django.db import connection
-from core.database_utils import retry_database_operation, ensure_database_connection
 import logging
 
 logger = logging.getLogger(__name__)

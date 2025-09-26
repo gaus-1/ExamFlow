@@ -3,7 +3,7 @@ Vector Store - полноценное векторное хранилище дл
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 import re
 
 logger = logging.getLogger(__name__)
@@ -168,7 +168,7 @@ class VectorStore:
     def _load_existing_tasks(self):
         """Загрузка существующих заданий в векторное хранилище"""
         try:
-            from learning.models import Task, Subject
+            from learning.models import Task
             
             tasks = Task.objects.select_related('subject').all() # type: ignore
             loaded_count = 0

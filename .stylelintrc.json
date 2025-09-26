@@ -1,26 +1,16 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-recommended",
+    "stylelint-config-prettier"
+  ],
   "rules": {
-    "alpha-value-notation": "number",
-    "color-function-notation": "legacy",
-    "color-function-alias-notation": "legacy",
-    "color-hex-length": null,
-    "declaration-no-important": null,
-    "property-no-vendor-prefix": null,
-    "value-no-vendor-prefix": null,
-    "media-feature-range-notation": "prefix",
-    "selector-pseudo-class-no-unknown": [true, {
-      "ignorePseudoClasses": ["grid-cols-2", "grid-cols-3", "grid-cols-4"]
-    }],
-    "selector-class-pattern": null,
-    "keyframes-name-pattern": null,
-    "property-no-deprecated": null,
-    "value-keyword-case": null,
-    "custom-property-empty-line-before": null,
-    "no-descending-specificity": null,
-    "declaration-block-no-redundant-longhand-properties": null,
-    "rule-empty-line-before": null,
-    "media-feature-name-value-no-unknown": null,
-    "declaration-property-value-keyword-no-deprecated": null
+    "selector-class-pattern": [
+      "^([a-z0-9]+(?:-[a-z0-9]+)*)?(?:__(?:[a-z0-9]+(?:-[a-z0-9]+)*))?(?:--(?:[a-z0-9]+(?:-[a-z0-9]+)*))?$",
+      {
+        "message": "Ожидается BEM-именование (block__element--modifier)"
+      }
+    ],
+    "declaration-no-important": true
   }
 }

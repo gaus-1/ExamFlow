@@ -3,7 +3,6 @@ Unit тесты для моделей ExamFlow
 """
 
 import pytest
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.contrib.auth import get_user_model
 from learning.models import Subject, Task, Topic, UserProgress

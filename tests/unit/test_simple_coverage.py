@@ -3,10 +3,9 @@
 Простые тесты для увеличения покрытия кода
 """
 
-import pytest
 from django.test import TestCase
 from django.http import HttpRequest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import json
 
 from core.health_check import health_check_view

@@ -4,7 +4,6 @@
 
 import pytest
 from django.test import TestCase
-from django.core.exceptions import ValidationError
 
 
 @pytest.mark.unit
@@ -14,7 +13,7 @@ class TestLearningModels(TestCase):
     
     def setUp(self):
         """Настройка тестовых данных"""
-        from learning.models import Subject, Task, UserProgress
+        from learning.models import Subject, Task
         from telegram_auth.models import TelegramUser
         
         # Создаем пользователя

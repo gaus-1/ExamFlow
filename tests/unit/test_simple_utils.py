@@ -4,12 +4,9 @@
 """
 
 import unittest
-from unittest.mock import patch, Mock
-import base64
-import io
+from unittest.mock import patch
 
 from core.utils import generate_qr_code
-from core.health_check import health_check_view
 
 
 class TestSimpleUtils(unittest.TestCase):

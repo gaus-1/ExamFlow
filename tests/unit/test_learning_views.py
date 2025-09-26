@@ -3,11 +3,9 @@
 Тесты для представлений learning приложения
 """
 
-import pytest
 from django.test import TestCase, RequestFactory
 from telegram_auth.models import TelegramUser
-from django.urls import reverse
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 import json
 
 from learning.views import (
@@ -16,7 +14,6 @@ from learning.views import (
 )
 from learning.models import Subject, Task
 from core.models import UserProgress
-from telegram_auth.models import TelegramUser
 
 
 class TestLearningViews(TestCase):

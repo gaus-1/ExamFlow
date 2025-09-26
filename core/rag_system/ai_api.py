@@ -3,14 +3,12 @@ API для AI интеграции в RAG системе
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 import json
 
 logger = logging.getLogger(__name__)

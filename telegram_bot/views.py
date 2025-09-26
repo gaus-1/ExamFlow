@@ -207,7 +207,7 @@ async def handle_telegram_update(update):  # type: ignore
                         "Нажмите кнопки ниже: Предметы, Случайное, Статистика."
                     )
                 )
-            except Exception as e:
+            except Exception:
                 logger.error("Ошибка быстрой отправки /start: {e}")
 
         # Импортируем обработчики
@@ -236,7 +236,7 @@ async def handle_telegram_update(update):  # type: ignore
             # Всегда подтверждаем callback, чтобы убрать "часики" в Telegram
             try:
                 await update.callback_query.answer()
-            except Exception as ack_err:
+            except Exception:
                 logger.warning("Не удалось ответить на callback_query: {ack_err}")
 
             callback_data = update.callback_query.data or ""
@@ -296,7 +296,7 @@ async def handle_telegram_update(update):  # type: ignore
                     await h_show_task(update, context)  # type: ignore
                 else:
                     await h_unknown(update, context)  # type: ignore
-            except Exception as cb_err:
+            except Exception:
                 logger.error("Ошибка обработки callback '{callback_data}': {cb_err}")
                 # Отправим аккуратное сообщение пользователю, чтобы он не остался без
                 # ответа
@@ -304,11 +304,11 @@ async def handle_telegram_update(update):  # type: ignore
                     if chat_id is not None:
                         # type: ignore
                         await context.bot.send_message(chat_id=chat_id, text="❌ Временная ошибка. Попробуйте ещё раз или отправьте /start")
-                except Exception as send_err:
+                except Exception:
                     logger.error(
                         "Не удалось отправить сообщение об ошибке: {send_err}")
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка обработки обновления: {e}")
 
 class MockContext:

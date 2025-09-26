@@ -123,6 +123,7 @@ def create_sample_data():
     print("📝 Создание примеров данных...")
 
     sample_docs = [
+        {
             'title': 'Демонстрационный вариант ЕГЭ по математике 2024',
             'content': 'Примеры заданий по алгебре, геометрии и началам анализа...',
             'data_type': 'demo_variant',
@@ -130,8 +131,9 @@ def create_sample_data():
             'exam_type': 'ege',
             'url': 'https://fipi.ru/ege/demo-varianty-po-matematike',
             'content_hash': 'sample_math_2024_hash',
-            'collected_at': timezone.now()
+            'collected_at': timezone.now(),
         },
+        {
             'title': 'Спецификация ЕГЭ по русскому языку 2024',
             'content': 'Структура экзамена, критерии оценивания, типы заданий...',
             'data_type': 'specification',
@@ -139,8 +141,9 @@ def create_sample_data():
             'exam_type': 'ege',
             'url': 'https://fipi.ru/ege/specifikacii-po-russkomu-yazyku',
             'content_hash': 'sample_russian_2024_hash',
-            'collected_at': timezone.now()
+            'collected_at': timezone.now(),
         },
+        {
             'title': 'Кодификатор ЕГЭ по физике 2024',
             'content': 'Элементы содержания, проверяемые на ЕГЭ по физике...',
             'data_type': 'codifier',
@@ -148,8 +151,8 @@ def create_sample_data():
             'exam_type': 'ege',
             'url': 'https://fipi.ru/ege/kodifikatory-po-fizike',
             'content_hash': 'sample_physics_2024_hash',
-            'collected_at': timezone.now()
-        }
+            'collected_at': timezone.now(),
+        },
     ]
 
     created_count = 0
@@ -160,9 +163,9 @@ def create_sample_data():
         )
         if created:
             created_count += 1
-            print("✅ Создан: {doc.title}")
+            print(f"✅ Создан: {doc.title}")
 
-    print("✅ Создано {created_count} примеров документов")
+    print(f"✅ Создано {created_count} примеров документов")
     return created_count
 
 def main():

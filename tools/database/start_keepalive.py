@@ -65,7 +65,7 @@ class KeepaliveManager:
 
             return process
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка запуска keepalive: {e}")
             return None
 
@@ -80,7 +80,7 @@ class KeepaliveManager:
             except subprocess.TimeoutExpired:
                 process.kill()
                 logger.warning("⚠️ Keepalive сервис принудительно остановлен")
-            except Exception as e:
+            except Exception:
                 logger.error("❌ Ошибка остановки keepalive: {e}")
 
             del self.processes['keepalive']
@@ -130,7 +130,7 @@ class KeepaliveManager:
         except KeyboardInterrupt:
             logger.info("🛑 Остановка по запросу пользователя...")
             self.stop_keepalive()
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка в foreground режиме: {e}")
             self.stop_keepalive()
 

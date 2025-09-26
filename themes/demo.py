@@ -9,6 +9,7 @@
 from .models import UserThemePreference, ThemeUsage, ThemeCustomization
 import os
 import django
+from django.contrib.auth.models import User
 
 # Настройка Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
@@ -32,9 +33,9 @@ def demo_theme_management():
     if created:
         user.set_password('demo123')
         user.save()
-        print("✅ Создан тестовый пользователь: {user.username}")
+        print(f"✅ Создан тестовый пользователь: {user.username}")
     else:
-        print("📝 Используется существующий пользователь: {user.username}")
+        print(f"📝 Используется существующий пользователь: {user.username}")
 
     print()
 
@@ -49,9 +50,9 @@ def demo_theme_management():
     )
 
     if created:
-        print("✅ Создано предпочтение темы: {preference.get_theme_display()}")
+        print(f"✅ Создано предпочтение темы: {preference.get_theme_display()}")
     else:
-        print("📝 Текущее предпочтение: {preference.get_theme_display()}")
+        print(f"📝 Текущее предпочтение: {preference.get_theme_display()}")
 
     # Переключаем тему
     old_theme = preference.theme
@@ -59,9 +60,9 @@ def demo_theme_management():
     preference.theme = new_theme
     preference.save()
 
-    print("🔄 Тема изменена: {preference.get_theme_display()}")
-    print("   Старая тема: {dict(UserThemePreference.THEME_CHOICES)[old_theme]}")
-    print("   Новая тема: {dict(UserThemePreference.THEME_CHOICES)[new_theme]}")
+    print(f"🔄 Тема изменена: {preference.get_theme_display()}")
+    print(f"   Старая тема: {dict(UserThemePreference.THEME_CHOICES)[old_theme]}")
+    print(f"   Новая тема: {dict(UserThemePreference.THEME_CHOICES)[new_theme]}")
 
     print()
 
@@ -70,17 +71,16 @@ def demo_theme_management():
     print("-" * 40)
 
     # Создаем записи об использовании
-    usage_data = [
-    ]
+    usage_data = []
 
     for data in usage_data:
-        usage = ThemeUsage.objects.create( # type: ignore
+        created_usage = ThemeUsage.objects.create( # type: ignore
             user=user,
             **data
         )
-        print("✅ Создана запись использования: {usage.get_theme_display()}")
-        print("   Время сессии: {usage.get_session_duration_minutes()} мин")
-        print("   Просмотрено страниц: {usage.page_views}")
+        print(f"✅ Создана запись использования: {created_usage.get_theme_display()}")
+        print(f"   Время сессии: {created_usage.get_session_duration_minutes()} мин")
+        print(f"   Просмотрено страниц: {created_usage.page_views}")
 
     print()
 
@@ -113,13 +113,13 @@ def demo_theme_management():
 
     if created:
         print(
-            "✅ Созданы пользовательские настройки для темы: {customization.get_theme_display()}")
+            f"✅ Созданы пользовательские настройки для темы: {customization.get_theme_display()}")
     else:
         print(
-            "📝 Обновлены пользовательские настройки для темы: {customization.get_theme_display()}")
+            f"📝 Обновлены пользовательские настройки для темы: {customization.get_theme_display()}")
 
-    print("   Кастомные цвета: {len(customization.custom_colors)} цветов")
-    print("   Кастомные шрифты: {len(customization.custom_fonts)} шрифтов")
+    print(f"   Кастомные цвета: {len(customization.custom_colors)} цветов")
+    print(f"   Кастомные шрифты: {len(customization.custom_fonts)} шрифтов")
 
     print()
 
@@ -131,24 +131,24 @@ def demo_theme_management():
     school_usage = total_usage.filter(theme='school')
     adult_usage = total_usage.filter(theme='adult')
 
-    print("📊 Общая статистика для пользователя {user.username}:")
-    print("   Всего записей: {total_usage.count()}")
-    print("   Использование школьной темы: {school_usage.count()} раз")
-    print("   Использование взрослой темы: {adult_usage.count()} раз")
+    print(f"📊 Общая статистика для пользователя {user.username}:")
+    print(f"   Всего записей: {total_usage.count()}")
+    print(f"   Использование школьной темы: {school_usage.count()} раз")
+    print(f"   Использование взрослой темы: {adult_usage.count()} раз")
 
     # Время использования по темам
-    school_time = sum(usage.session_duration for usage in school_usage)
-    adult_time = sum(usage.session_duration for usage in adult_usage)
+    school_time = sum(u.session_duration for u in school_usage)
+    adult_time = sum(u.session_duration for u in adult_usage)
 
-    print("   Время в школьной теме: {school_time // 60} мин")
-    print("   Время во взрослой теме: {adult_time // 60} мин")
+    print(f"   Время в школьной теме: {school_time // 60} мин")
+    print(f"   Время во взрослой теме: {adult_time // 60} мин")
 
     # Страницы по темам
-    school_pages = sum(usage.page_views for usage in school_usage)
-    adult_pages = sum(usage.page_views for usage in adult_usage)
+    school_pages = sum(u.page_views for u in school_usage)
+    adult_pages = sum(u.page_views for u in adult_usage)
 
-    print("   Страниц в школьной теме: {school_pages}")
-    print("   Страниц во взрослой теме: {adult_pages}")
+    print(f"   Страниц в школьной теме: {school_pages}")
+    print(f"   Страниц во взрослой теме: {adult_pages}")
 
     print()
 
@@ -158,22 +158,22 @@ def demo_theme_management():
 
     # Методы UserThemePreference
     print("🎯 Методы UserThemePreference:")
-    print("   Текущая тема: {preference.get_theme_display()}")
-    print("   Можно переключить: {preference.can_switch_theme()}")
+    print(f"   Текущая тема: {preference.get_theme_display()}")
+    print(f"   Можно переключить: {preference.can_switch_theme()}")
 
     # Методы ThemeUsage
     latest_usage = ThemeUsage.objects.filter(user=user).latest('created_at') # type: ignore
     print("📈 Методы ThemeUsage:")
-    print("   Последнее использование: {latest_usage.get_theme_display()}")
-    print("   Время сессии: {latest_usage.get_session_duration_minutes()} мин")
+    print(f"   Последнее использование: {latest_usage.get_theme_display()}")
+    print(f"   Время сессии: {latest_usage.get_session_duration_minutes()} мин")
 
     # Методы ThemeCustomization
     if customization.is_active:
         print("🎨 Методы ThemeCustomization:")
-        print("   Есть кастомизация: {customization.has_customizations()}")
+        print(f"   Есть кастомизация: {customization.has_customizations()}")
         print(
-            "   Основной цвет: {customization.get_custom_color('primary', '#000000')}")
-        print("   Основной шрифт: {customization.get_custom_font('main', 'Arial')}")
+            f"   Основной цвет: {customization.get_custom_color('primary', '#000000')}")
+        print(f"   Основной шрифт: {customization.get_custom_font('main', 'Arial')}")
 
     print()
     print("🎉 Демонстрация завершена!")
@@ -214,6 +214,6 @@ if __name__ == '__main__':
         print()
         demo_api_endpoints()
     except Exception as e:
-        print("❌ Ошибка при выполнении демонстрации: {e}")
+        print(f"❌ Ошибка при выполнении демонстрации: {e}")
         import traceback
         traceback.print_exc()

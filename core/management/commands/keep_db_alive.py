@@ -45,7 +45,7 @@ class Command(BaseCommand):
                 self.stdout.write("✅ {timestamp} - База активна")
                 logger.info("База данных активна: {timestamp}")
 
-            except Exception as e:
+            except Exception:
                 timestamp = timezone.now().strftime('%H:%M:%S')
                 error_msg = "❌ {timestamp} - Ошибка базы: {e}"
                 self.stdout.write("❌ {error_msg}")
@@ -56,7 +56,7 @@ class Command(BaseCommand):
                     connection.close()
                     connection.ensure_connection()
                     self.stdout.write("🔄 Переподключение к базе...")
-                except Exception as reconnect_error:
+                except Exception:
                     self.stdout.write(
                         "❌ Не удалось переподключиться: {reconnect_error}"
                     )

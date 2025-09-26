@@ -71,7 +71,7 @@ class UserBehaviorAnalyzer:
             logger.info("Профиль пользователя {self.user.username} обновлен")
             return user_profile
 
-        except Exception as e:
+        except Exception:
             logger.error(
                 "Ошибка анализа поведения пользователя {self.user.username}: {e}")
             return {}
@@ -124,7 +124,7 @@ class UserBehaviorAnalyzer:
 
             return dict(sorted_preferences)
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка анализа предпочтений по предметам: {e}")
             return {}
 
@@ -162,7 +162,7 @@ class UserBehaviorAnalyzer:
                 'preferred_topics': self._get_preferred_topics()
             }
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка анализа предпочтений по заданиям: {e}")
             return {}
 
@@ -206,7 +206,7 @@ class UserBehaviorAnalyzer:
 
             return time_patterns
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка анализа временных паттернов: {e}")
             return {}
 
@@ -236,7 +236,7 @@ class UserBehaviorAnalyzer:
                 return difficulty_stats[0]['task__difficulty']
             return 2  # Средняя сложность по умолчанию
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка определения предпочитаемой сложности: {e}")
             return 2
 
@@ -256,7 +256,7 @@ class UserBehaviorAnalyzer:
 
             return [topic['task__subject__name'] for topic in topic_stats]
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка определения предпочитаемых тем: {e}")
             return []
 
@@ -276,7 +276,7 @@ class UserBehaviorAnalyzer:
             else:
                 return 'thorough'
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка определения стиля обучения: {e}")
             return 'balanced'
 
@@ -301,7 +301,7 @@ class UserBehaviorAnalyzer:
             else:
                 return 'beginner'
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка определения уровня сложности: {e}")
             return 'medium'
 
@@ -336,7 +336,7 @@ class PersonalizedRecommendations:
                 'behavior_profile': behavior_profile
             }
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка получения рекомендаций для {self.user.username}: {e}")
             return {}
 
@@ -380,7 +380,7 @@ class PersonalizedRecommendations:
                 'current_progress': subject_prefs
             }
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка получения рекомендаций по предметам: {e}")
             return {}
 
@@ -410,7 +410,7 @@ class PersonalizedRecommendations:
 
             return recommendations
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка получения рекомендаций по заданиям: {e}")
             return []
 
@@ -436,7 +436,7 @@ class PersonalizedRecommendations:
 
             return recommendations
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка получения рекомендаций по темам: {e}")
             return []
 
@@ -477,7 +477,7 @@ class PersonalizedRecommendations:
                 'break_frequency': 'Каждые 45 минут - перерыв 10 минут'
             }
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка генерации плана обучения: {e}")
             return {}
 
@@ -486,7 +486,7 @@ def get_user_recommendations(user):
     try:
         recommender = PersonalizedRecommendations(user)
         return recommender.get_recommendations()
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка получения рекомендаций: {e}")
         return {}
 
@@ -495,6 +495,6 @@ def analyze_user_behavior(user):
     try:
         analyzer = UserBehaviorAnalyzer(user)
         return analyzer.analyze_behavior()
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка анализа поведения: {e}")
         return {}

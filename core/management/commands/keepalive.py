@@ -37,7 +37,7 @@ class KeepaliveService:
             else:
                 logger.warning("⚠️ Сайт отвечает с кодом {response.status_code}")
                 return False
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка проверки сайта: {e}")
             return False
 
@@ -53,7 +53,7 @@ class KeepaliveService:
                 else:
                     logger.warning("⚠️ База данных не отвечает корректно")
                     return False
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка проверки базы данных: {e}")
             return False
 
@@ -74,7 +74,7 @@ class KeepaliveService:
                 logger.warning(
                     "⚠️ Telegram API отвечает с кодом {response.status_code}")
                 return False
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка проверки Telegram бота: {e}")
             return False
 
@@ -88,7 +88,7 @@ class KeepaliveService:
             else:
                 logger.warning("⚠️ Сайт отвечает с кодом {response.status_code}")
                 return False
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка пробуждения сайта: {e}")
             return False
 
@@ -101,7 +101,7 @@ class KeepaliveService:
                 logger.info(
                     "✅ База данных разбужена, профилей: {result[0] if result else 0}")
                 return True
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка пробуждения базы данных: {e}")
             return False
 
@@ -138,7 +138,7 @@ class KeepaliveService:
             except KeyboardInterrupt:
                 logger.info("🛑 Keepalive цикл остановлен пользователем")
                 break
-            except Exception as e:
+            except Exception:
                 logger.error("❌ Ошибка в keepalive цикле: {e}")
                 time.sleep(60)  # Ждем минуту перед повторной попыткой
 

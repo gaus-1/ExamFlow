@@ -4,7 +4,6 @@ Integration тесты для базы данных ExamFlow
 
 import pytest
 from django.db import transaction, IntegrityError
-from django.test import TransactionTestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 

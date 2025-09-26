@@ -6,11 +6,9 @@ import pytest
 import time
 import random
 import json
-from locust import HttpUser, task, between, events
+from locust import HttpUser, task, between
 from locust.env import Environment
-from locust.stats import stats_printer, stats_history
 from locust.log import setup_logging
-import threading
 import logging
 
 logger = logging.getLogger(__name__)

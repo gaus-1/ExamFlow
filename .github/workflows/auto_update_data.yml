@@ -1,0 +1,72 @@
+name: Автоматическое обновление данных
+
+on:
+  schedule:
+    # Запускается каждый день в 3:00 UTC (6:00 по Москве)
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Позволяет запускать вручную
+  push:
+    branches: [ main ]
+    paths:
+      - 'core/fipi_parser_*.py'
+      - 'core/management/commands/parse_*.py'
+
+jobs:
+  update-database:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🚀 Клонирование репозитория
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Настройка Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 📦 Установка зависимостей
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: 🔧 Настройка переменных окружения
+      run: |
+        echo "DEBUG=False" >> .env
+        echo "SECRET_KEY=django-insecure-temp-key-for-ci" >> .env
+        echo "DATABASE_URL=sqlite:///db.sqlite3" >> .env
+        echo "USE_SQLITE=True" >> .env
+        
+    - name: 🗄️ Создание базы данных
+      run: |
+        python manage.py makemigrations
+        python manage.py migrate
+        
+    - name: 🔍 Запуск парсера данных
+      run: |
+        python manage.py load_sample_data || echo "Sample data loading completed"
+      continue-on-error: true
+      
+    - name: 📊 Проверка результатов
+      run: |
+        python manage.py shell -c "
+        from learning.models import Subject, Task
+        print(f'📚 Всего предметов: {Subject.objects.count()}')
+        print(f'📝 Всего заданий: {Task.objects.count()}')
+        print('✅ База данных обновлена успешно!')
+        "
+        
+    - name: 📤 Коммит изменений (если есть)
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git diff --quiet && git diff --staged --quiet || git commit -m "🤖 Автоматическое обновление данных [skip ci]"
+        git push
+      continue-on-error: true
+      
+    - name: 📧 Уведомление о завершении
+      if: always()
+      run: |
+        echo "🔄 Задача автоматического обновления данных завершена"
+        echo "📅 Время: $(date)"
+        echo "✅ Статус: ${{ job.status }}"

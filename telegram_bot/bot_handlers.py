@@ -89,7 +89,7 @@ def send_notification(telegram_id: int, text: str):  # type: ignore
             return False
         bot.send_message(chat_id=telegram_id, text=text)  # type: ignore
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 def send_achievement_notification(telegram_id: int, title: str, points: int = 0):  # type: ignore
@@ -455,7 +455,7 @@ def set_current_task_id(user, task_id):
         profile.save()
         logger.info(
             "Установлен current_task_id: {task_id} для пользователя {user.username}")
-    except Exception as e:
+    except Exception:
         logger.error("Профиль не найден для пользователя {user.username}: {e}")
 
 def get_or_create_user(telegram_user):
@@ -844,7 +844,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=reply_markup,
             parse_mode=None
         )
-    except Exception as edit_err:
+    except Exception:
         logger.warning(
             "main_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
@@ -854,7 +854,7 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=reply_markup,
                 parse_mode=None
             )
-        except Exception as send_err:
+        except Exception:
             logger.error("main_menu: send_message тоже не удался: {send_err}")
 
 async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -875,7 +875,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not subjects:
                 await query.edit_message_text("📚 Предметы пока загружаются... Попробуйте позже.")
                 return
-        except Exception as e:
+        except Exception:
             logger.error("subjects_menu: ошибка получения предметов: {e}")
             await query.edit_message_text("❌ Ошибка загрузки предметов. Попробуйте позже.")
             return
@@ -908,7 +908,7 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=reply_markup,
                 parse_mode='Markdown'
             )
-        except Exception as edit_err:
+        except Exception:
             logger.warning(
                 "subjects_menu: edit_message_text не удался: {edit_err}. Пробуем send_message")
             try:
@@ -920,10 +920,10 @@ async def subjects_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     reply_markup=reply_markup,
                     parse_mode='Markdown'
                 )
-            except Exception as send_err:
+            except Exception:
                 logger.error("subjects_menu: send_message тоже не удался: {send_err}")
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в subjects_menu: {e}")
         try:
             await query.edit_message_text("❌ Не удалось загрузить предметы. Попробуйте позже.")  # type: ignore
@@ -992,7 +992,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
             reply_markup=InlineKeyboardMarkup(keyboard),
             parse_mode='Markdown'
         )
-    except Exception as edit_err:
+    except Exception:
         logger.warning(
             "show_subject_topics: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
@@ -1002,7 +1002,7 @@ async def show_subject_topics(update: Update, context: ContextTypes.DEFAULT_TYPE
                 reply_markup=InlineKeyboardMarkup(keyboard),
                 parse_mode='Markdown'
             )
-        except Exception as send_err:
+        except Exception:
             logger.error(
                 "show_subject_topics: send_message тоже не удался: {send_err}")
 
@@ -1030,7 +1030,7 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await db_set_current_task_id(user, task.id)
         logger.info(
             "random_task: установлен current_task_id: {task.id} для пользователя {user.username}")
-    except Exception as prof_err:
+    except Exception:
         logger.warning("Не удалось сохранить current_task_id в профиль: {prof_err}")
 
     # Получаем название предмета безопасно
@@ -1056,7 +1056,7 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
             task_text,
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-    except Exception as edit_err:
+    except Exception:
         logger.warning(
             "random_task: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
@@ -1065,7 +1065,7 @@ async def random_task(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=task_text,
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
-        except Exception as send_err:
+        except Exception:
             logger.error("random_task: send_message тоже не удался: {send_err}")
 
 async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1111,7 +1111,7 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
             answer_text,
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
-    except Exception as edit_err:
+    except Exception:
         logger.warning(
             "show_answer: edit_message_text не удался: {edit_err}. Пробуем send_message")
         try:
@@ -1120,7 +1120,7 @@ async def show_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=answer_text,
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
-        except Exception as send_err:
+        except Exception:
             logger.error("show_answer: send_message тоже не удался: {send_err}")
 
 async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1349,7 +1349,7 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.info(
                     "Пользователь {profile.telegram_id} получил персонализированную AI помощь для задания {task.id}")
 
-            except (IndexError, ValueError) as e:
+            except (IndexError, ValueError):
                 logger.error("Ошибка парсинга task_id в ai_help_handler: {e}")
                 await query.edit_message_text("❌ Ошибка формата данных. Попробуйте еще раз.")  # type: ignore
                 return
@@ -1389,7 +1389,7 @@ async def ai_help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         parse_mode=None
                     )
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в ai_help_handler: {e}")
         if is_callback and query:
             await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
@@ -1590,7 +1590,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
                 text="❌ Произошла ошибка. Попробуйте позже.",
                 reply_to_message_id=update.message.message_id  # type: ignore
             )
-        except Exception as send_err:
+        except Exception:
             logger.error("Не удалось отправить сообщение об ошибке: {send_err}")
 
 async def handle_menu_button(
@@ -1687,7 +1687,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.info(
             f"Пользователь {profile.telegram_id} получил прямой ответ от ИИ на вопрос: {clean_message}")
 
-    except Exception as e:  # type: ignore
+    except Exception:  # type: ignore
         logger.error("Ошибка в handle_ai_message: {e}")
         try:
             await context.bot.send_message(
@@ -1695,7 +1695,7 @@ async def handle_ai_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text="❌ Произошла ошибка при обработке вашего вопроса. Попробуйте позже или используйте кнопку '🤖 Спросить ИИ'.",
                 reply_to_message_id=update.message.message_id  # type: ignore
             )
-        except Exception as send_err:
+        except Exception:
             logger.error("Не удалось отправить сообщение об ошибке: {send_err}")
 
 # ============================================================================
@@ -1747,7 +1747,7 @@ async def random_subject_handler(update: Update, context: ContextTypes.DEFAULT_T
             parse_mode='Markdown'
         )
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в random_subject_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
@@ -1794,7 +1794,7 @@ async def show_task_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             parse_mode='Markdown'
         )
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка в show_task_handler: {e}")
         await query.edit_message_text("❌ Произошла ошибка. Попробуйте позже.")  # type: ignore
 
@@ -1917,7 +1917,7 @@ async def auth_success_handler(update: Update, context: ContextTypes.DEFAULT_TYP
 
     user_id = update.effective_user.id  # type: ignore
 
-    success_text = f"""
+    success_text = """
 ✅ **АВТОРИЗАЦИЯ УСПЕШНА!**
 
 Добро пожаловать в ExamFlow! 🎉

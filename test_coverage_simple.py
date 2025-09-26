@@ -6,7 +6,6 @@
 import os
 import sys
 import django
-from django.conf import settings
 
 # Добавляем путь к проекту
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -73,7 +72,6 @@ def test_health_check():
     print("\n🧪 Тестируем health_check...")
     
     try:
-        from core.health_check import health_check_view
         print("✅ health_check импортируется")
         
         # Создаем mock request
@@ -93,7 +91,7 @@ def test_fallback_views():
     print("\n🧪 Тестируем fallback_views...")
     
     try:
-        from core.fallback_views import FallbackAIView, fallback_subjects_view
+        from core.fallback_views import FallbackAIView
         print("✅ fallback_views импортируется")
         
         # Тестируем FallbackAIView

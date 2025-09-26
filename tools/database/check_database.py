@@ -45,7 +45,7 @@ def check_database():
 
         return True
 
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка при проверке базы данных: {e}")
         return False
 
@@ -65,7 +65,7 @@ def check_ingestion_system():
 
         return True
 
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка при проверке системы сбора: {e}")
         return False
 
@@ -84,7 +84,7 @@ def check_premium_system():
 
         return True
 
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка при проверке премиум-системы: {e}")
         return False
 

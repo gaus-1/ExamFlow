@@ -4,7 +4,6 @@
 """
 
 import unittest
-from unittest.mock import Mock, patch
 
 
 class TestSimpleModels(unittest.TestCase):

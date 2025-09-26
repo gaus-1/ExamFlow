@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
         except Task.DoesNotExist:
             raise CommandError('❌ Задание с ID {task_id} не найдено')
-        except Exception as e:
+        except Exception:
             raise CommandError('❌ Ошибка: {str(e)}')
 
     def generate_multiple_tasks(self, limit, force):
@@ -122,7 +122,7 @@ class Command(BaseCommand):
                             '📊 Прогресс: {i}/{len(tasks)} | Создано: {generated_count} | Ошибок: {error_count}')  # type: ignore
                     )
 
-            except Exception as e:
+            except Exception:
                 error_count += 1
                 self.stdout.write(
                     self.style.ERROR('  ❌ Ошибка: {str(e)}')  # type: ignore

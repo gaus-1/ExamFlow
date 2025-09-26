@@ -108,7 +108,7 @@ class Command(BaseCommand):
 
             return True
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка обновления предметов: {e}')
             return False
 
@@ -136,7 +136,7 @@ class Command(BaseCommand):
 
             return True
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка обновления заданий: {e}')
             return False
 
@@ -166,5 +166,5 @@ class Command(BaseCommand):
                     '{subject_tasks} заданий, {subject_topics} тем'
                 )
 
-        except Exception as e:
+        except Exception:
             self.stdout.write('⚠️ Не удалось показать статистику: {e}')

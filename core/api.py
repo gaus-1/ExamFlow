@@ -154,7 +154,7 @@ class EmergencyAIView(View):
 
             return JsonResponse({'success': True, 'answer': answer}, status=200)
 
-        except Exception as e:
+        except Exception:
             return JsonResponse({'success': True, 'answer': 'Сервис временно перегружен. Попробуйте позже.'}, status=200)
 
 @method_decorator(csrf_exempt, name='dispatch')

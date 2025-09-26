@@ -44,7 +44,7 @@ def check_ssl_certificate(url):
     except requests.exceptions.SSLError:
         print_status("SSL ошибка для {url}", "ERROR")
         return False
-    except Exception as e:
+    except Exception:
         print_status("Ошибка проверки SSL: {e}", "ERROR")
         return False
 
@@ -74,7 +74,7 @@ def check_security_headers(url):
                 print_status("  {description}: отсутствует", "WARNING")
 
         return True
-    except Exception as e:
+    except Exception:
         print_status("Ошибка проверки заголовков: {e}", "ERROR")
         return False
 
@@ -101,7 +101,7 @@ def check_dependencies():
             print_status("  requirements.txt: не найден", "ERROR")
 
         return True
-    except Exception as e:
+    except Exception:
         print_status("Ошибка проверки зависимостей: {e}", "ERROR")
         return False
 
@@ -139,7 +139,7 @@ def check_django_settings():
                     print_status("  {setting}: не настроен", "WARNING")
 
         return True
-    except Exception as e:
+    except Exception:
         print_status("Ошибка проверки настроек Django: {e}", "ERROR")
         return False
 
@@ -176,7 +176,7 @@ def check_telegram_bot():
                 print_status("  {file_path}: файл не найден", "ERROR")
 
         return True
-    except Exception as e:
+    except Exception:
         print_status("Ошибка проверки Telegram бота: {e}", "ERROR")
         return False
 

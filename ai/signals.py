@@ -77,7 +77,7 @@ def check_and_reset_limits(sender, instance, **kwargs):
             logger.info(
                 f"Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}")
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при сбросе лимита: {e}")
 
 # ========================================
@@ -109,7 +109,7 @@ def clear_ai_cache_on_provider_update(sender, instance, **kwargs):
         # Например, очистка Redis кэша или файлового кэша
         logger.info(f"Кэш ИИ очищен после обновления провайдера {instance.name}")
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при очистке кэша ИИ: {e}")
 
 # ========================================
@@ -132,7 +132,7 @@ def check_rate_limiting(sender, instance, **kwargs):
                     f"({daily_limit.current_usage}/{daily_limit.max_limit})"
                 )
 
-        except Exception as e:
+        except Exception:
             logger.error("Ошибка при проверке лимитов: {e}")
 
 # ========================================
@@ -148,5 +148,5 @@ def auto_reactivate_provider(sender, instance, **kwargs):
             instance.save()
             logger.info("Провайдер {instance.name} автоматически реактивирован")
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при автоматической реактивации провайдера: {e}")

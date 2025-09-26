@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 self.stdout.write('   Темы: {Topic.objects.count()}')  # type: ignore
                 self.stdout.write('   Задания: {Task.objects.count()}')  # type: ignore
 
-        except Exception as e:
+        except Exception:
             self.stdout.write(self.style.ERROR(
                 '❌ Ошибка при загрузке данных: {e}'))  # type: ignore
             return

@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Any
 from abc import ABC, abstractmethod
 
 from django.http import JsonResponse
