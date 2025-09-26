@@ -3,12 +3,11 @@
 Тесты для представлений ai приложения
 """
 
-import pytest
 from django.test import TestCase, RequestFactory
 from telegram_auth.models import TelegramUser
 from unittest.mock import Mock, patch
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.utils import timezone
 
 from ai.views import (
@@ -16,7 +15,6 @@ from ai.views import (
     get_ai_service
 )
 from ai.models import AiLimit
-from telegram_auth.models import TelegramUser
 
 
 class TestAIViews(TestCase):

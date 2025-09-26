@@ -3,10 +3,8 @@ Load тесты для ExamFlow - проверка производительн�
 """
 
 import time
-import json
 import random
 from locust import HttpUser, task, between
-from locust.exception import StopUser
 
 
 class ExamFlowUser(HttpUser):

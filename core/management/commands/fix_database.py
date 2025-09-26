@@ -37,7 +37,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(
                 '🎉 БАЗА ДАННЫХ ИСПРАВЛЕНА!'))  # type: ignore
 
-        except Exception as e:
+        except Exception:
             self.stdout.write(self.style.ERROR('❌ Ошибка: {e}'))  # type: ignore
 
     def create_missing_fields(self):
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     ADD COLUMN IF NOT EXISTS exam_type VARCHAR(3) DEFAULT 'ЕГЭ';
                 """)
                 self.stdout.write('✅ Поле exam_type добавлено в learning_subject')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ exam_type: {e}')
 
             # Создаем поле code в learning_topic
@@ -60,7 +60,7 @@ class Command(BaseCommand):
                     ADD COLUMN IF NOT EXISTS code VARCHAR(20) DEFAULT '';
                 """)
                 self.stdout.write('✅ Поле code добавлено в learning_topic')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ code: {e}')
 
             # Проверяем и создаем таблицы если их нет
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                     );
                 """)
                 self.stdout.write('✅ Таблица learning_subject проверена/создана')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ learning_subject: {e}')
 
             try:
@@ -90,5 +90,5 @@ class Command(BaseCommand):
                     );
                 """)
                 self.stdout.write('✅ Таблица learning_task проверена/создана')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ learning_task: {e}')

@@ -60,7 +60,7 @@ def run_optimization_script(script_name: str, description: str):
         if result.stderr:
             print("⚠️ Предупреждения: {result.stderr}")
         return True
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         print("❌ Ошибка выполнения {script_name}: {e}")
         print("Вывод: {e.stdout}")
         print("Ошибки: {e.stderr}")

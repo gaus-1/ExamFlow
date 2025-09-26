@@ -3,7 +3,6 @@
 Простые тесты для learning.models
 """
 
-import pytest
 from django.test import TestCase
 from learning.models import Subject, Task
 

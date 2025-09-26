@@ -3,7 +3,7 @@ Integration тесты для Redis ExamFlow
 """
 
 import pytest
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from django.core.cache import cache
 from django.test import override_settings
 
@@ -297,7 +297,6 @@ class TestRedisPerformance:
     def test_cache_concurrent_access(self):
         """Тест конкурентного доступа к кэшу"""
         import threading
-        import time
         
         results = []
         

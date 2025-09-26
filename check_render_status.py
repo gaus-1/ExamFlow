@@ -4,8 +4,6 @@
 """
 
 import requests
-import json
-import os
 from datetime import datetime
 
 def check_render_service():
@@ -18,7 +16,7 @@ def check_render_service():
         "https://examflow-app.onrender.com"
     ]
     
-    print(f"🔍 Проверка статуса Render сервисов...")
+    print("🔍 Проверка статуса Render сервисов...")
     print(f"⏰ Время проверки: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("-" * 50)
     
@@ -28,17 +26,17 @@ def check_render_service():
             response = requests.get(url, timeout=10)
             
             if response.status_code == 200:
-                print(f"✅ Статус: 200 OK - Сервис работает!")
+                print("✅ Статус: 200 OK - Сервис работает!")
                 print(f"📄 Размер ответа: {len(response.text)} символов")
             elif response.status_code == 404:
-                print(f"⚠️  Статус: 404 - Сервис не найден")
+                print("⚠️  Статус: 404 - Сервис не найден")
             else:
                 print(f"⚠️  Статус: {response.status_code}")
                 
         except requests.exceptions.Timeout:
-            print(f"⏰ Таймаут - сервис не отвечает")
+            print("⏰ Таймаут - сервис не отвечает")
         except requests.exceptions.ConnectionError:
-            print(f"❌ Ошибка подключения - сервис недоступен")
+            print("❌ Ошибка подключения - сервис недоступен")
         except Exception as e:
             print(f"❌ Ошибка: {e}")
         

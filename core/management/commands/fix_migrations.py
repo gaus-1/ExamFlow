@@ -32,7 +32,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(
                 '🎉 МИГРАЦИИ ИСПРАВЛЕНЫ!'))  # type: ignore
 
-        except Exception as e:
+        except Exception:
             self.stdout.write(self.style.ERROR('❌ Ошибка: {e}'))  # type: ignore
 
     def create_tables_manually(self):
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     );
                 """)
                 self.stdout.write('✅ Таблица learning_subject создана/проверена')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ learning_subject: {e}')
 
             # Создаем таблицу learning_task если её нет
@@ -69,7 +69,7 @@ class Command(BaseCommand):
                     );
                 """)
                 self.stdout.write('✅ Таблица learning_task создана/проверена')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ learning_task: {e}')
 
             # Создаем таблицу authentication_userprofile если её нет
@@ -85,5 +85,5 @@ class Command(BaseCommand):
                 """)
                 self.stdout.write(
                     '✅ Таблица authentication_userprofile создана/проверена')
-            except Exception as e:
+            except Exception:
                 self.stdout.write('⚠️ authentication_userprofile: {e}')

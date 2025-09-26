@@ -3,9 +3,8 @@
 Хранит историю диалогов пользователей с AI
 """
 
-import json
 import logging
-from typing import List, Dict, Optional
+from typing import List, Dict
 from django.core.cache import cache
 from datetime import datetime, timedelta
 

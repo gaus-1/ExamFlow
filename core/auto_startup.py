@@ -39,7 +39,7 @@ def should_run_startup():
             logger.info("Данные уже загружены, пропускаем автозапуск")
             return False
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка проверки данных: {str(e)}")
         return True  # В случае ошибки пытаемся загрузить
 
@@ -75,14 +75,14 @@ def run_startup_tasks():
                     'set',
                     url="{dj_settings.SITE_URL}/bot/webhook/",
                     verbosity=0)
-            except Exception as e:
+            except Exception:
                 logger.warning("Ошибка настройки webhook: {str(e)}")
 
             # 5. Генерация голосовых подсказок (ограниченно)
             logger.info("🎤 Генерация голосовых подсказок...")
             try:
                 call_command('generate_voices', limit=20, verbosity=0)
-            except Exception as e:
+            except Exception:
                 logger.warning("Ошибка генерации голоса: {str(e)}")
 
             # 6. Запуск keep-alive (поддержание активности и еженедельные напоминания)
@@ -91,7 +91,7 @@ def run_startup_tasks():
                 start_keepalive()
                 logger.info(
                     "🌐 Keep-alive запущен (пинги каждые 10 минут, напоминания по воскресеньям)")
-            except Exception as e:
+            except Exception:
                 logger.warning("Не удалось запустить keep-alive: {str(e)}")
 
             _startup_executed = True
@@ -102,7 +102,7 @@ def run_startup_tasks():
             tasks_count = Task.objects.count()
             logger.info("📊 Итого: {subjects_count} предметов, {tasks_count} заданий")
 
-        except Exception as e:
+        except Exception:
             logger.error("❌ Ошибка автозапуска: {str(e)}")
             _startup_executed = True  # Помечаем как выполненное, чтобы не повторять
 

@@ -3,7 +3,6 @@
 Тесты для API core приложения
 """
 
-import pytest
 from django.test import TestCase, RequestFactory
 from unittest.mock import Mock, patch
 import json

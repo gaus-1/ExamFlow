@@ -46,7 +46,7 @@ class Command(BaseCommand):
                     self.style.ERROR("❌ Ошибка при парсинге")  # type: ignore
                 )
 
-        except Exception as e:
+        except Exception:
             logger.error("Критическая ошибка: {e}")
             self.stdout.write(
                 self.style.ERROR("❌ Критическая ошибка: {e}")  # type: ignore

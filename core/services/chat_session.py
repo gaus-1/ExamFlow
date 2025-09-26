@@ -3,7 +3,7 @@ Chat Session Service - управление сессиями чата
 """
 
 import logging
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, List
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)

@@ -45,7 +45,7 @@ class Command(BaseCommand):
                 cursor.fetchone()
             self.stdout.write('✅ База данных доступна')
             logger.info('База данных доступна')
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка базы данных: {e}')
             logger.error('Ошибка базы данных: {e}')
             return
@@ -59,7 +59,7 @@ class Command(BaseCommand):
             bot_info = asyncio.run(bot.get_me())
             self.stdout.write('✅ Бот доступен: @{bot_info.username}')
             logger.info('Бот доступен: @{bot_info.username}')
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка бота: {e}')
             logger.error('Ошибка бота: {e}')
             return

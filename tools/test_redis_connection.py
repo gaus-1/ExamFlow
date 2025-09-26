@@ -3,7 +3,6 @@
 Простой тест подключения к Redis
 """
 
-import os
 import redis
 from urllib.parse import urlparse
 
@@ -47,7 +46,7 @@ def test_redis():
     except redis.exceptions.ConnectionError as e:  # type: ignore
         if "allowlist" in str(e):
             print(f"❌ IP не в whitelist: {e}")
-            print(f"💡 Добавьте IP 84.17.55.155 в allowlist на Render.com")
+            print("💡 Добавьте IP 84.17.55.155 в allowlist на Render.com")
         else:
             print(f"❌ Ошибка подключения: {e}")
         return False

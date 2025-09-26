@@ -3,10 +3,7 @@
 Тесты для представлений core приложения
 """
 
-import pytest
 from django.test import TestCase, RequestFactory
-from telegram_auth.models import TelegramUser
-from django.urls import reverse
 from django.contrib.messages.storage.fallback import FallbackStorage
 from unittest.mock import Mock, patch
 import json
@@ -16,8 +13,7 @@ from core.views import (
     api_user_insights,
     api_recommended_tasks,
     api_study_plan,
-    api_weak_topics,
-    api_user_preferences
+    api_weak_topics
 )
 
 

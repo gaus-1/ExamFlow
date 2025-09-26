@@ -30,7 +30,7 @@ def check_django_server():
         else:
             print("⚠️ Django сервер отвечает с кодом: {response.status_code}")
             return False
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException:
         print("❌ Django сервер недоступен: {e}")
         return False
 
@@ -43,7 +43,7 @@ def check_database():
             cursor.fetchone()
         print("✅ База данных доступна")
         return True
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка базы данных: {e}")
         return False
 
@@ -75,7 +75,7 @@ def check_models():
         print("   🎯 Тем: {topics_count}")
         print("   📝 Заданий: {tasks_count}")
         return True
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка моделей: {e}")
         return False
 
@@ -92,7 +92,7 @@ def check_telegram_bot():
         else:
             print("⚠️ Python процессы не найдены")
             return False
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка проверки процессов: {e}")
         return False
 
@@ -129,7 +129,7 @@ def main():
         try:
             result = check()
             results.append(result)
-        except Exception as e:
+        except Exception:
             print("❌ Ошибка в проверке {check.__name__}: {e}")
             results.append(False)
         print()

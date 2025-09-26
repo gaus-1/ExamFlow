@@ -32,7 +32,7 @@ def _send_tg_message(bot_token: str, chat_id: str, text: str) -> bool:
         )
         resp.raise_for_status()
         return True
-    except Exception as e:
+    except Exception:
         logger.warning("Не удалось отправить напоминание: {e}")
         return False
 

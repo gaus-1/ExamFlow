@@ -4,7 +4,6 @@ from django.conf import settings
 from dataclasses import dataclass
 
 from django.utils import timezone
-from django.conf import settings
 
 try:
     import requests  # type: ignore
@@ -157,14 +156,14 @@ class GeminiProvider(BaseProvider):
                     cost=0.0,
                     provider_name=self.name)
 
-        except requests.exceptions.RequestException as e:  # type: ignore
+        except requests.exceptions.RequestException:  # type: ignore
             logger.error("Сетевая ошибка Gemini: {str(e)}")
             return AiResult(
                 text="❌ **Ошибка сети Gemini:** {str(e)}\n\nПроверьте подключение к интернету.",
                 tokens_used=0,
                 cost=0.0,
                 provider_name=self.name)
-        except Exception as e:
+        except Exception:
             logger.error("Неожиданная ошибка Gemini: {str(e)}")
             return AiResult(
                 text="❌ **Неожиданная ошибка Gemini:** {str(e)}\n\nПопробуйте позже.",
@@ -212,7 +211,7 @@ class FallbackProvider(BaseProvider):
                     'cost': 0.0
                 }
 
-        except Exception as e:
+        except Exception:
             import logging
             logger = logging.getLogger(__name__)
             logger.error("Ошибка fallback провайдера: {e}")
@@ -311,7 +310,7 @@ class AiService:
                 # Обычный вопрос без RAG
                 return self.ask(prompt, user, use_cache=use_cache)
 
-        except Exception as e:
+        except Exception:
             import logging
             logger = logging.getLogger(__name__)
             logger.error("Ошибка в RAG запросе: {e}")
@@ -467,7 +466,7 @@ class AiService:
                 "task_type": task_type
             }
 
-        except Exception as e:
+        except Exception:
             import logging
             logger = logging.getLogger(__name__)
             logger.error("Ошибка в _ask_ai: {e}")

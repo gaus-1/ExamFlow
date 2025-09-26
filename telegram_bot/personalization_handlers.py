@@ -13,14 +13,17 @@ async def personalization_menu(update: Update, context: ContextTypes.DEFAULT_TYP
     """Главное меню персонализации"""
     try:
         keyboard = [
+            [
                 InlineKeyboardButton("📊 Моя аналитика", callback_data="my_analytics"),
-                InlineKeyboardButton("🎯 Рекомендации", callback_data="my_recommendations")
+                InlineKeyboardButton("🎯 Рекомендации", callback_data="my_recommendations"),
             ],
+            [
                 InlineKeyboardButton("📚 План обучения", callback_data="study_plan"),
-                InlineKeyboardButton("⚠️ Слабые темы", callback_data="weak_topics")
+                InlineKeyboardButton("⚠️ Слабые темы", callback_data="weak_topics"),
             ],
-                InlineKeyboardButton("🔙 Назад", callback_data="main_menu")
-            ]
+            [
+                InlineKeyboardButton("🔙 Назад", callback_data="main_menu"),
+            ],
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -33,7 +36,7 @@ async def personalization_menu(update: Update, context: ContextTypes.DEFAULT_TYP
         )
 
     except Exception as e:
-        logger.error("Ошибка в меню персонализации: {e}")
+        logger.error(f"Ошибка в меню персонализации: {e}")
         await update.callback_query.answer("Произошла ошибка. Попробуйте позже.")
 
 async def show_my_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -67,14 +70,17 @@ async def show_my_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if preferences.get('favorite_subjects'):
             subjects = ', '.join(preferences['favorite_subjects'])
-            message += "🎯 *Любимые предметы:* {subjects}\n"
+            message += f"🎯 *Любимые предметы:* {subjects}\n"
 
         keyboard = [
-                InlineKeyboardButton(
-                    "🎯 Рекомендации", callback_data="my_recommendations"), InlineKeyboardButton(
-                    "📚 План обучения", callback_data="study_plan")], [
-                InlineKeyboardButton(
-                    "🔙 Назад", callback_data="personalization_menu")]]
+            [
+                InlineKeyboardButton("🎯 Рекомендации", callback_data="my_recommendations"),
+                InlineKeyboardButton("📚 План обучения", callback_data="study_plan"),
+            ],
+            [
+                InlineKeyboardButton("🔙 Назад", callback_data="personalization_menu"),
+            ],
+        ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -85,7 +91,7 @@ async def show_my_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except Exception as e:
-        logger.error("Ошибка при показе аналитики: {e}")
+        logger.error(f"Ошибка при показе аналитики: {e}")
         await update.callback_query.edit_message_text(
             "❌ Произошла ошибка при получении аналитики.",
             parse_mode='Markdown'
@@ -117,17 +123,18 @@ async def show_my_recommendations(update: Update, context: ContextTypes.DEFAULT_
             subject_name = getattr(
                 task.subject, 'name', 'Неизвестно') if hasattr(
                 task, 'subject') else 'Неизвестно'
-
-            message += "{i}. **{getattr(task, 'title', 'Задание')}**\n"
-            message += "   📚 {subject_name}\n"
-            message += "   {difficulty_stars} Сложность: {getattr(task, 'difficulty', 3)}/5\n\n"
+            message += f"{i}. **{getattr(task, 'title', 'Задание')}**\n"
+            message += f"   📚 {subject_name}\n"
+            message += f"   {difficulty_stars} Сложность: {getattr(task, 'difficulty', 3)}/5\n\n"
 
         keyboard = [
+            [
                 InlineKeyboardButton("📚 План обучения", callback_data="study_plan"),
-                InlineKeyboardButton("⚠️ Слабые темы", callback_data="weak_topics")
+                InlineKeyboardButton("⚠️ Слабые темы", callback_data="weak_topics"),
             ],
-                InlineKeyboardButton("🔙 Назад", callback_data="personalization_menu")
-            ]
+            [
+                InlineKeyboardButton("🔙 Назад", callback_data="personalization_menu"),
+            ],
         ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -139,7 +146,7 @@ async def show_my_recommendations(update: Update, context: ContextTypes.DEFAULT_
         )
 
     except Exception as e:
-        logger.error("Ошибка при показе рекомендаций: {e}")
+        logger.error(f"Ошибка при показе рекомендаций: {e}")
         await update.callback_query.edit_message_text(
             "❌ Произошла ошибка при получении рекомендаций.",
             parse_mode='Markdown'
@@ -161,7 +168,7 @@ async def show_study_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if daily_goals:
             message += "🎯 *Ежедневные цели:*\n"
             for goal in daily_goals:
-                message += "   • {goal.get('description', '')}\n"
+                message += f"   • {goal.get('description', '')}\n"
             message += "\n"
 
         weekly_focus = study_plan.get('weekly_focus', [])
@@ -170,14 +177,17 @@ async def show_study_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for focus in weekly_focus:
                 subject = focus.get('subject', '')
                 goal = focus.get('goal', '')
-                message += "   • {subject}: {goal}\n"
+                message += f"   • {subject}: {goal}\n"
 
         keyboard = [
-                InlineKeyboardButton(
-                    "🎯 Рекомендации", callback_data="my_recommendations"), InlineKeyboardButton(
-                    "⚠️ Слабые темы", callback_data="weak_topics")], [
-                InlineKeyboardButton(
-                    "🔙 Назад", callback_data="personalization_menu")]]
+            [
+                InlineKeyboardButton("🎯 Рекомендации", callback_data="my_recommendations"),
+                InlineKeyboardButton("⚠️ Слабые темы", callback_data="weak_topics"),
+            ],
+            [
+                InlineKeyboardButton("🔙 Назад", callback_data="personalization_menu"),
+            ],
+        ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -188,7 +198,7 @@ async def show_study_plan(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except Exception as e:
-        logger.error("Ошибка при показе плана обучения: {e}")
+        logger.error(f"Ошибка при показе плана обучения: {e}")
         await update.callback_query.edit_message_text(
             "❌ Произошла ошибка при получении плана обучения.",
             parse_mode='Markdown'
@@ -218,21 +228,23 @@ async def show_weak_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
             subject = topic.get('subject', 'Неизвестно')
             failed_tasks = topic.get('failed_tasks', 0)
             avg_difficulty = topic.get('avg_difficulty', 0)
-
-            message += "{i}. **{subject}**\n"
-            message += "   ❌ Провалено: {failed_tasks}\n"
-            message += "   📊 Сложность: {avg_difficulty}/5\n\n"
+            message += f"{i}. **{subject}**\n"
+            message += f"   ❌ Провалено: {failed_tasks}\n"
+            message += f"   📊 Сложность: {avg_difficulty}/5\n\n"
 
         message += "💡 *Рекомендации:*\n"
         message += "• Решите больше заданий по этим темам\n"
         message += "• Начните с простых и усложняйте\n"
 
         keyboard = [
-                InlineKeyboardButton(
-                    "🎯 Рекомендации", callback_data="my_recommendations"), InlineKeyboardButton(
-                    "📚 План обучения", callback_data="study_plan")], [
-                InlineKeyboardButton(
-                    "🔙 Назад", callback_data="personalization_menu")]]
+            [
+                InlineKeyboardButton("🎯 Рекомендации", callback_data="my_recommendations"),
+                InlineKeyboardButton("📚 План обучения", callback_data="study_plan"),
+            ],
+            [
+                InlineKeyboardButton("🔙 Назад", callback_data="personalization_menu"),
+            ],
+        ]
 
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -243,7 +255,7 @@ async def show_weak_topics(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except Exception as e:
-        logger.error("Ошибка при показе слабых тем: {e}")
+        logger.error(f"Ошибка при показе слабых тем: {e}")
         await update.callback_query.edit_message_text(
             "❌ Произошла ошибка при получении слабых тем.",
             parse_mode='Markdown'

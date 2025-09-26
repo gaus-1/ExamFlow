@@ -3,9 +3,7 @@
 Тесты для моделей core приложения
 """
 
-import pytest
 from django.test import TestCase
-from unittest.mock import Mock, patch
 
 from telegram_auth.models import TelegramUser
 from core.models import (

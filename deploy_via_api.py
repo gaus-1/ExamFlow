@@ -6,7 +6,6 @@
 
 import os
 import requests
-import json
 
 def trigger_render_deploy():
     """Запускает деплой через Render API"""

@@ -74,7 +74,7 @@ def remove_unused_imports():
         else:
             print("⚠️ Ошибки при удалении импортов: {result.stderr}")
 
-    except Exception as e:
+    except Exception:
         print("❌ Ошибка: {e}")
 
 if __name__ == "__main__":

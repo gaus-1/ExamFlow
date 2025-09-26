@@ -3,7 +3,6 @@
 """
 
 import pytest
-from django.conf import settings
 
 
 @pytest.mark.unit

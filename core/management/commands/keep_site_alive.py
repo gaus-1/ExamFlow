@@ -69,12 +69,12 @@ class Command(BaseCommand):
                 self.stdout.write("⏰ {timestamp} - Таймаут запроса к сайту")
                 logger.warning("Таймаут запроса к сайту: {timestamp}")
 
-            except requests.exceptions.ConnectionError as e:
+            except requests.exceptions.ConnectionError:
                 timestamp = time.strftime('%H:%M:%S')
                 self.stdout.write("🔌 {timestamp} - Ошибка соединения: {e}")
                 logger.error("Ошибка соединения с сайтом: {e}")
 
-            except Exception as e:
+            except Exception:
                 timestamp = time.strftime('%H:%M:%S')
                 self.stdout.write("❌ {timestamp} - Неожиданная ошибка: {e}")
                 logger.error("Неожиданная ошибка keep-alive сайта: {e}")

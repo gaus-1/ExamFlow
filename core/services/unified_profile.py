@@ -3,7 +3,7 @@ Unified Profile Service - управление профилями пользов
 """
 
 import logging
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 from django.contrib.auth import get_user_model
 from django.db import transaction
 

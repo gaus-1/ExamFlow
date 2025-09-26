@@ -3,14 +3,10 @@
 """
 
 import pytest
-import json
 import hashlib
 import hmac
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django.core.cache import cache
-from unittest.mock import patch, MagicMock
 import logging
 
 logger = logging.getLogger(__name__)

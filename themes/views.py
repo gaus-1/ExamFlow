@@ -57,7 +57,7 @@ def switch_theme(request):
 
                 print(
                     "Пользователь {request.user.username} переключился на тему: {theme}")
-            except Exception as e:
+            except Exception:
                 print("Ошибка сохранения темы в профиль: {e}")
 
         # Возвращаем успешный ответ
@@ -72,7 +72,7 @@ def switch_theme(request):
             'success': False,
             'message': 'Неверный формат JSON'
         }, status=400)
-    except Exception as e:
+    except Exception:
         return JsonResponse({
             'success': False,
             'message': 'Внутренняя ошибка сервера: {str(e)}'
@@ -109,7 +109,7 @@ def get_current_theme(request):
                         theme='school'
                     )
                     theme = preference.theme
-            except Exception as e:
+            except Exception:
                 print("Ошибка получения темы из профиля: {e}")
                 theme = 'school'
 
@@ -119,7 +119,7 @@ def get_current_theme(request):
             'user_authenticated': request.user.is_authenticated
         })
 
-    except Exception as e:
+    except Exception:
         return JsonResponse({
             'success': False,
             'message': 'Внутренняя ошибка сервера: {str(e)}'
@@ -186,7 +186,7 @@ def preview_theme(request, theme):
             'preview_data': preview_data.get(theme, {})
         })
 
-    except Exception as e:
+    except Exception:
         return JsonResponse({
             'success': False,
             'message': 'Внутренняя ошибка сервера: {str(e)}'

@@ -82,7 +82,7 @@ class Command(BaseCommand):
                 self.style.WARNING('\n⚠️  Остановка по запросу пользователя...')
             )
             stop_auto_updater()
-        except Exception as e:
+        except Exception:
             self.stdout.write(
                 self.style.ERROR('❌ Ошибка запуска: {str(e)}')
             )
@@ -136,7 +136,7 @@ class Command(BaseCommand):
             self.stdout.write('  • Заданий загружено: {result["tasks"]}')
             self.stdout.write('  • Примеров добавлено: {result["samples"]}')
 
-        except Exception as e:
+        except Exception:
             self.stdout.write(
                 self.style.ERROR('❌ Ошибка ручного обновления: {str(e)}')
             )

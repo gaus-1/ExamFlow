@@ -48,6 +48,6 @@ class Command(BaseCommand):
 
         except KeyboardInterrupt:
             self.stdout.write('\n⚠️  Остановка по запросу пользователя...')
-        except Exception as e:
+        except Exception:
             self.stdout.write('❌ Ошибка запуска бота: {e}')
             logger.error('Ошибка запуска бота: {e}')

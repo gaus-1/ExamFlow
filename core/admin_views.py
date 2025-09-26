@@ -106,7 +106,7 @@ def start_parsing(request):
             # Шаг 4: Webhook
             try:
                 call_command('setup_webhook', 'set', verbosity=0)
-            except Exception as e:
+            except Exception:
                 logger.warning("Ошибка webhook: {str(e)}")
 
             # Шаг 5: Голосовые подсказки (опционально)
@@ -117,7 +117,7 @@ def start_parsing(request):
                 })
                 try:
                     call_command('generate_voices', limit=50, verbosity=0)
-                except Exception as e:
+                except Exception:
                     logger.warning("Ошибка генерации голоса: {str(e)}")
 
             # Финиш
@@ -134,7 +134,7 @@ def start_parsing(request):
             logger.info(
                 "✅ Парсинг завершен: {subjects_count} предметов, {tasks_count} заданий")
 
-        except Exception as e:
+        except Exception:
             _parsing_status.update({
                 'running': False,
                 'progress': 0,

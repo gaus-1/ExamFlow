@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 '✅ Таблица Task: {task_count} записей'))  # type: ignore
 
             return True
-        except Exception as e:
+        except Exception:
             self.stdout.write(self.style.ERROR(
                 '❌ Ошибка при проверке таблиц: {e}'))  # type: ignore
             return False
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                     '✅ Создано {len(subjects)} предметов'))  # type: ignore
 
             return True
-        except Exception as e:
+        except Exception:
             self.stdout.write(self.style.ERROR(
                 '❌ Ошибка при создании образцов данных: {e}'))  # type: ignore
             return False

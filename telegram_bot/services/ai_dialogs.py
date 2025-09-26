@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from core.container import Container
 
 try:
     from telegram_bot.bot_handlers import (
@@ -176,4 +175,4 @@ def get_ai_response(prompt: str, task_type: str = 'chat', user=None, task=None) 
         # type: ignore
         import logging  # Импортируем логгер, если не был импортирован ранее
         logging.error(f"Ошибка AI сервиса с контекстом: {e}")
-        return f'Ошибка AI сервиса: попробуйте позже'
+        return 'Ошибка AI сервиса: попробуйте позже'

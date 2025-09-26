@@ -83,7 +83,7 @@ class UserBehaviorAnalyzer:
 
             return preferences
 
-        except Exception as e:
+        except Exception:
             logger.error(
                 "Ошибка при анализе предпочтений пользователя {self.user_id}: {e}")
             return {
@@ -165,7 +165,7 @@ class UserBehaviorAnalyzer:
 
             return patterns
 
-        except Exception as e:
+        except Exception:
             logger.error(
                 "Ошибка при анализе паттернов обучения пользователя {self.user_id}: {e}")
             return {
@@ -219,7 +219,7 @@ class PersonalizedRecommendations:
 
             return list(recommended_tasks)
 
-        except Exception as e:
+        except Exception:
             logger.error(
                 "Ошибка при получении рекомендаций для пользователя {self.user_id}: {e}")
             return []
@@ -269,7 +269,7 @@ class PersonalizedRecommendations:
 
             return plan
 
-        except Exception as e:
+        except Exception:
             logger.error(
                 "Ошибка при создании плана обучения для пользователя {self.user_id}: {e}")
             return {
@@ -342,7 +342,7 @@ class PersonalizedRecommendations:
                 for subject, data in sorted_weak_topics[:5]  # Топ-5 слабых тем
             ]
 
-        except Exception as e:
+        except Exception:
             logger.error(
                 "Ошибка при определении слабых тем пользователя {self.user_id}: {e}")
             return []
@@ -366,7 +366,7 @@ def get_user_insights(user_id: int) -> Dict:
 
         return insights
 
-    except Exception as e:
+    except Exception:
         logger.error("Ошибка при получении инсайтов для пользователя {user_id}: {e}")
         return {}
 
@@ -398,7 +398,7 @@ def _get_progress_summary(user_id: int) -> Dict:
                 100,
                 1) if total_tasks > 0 else 0}
 
-    except Exception as e:
+    except Exception:
         logger.error(
             "Ошибка при получении сводки прогресса для пользователя {user_id}: {e}")
         return {

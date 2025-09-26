@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.http import HttpResponse
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.contrib.sitemaps.views import sitemap
 from core.sitemaps import StaticViewSitemap, RootViewSitemap
 from django.conf import settings

@@ -3,12 +3,10 @@
 """
 
 import pytest
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.db import connection, transaction
-from django.core.management import call_command
 from django.contrib.auth import get_user_model
 from learning.models import Subject, Task, UserProgress
-from core.models import UserProfile
 from telegram_auth.models import TelegramUser
 import logging
 

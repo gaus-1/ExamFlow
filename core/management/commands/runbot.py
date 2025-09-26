@@ -73,7 +73,7 @@ class Command(BaseCommand):
                         self.style.ERROR('❌ Не удалось создать экземпляр бота')
                     )
                     return
-            except Exception as e:
+            except Exception:
                 self.stdout.write(
                     self.style.ERROR('❌ Ошибка создания бота: {e}')  # type: ignore
                 )
@@ -90,7 +90,7 @@ class Command(BaseCommand):
                     self.stdout.write(
                         self.style.SUCCESS('✅ Бот запущен в фоне')  # type: ignore
                     )
-                except Exception as e:
+                except Exception:
                     self.stdout.write(
                         self.style.ERROR('❌ Ошибка запуска бота: {e}')  # type: ignore
                     )
@@ -109,12 +109,12 @@ class Command(BaseCommand):
                         self.style.WARNING(
                             '\n⚠️  Остановка по запросу пользователя...')  # type: ignore
                     )
-                except Exception as e:
+                except Exception:
                     self.stdout.write(
                         self.style.ERROR('❌ Ошибка запуска: {e}')  # type: ignore
                     )
 
-        except Exception as e:
+        except Exception:
             self.stdout.write(
                 self.style.ERROR('❌ Неожиданная ошибка: {str(e)}')  # type: ignore
             )
@@ -146,7 +146,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS('✅ Бот остановлен (PID: {pid})')  # type: ignore
             )
 
-        except (ValueError, ProcessLookupError) as e:
+        except (ValueError, ProcessLookupError):
             self.stdout.write(
                 self.style.ERROR('❌ Ошибка остановки: {str(e)}')  # type: ignore
             )
@@ -207,7 +207,7 @@ class Command(BaseCommand):
                             '⚠️  TELEGRAM_BOT_TOKEN не настроен')  # type: ignore
                     )
 
-            except Exception as e:
+            except Exception:
                 self.stdout.write(
                     self.style.WARNING(
                         '⚠️  Не удалось проверить API: {str(e)}')  # type: ignore
