@@ -4,22 +4,29 @@
 """
 
 import os
-import django
 import time
 
+import django
+
 # Настройка Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 django.setup()
 
-from core.models import FIPIData, FIPISourceMap  # noqa: E402
-from core.data_ingestion.ingestion_engine import IngestionEngine, TaskPriority  # noqa: E402
 from django.utils import timezone  # noqa: E402
+
+from core.data_ingestion.ingestion_engine import (  # noqa: E402
+    IngestionEngine,
+    TaskPriority,
+)
+from core.models import FIPIData, FIPISourceMap  # noqa: E402
+
 
 def init_source_map():
     """Инициализирует карту источников"""
     print("🗺️ Инициализация карты источников...")
 
     from core.data_ingestion.fipi_structure_map import get_fipi_structure_map
+
     structure_map = get_fipi_structure_map()
     sources = structure_map.get_all_sources()
 
@@ -28,22 +35,23 @@ def init_source_map():
         source_obj, created = FIPISourceMap.objects.get_or_create(  # type: ignore
             source_id=source.id,
             defaults={
-                'name': source.name,
-                'url': source.url,
-                'data_type': source.data_type.value,
-                'exam_type': source.exam_type.value,
-                'subject': source.subject,
-                'priority': source.priority.value,
-                'update_frequency': source.update_frequency.value,
-                'file_format': source.file_format,
-                'description': source.description,
-            }
+                "name": source.name,
+                "url": source.url,
+                "data_type": source.data_type.value,
+                "exam_type": source.exam_type.value,
+                "subject": source.subject,
+                "priority": source.priority.value,
+                "update_frequency": source.update_frequency.value,
+                "file_format": source.file_format,
+                "description": source.description,
+            },
         )
         if created:
             created_count += 1
 
     print("✅ Создано {created_count} источников")
     return created_count
+
 
 def start_ingestion_engine():
     """Запускает движок сбора данных"""
@@ -56,18 +64,20 @@ def start_ingestion_engine():
     high_priority_sources = FIPISourceMap.objects.filter(priority=1)  # type: ignore
     for source in high_priority_sources:
         from core.data_ingestion.ingestion_engine import IngestionTask
+
         task = IngestionTask(
             id="task_{source.source_id}_{int(time.time())}",
             source_id=source.source_id,
             url=source.url,
             priority=TaskPriority.HIGH,
             data_type=source.data_type,
-            created_at=timezone.now()
+            created_at=timezone.now(),
         )
         engine.task_queue.add_task(task)
 
     print("✅ Добавлено {high_priority_sources.count()} задач высокого приоритета")
     return engine
+
 
 def monitor_progress(engine, max_wait_time=300):
     """Мониторит прогресс сбора данных"""
@@ -80,7 +90,9 @@ def monitor_progress(engine, max_wait_time=300):
         current_count = FIPIData.objects.count()  # type: ignore
 
         if current_count > last_count:
-            print("📈 Собрано документов: {current_count} (+{current_count - last_count})")
+            print(
+                "📈 Собрано документов: {current_count} (+{current_count - last_count})"
+            )
             last_count = current_count
 
         if current_count >= 10:  # Минимальное количество для работы
@@ -91,32 +103,35 @@ def monitor_progress(engine, max_wait_time=300):
 
     return FIPIData.objects.count()  # type: ignore
 
+
 def process_pdf_documents():
     """Обрабатывает PDF документы"""
     print("📄 Обработка PDF документов...")
 
     from core.data_ingestion.pdf_processor import PDFProcessor, process_document
+
     _processor = PDFProcessor()
 
     # Получаем необработанные PDF
     pdf_docs = FIPIData.objects.filter(  # type: ignore
-        data_type__in=['demo_variant', 'specification', 'codefier', 'document'],
+        data_type__in=["demo_variant", "specification", "codefier", "document"],
         is_processed=False,
-        url__iendswith='.pd'
+        url__iendswith=".pd",
     )[:5]
 
     processed_count = 0
     for doc in pdf_docs:
         try:
             result = process_document(doc.url, doc.id)  # type: ignore
-            if isinstance(result, dict) and result.get('status') == 'completed':
+            if isinstance(result, dict) and result.get("status") == "completed":
                 processed_count += 1
                 print("✅ Обработан: {doc.title}")
-        except Exception as e:
+        except Exception:
             print("❌ Ошибка обработки {doc.title}: {e}")
 
     print("✅ Обработано {processed_count} PDF документов")
     return processed_count
+
 
 def create_sample_data():
     """Создает примеры данных для демонстрации"""
@@ -124,42 +139,41 @@ def create_sample_data():
 
     sample_docs = [
         {
-            'title': 'Демонстрационный вариант ЕГЭ по математике 2024',
-            'content': 'Примеры заданий по алгебре, геометрии и началам анализа...',
-            'data_type': 'demo_variant',
-            'subject': 'mathematics',
-            'exam_type': 'ege',
-            'url': 'https://fipi.ru/ege/demo-varianty-po-matematike',
-            'content_hash': 'sample_math_2024_hash',
-            'collected_at': timezone.now(),
+            "title": "Демонстрационный вариант ЕГЭ по математике 2024",
+            "content": "Примеры заданий по алгебре, геометрии и началам анализа...",
+            "data_type": "demo_variant",
+            "subject": "mathematics",
+            "exam_type": "ege",
+            "url": "https://fipi.ru/ege/demo-varianty-po-matematike",
+            "content_hash": "sample_math_2024_hash",
+            "collected_at": timezone.now(),
         },
         {
-            'title': 'Спецификация ЕГЭ по русскому языку 2024',
-            'content': 'Структура экзамена, критерии оценивания, типы заданий...',
-            'data_type': 'specification',
-            'subject': 'russian',
-            'exam_type': 'ege',
-            'url': 'https://fipi.ru/ege/specifikacii-po-russkomu-yazyku',
-            'content_hash': 'sample_russian_2024_hash',
-            'collected_at': timezone.now(),
+            "title": "Спецификация ЕГЭ по русскому языку 2024",
+            "content": "Структура экзамена, критерии оценивания, типы заданий...",
+            "data_type": "specification",
+            "subject": "russian",
+            "exam_type": "ege",
+            "url": "https://fipi.ru/ege/specifikacii-po-russkomu-yazyku",
+            "content_hash": "sample_russian_2024_hash",
+            "collected_at": timezone.now(),
         },
         {
-            'title': 'Кодификатор ЕГЭ по физике 2024',
-            'content': 'Элементы содержания, проверяемые на ЕГЭ по физике...',
-            'data_type': 'codifier',
-            'subject': 'physics',
-            'exam_type': 'ege',
-            'url': 'https://fipi.ru/ege/kodifikatory-po-fizike',
-            'content_hash': 'sample_physics_2024_hash',
-            'collected_at': timezone.now(),
+            "title": "Кодификатор ЕГЭ по физике 2024",
+            "content": "Элементы содержания, проверяемые на ЕГЭ по физике...",
+            "data_type": "codifier",
+            "subject": "physics",
+            "exam_type": "ege",
+            "url": "https://fipi.ru/ege/kodifikatory-po-fizike",
+            "content_hash": "sample_physics_2024_hash",
+            "collected_at": timezone.now(),
         },
     ]
 
     created_count = 0
     for doc_data in sample_docs:
         doc, created = FIPIData.objects.get_or_create(  # type: ignore
-            url=doc_data['url'],
-            defaults=doc_data
+            url=doc_data["url"], defaults=doc_data
         )
         if created:
             created_count += 1
@@ -167,6 +181,7 @@ def create_sample_data():
 
     print(f"✅ Создано {created_count} примеров документов")
     return created_count
+
 
 def main():
     """Основная функция наполнения сайта"""
@@ -211,10 +226,12 @@ def main():
         else:
             print("\n⚠️  Данные не были собраны. Проверьте настройки.")
 
-    except Exception as e:
+    except Exception:
         print("\n❌ Ошибка при наполнении сайта: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     main()

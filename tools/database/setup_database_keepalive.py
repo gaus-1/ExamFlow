@@ -5,17 +5,17 @@
 запуска скрипта поддержания активности базы данных каждые 5 минут.
 """
 
-import sys
-import subprocess
 import logging
+import subprocess
+import sys
 from pathlib import Path
 
 # Настройка логирования
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 def create_scheduled_task():
     """Создаёт задачу в планировщике задач Windows"""
@@ -33,11 +33,19 @@ def create_scheduled_task():
         # Создаём команду для создания задачи
         task_name = "ExamFlow_Database_KeepAlive"
         command = [
-            "schtasks", "/create", "/tn", task_name,
-            "/tr", '"{python_exe}" "{script_path}"',
-            "/sc", "minute", "/mo", "5",
-            "/ru", "SYSTEM",
-            "/"  # Принудительно перезаписать существующую задачу
+            "schtasks",
+            "/create",
+            "/tn",
+            task_name,
+            "/tr",
+            '"{python_exe}" "{script_path}"',
+            "/sc",
+            "minute",
+            "/mo",
+            "5",
+            "/ru",
+            "SYSTEM",
+            "/",  # Принудительно перезаписать существующую задачу
         ]
 
         logger.info("Создаю задачу в планировщике...")
@@ -57,6 +65,7 @@ def create_scheduled_task():
     except Exception:
         logger.error("Ошибка при создании задачи: {e}")
         return False
+
 
 def check_scheduled_task():
     """Проверяет существование задачи в планировщике"""
@@ -78,6 +87,7 @@ def check_scheduled_task():
         logger.error("Ошибка при проверке задачи: {e}")
         return False
 
+
 def delete_scheduled_task():
     """Удаляет задачу из планировщика"""
     try:
@@ -98,6 +108,7 @@ def delete_scheduled_task():
         logger.error("Ошибка при удалении задачи: {e}")
         return False
 
+
 def create_batch_file():
     """Создаёт .bat файл для ручного запуска"""
     try:
@@ -117,7 +128,7 @@ pause
 
         batch_path = current_dir / "run_database_keepalive.bat"
 
-        with open(batch_path, 'w', encoding='utf-8') as f:
+        with open(batch_path, "w", encoding="utf-8") as f:
             f.write(batch_content)
 
         logger.info("✅ Создан .bat файл: {batch_path}")
@@ -126,6 +137,7 @@ pause
     except Exception:
         logger.error("Ошибка при создании .bat файла: {e}")
         return False
+
 
 def create_powershell_script():
     """Создаёт PowerShell скрипт для запуска"""
@@ -152,7 +164,7 @@ Read-Host
 
         ps_path = current_dir / "run_database_keepalive.ps1"
 
-        with open(ps_path, 'w', encoding='utf-8') as f:
+        with open(ps_path, "w", encoding="utf-8") as f:
             f.write(ps_content)
 
         logger.info("✅ Создан PowerShell скрипт: {ps_path}")
@@ -162,6 +174,7 @@ Read-Host
         logger.error("Ошибка при создании PowerShell скрипта: {e}")
         return False
 
+
 def main():
     """Основная функция"""
     logger.info("🚀 Настройка автоматического запуска database_keepalive.py")
@@ -170,9 +183,12 @@ def main():
     # Проверяем права администратора
     try:
         import ctypes
+
         is_admin = ctypes.windll.shell32.IsUserAnAdmin()
         if not is_admin:
-            logger.warning("⚠️ Для создания задачи в планировщике требуются права администратора")
+            logger.warning(
+                "⚠️ Для создания задачи в планировщике требуются права администратора"
+            )
             logger.info("Создаю альтернативные способы запуска...")
 
             # Создаём .bat и .ps1 файлы
@@ -182,7 +198,9 @@ def main():
             logger.info("\n📋 Инструкции по настройке:")
             logger.info("1. Запустите PowerShell от имени администратора")
             logger.info("2. Выполните команду:")
-            logger.info('   schtasks /create /tn "ExamFlow_Database_KeepAlive" /tr "python {Path(__file__).parent / "database_keepalive.py"}" /sc minute /mo 5 /ru SYSTEM /f')
+            logger.info(
+                '   schtasks /create /tn "ExamFlow_Database_KeepAlive" /tr "python {Path(__file__).parent / "database_keepalive.py"}" /sc minute /mo 5 /ru SYSTEM /f'
+            )
             logger.info("3. Или используйте созданные файлы для ручного запуска")
 
         else:
@@ -192,7 +210,7 @@ def main():
             if check_scheduled_task():
                 logger.info("Задача уже существует. Хотите пересоздать? (y/n): ")
                 response = input().lower().strip()
-                if response == 'y':
+                if response == "y":
                     delete_scheduled_task()
                     create_scheduled_task()
                 else:
@@ -216,6 +234,7 @@ def main():
     logger.info("2. Ручной запуск через .bat файл")
     logger.info("3. Ручной запуск через PowerShell скрипт")
     logger.info("4. Прямой запуск: python database_keepalive.py")
+
 
 if __name__ == "__main__":
     main()

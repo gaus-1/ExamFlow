@@ -1,4 +1,4 @@
 # Модуль обучения и работы с заданиями
 # Содержит логику для работы с предметами, темами, заданиями и прогрессом
 
-default_app_config = 'learning.apps.LearningConfig'
+default_app_config = "learning.apps.LearningConfig"

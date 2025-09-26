@@ -4,24 +4,31 @@
 Проверяет все основные кнопки и их ответы
 """
 
+import asyncio
 import os
 import sys
+from unittest.mock import AsyncMock, Mock
+
 import django
-import asyncio
-from unittest.mock import Mock, AsyncMock
 
 # Настройка Django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 django.setup()
 
-from telegram_bot.bot_handlers import (
-    start, subjects_menu, show_stats, ai_help_handler,
-    show_subject_topics, random_task, handle_ai_message
-)
-from telegram import Update, User, Message, CallbackQuery, Chat
-from telegram.ext import ContextTypes
 from asgiref.sync import sync_to_async
+from telegram import CallbackQuery, Chat, Message, Update, User
+from telegram.ext import ContextTypes
+
+from telegram_bot.bot_handlers import (
+    ai_help_handler,
+    handle_ai_message,
+    random_task,
+    show_stats,
+    show_subject_topics,
+    start,
+    subjects_menu,
+)
 
 
 class BotTester:
@@ -139,6 +146,7 @@ class BotTester:
 
         # Берем первый предмет
         from learning.models import Subject
+
         subject = await sync_to_async(Subject.objects.filter(is_archived=False).first)()  # type: ignore
         if not subject:
             print("❌ Нет доступных предметов")
@@ -151,7 +159,9 @@ class BotTester:
         try:
             await show_subject_topics(update, context)
             print(f"✅ Выбор предмета '{subject.name}' работает")
-            self.test_results.append(("subject_selection", True, f"Subject: {subject.name}"))
+            self.test_results.append(
+                ("subject_selection", True, f"Subject: {subject.name}")
+            )
         except Exception as e:
             print(f"❌ Ошибка при выборе предмета: {e}")
             self.test_results.append(("subject_selection", False, str(e)))
@@ -175,7 +185,9 @@ class BotTester:
         """Тестирует прямое сообщение ИИ"""
         print("🧪 Тестирую прямое сообщение ИИ...")
 
-        update = self.create_mock_update(message_text="Как решать квадратные уравнения?")
+        update = self.create_mock_update(
+            message_text="Как решать квадратные уравнения?"
+        )
         context = self.create_mock_context()
 
         try:

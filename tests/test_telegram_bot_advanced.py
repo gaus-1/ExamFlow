@@ -3,9 +3,12 @@
 """
 
 import asyncio
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import AsyncMock, Mock, patch
+
 from django.test import TestCase
+
 from telegram_bot.bot_handlers import BotHandlers
+
 
 class TestBotHandlers(TestCase):
     """Тесты обработчиков Telegram бота."""
@@ -56,16 +59,16 @@ class TestBotHandlers(TestCase):
         finally:
             loop.close()
 
-    @patch('core.rag_system.orchestrator.RAGOrchestrator')
+    @patch("core.rag_system.orchestrator.RAGOrchestrator")
     def test_search_command(self, mock_rag_class):
         """Тест команды поиска."""
         # Настраиваем мок RAG системы
         mock_rag = Mock()
         mock_rag_class.return_value = mock_rag
         mock_rag.process_query.return_value = {
-            'answer': 'тест ответ',
-            'sources': ['источник 1'],
-            'cached': False
+            "answer": "тест ответ",
+            "sources": ["источник 1"],
+            "cached": False,
         }
 
         # Настраиваем мок сообщения
@@ -88,16 +91,16 @@ class TestBotHandlers(TestCase):
         # Проверяем, что ответ был отправлен
         self.mock_update.message.reply_text.assert_called_once()
 
-    @patch('core.rag_system.orchestrator.RAGOrchestrator')
+    @patch("core.rag_system.orchestrator.RAGOrchestrator")
     def test_fipi_command(self, mock_rag_class):
         """Тест команды поиска по ФИПИ."""
         # Настраиваем мок RAG системы
         mock_rag = Mock()
         mock_rag_class.return_value = mock_rag
         mock_rag.process_query.return_value = {
-            'answer': 'ФИПИ ответ',
-            'sources': ['ФИПИ источник'],
-            'cached': False
+            "answer": "ФИПИ ответ",
+            "sources": ["ФИПИ источник"],
+            "cached": False,
         }
 
         # Настраиваем мок сообщения
@@ -117,8 +120,8 @@ class TestBotHandlers(TestCase):
         # Проверяем, что RAG система была вызвана с правильными параметрами
         mock_rag.process_query.assert_called_once()
         call_args = mock_rag.process_query.call_args[1]
-        self.assertEqual(call_args['subject'], 'математика')
-        self.assertEqual(call_args['document_type'], 'fipi')
+        self.assertEqual(call_args["subject"], "математика")
+        self.assertEqual(call_args["document_type"], "fipi")
 
     def test_handle_message_text(self):
         """Тест обработки текстовых сообщений."""
@@ -127,13 +130,13 @@ class TestBotHandlers(TestCase):
         self.mock_update.message.reply_text = Mock()
 
         # Мокаем RAG систему
-        with patch('core.rag_system.orchestrator.RAGOrchestrator') as mock_rag_class:
+        with patch("core.rag_system.orchestrator.RAGOrchestrator") as mock_rag_class:
             mock_rag = Mock()
             mock_rag_class.return_value = mock_rag
             mock_rag.process_query.return_value = {
-                'answer': 'ответ на сообщение',
-                'sources': [],
-                'cached': False
+                "answer": "ответ на сообщение",
+                "sources": [],
+                "cached": False,
             }
             # Вызываем обработчик (асинхронный вызов, результат нужно ожидать)
             loop = asyncio.new_event_loop()
@@ -170,7 +173,7 @@ class TestBotHandlers(TestCase):
         # Проверяем, что сообщение было отправлено
         self.mock_update.message.reply_text.assert_called_once()
         call_args = self.mock_update.message.reply_text.call_args[0][0]
-        self.assertIn('текстовое сообщение', call_args)
+        self.assertIn("текстовое сообщение", call_args)
 
     def test_error_handling(self):
         """Тест обработки ошибок."""
@@ -179,7 +182,7 @@ class TestBotHandlers(TestCase):
         self.mock_update.message.reply_text = Mock()
 
         # Мокаем RAG систему с ошибкой
-        with patch('core.rag_system.orchestrator.RAGOrchestrator') as mock_rag_class:
+        with patch("core.rag_system.orchestrator.RAGOrchestrator") as mock_rag_class:
             mock_rag = Mock()
             mock_rag_class.return_value = mock_rag
             mock_rag.process_query.side_effect = Exception("Тестовая ошибка")
@@ -197,7 +200,8 @@ class TestBotHandlers(TestCase):
             # Проверяем, что ошибка была обработана
             self.mock_update.message.reply_text.assert_called_once()
             call_args = self.mock_update.message.reply_text.call_args[0][0]
-            self.assertIn('ошибка', call_args.lower())
+            self.assertIn("ошибка", call_args.lower())
+
 
 class TestBotIntegration(TestCase):
     """Интеграционные тесты бота."""
@@ -229,15 +233,15 @@ class TestBotIntegration(TestCase):
 
         # Тест форматирования ответа RAG
         rag_response = {
-            'answer': 'тест ответ',
-            'sources': ['источник 1', 'источник 2'],
-            'cached': False,
-            'processing_time': 1.5
+            "answer": "тест ответ",
+            "sources": ["источник 1", "источник 2"],
+            "cached": False,
+            "processing_time": 1.5,
         }
 
         formatted = handlers._format_rag_response(rag_response)
 
-        self.assertIn('тест ответ', formatted)
-        self.assertIn('источник 1', formatted)
-        self.assertIn('источник 2', formatted)
-        self.assertIn('1.5', formatted)  # время обработки
+        self.assertIn("тест ответ", formatted)
+        self.assertIn("источник 1", formatted)
+        self.assertIn("источник 2", formatted)
+        self.assertIn("1.5", formatted)  # время обработки

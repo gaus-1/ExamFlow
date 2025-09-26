@@ -2,10 +2,13 @@
 Unit тесты для RAG системы
 """
 
+from unittest.mock import MagicMock, patch
+
 from django.test import TestCase
-from unittest.mock import patch, MagicMock
+
 from core.rag_system.orchestrator import RAGOrchestrator
 from core.rag_system.vector_store import VectorStore
+
 
 class TestRAGOrchestrator(TestCase):
     """Тесты для AI Orchestrator"""
@@ -14,57 +17,59 @@ class TestRAGOrchestrator(TestCase):
         """Настройка тестов"""
         self.orchestrator = RAGOrchestrator()
 
-    @patch('core.rag_system.orchestrator.VectorStore')
+    @patch("core.rag_system.orchestrator.VectorStore")
     def test_process_query_success(self, mock_vector_store):
         """Тест успешной обработки запроса"""
         # Мокаем векторный поиск
         mock_vector_store.return_value.search.return_value = [
             {
-                'text': 'Тестовый контекст',
-                'similarity': 0.85,
-                'subject': 'mathematics',
-                'source': 'fipi.ru'
+                "text": "Тестовый контекст",
+                "similarity": 0.85,
+                "subject": "mathematics",
+                "source": "fipi.ru",
             }
         ]
 
         # Мокаем AI ответ
-        with patch.object(self.orchestrator, 'get_ai_response') as mock_ai:
+        with patch.object(self.orchestrator, "get_ai_response") as mock_ai:
             mock_ai.return_value = "Тестовый ответ от AI"
 
             result = self.orchestrator.process_query("Тестовый вопрос")
 
-            self.assertIn('answer', result)
-            self.assertIn('sources', result)
-            self.assertIn('practice', result)
+            self.assertIn("answer", result)
+            self.assertIn("sources", result)
+            self.assertIn("practice", result)
 
     def test_get_user_context_empty(self):
         """Тест получения контекста пользователя (пустой)"""
-        context = self.orchestrator.get_user_context(999)  # Несуществующий пользователь # type: ignore
+        context = self.orchestrator.get_user_context(
+            999
+        )  # Несуществующий пользователь # type: ignore
         self.assertEqual(context, {})
 
     def test_build_context_with_results(self):
         """Тест построения контекста с результатами"""
         search_results = [
             {
-                'text': 'Контекст 1',
-                'similarity': 0.9,
-                'subject': 'mathematics',
-                'source': 'fipi.ru'
+                "text": "Контекст 1",
+                "similarity": 0.9,
+                "subject": "mathematics",
+                "source": "fipi.ru",
             },
             {
-                'text': 'Контекст 2',
-                'similarity': 0.8,
-                'subject': 'physics',
-                'source': 'fipi.ru'
-            }
+                "text": "Контекст 2",
+                "similarity": 0.8,
+                "subject": "physics",
+                "source": "fipi.ru",
+            },
         ]
 
         context = self.orchestrator.build_context(search_results, {})  # type: ignore
 
-        self.assertIn('Контекст 1', context)
-        self.assertIn('Контекст 2', context)
-        self.assertIn('Релевантность: 0.90', context)
-        self.assertIn('Релевантность: 0.80', context)
+        self.assertIn("Контекст 1", context)
+        self.assertIn("Контекст 2", context)
+        self.assertIn("Релевантность: 0.90", context)
+        self.assertIn("Релевантность: 0.80", context)
 
     def test_build_context_empty(self):
         """Тест построения контекста без результатов"""
@@ -75,20 +80,16 @@ class TestRAGOrchestrator(TestCase):
         """Тест оптимизированной генерации промпта"""
         query = "Как решить квадратное уравнение?"
         context = "Квадратное уравнение решается по формуле..."
-        user_context = {
-            'level': 2,
-            'total_problems_solved': 15,
-            'streak': 3
-        }
+        user_context = {"level": 2, "total_problems_solved": 15, "streak": 3}
 
         prompt = self.orchestrator.generate_prompt(query, context, user_context)  # type: ignore
 
         self.assertIn(query, prompt)
         self.assertIn(context, prompt)
-        self.assertIn('уровень 2', prompt)
-        self.assertIn('решено 15 задач', prompt)
-        self.assertIn('серия 3', prompt)
-        self.assertIn('Требования к ответу:', prompt)
+        self.assertIn("уровень 2", prompt)
+        self.assertIn("решено 15 задач", prompt)
+        self.assertIn("серия 3", prompt)
+        self.assertIn("Требования к ответу:", prompt)
 
     def test_generate_prompt_no_user_context(self):
         """Тест генерации промпта без контекста пользователя"""
@@ -99,9 +100,9 @@ class TestRAGOrchestrator(TestCase):
 
         self.assertIn(query, prompt)
         self.assertIn(context, prompt)
-        self.assertNotIn('Пользователь:', prompt)
+        self.assertNotIn("Пользователь:", prompt)
 
-    @patch('core.rag_system.orchestrator.genai')
+    @patch("core.rag_system.orchestrator.genai")
     def test_get_ai_response_success(self, mock_genai):
         """Тест получения ответа от AI"""
         mock_model = MagicMock()
@@ -123,10 +124,11 @@ class TestRAGOrchestrator(TestCase):
         """Тест fallback ответа"""
         response = self.orchestrator.get_fallback_response("Тестовый вопрос", "Ошибка")  # type: ignore
 
-        self.assertIn('Извините', response['answer'])
-        self.assertIn('Тестовый вопрос', response['answer'])
-        self.assertIn('sources', response)
-        self.assertIn('practice', response)
+        self.assertIn("Извините", response["answer"])
+        self.assertIn("Тестовый вопрос", response["answer"])
+        self.assertIn("sources", response)
+        self.assertIn("practice", response)
+
 
 class TestVectorStore(TestCase):
     """Тесты для Vector Store"""
@@ -135,12 +137,10 @@ class TestVectorStore(TestCase):
         """Настройка тестов"""
         self.vector_store = VectorStore()
 
-    @patch('core.rag_system.vector_store.genai')
+    @patch("core.rag_system.vector_store.genai")
     def test_create_embedding_success(self, mock_genai):
         """Тест создания эмбеддинга"""
-        mock_genai.embed_content.return_value = {
-            'embedding': [0.1, 0.2, 0.3, 0.4, 0.5]
-        }
+        mock_genai.embed_content.return_value = {"embedding": [0.1, 0.2, 0.3, 0.4, 0.5]}
 
         embedding = self.vector_store.create_embedding("Тестовый текст")  # type: ignore
 
@@ -155,11 +155,11 @@ class TestVectorStore(TestCase):
         vec3 = [0, 1, 0]
 
         # Идентичные векторы
-        similarity1 = self.vector_store.cosine_similarity(vec1, vec2) # type: ignore
+        similarity1 = self.vector_store.cosine_similarity(vec1, vec2)  # type: ignore
         self.assertAlmostEqual(similarity1, 1.0, places=5)
 
         # Перпендикулярные векторы
-        similarity2 = self.vector_store.cosine_similarity(vec1, vec3) # type: ignore
+        similarity2 = self.vector_store.cosine_similarity(vec1, vec3)  # type: ignore
         self.assertAlmostEqual(similarity2, 0.0, places=5)
 
     def test_find_similar_chunks(self):
@@ -167,32 +167,45 @@ class TestVectorStore(TestCase):
         # Мокаем данные
         query_embedding = [1, 0, 0]
         chunks = [
-            {'text': 'Текст 1', 'embedding': [1, 0, 0], 'subject': 'mathematics', 'source': 'fipi.ru'},
-            {'text': 'Текст 2', 'embedding': [0.7, 0.2, 0.1], 'subject': 'russian', 'source': 'fipi.ru'},
-            {'text': 'Текст 3', 'embedding': [0.9, 0.05, 0.05], 'subject': 'physics', 'source': 'fipi.ru'},
+            {
+                "text": "Текст 1",
+                "embedding": [1, 0, 0],
+                "subject": "mathematics",
+                "source": "fipi.ru",
+            },
+            {
+                "text": "Текст 2",
+                "embedding": [0.7, 0.2, 0.1],
+                "subject": "russian",
+                "source": "fipi.ru",
+            },
+            {
+                "text": "Текст 3",
+                "embedding": [0.9, 0.05, 0.05],
+                "subject": "physics",
+                "source": "fipi.ru",
+            },
         ]
 
-        similar = self.vector_store.find_similar_chunks(query_embedding, chunks, limit=2) # type: ignore
+        similar = self.vector_store.find_similar_chunks(query_embedding, chunks, limit=2)  # type: ignore
 
         self.assertEqual(len(similar), 2)
-        self.assertEqual(similar[0]['text'], 'Текст 1')  # Наиболее похожий
-        self.assertEqual(similar[1]['text'], 'Текст 3')  # Второй по похожести
+        self.assertEqual(similar[0]["text"], "Текст 1")  # Наиболее похожий
+        self.assertEqual(similar[1]["text"], "Текст 3")  # Второй по похожести
 
-    @patch('core.rag_system.vector_store.genai')
+    @patch("core.rag_system.vector_store.genai")
     def test_search_success(self, mock_genai):
         """Тест поиска в векторном хранилище"""
-        mock_genai.embed_content.return_value = {
-            'embedding': [1, 0, 0]
-        }
+        mock_genai.embed_content.return_value = {"embedding": [1, 0, 0]}
 
         # Мокаем поиск в БД
-        with patch('core.rag_system.vector_store.DataChunk') as mock_chunk:
+        with patch("core.rag_system.vector_store.DataChunk") as mock_chunk:
             mock_chunk.objects.all.return_value = [
                 MagicMock(
                     embedding=[1, 0, 0],
                     text="Найденный текст",
                     subject="mathematics",
-                    source="fipi.ru"
+                    source="fipi.ru",
                 )
             ]
 
@@ -200,10 +213,11 @@ class TestVectorStore(TestCase):
 
             self.assertIsInstance(results, list)
             if results:  # Если есть результаты
-                self.assertIn('text', results[0])
-                self.assertIn('similarity', results[0])
-                self.assertIn('subject', results[0])
-                self.assertIn('source', results[0])
+                self.assertIn("text", results[0])
+                self.assertIn("similarity", results[0])
+                self.assertIn("subject", results[0])
+                self.assertIn("source", results[0])
+
 
 class TestIntegration(TestCase):
     """Интеграционные тесты"""
@@ -212,17 +226,17 @@ class TestIntegration(TestCase):
         """Настройка тестов"""
         self.orchestrator = RAGOrchestrator()
 
-    @patch('core.rag_system.orchestrator.VectorStore')
-    @patch('core.rag_system.orchestrator.genai')
+    @patch("core.rag_system.orchestrator.VectorStore")
+    @patch("core.rag_system.orchestrator.genai")
     def test_full_pipeline(self, mock_genai, mock_vector_store):
         """Тест полного пайплайна обработки запроса"""
         # Настраиваем моки
         mock_vector_store.return_value.search.return_value = [
             {
-                'text': 'Контекст о математике',
-                'similarity': 0.9,
-                'subject': 'mathematics',
-                'source': 'fipi.ru'
+                "text": "Контекст о математике",
+                "similarity": 0.9,
+                "subject": "mathematics",
+                "source": "fipi.ru",
             }
         ]
 
@@ -236,10 +250,10 @@ class TestIntegration(TestCase):
         result = self.orchestrator.process_query("Как решить уравнение?")
 
         # Проверяем результат
-        self.assertIn('answer', result)
-        self.assertIn('sources', result)
-        self.assertIn('practice', result)
-        self.assertEqual(result['answer'], "Ответ на вопрос о математике")
+        self.assertIn("answer", result)
+        self.assertIn("sources", result)
+        self.assertIn("practice", result)
+        self.assertEqual(result["answer"], "Ответ на вопрос о математике")
 
         # Проверяем, что все методы были вызваны
         mock_vector_store.return_value.search.assert_called_once()

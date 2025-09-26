@@ -1,6 +1,8 @@
-import qrcode  # type: ignore
-from io import BytesIO
 import base64
+from io import BytesIO
+
+import qrcode  # type: ignore
+
 
 def generate_qr_code(url):
     """Генерирует QR-код для указанного URL"""

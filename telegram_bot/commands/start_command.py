@@ -4,19 +4,20 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from .base_command import BaseCommand
 
 
 class StartCommand(BaseCommand):
     """Обработчик команды /start"""
-    
+
     async def execute(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Выполнить команду /start"""
         if not self.validate_update(update):
             return
-            
+
         user = update.effective_user
-        
+
         welcome_text = f"""
 🎯 **Добро пожаловать в ExamFlow, {user.first_name}!**
 
@@ -40,8 +41,8 @@ class StartCommand(BaseCommand):
 
 Готов помочь тебе достичь высоких результатов! 🎓
         """
-        
+
         await self.send_message(update, context, welcome_text)
-    
+
     def get_command_name(self) -> str:
         return "/start"

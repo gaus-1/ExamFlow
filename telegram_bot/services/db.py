@@ -4,17 +4,34 @@ from core.container import Container
 
 try:
     from telegram_bot.bot_handlers import (
-        db_check_connection as _db_check_connection, # type: ignore
-        db_get_or_create_unified_profile as _db_get_or_create_unified_profile, # type: ignore
-        db_update_profile_activity as _db_update_profile_activity, # type: ignore
-        db_get_profile_progress as _db_get_profile_progress, # type: ignore
-        db_get_or_create_chat_session as _db_get_or_create_chat_session, # type: ignore
-        db_add_user_message_to_session as _db_add_user_message_to_session, # type: ignore
-        db_add_assistant_message_to_session as _db_add_assistant_message_to_session, # type: ignore
+        db_add_assistant_message_to_session as _db_add_assistant_message_to_session,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_add_user_message_to_session as _db_add_user_message_to_session,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_check_connection as _db_check_connection,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_clear_chat_session_context as _db_clear_chat_session_context,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
         db_create_enhanced_prompt as _db_create_enhanced_prompt,
-        db_clear_chat_session_context as _db_clear_chat_session_context, # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_or_create_chat_session as _db_get_or_create_chat_session,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_or_create_unified_profile as _db_get_or_create_unified_profile,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_get_profile_progress as _db_get_profile_progress,  # type: ignore
+    )
+    from telegram_bot.bot_handlers import (
+        db_update_profile_activity as _db_update_profile_activity,  # type: ignore
     )
 except Exception:
+
     def _db_check_connection() -> bool:  # type: ignore
         return True
 
@@ -48,6 +65,7 @@ def check_connection() -> bool:
     """Проверяет подключение к базе данных."""
     try:
         from django.db import connection
+
         connection.ensure_connection()
         return True
     except Exception:

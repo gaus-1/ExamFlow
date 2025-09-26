@@ -3,36 +3,36 @@
 Предотвращает "засыпание" PostgreSQL на Render
 """
 
+import logging
+import time
+
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils import timezone
-import time
-import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
-    help = 'Поддерживает соединение с базой данных активным'
+    help = "Поддерживает соединение с базой данных активным"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--interval',
+            "--interval",
             type=int,
             default=60,
-            help='Интервал проверки в секундах (по умолчанию 60)'
+            help="Интервал проверки в секундах (по умолчанию 60)",
         )
         parser.add_argument(
-            '--continuous',
-            action='store_true',
-            help='Запустить в непрерывном режиме'
+            "--continuous", action="store_true", help="Запустить в непрерывном режиме"
         )
 
     def handle(self, *args, **options):
-        interval = options['interval']
-        continuous = options['continuous']
+        interval = options["interval"]
+        continuous = options["continuous"]
 
         self.stdout.write(
-            '🔄 Запуск keep-alive для базы данных (интервал: {interval}с)'
+            "🔄 Запуск keep-alive для базы данных (интервал: {interval}с)"
         )
 
         while True:
@@ -41,12 +41,12 @@ class Command(BaseCommand):
                     cursor.execute("SELECT 1")
                     cursor.fetchone()
 
-                timestamp = timezone.now().strftime('%H:%M:%S')
+                timestamp = timezone.now().strftime("%H:%M:%S")
                 self.stdout.write("✅ {timestamp} - База активна")
                 logger.info("База данных активна: {timestamp}")
 
             except Exception:
-                timestamp = timezone.now().strftime('%H:%M:%S')
+                timestamp = timezone.now().strftime("%H:%M:%S")
                 error_msg = "❌ {timestamp} - Ошибка базы: {e}"
                 self.stdout.write("❌ {error_msg}")
                 logger.error("Ошибка соединения с базой: {e}")
@@ -66,6 +66,4 @@ class Command(BaseCommand):
 
             time.sleep(interval)
 
-        self.stdout.write(
-            '🏁 Keep-alive завершен'
-        )
+        self.stdout.write("🏁 Keep-alive завершен")

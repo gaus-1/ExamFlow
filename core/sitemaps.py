@@ -8,11 +8,12 @@ from django.urls import reverse
 
 class StaticViewSitemap(Sitemap):
     """Sitemap для статических страниц"""
+
     priority = 0.8
-    changefreq = 'weekly'
+    changefreq = "weekly"
 
     def items(self):
-        return ['learning:home', 'learning:subjects_list']
+        return ["learning:home", "learning:subjects_list"]
 
     def location(self, item):
         return reverse(item)
@@ -20,11 +21,12 @@ class StaticViewSitemap(Sitemap):
 
 class RootViewSitemap(Sitemap):
     """Sitemap для корневых страниц"""
+
     priority = 1.0
-    changefreq = 'daily'
+    changefreq = "daily"
 
     def items(self):
-        return ['/']
+        return ["/"]
 
     def location(self, item):
         return item

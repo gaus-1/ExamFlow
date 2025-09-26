@@ -7,24 +7,20 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def install_security_tools():
     """Устанавливает инструменты безопасности"""
     print("🔒 Устанавливаем инструменты безопасности...")
 
-    tools = [
-        'safety',
-        'bandit',
-        'pip-audit',
-        'django-csp',
-        'django-ratelimit'
-    ]
+    tools = ["safety", "bandit", "pip-audit", "django-csp", "django-ratelimit"]
 
     for tool in tools:
         try:
-            subprocess.run([sys.executable, '-m', 'pip', 'install', tool], check=True)
+            subprocess.run([sys.executable, "-m", "pip", "install", tool], check=True)
             print("✅ {tool} установлен")
         except subprocess.CalledProcessError:
             print("❌ Ошибка установки {tool}")
+
 
 def update_dependencies():
     """Обновляет зависимости до последних версий"""
@@ -32,28 +28,39 @@ def update_dependencies():
 
     try:
         # Проверяем уязвимости
-        subprocess.run([sys.executable, '-m', 'safety', 'check'], check=True)
+        subprocess.run([sys.executable, "-m", "safety", "check"], check=True)
         print("✅ Проверка безопасности пройдена")
     except subprocess.CalledProcessError:
         print("⚠️ Найдены уязвимости, обновляем...")
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip'])
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', '-r', 'requirements.txt'])
+        subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--upgrade",
+                "-r",
+                "requirements.txt",
+            ]
+        )
+
 
 def enable_csp():
     """Включает Content Security Policy"""
     print("🛡️ Включаем CSP...")
 
-    settings_file = Path('examflow_project/settings.py')
+    settings_file = Path("examflow_project/settings.py")
     if not settings_file.exists():
         print("❌ Файл settings.py не найден")
         return
 
     # Читаем текущие настройки
-    with open(settings_file, 'r', encoding='utf-8') as f:
+    with open(settings_file, encoding="utf-8") as f:
         content = f.read()
 
     # Добавляем CSP настройки если их нет
-    csp_config = '''
+    csp_config = """
 # Content Security Policy
 CSP_DEFAULT_SRC = ("'self'", )
 CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://www.googletagmanager.com")
@@ -64,30 +71,33 @@ CSP_CONNECT_SRC = ("'self'", "https://generativelanguage.googleapis.com")
 CSP_FRAME_ANCESTORS = ("'none'", )
 CSP_BASE_URI = ("'self'", )
 CSP_OBJECT_SRC = ("'none'", )
-'''
+"""
 
-    if 'CSP_DEFAULT_SRC' not in content:
+    if "CSP_DEFAULT_SRC" not in content:
         # Добавляем CSP настройки перед INSTALLED_APPS
-        content = content.replace('INSTALLED_APPS = [', csp_config + '\nINSTALLED_APPS = [')
+        content = content.replace(
+            "INSTALLED_APPS = [", csp_config + "\nINSTALLED_APPS = ["
+        )
 
         # Включаем CSP middleware
         if "'csp.middleware.CSPMiddleware'" not in content:
             content = content.replace(
                 "# 'csp.middleware.CSPMiddleware',  # CSP middleware - ВРЕМЕННО ОТКЛЮЧЕН",
-                "'csp.middleware.CSPMiddleware',  # CSP middleware"
+                "'csp.middleware.CSPMiddleware',  # CSP middleware",
             )
 
-        with open(settings_file, 'w', encoding='utf-8') as f:
+        with open(settings_file, "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ CSP включен")
     else:
         print("✅ CSP уже настроен")
 
+
 def add_security_headers():
     """Добавляет заголовки безопасности"""
     print("🔐 Добавляем заголовки безопасности...")
 
-    middleware_file = Path('examflow_project/middleware.py')
+    middleware_file = Path("examflow_project/middleware.py")
     if not middleware_file.exists():
         # Создаем middleware файл
         middleware_content = '''"""
@@ -110,17 +120,18 @@ class SecurityHeadersMiddleware:
 
         return response
 '''
-        with open(middleware_file, 'w', encoding='utf-8') as f:
+        with open(middleware_file, "w", encoding="utf-8") as f:
             f.write(middleware_content)
         print("✅ Middleware безопасности создан")
     else:
         print("✅ Middleware безопасности уже существует")
 
+
 def add_input_validation():
     """Добавляет валидацию входных данных"""
     print("🔍 Добавляем валидацию входных данных...")
 
-    validators_file = Path('core/validators.py')
+    validators_file = Path("core/validators.py")
     if not validators_file.exists():
         validators_content = '''"""
 Валидаторы для входных данных
@@ -197,11 +208,12 @@ def validate_user_input(data: Dict[str, Any]) -> Dict[str, Any]:
 
     return data
 '''
-        with open(validators_file, 'w', encoding='utf-8') as f:
+        with open(validators_file, "w", encoding="utf-8") as f:
             f.write(validators_content)
         print("✅ Валидаторы созданы")
     else:
         print("✅ Валидаторы уже существуют")
+
 
 def run_security_checks():
     """Запускает проверки безопасности"""
@@ -209,17 +221,31 @@ def run_security_checks():
 
     try:
         # Bandit проверка
-        subprocess.run([sys.executable, '-m', 'bandit', '-r', '.', '-', 'json', '-o', 'bandit-report.json'], check=True)
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "bandit",
+                "-r",
+                ".",
+                "-",
+                "json",
+                "-o",
+                "bandit-report.json",
+            ],
+            check=True,
+        )
         print("✅ Bandit проверка пройдена")
     except subprocess.CalledProcessError:
         print("⚠️ Bandit нашел проблемы, проверьте bandit-report.json")
 
     try:
         # Safety проверка
-        subprocess.run([sys.executable, '-m', 'safety', 'check'], check=True)
+        subprocess.run([sys.executable, "-m", "safety", "check"], check=True)
         print("✅ Safety проверка пройдена")
     except subprocess.CalledProcessError:
         print("⚠️ Safety нашел уязвимости в зависимостях")
+
 
 def main():
     """Основная функция"""
@@ -249,6 +275,7 @@ def main():
     print("2. Обновите requirements.txt с новыми версиями")
     print("3. Протестируйте приложение")
     print("4. Запустите миграции: python manage.py migrate")
+
 
 if __name__ == "__main__":
     main()

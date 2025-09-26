@@ -5,12 +5,13 @@
 import hashlib
 import hmac
 import logging
-from typing import Dict, Any, Optional, Tuple
-from django.conf import settings
-from django.utils import timezone
-from django.db import transaction
+from typing import Any
 
-from .models import TelegramUser, TelegramAuthSession, TelegramAuthLog
+from django.conf import settings
+from django.db import transaction
+from django.utils import timezone
+
+from .models import TelegramAuthLog, TelegramAuthSession, TelegramUser
 
 logger = logging.getLogger(__name__)
 
@@ -23,24 +24,26 @@ class TelegramAuthService:
         if not self.bot_token:
             raise ValueError("TELEGRAM_BOT_TOKEN не настроен в settings")
 
-    def verify_telegram_data(self, auth_data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+    def verify_telegram_data(
+        self, auth_data: dict[str, Any]
+    ) -> tuple[bool, str | None]:
         """
         Проверяет подлинность данных от Telegram Login Widget
-        
+
         Args:
             auth_data: Данные от Telegram (id, first_name, username, hash, auth_date)
-            
+
         Returns:
             Tuple[bool, str]: (успех_проверки, сообщение_об_ошибке)
         """
         try:
             # Извлекаем hash из данных
-            received_hash = auth_data.pop('hash', None)
+            received_hash = auth_data.pop("hash", None)
             if not received_hash:
                 return False, "Отсутствует hash в данных аутентификации"
 
             # Проверяем обязательные поля
-            required_fields = ['id', 'first_name', 'auth_date']
+            required_fields = ["id", "first_name", "auth_date"]
             for field in required_fields:
                 if field not in auth_data:
                     return False, f"Отсутствует обязательное поле: {field}"
@@ -53,9 +56,7 @@ class TelegramAuthService:
 
             # Вычисляем hash
             calculated_hash = hmac.new(
-                secret_key,
-                data_check_string.encode(),
-                hashlib.sha256
+                secret_key, data_check_string.encode(), hashlib.sha256
             ).hexdigest()
 
             # Сравниваем hash
@@ -63,7 +64,7 @@ class TelegramAuthService:
                 return False, "Неверный hash - данные могли быть подделаны"
 
             # Проверяем время аутентификации (не старше 24 часов)
-            auth_date = int(auth_data['auth_date'])
+            auth_date = int(auth_data["auth_date"])
             current_time = int(timezone.now().timestamp())
             if current_time - auth_date > 86400:  # 24 часа
                 return False, "Данные аутентификации устарели"
@@ -74,32 +75,35 @@ class TelegramAuthService:
             logger.error(f"Ошибка проверки данных Telegram: {e}")
             return False, f"Ошибка проверки данных: {str(e)}"
 
-    def _create_data_check_string(self, auth_data: Dict[str, Any]) -> str:
+    def _create_data_check_string(self, auth_data: dict[str, Any]) -> str:
         """
         Создает строку для проверки hash согласно документации Telegram
-        
+
         Args:
             auth_data: Данные аутентификации
-            
+
         Returns:
             str: Строка для проверки
         """
         # Сортируем ключи и создаем строку вида "key=value\nkey=value"
         sorted_items = sorted(auth_data.items())
-        return '\n'.join([f"{key}={value}" for key, value in sorted_items])
+        return "\n".join([f"{key}={value}" for key, value in sorted_items])
 
     @transaction.atomic
-    def authenticate_user(self, auth_data: Dict[str, Any],
-                         ip_address: str = None,    # type: ignore  
-                         user_agent: str = None) -> Tuple[bool, Optional[TelegramUser], str]:  # type: ignore
+    def authenticate_user(
+        self,
+        auth_data: dict[str, Any],
+        ip_address: str = None,  # type: ignore
+        user_agent: str = None,
+    ) -> tuple[bool, TelegramUser | None, str]:  # type: ignore
         """
         Аутентифицирует пользователя через Telegram данные
-        
+
         Args:
             auth_data: Данные от Telegram
             ip_address: IP адрес пользователя
             user_agent: User Agent браузера
-            
+
         Returns:
             Tuple[bool, TelegramUser, str]: (успех, пользователь, сообщение)
         """
@@ -108,34 +112,34 @@ class TelegramAuthService:
             is_valid, error_message = self.verify_telegram_data(auth_data.copy())
             if not is_valid:
                 self._log_auth_attempt(
-                    int(auth_data.get('id', 0)),
+                    int(auth_data.get("id", 0)),
                     False,
                     ip_address,
                     user_agent,
-                    error_message  # type: ignore
+                    error_message,  # type: ignore
                 )
                 return False, None, error_message  # type: ignore
 
-            telegram_id = int(auth_data['id'])
+            telegram_id = int(auth_data["id"])
 
             # Получаем или создаем пользователя
             user, created = TelegramUser.objects.get_or_create(
                 telegram_id=telegram_id,
                 defaults={
-                    'telegram_username': auth_data.get('username', ''),
-                    'telegram_first_name': auth_data.get('first_name', ''),
-                    'telegram_last_name': auth_data.get('last_name', ''),
-                    'language_code': auth_data.get('language_code', 'ru'),
-                    'last_login': timezone.now()
-                }
+                    "telegram_username": auth_data.get("username", ""),
+                    "telegram_first_name": auth_data.get("first_name", ""),
+                    "telegram_last_name": auth_data.get("last_name", ""),
+                    "language_code": auth_data.get("language_code", "ru"),
+                    "last_login": timezone.now(),
+                },
             )
 
             # Обновляем данные существующего пользователя
             if not created:
-                user.telegram_username = auth_data.get('username', '')
-                user.telegram_first_name = auth_data.get('first_name', '')
-                user.telegram_last_name = auth_data.get('last_name', '')
-                user.language_code = auth_data.get('language_code', 'ru')
+                user.telegram_username = auth_data.get("username", "")
+                user.telegram_first_name = auth_data.get("first_name", "")
+                user.telegram_last_name = auth_data.get("last_name", "")
+                user.language_code = auth_data.get("language_code", "ru")
                 user.last_login = timezone.now()
                 user.save()
 
@@ -155,17 +159,20 @@ class TelegramAuthService:
             logger.error(f"Ошибка аутентификации пользователя: {e}")
             error_message = f"Ошибка аутентификации: {str(e)}"
             self._log_auth_attempt(
-                int(auth_data.get('id', 0)),
+                int(auth_data.get("id", 0)),
                 False,
                 ip_address,
                 user_agent,
-                error_message
+                error_message,
             )
             return False, None, error_message
 
-    def _create_auth_session(self, user: TelegramUser,
-                           ip_address: str = None,    # type: ignore
-                           user_agent: str = None) -> TelegramAuthSession:  # type: ignore
+    def _create_auth_session(
+        self,
+        user: TelegramUser,
+        ip_address: str = None,  # type: ignore
+        user_agent: str = None,
+    ) -> TelegramAuthSession:  # type: ignore
         """Создает сессию аутентификации"""
         import secrets
 
@@ -177,29 +184,33 @@ class TelegramAuthService:
             session_token=session_token,
             expires_at=expires_at,
             ip_address=ip_address,
-            user_agent=user_agent
+            user_agent=user_agent,
         )
 
         return session
 
-    def _log_auth_attempt(self, telegram_id: int, success: bool,
-                         ip_address: str = None, user_agent: str = None,    # type: ignore
-                         error_message: str = None):  # type: ignore
+    def _log_auth_attempt(
+        self,
+        telegram_id: int,
+        success: bool,
+        ip_address: str = None,
+        user_agent: str = None,  # type: ignore
+        error_message: str = None,
+    ):  # type: ignore
         """Логирует попытку аутентификации"""
         TelegramAuthLog.objects.create(  # type: ignore
             telegram_id=telegram_id,
             success=success,
             ip_address=ip_address,
             user_agent=user_agent,
-            error_message=error_message or ''
+            error_message=error_message or "",
         )
 
-    def get_user_by_session(self, session_token: str) -> Optional[TelegramUser]:
+    def get_user_by_session(self, session_token: str) -> TelegramUser | None:
         """Получает пользователя по токену сессии"""
         try:
-            session = TelegramAuthSession.objects.select_related('user').get(  # type: ignore
-                session_token=session_token,
-                is_active=True
+            session = TelegramAuthSession.objects.select_related("user").get(  # type: ignore
+                session_token=session_token, is_active=True
             )
 
             if session.is_expired:
@@ -219,7 +230,7 @@ class TelegramAuthService:
             session.is_active = False
             session.save()
             return True
-        except TelegramAuthSession.DoesNotExist:  # type: ignore    
+        except TelegramAuthSession.DoesNotExist:  # type: ignore
             return False
 
 

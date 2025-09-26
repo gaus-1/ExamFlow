@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
+
 class LearningConfig(AppConfig):
     """
     Конфигурация модуля обучения
@@ -11,6 +12,7 @@ class LearningConfig(AppConfig):
     - Систему достижений и рейтингов
     - Загрузку материалов с ФИПИ
     """
-    default_auto_field = 'django.db.models.BigAutoField'  # type: ignore
-    name = 'learning'
-    verbose_name = 'Обучение'
+
+    default_auto_field = "django.db.models.BigAutoField"  # type: ignore
+    name = "learning"
+    verbose_name = "Обучение"

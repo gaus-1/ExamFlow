@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
+
 class TelegramBotConfig(AppConfig):
     """
     Конфигурация модуля Telegram бота
@@ -10,6 +11,7 @@ class TelegramBotConfig(AppConfig):
     - Отправку уведомлений пользователям
     - Синхронизацию данных между сайтом и ботом
     """
-    default_auto_field = 'django.db.models.BigAutoField'  # type: ignore
-    name = 'telegram_bot'
-    verbose_name = 'Telegram Бот'
+
+    default_auto_field = "django.db.models.BigAutoField"  # type: ignore
+    name = "telegram_bot"
+    verbose_name = "Telegram Бот"

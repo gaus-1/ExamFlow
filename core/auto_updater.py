@@ -2,18 +2,21 @@
 Система автоматического обновления материалов ФИПИ
 """
 
-import schedule
-import time
-import threading
 import logging
+import threading
+import time
 from datetime import timedelta
-from django.utils import timezone
-from django.core.management import call_command
+
+import schedule
 from django.conf import settings
+from django.core.management import call_command
+from django.utils import timezone
+
 from core.fipi_loader import FipiLoader
-from learning.models import Task, Subject
+from learning.models import Subject, Task
 
 logger = logging.getLogger(__name__)
+
 
 class AutoUpdater:
     """Автоматическое обновление материалов"""
@@ -35,8 +38,11 @@ class AutoUpdater:
         # Расписание обновлений
         schedule.every().day.at("03:00").do(self.daily_update)  # Ежедневно в 3:00
         schedule.every().sunday.at("02:00").do(
-            self.weekly_update)  # Еженедельно в воскресенье в 2:00
-        schedule.every().day.at("04:00").do(self.generate_voices_batch)  # Генерация голосов в 4:00
+            self.weekly_update
+        )  # Еженедельно в воскресенье в 2:00
+        schedule.every().day.at("04:00").do(
+            self.generate_voices_batch
+        )  # Генерация голосов в 4:00
         schedule.every(30).minutes.do(self.cleanup_old_data)  # Очистка каждые 30 минут
 
         # Запускаем в отдельном потоке
@@ -95,7 +101,7 @@ class AutoUpdater:
 
         try:
             # Полная перезагрузка данных
-            call_command('load_fipi_data')
+            call_command("load_fipi_data")
 
             # Генерируем голосовые файлы для новых заданий
             self.generate_voices_batch()
@@ -131,8 +137,7 @@ class AutoUpdater:
         try:
             # Генерируем голоса для заданий без аудио (максимум 20 за раз)
             tasks_without_audio = Task.objects.filter(
-                is_active=True,
-                audio_file__isnull=True
+                is_active=True, audio_file__isnull=True
             )[:20]
 
             if not tasks_without_audio:
@@ -144,9 +149,10 @@ class AutoUpdater:
             for task in tasks_without_audio:
                 try:
                     from core.voice_service import voice_service
+
                     result = voice_service.generate_task_audio(task)
 
-                    if result and result['task_audio']:
+                    if result and result["task_audio"]:
                         generated_count += 1
                         logger.info("🎤 Создан голос для: {task.title}")
 
@@ -174,14 +180,12 @@ class AutoUpdater:
         try:
             # Очищаем старые голосовые файлы (старше 30 дней)
             from core.voice_service import voice_service
+
             deleted_audio = voice_service.cleanup_old_audio(days=30)
 
             # Деактивируем очень старые задания (старше 1 года)
             cutoff_date = timezone.now() - timedelta(days=365)
-            old_tasks = Task.objects.filter(
-                created_at__lt=cutoff_date,
-                is_active=True
-            )
+            old_tasks = Task.objects.filter(created_at__lt=cutoff_date, is_active=True)
 
             deactivated_count = old_tasks.count()
             if deactivated_count > 0:
@@ -190,7 +194,8 @@ class AutoUpdater:
 
             if deleted_audio > 0 or deactivated_count > 0:
                 logger.info(
-                    "🧹 Очистка: удалено аудио {deleted_audio}, деактивировано заданий {deactivated_count}")
+                    "🧹 Очистка: удалено аудио {deleted_audio}, деактивировано заданий {deactivated_count}"
+                )
 
         except Exception:
             logger.error("❌ Ошибка очистки данных: {str(e)}")
@@ -198,8 +203,8 @@ class AutoUpdater:
     def _send_admin_notification(self, message):
         """Отправляет уведомление админу"""
         try:
-            admin_chat_id = getattr(settings, 'ADMIN_CHAT_ID', None)
-            bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', None)
+            admin_chat_id = getattr(settings, "ADMIN_CHAT_ID", None)
+            bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", None)
 
             if not admin_chat_id or not bot_token:
                 logger.warning("Не настроены данные для уведомлений админа")
@@ -209,9 +214,9 @@ class AutoUpdater:
 
             url = "https://api.telegram.org/bot{bot_token}/sendMessage"
             data = {
-                'chat_id': admin_chat_id,
-                'text': "🤖 ExamFlow AutoUpdater\n\n{message}",
-                'parse_mode': 'HTML'
+                "chat_id": admin_chat_id,
+                "text": "🤖 ExamFlow AutoUpdater\n\n{message}",
+                "parse_mode": "HTML",
             }
 
             response = requests.post(url, data=data, timeout=10)
@@ -219,8 +224,7 @@ class AutoUpdater:
             if response.status_code == 200:
                 logger.info("✅ Уведомление админу отправлено")
             else:
-                logger.warning(
-                    "⚠️ Ошибка отправки уведомления: {response.status_code}")
+                logger.warning("⚠️ Ошибка отправки уведомления: {response.status_code}")
 
         except Exception:
             logger.error("❌ Ошибка отправки уведомления: {str(e)}")
@@ -237,26 +241,30 @@ class AutoUpdater:
 
             logger.info("✅ Ручное обновление завершено")
             logger.info(
-                "📊 Предметов: {subjects_count}, Заданий: {tasks_count}, Примеров: {sample_tasks}")
+                "📊 Предметов: {subjects_count}, Заданий: {tasks_count}, Примеров: {sample_tasks}"
+            )
 
             return {
-                'subjects': subjects_count,
-                'tasks': tasks_count,
-                'samples': sample_tasks
+                "subjects": subjects_count,
+                "tasks": tasks_count,
+                "samples": sample_tasks,
             }
 
         except Exception:
             logger.error("❌ Ошибка ручного обновления: {str(e)}")
             raise
 
+
 # Глобальный экземпляр обновлятора
 auto_updater = AutoUpdater()
+
 
 def start_auto_updater():
     """Запускает автообновления"""
     logger.info("🚀 Инициализация системы автообновлений...")
     auto_updater.start_scheduler()
     logger.info("✅ Система автообновлений запущена")
+
 
 def stop_auto_updater():
     """Останавливает автообновления"""

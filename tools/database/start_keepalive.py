@@ -3,32 +3,31 @@
 Скрипт для запуска keepalive сервиса ExamFlow 2.0 в фоновом режиме
 """
 
-import os
-import sys
-import django
-import subprocess
-import time
-import signal
 import logging
+import os
+import signal
+import subprocess
+import sys
+import time
 from pathlib import Path
+
+import django
 
 # Настройка Django
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.append(str(BASE_DIR))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 django.setup()
 
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('keepalive.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("keepalive.log"), logging.StreamHandler()],
 )
 
 logger = logging.getLogger(__name__)
+
 
 class KeepaliveManager:
     """Менеджер для управления keepalive процессами"""
@@ -44,8 +43,11 @@ class KeepaliveManager:
 
             # Запускаем Django команду keepalive
             cmd = [
-                sys.executable, 'manage.py', 'keepalive',
-                '--interval', str(interval)
+                sys.executable,
+                "manage.py",
+                "keepalive",
+                "--interval",
+                str(interval),
             ]
 
             process = subprocess.Popen(
@@ -54,10 +56,10 @@ class KeepaliveManager:
                 stderr=subprocess.PIPE,
                 text=True,
                 bufsize=1,
-                universal_newlines=True
+                universal_newlines=True,
             )
 
-            self.processes['keepalive'] = process
+            self.processes["keepalive"] = process
             self.running = True
 
             logger.info("✅ Keepalive сервис запущен (PID: {process.pid})")
@@ -71,8 +73,8 @@ class KeepaliveManager:
 
     def stop_keepalive(self):
         """Останавливает keepalive сервис"""
-        if 'keepalive' in self.processes:
-            process = self.processes['keepalive']
+        if "keepalive" in self.processes:
+            process = self.processes["keepalive"]
             try:
                 process.terminate()
                 process.wait(timeout=10)
@@ -83,13 +85,13 @@ class KeepaliveManager:
             except Exception:
                 logger.error("❌ Ошибка остановки keepalive: {e}")
 
-            del self.processes['keepalive']
+            del self.processes["keepalive"]
             self.running = False
 
     def check_status(self):
         """Проверяет статус keepalive сервиса"""
-        if 'keepalive' in self.processes:
-            process = self.processes['keepalive']
+        if "keepalive" in self.processes:
+            process = self.processes["keepalive"]
             if process.poll() is None:
                 logger.info("🟢 Keepalive сервис активен (PID: {process.pid})")
                 return True
@@ -134,31 +136,26 @@ class KeepaliveManager:
             logger.error("❌ Ошибка в foreground режиме: {e}")
             self.stop_keepalive()
 
+
 def main():
     """Главная функция"""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Keepalive сервис ExamFlow 2.0')
+    parser = argparse.ArgumentParser(description="Keepalive сервис ExamFlow 2.0")
     parser.add_argument(
-        '--interval',
+        "--interval",
         type=int,
         default=300,
-        help='Интервал проверки в секундах (по умолчанию 300)'
+        help="Интервал проверки в секундах (по умолчанию 300)",
     )
     parser.add_argument(
-        '--foreground',
-        action='store_true',
-        help='Запустить в foreground режиме'
+        "--foreground", action="store_true", help="Запустить в foreground режиме"
     )
     parser.add_argument(
-        '--status',
-        action='store_true',
-        help='Показать статус keepalive сервиса'
+        "--status", action="store_true", help="Показать статус keepalive сервиса"
     )
     parser.add_argument(
-        '--stop',
-        action='store_true',
-        help='Остановить keepalive сервис'
+        "--stop", action="store_true", help="Остановить keepalive сервис"
     )
 
     args = parser.parse_args()
@@ -178,5 +175,6 @@ def main():
         logger.info("Используйте --status для проверки статуса")
         logger.info("Используйте --stop для остановки")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

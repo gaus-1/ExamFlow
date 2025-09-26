@@ -4,17 +4,18 @@
 
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from .base_command import BaseCommand
 
 
 class HelpCommand(BaseCommand):
     """Обработчик команды /help"""
-    
+
     async def execute(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         """Выполнить команду /help"""
         if not self.validate_update(update):
             return
-            
+
         help_text = """
 🤖 **ExamFlow Bot - Справка**
 
@@ -48,8 +49,8 @@ class HelpCommand(BaseCommand):
 **❓ Нужна помощь?**
 Напишите @examflow_support или используйте команду /start
         """
-        
+
         await self.send_message(update, context, help_text)
-    
+
     def get_command_name(self) -> str:
         return "/help"

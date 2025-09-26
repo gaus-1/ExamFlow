@@ -4,13 +4,8 @@
 """
 
 from .base_command import BaseCommand
-from .start_command import StartCommand
 from .help_command import HelpCommand
+from .start_command import StartCommand
 from .subjects_command import SubjectsCommand
 
-__all__ = [
-    'BaseCommand',
-    'StartCommand', 
-    'HelpCommand',
-    'SubjectsCommand'
-]
+__all__ = ["BaseCommand", "StartCommand", "HelpCommand", "SubjectsCommand"]

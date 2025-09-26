@@ -3,10 +3,12 @@
 Запускается при первом запросе к сайту (бесплатно)
 """
 
-import os
 import logging
+import os
 import threading
+
 from django.core.management import call_command
+
 from learning.models import Subject, Task
 
 logger = logging.getLogger(__name__)
@@ -15,11 +17,12 @@ logger = logging.getLogger(__name__)
 _startup_executed = False
 _startup_lock = threading.Lock()
 
+
 def should_run_startup():
     """Проверяет, нужно ли запускать автозапуск"""
     # Проверяем переменную окружения
-    auto_startup = os.getenv('AUTO_STARTUP_ENABLED', 'true').lower()
-    if auto_startup not in ['true', '1', 'yes']:
+    auto_startup = os.getenv("AUTO_STARTUP_ENABLED", "true").lower()
+    if auto_startup not in ["true", "1", "yes"]:
         logger.info("Автозапуск отключен через AUTO_STARTUP_ENABLED")
         return False
 
@@ -29,7 +32,8 @@ def should_run_startup():
         tasks_count = Task.objects.count()
 
         logger.info(
-            "Текущее состояние: {subjects_count} предметов, {tasks_count} заданий")
+            "Текущее состояние: {subjects_count} предметов, {tasks_count} заданий"
+        )
 
         # Если данных мало, запускаем парсинг
         if subjects_count < 3 or tasks_count < 10:
@@ -42,6 +46,7 @@ def should_run_startup():
     except Exception:
         logger.error("Ошибка проверки данных: {str(e)}")
         return True  # В случае ошибки пытаемся загрузить
+
 
 def run_startup_tasks():
     """Выполняет задачи автозапуска"""
@@ -56,41 +61,46 @@ def run_startup_tasks():
         try:
             # 1. Применяем миграции
             logger.info("📋 Применение миграций...")
-            call_command('migrate', verbosity=0)
+            call_command("migrate", verbosity=0)
 
             # 2. Загружаем базовые данные
             logger.info("📊 Загрузка базовых данных...")
-            call_command('load_sample_data', verbosity=0)
+            call_command("load_sample_data", verbosity=0)
 
             # 3. Быстрый парсинг ФИПИ (только основные предметы)
             logger.info("🔥 Быстрый парсинг материалов ФИПИ...")
-            call_command('parse_all_fipi', quick=True, verbosity=1)
+            call_command("parse_all_fipi", quick=True, verbosity=1)
 
             # 4. Настройка webhook
             logger.info("🤖 Настройка Telegram webhook...")
             try:
                 # Передаём вычисленный SITE_URL для корректного webhook
                 call_command(
-                    'setup_webhook',
-                    'set',
+                    "setup_webhook",
+                    "set",
                     url="{dj_settings.SITE_URL}/bot/webhook/",
-                    verbosity=0)
+                    verbosity=0,
+                )
             except Exception:
                 logger.warning("Ошибка настройки webhook: {str(e)}")
 
             # 5. Генерация голосовых подсказок (ограниченно)
             logger.info("🎤 Генерация голосовых подсказок...")
             try:
-                call_command('generate_voices', limit=20, verbosity=0)
+                call_command("generate_voices", limit=20, verbosity=0)
             except Exception:
                 logger.warning("Ошибка генерации голоса: {str(e)}")
 
             # 6. Запуск keep-alive (поддержание активности и еженедельные напоминания)
             try:
-                from core.keepalive import start_keepalive  # ленивый импорт, чтобы избежать циклов
+                from core.keepalive import (
+                    start_keepalive,  # ленивый импорт, чтобы избежать циклов
+                )
+
                 start_keepalive()
                 logger.info(
-                    "🌐 Keep-alive запущен (пинги каждые 10 минут, напоминания по воскресеньям)")
+                    "🌐 Keep-alive запущен (пинги каждые 10 минут, напоминания по воскресеньям)"
+                )
             except Exception:
                 logger.warning("Не удалось запустить keep-alive: {str(e)}")
 
@@ -106,6 +116,7 @@ def run_startup_tasks():
             logger.error("❌ Ошибка автозапуска: {str(e)}")
             _startup_executed = True  # Помечаем как выполненное, чтобы не повторять
 
+
 def run_startup_in_background():
     """Запускает автозапуск в фоновом потоке"""
     if not should_run_startup():
@@ -114,6 +125,7 @@ def run_startup_in_background():
     def background_task():
         # Небольшая задержка для стабилизации
         import time
+
         time.sleep(2)
         run_startup_tasks()
 
@@ -122,6 +134,7 @@ def run_startup_in_background():
     thread.start()
     logger.info("🔄 Автозапуск запущен в фоновом режиме...")
 
+
 def trigger_startup_on_first_request(get_response):
     """Middleware для запуска автозадач при первом запросе"""
 
@@ -129,7 +142,7 @@ def trigger_startup_on_first_request(get_response):
         global _startup_executed
 
         # Запускаем только при первом запросе
-        if not _startup_executed and not request.path.startswith('/admin'):
+        if not _startup_executed and not request.path.startswith("/admin"):
             run_startup_in_background()
 
         response = get_response(request)

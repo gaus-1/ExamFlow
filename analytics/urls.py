@@ -9,20 +9,21 @@ URL-маршруты для модуля аналитики
 """
 
 from django.urls import path
+
 from . import views
 
-app_name = 'analytics'
+app_name = "analytics"
 
 urlpatterns = [
     # Панели аналитики
-    path('', views.dashboard, name='dashboard'),
-    path('users/', views.users_analytics, name='users'),
-    path('tasks/', views.tasks_analytics, name='tasks'),
-
+    path("", views.dashboard, name="dashboard"),
+    path("users/", views.users_analytics, name="users"),
+    path("tasks/", views.tasks_analytics, name="tasks"),
     # API
-    path('api/stats/', views.api_stats, name='api_stats'),
+    path("api/stats/", views.api_stats, name="api_stats"),
     path(
-        'api/update-user-profile/',
+        "api/update-user-profile/",
         views.update_user_profile,
-        name='update_user_profile'),
-        ]
+        name="update_user_profile",
+    ),
+]

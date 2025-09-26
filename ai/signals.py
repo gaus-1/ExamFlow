@@ -1,10 +1,12 @@
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
-from django.contrib.auth import get_user_model
-from django.utils import timezone
-from datetime import timedelta
-from .models import AiRequest, AiLimit, AiProvider
 import logging
+from datetime import timedelta
+
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
+from django.utils import timezone
+
+from .models import AiLimit, AiProvider, AiRequest
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,7 @@ logger = logging.getLogger(__name__)
 # Получаем модель пользователя безопасно (apps уже готовы внутри AppConfig.ready)
 User = get_user_model()
 
+
 @receiver(post_save, sender=User)
 def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
     """Автоматически создает лимиты ИИ для нового пользователя"""
@@ -23,30 +26,33 @@ def create_ai_limits_for_new_user(sender, instance, created, **kwargs):
             # Создаем дневной лимит
             AiLimit.objects.create(  # type: ignore[attr-defined]
                 user=instance,
-                limit_type='daily',
+                limit_type="daily",
                 max_limit=30,  # 30 запросов в день для зарегистрированных
                 current_usage=0,
-                reset_date=timezone.now() + timedelta(days=1)
+                reset_date=timezone.now() + timedelta(days=1),
             )
 
             # Создаем месячный лимит
             AiLimit.objects.create(  # type: ignore[attr-defined]
                 user=instance,
-                limit_type='monthly',
+                limit_type="monthly",
                 max_limit=300,  # 300 запросов в месяц
                 current_usage=0,
-                reset_date=timezone.now() + timedelta(days=30)
+                reset_date=timezone.now() + timedelta(days=30),
             )
 
             logger.info(f"Созданы лимиты ИИ для пользователя {instance.username}")
 
         except Exception as e:
             logger.error(
-                f"Ошибка при создании лимитов ИИ для пользователя {instance.username}: {e}")
+                f"Ошибка при создании лимитов ИИ для пользователя {instance.username}: {e}"
+            )
+
 
 # ========================================
 # СИГНАЛЫ ДЛЯ ОБНОВЛЕНИЯ СТАТИСТИКИ ПРОВАЙДЕРОВ
 # ========================================
+
 
 @receiver(post_save, sender=AiRequest)
 def update_provider_statistics(sender, instance, **kwargs):
@@ -55,9 +61,11 @@ def update_provider_statistics(sender, instance, **kwargs):
     # так как у AiRequest нет поля provider
     # TODO: Добавить поле provider в модель или переработать логику
 
+
 # ========================================
 # СИГНАЛЫ ДЛЯ ОЧИСТКИ УСТАРЕВШИХ ДАННЫХ
 # ========================================
+
 
 @receiver(post_save, sender=AiLimit)
 def check_and_reset_limits(sender, instance, **kwargs):
@@ -68,38 +76,50 @@ def check_and_reset_limits(sender, instance, **kwargs):
             instance.current_usage = 0
 
             # Устанавливаем новую дату сброса
-            if instance.limit_type == 'daily':
+            if instance.limit_type == "daily":
                 instance.reset_date = timezone.now() + timedelta(days=1)
-            elif instance.limit_type == 'monthly':
+            elif instance.limit_type == "monthly":
                 instance.reset_date = timezone.now() + timedelta(days=30)
 
             instance.save()
             logger.info(
-                f"Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}")
+                f"Сброшен лимит {instance.limit_type} для пользователя {instance.user.username}"
+            )
 
     except Exception:
         logger.error("Ошибка при сбросе лимита: {e}")
+
 
 # ========================================
 # СИГНАЛЫ ДЛЯ ЛОГИРОВАНИЯ
 # ========================================
 
+
 @receiver(post_save, sender=AiRequest)
 def log_ai_request(sender, instance, created, **kwargs):
     """Логирует создание нового запроса к ИИ"""
     if created:
-        user_info = instance.user.username if instance.user else f"Session: {instance.session_id}"
+        user_info = (
+            instance.user.username
+            if instance.user
+            else f"Session: {instance.session_id}"
+        )
         logger.info(f"Новый запрос к ИИ от {user_info}: {instance.request_type}")
+
 
 @receiver(post_delete, sender=AiRequest)
 def log_ai_request_deletion(sender, instance, **kwargs):
     """Логирует удаление запроса к ИИ"""
-    user_info = instance.user.username if instance.user else f"Session: {instance.session_id}"
+    user_info = (
+        instance.user.username if instance.user else f"Session: {instance.session_id}"
+    )
     logger.info(f"Удален запрос к ИИ от {user_info}: {instance.request_type}")
+
 
 # ========================================
 # СИГНАЛЫ ДЛЯ УПРАВЛЕНИЯ КЭШЕМ
 # ========================================
+
 
 @receiver(post_save, sender=AiProvider)
 def clear_ai_cache_on_provider_update(sender, instance, **kwargs):
@@ -112,9 +132,11 @@ def clear_ai_cache_on_provider_update(sender, instance, **kwargs):
     except Exception:
         logger.error("Ошибка при очистке кэша ИИ: {e}")
 
+
 # ========================================
 # СИГНАЛЫ ДЛЯ МОНИТОРИНГА
 # ========================================
+
 
 @receiver(post_save, sender=AiRequest)
 def check_rate_limiting(sender, instance, **kwargs):
@@ -122,8 +144,7 @@ def check_rate_limiting(sender, instance, **kwargs):
     if instance.user:
         try:
             daily_limit = AiLimit.objects.filter(  # type: ignore[attr-defined]
-                user=instance.user,
-                limit_type='daily'
+                user=instance.user, limit_type="daily"
             ).first()
 
             if daily_limit and daily_limit.is_exceeded():
@@ -135,9 +156,11 @@ def check_rate_limiting(sender, instance, **kwargs):
         except Exception:
             logger.error("Ошибка при проверке лимитов: {e}")
 
+
 # ========================================
 # СИГНАЛЫ ДЛЯ АВТОМАТИЧЕСКОГО ВОССТАНОВЛЕНИЯ
 # ========================================
+
 
 @receiver(post_save, sender=AiProvider)
 def auto_reactivate_provider(sender, instance, **kwargs):

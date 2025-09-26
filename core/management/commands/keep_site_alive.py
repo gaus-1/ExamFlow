@@ -3,42 +3,42 @@
 Предотвращает "засыпание" сайта на Render
 """
 
-import requests
-import time
 import logging
+import time
+
+import requests
 from django.core.management.base import BaseCommand
 
 logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     help = 'Поддерживает сайт активным, предотвращая "засыпание" на Render'
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--interval',
+            "--interval",
             type=int,
             default=600,  # 10 минут по умолчанию
-            help='Интервал проверки в секундах (по умолчанию 600 = 10 минут)'
+            help="Интервал проверки в секундах (по умолчанию 600 = 10 минут)",
         )
         parser.add_argument(
-            '--continuous',
-            action='store_true',
-            help='Запустить в непрерывном режиме'
+            "--continuous", action="store_true", help="Запустить в непрерывном режиме"
         )
         parser.add_argument(
-            '--url',
+            "--url",
             type=str,
-            default='https://examflow.ru',
-            help='URL сайта для keep-alive'
+            default="https://examflow.ru",
+            help="URL сайта для keep-alive",
         )
 
     def handle(self, *args, **options):
-        interval = options['interval']
-        continuous = options['continuous']
-        site_url = options['url']
+        interval = options["interval"]
+        continuous = options["continuous"]
+        site_url = options["url"]
 
         self.stdout.write(
-            '🔄 Запуск keep-alive для сайта {site_url} (интервал: {interval}с)'
+            "🔄 Запуск keep-alive для сайта {site_url} (интервал: {interval}с)"
         )
 
         while True:
@@ -47,35 +47,37 @@ class Command(BaseCommand):
                 response = requests.get(
                     site_url,
                     timeout=30,
-                    headers={
-                        'User-Agent': 'ExamFlow-KeepAlive/1.0'
-                    }
+                    headers={"User-Agent": "ExamFlow-KeepAlive/1.0"},
                 )
 
-                timestamp = time.strftime('%H:%M:%S')
+                timestamp = time.strftime("%H:%M:%S")
                 if response.status_code == 200:
                     self.stdout.write(
-                        "✅ {timestamp} - Сайт активен (HTTP {response.status_code})")
+                        "✅ {timestamp} - Сайт активен (HTTP {response.status_code})"
+                    )
                     logger.info(
-                        "Сайт активен: {timestamp} - HTTP {response.status_code}")
+                        "Сайт активен: {timestamp} - HTTP {response.status_code}"
+                    )
                 else:
                     self.stdout.write(
-                        "⚠️ {timestamp} - Сайт отвечает, но статус {response.status_code}")
+                        "⚠️ {timestamp} - Сайт отвечает, но статус {response.status_code}"
+                    )
                     logger.warning(
-                        "Сайт отвечает со статусом {response.status_code}: {timestamp}")
+                        "Сайт отвечает со статусом {response.status_code}: {timestamp}"
+                    )
 
             except requests.exceptions.Timeout:
-                timestamp = time.strftime('%H:%M:%S')
+                timestamp = time.strftime("%H:%M:%S")
                 self.stdout.write("⏰ {timestamp} - Таймаут запроса к сайту")
                 logger.warning("Таймаут запроса к сайту: {timestamp}")
 
             except requests.exceptions.ConnectionError:
-                timestamp = time.strftime('%H:%M:%S')
+                timestamp = time.strftime("%H:%M:%S")
                 self.stdout.write("🔌 {timestamp} - Ошибка соединения: {e}")
                 logger.error("Ошибка соединения с сайтом: {e}")
 
             except Exception:
-                timestamp = time.strftime('%H:%M:%S')
+                timestamp = time.strftime("%H:%M:%S")
                 self.stdout.write("❌ {timestamp} - Неожиданная ошибка: {e}")
                 logger.error("Неожиданная ошибка keep-alive сайта: {e}")
 
@@ -84,4 +86,4 @@ class Command(BaseCommand):
 
             time.sleep(interval)
 
-        self.stdout.write('🏁 Keep-alive сайта завершен')
+        self.stdout.write("🏁 Keep-alive сайта завершен")

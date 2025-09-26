@@ -4,25 +4,27 @@
 Выявляет узкие места и предлагает оптимизации
 """
 
+import cProfile
+import io
 import os
+import pstats
 import sys
 import time
-import cProfile
-import pstats
-import io
 from pathlib import Path
 
 # Настройка Django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examflow_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "examflow_project.settings")
 
 try:
     import django
+
     django.setup()
+
+    from django.test import RequestFactory
 
     from core.container import Container
     from learning.models import Subject, Task
-    from django.test import RequestFactory
     from learning.views import home
 
 except ImportError as e:
@@ -48,7 +50,7 @@ class PerformanceAnalyzer:
             test_prompts = [
                 "Что такое производная?",
                 "Как решать квадратные уравнения?",
-                "Объясни интегралы"
+                "Объясни интегралы",
             ]
 
             times = []
@@ -58,7 +60,7 @@ class PerformanceAnalyzer:
                     response = ai_orchestrator.ask(prompt)
                     end_time = time.time()
 
-                    if response and 'answer' in response:
+                    if response and "answer" in response:
                         duration = end_time - start_time
                         times.append(duration)
                         print(f"  ✅ Запрос выполнен за {duration:.2f}с")
@@ -77,8 +79,8 @@ class PerformanceAnalyzer:
                 print(f"  📊 Максимальное: {max_time:.2f}с")
                 print(f"  📊 Минимальное: {min_time:.2f}с")
 
-                self.results['ai_avg_time'] = avg_time
-                self.results['ai_max_time'] = max_time
+                self.results["ai_avg_time"] = avg_time
+                self.results["ai_max_time"] = max_time
 
                 # Оценка производительности
                 if avg_time < 2.0:
@@ -97,7 +99,7 @@ class PerformanceAnalyzer:
 
         try:
             # Профилируем главную страницу
-            request = self.factory.get('/')
+            request = self.factory.get("/")
 
             # Используем cProfile для детального анализа
             profiler = cProfile.Profile()
@@ -116,15 +118,15 @@ class PerformanceAnalyzer:
             # Анализируем профиль
             s = io.StringIO()
             ps = pstats.Stats(profiler, stream=s)
-            ps.sort_stats('cumulative')
+            ps.sort_stats("cumulative")
             ps.print_stats(10)  # Топ 10 функций
 
             profile_output = s.getvalue()
 
             # Ищем медленные функции
             slow_functions = []
-            for line in profile_output.split('\n')[5:15]:  # Пропускаем заголовки
-                if line.strip() and 'function calls' not in line:
+            for line in profile_output.split("\n")[5:15]:  # Пропускаем заголовки
+                if line.strip() and "function calls" not in line:
                     parts = line.split()
                     if len(parts) >= 4:
                         try:
@@ -141,7 +143,7 @@ class PerformanceAnalyzer:
             else:
                 print("  ✅ Медленных функций не найдено")
 
-            self.results['view_time'] = total_time
+            self.results["view_time"] = total_time
 
             # Оценка
             if total_time < 0.1:
@@ -171,7 +173,7 @@ class PerformanceAnalyzer:
 
                 # Выполняем типичные операции
                 subjects = list(Subject.objects.filter(is_archived=False)[:10])
-                tasks = list(Task.objects.select_related('subject')[:20])
+                tasks = list(Task.objects.select_related("subject")[:20])
 
                 end_time = time.time()
 
@@ -186,9 +188,9 @@ class PerformanceAnalyzer:
                 slow_queries = []
                 for query in connection.queries:
                     try:
-                        query_time = float(query['time'])
+                        query_time = float(query["time"])
                         if query_time > 0.01:  # Запросы медленнее 10ms
-                            slow_queries.append((query['sql'][:100], query_time))
+                            slow_queries.append((query["sql"][:100], query_time))
                     except (KeyError, ValueError):
                         pass
 
@@ -199,8 +201,8 @@ class PerformanceAnalyzer:
                 else:
                     print("  ✅ Медленных запросов не найдено")
 
-                self.results['db_queries'] = query_count
-                self.results['db_time'] = total_time
+                self.results["db_queries"] = query_count
+                self.results["db_time"] = total_time
 
                 # Оценка
                 if query_count < 10 and total_time < 0.1:
@@ -222,32 +224,42 @@ class PerformanceAnalyzer:
 
             # Анализируем размеры по типам файлов
             file_stats = {
-                'python': {'count': 0, 'size': 0, 'extensions': ['.py']},
-                'templates': {'count': 0, 'size': 0, 'extensions': ['.html']},
-                'css': {'count': 0, 'size': 0, 'extensions': ['.css']},
-                'javascript': {'count': 0, 'size': 0, 'extensions': ['.js']},
-                'static': {'count': 0, 'size': 0, 'extensions': ['.png', '.jpg', '.svg', '.ico']},
+                "python": {"count": 0, "size": 0, "extensions": [".py"]},
+                "templates": {"count": 0, "size": 0, "extensions": [".html"]},
+                "css": {"count": 0, "size": 0, "extensions": [".css"]},
+                "javascript": {"count": 0, "size": 0, "extensions": [".js"]},
+                "static": {
+                    "count": 0,
+                    "size": 0,
+                    "extensions": [".png", ".jpg", ".svg", ".ico"],
+                },
             }
 
-            for file_path in project_root.rglob('*'):
-                if file_path.is_file() and not any(part.startswith('.') for part in file_path.parts):
+            for file_path in project_root.rglob("*"):
+                if file_path.is_file() and not any(
+                    part.startswith(".") for part in file_path.parts
+                ):
                     file_size = file_path.stat().st_size
                     file_ext = file_path.suffix.lower()
 
                     for file_type, stats in file_stats.items():
-                        if file_ext in stats['extensions']:
-                            stats['count'] += 1
-                            stats['size'] += file_size
+                        if file_ext in stats["extensions"]:
+                            stats["count"] += 1
+                            stats["size"] += file_size
                             break
 
             # Выводим статистику
-            total_size = sum(stats['size'] for stats in file_stats.values())
+            total_size = sum(stats["size"] for stats in file_stats.values())
 
             for file_type, stats in file_stats.items():
-                if stats['count'] > 0:
-                    size_mb = stats['size'] / 1024 / 1024
-                    percentage = (stats['size'] / total_size) * 100 if total_size > 0 else 0
-                    print(f"  📊 {file_type.title()}: {stats['count']} файлов, {size_mb:.1f}MB ({percentage:.1f}%)")
+                if stats["count"] > 0:
+                    size_mb = stats["size"] / 1024 / 1024
+                    percentage = (
+                        (stats["size"] / total_size) * 100 if total_size > 0 else 0
+                    )
+                    print(
+                        f"  📊 {file_type.title()}: {stats['count']} файлов, {size_mb:.1f}MB ({percentage:.1f}%)"
+                    )
 
             total_mb = total_size / 1024 / 1024
             print(f"  📊 Общий размер: {total_mb:.1f}MB")
@@ -268,16 +280,18 @@ class PerformanceAnalyzer:
         print("\n💡 РЕКОМЕНДАЦИИ ПО ОПТИМИЗАЦИИ:")
 
         # AI рекомендации
-        if 'ai_avg_time' in self.results:
-            if self.results['ai_avg_time'] > 3.0:
+        if "ai_avg_time" in self.results:
+            if self.results["ai_avg_time"] > 3.0:
                 print("  🔧 AI: Добавить более агрессивное кэширование")
                 print("  🔧 AI: Рассмотреть асинхронную обработку")
 
         # БД рекомендации
-        if 'db_queries' in self.results:
-            if self.results['db_queries'] > 15:
+        if "db_queries" in self.results:
+            if self.results["db_queries"] > 15:
                 print("  🔧 БД: Добавить select_related() и prefetch_related()")
-                print("  🔧 БД: Рассмотреть денормализацию для часто используемых данных")
+                print(
+                    "  🔧 БД: Рассмотреть денормализацию для часто используемых данных"
+                )
 
         # Общие рекомендации
         print("  ✅ Продолжить использование Redis кэширования")

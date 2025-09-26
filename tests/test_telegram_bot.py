@@ -2,9 +2,11 @@
 Тесты для Telegram бота
 """
 
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.test import TestCase
+
 from core.models import Subject, Task
+
 
 class TestTelegramBot(TestCase):
     """Тесты для Telegram бота"""
@@ -15,24 +17,22 @@ class TestTelegramBot(TestCase):
         User = get_user_model()
         self.user = User.objects.create(  # type: ignore
             telegram_id=123456789,
-            telegram_username='testuser',
-            telegram_first_name='Test',
-            telegram_last_name='User'
+            telegram_username="testuser",
+            telegram_first_name="Test",
+            telegram_last_name="User",
         )
 
         # Создаем тестовые данные
         self.subject = Subject.objects.create(  # type: ignore
-            name='Математика',
-            code='MATH',
-            exam_type='ege'
+            name="Математика", code="MATH", exam_type="ege"
         )
 
         self.task = Task.objects.create(  # type: ignore
-            title='Тестовое задание',
-            text='Решите уравнение: x + 2 = 5',
-            answer='3',
+            title="Тестовое задание",
+            text="Решите уравнение: x + 2 = 5",
+            answer="3",
             subject=self.subject,
-            difficulty=1
+            difficulty=1,
         )
 
     def test_bot_initialization(self):
@@ -44,26 +44,26 @@ class TestTelegramBot(TestCase):
 
     def test_user_creation(self):
         """Тест создания пользователя"""
-        self.assertEqual(self.user.telegram_username, 'testuser')
+        self.assertEqual(self.user.telegram_username, "testuser")
         # email отсутствует у TelegramUser по умолчанию
 
     def test_subject_creation(self):
         """Тест создания предмета"""
-        self.assertEqual(self.subject.name, 'Математика')
-        self.assertEqual(self.subject.exam_type, 'ege')
+        self.assertEqual(self.subject.name, "Математика")
+        self.assertEqual(self.subject.exam_type, "ege")
 
     def test_task_creation(self):
         """Тест создания задания"""
-        self.assertEqual(self.task.title, 'Тестовое задание')
-        self.assertEqual(self.task.answer, '3')
+        self.assertEqual(self.task.title, "Тестовое задание")
+        self.assertEqual(self.task.answer, "3")
         self.assertEqual(self.task.subject, self.subject)
 
     def test_bot_commands(self):
         """Тест команд бота"""
         # Проверяем, что основные команды доступны
-        commands = ['/start', '/help', '/subjects', '/tasks']
+        commands = ["/start", "/help", "/subjects", "/tasks"]
         for command in commands:
-            self.assertTrue(command.startswith('/'))
+            self.assertTrue(command.startswith("/"))
 
     def test_user_authentication(self):
         """Тест аутентификации пользователя"""
@@ -74,7 +74,7 @@ class TestTelegramBot(TestCase):
     def test_task_solving(self):
         """Тест решения задания"""
         # Проверяем, что задание имеет правильный ответ
-        self.assertEqual(self.task.answer, '3')
+        self.assertEqual(self.task.answer, "3")
         self.assertEqual(self.task.difficulty, 1)
 
     def test_subject_tasks_relationship(self):
@@ -105,19 +105,19 @@ class TestTelegramBot(TestCase):
         """Тест уровней сложности заданий"""
         # Создаем задания с разными уровнями сложности
         easy_task = Task.objects.create(  # type: ignore
-            title='Легкое задание',
-            text='Простое уравнение',
-            answer='1',
+            title="Легкое задание",
+            text="Простое уравнение",
+            answer="1",
             subject=self.subject,
-            difficulty=1
+            difficulty=1,
         )
 
         medium_task = Task.objects.create(  # type: ignore
-            title='Среднее задание',
-            text='Уравнение средней сложности',
-            answer='2',
+            title="Среднее задание",
+            text="Уравнение средней сложности",
+            answer="2",
             subject=self.subject,
-            difficulty=2
+            difficulty=2,
         )
 
         self.assertEqual(easy_task.difficulty, 1)
@@ -143,4 +143,4 @@ class TestTelegramBot(TestCase):
         # Проверяем, что задание доступно пользователю
         available_task = user_tasks.first()
         self.assertIsNotNone(available_task)
-        self.assertEqual(available_task.title, 'Тестовое задание')
+        self.assertEqual(available_task.title, "Тестовое задание")

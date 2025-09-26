@@ -5,21 +5,24 @@
 
 import logging
 from datetime import timedelta
-from django.utils import timezone
+
 from django.conf import settings
+from django.utils import timezone
 
 try:
     import requests  # type: ignore
 except Exception:  # pragma: no cover
     requests = None
 
-from core.models import UserProfile, ReminderLog
+from core.models import ReminderLog, UserProfile
 
 logger = logging.getLogger(__name__)
 
 REMINDER_TEXT = (
     "Привет! Напоминаем о ExamFlow — можно тренироваться по заданиям ЕГЭ/ОГЭ, смотреть прогресс и повторять сложные темы. "
-    "Возвращайтесь, чтобы не терять темп!")
+    "Возвращайтесь, чтобы не терять темп!"
+)
+
 
 def _send_tg_message(bot_token: str, chat_id: str, text: str) -> bool:
     if not (requests and bot_token and chat_id):
@@ -36,9 +39,10 @@ def _send_tg_message(bot_token: str, chat_id: str, text: str) -> bool:
         logger.warning("Не удалось отправить напоминание: {e}")
         return False
 
+
 def send_weekly_inactive_reminders(limit: int = 200) -> int:
     """Отправляет напоминания тем, кто был неактивен >= 7 дней. Возвращает кол-во отправленных."""
-    bot_token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+    bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
     if not (requests and bot_token):
         logger.info("Telegram недоступен или токен не задан — напоминания пропущены")
         return 0
@@ -48,8 +52,9 @@ def send_weekly_inactive_reminders(limit: int = 200) -> int:
     sent = 0
 
     # Ищем профили с telegram_id и last_activity < 7 дней назад
-    qs = UserProfile.objects.filter(
-        telegram_id__isnull=False).select_related('user')  # type: ignore
+    qs = UserProfile.objects.filter(telegram_id__isnull=False).select_related(
+        "user"
+    )  # type: ignore
     for profile in qs.iterator():
         if profile.last_activity and profile.last_activity > threshold:
             continue
@@ -59,7 +64,8 @@ def send_weekly_inactive_reminders(limit: int = 200) -> int:
 
         # Проверим лог: не слали ли уже за последние 7 дней
         log = ReminderLog.objects.filter(
-            user=user, reminder_type='weekly_inactive').first()  # type: ignore
+            user=user, reminder_type="weekly_inactive"
+        ).first()  # type: ignore
         if log and log.last_sent_at and log.last_sent_at > threshold:
             continue
 
@@ -67,8 +73,8 @@ def send_weekly_inactive_reminders(limit: int = 200) -> int:
         if ok:
             ReminderLog.objects.update_or_create(  # type: ignore
                 user=user,
-                reminder_type='weekly_inactive',
-                defaults={'last_sent_at': now},
+                reminder_type="weekly_inactive",
+                defaults={"last_sent_at": now},
             )
             sent += 1
 

@@ -4,11 +4,12 @@
 Предотвращает "засыпание" базы данных из-за неактивности
 """
 
+import logging
 import os
 import time
-import logging
-import psycopg2
 from datetime import datetime
+
+import psycopg2
 import schedule
 from dotenv import load_dotenv
 
@@ -18,18 +19,16 @@ load_dotenv()
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('database_keepalive.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("database_keepalive.log"), logging.StreamHandler()],
 )
 
 logger = logging.getLogger(__name__)
 
+
 class DatabaseKeepAlive:
     def __init__(self):
-        self.db_url = os.getenv('DATABASE_URL')
+        self.db_url = os.getenv("DATABASE_URL")
         self.connection = None
         self.last_ping = None
         self.ping_interval = 300  # 5 минут
@@ -82,13 +81,15 @@ class DatabaseKeepAlive:
 
             with conn.cursor() as cursor:
                 # Простой запрос, который не нагружает базу
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT
                         current_timestamp,
                         version(),
                         current_database(),
                         current_user
-                """)
+                """
+                )
 
                 result = cursor.fetchone()
                 if result:
@@ -110,23 +111,27 @@ class DatabaseKeepAlive:
 
             with conn.cursor() as cursor:
                 # Проверяем активные соединения
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT
                         count(*) as active_connections,
                         max(backend_start) as oldest_connection
                     FROM pg_stat_activity
                     WHERE state = 'active'
-                """)
+                """
+                )
 
                 connections = cursor.fetchone()
                 if connections:
                     logger.info("Активных соединений: {connections[0]}")
 
                 # Проверяем размер базы данных
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT
                         pg_size_pretty(pg_database_size(current_database())) as db_size
-                """)
+                """
+                )
 
                 size = cursor.fetchone()
                 if size:
@@ -147,18 +152,22 @@ class DatabaseKeepAlive:
 
             with conn.cursor() as cursor:
                 # Проверяем настройки соединений
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SHOW max_connections;
-                """)
+                """
+                )
 
                 max_conn = cursor.fetchone()
                 if max_conn:
                     logger.info("Максимум соединений: {max_conn[0]}")
 
                 # Проверяем таймауты
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SHOW idle_in_transaction_session_timeout;
-                """)
+                """
+                )
 
                 timeout = cursor.fetchone()
                 if timeout:
@@ -242,16 +251,20 @@ class DatabaseKeepAlive:
 
             # Проверяем доступные таблицы
             with conn.cursor() as cursor:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT table_name
                     FROM information_schema.tables
                     WHERE table_schema = 'public'
                     LIMIT 5
-                """)
+                """
+                )
 
                 tables = cursor.fetchall()
                 if tables:
-                    logger.info("Доступные таблицы: {', '.join([t[0] for t in tables])}")
+                    logger.info(
+                        "Доступные таблицы: {', '.join([t[0] for t in tables])}"
+                    )
 
             return True
 
@@ -259,12 +272,13 @@ class DatabaseKeepAlive:
             logger.error("Ошибка тестирования: {e}")
             return False
 
+
 def main():
     """Основная функция"""
     logger.info("Запуск системы поддержания активности базы данных")
 
     # Проверяем наличие DATABASE_URL
-    if not os.getenv('DATABASE_URL'):
+    if not os.getenv("DATABASE_URL"):
         logger.error("DATABASE_URL не найден в переменных окружения")
         return
 
@@ -278,6 +292,7 @@ def main():
 
     # Запускаем запланированное поддержание активности
     keepalive.start_scheduled_keepalive()
+
 
 if __name__ == "__main__":
     main()

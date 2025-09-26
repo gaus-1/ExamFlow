@@ -6,18 +6,19 @@
 import os
 import subprocess
 
+
 def fix_pep8_issues():
     """Исправляет основные PEP 8 проблемы"""
 
     # Директории для обработки
     dirs_to_fix = [
-        'ai',
-        'core',
-        'authentication',
-        'learning',
-        'telegram_bot',
-        'analytics',
-        'themes'
+        "ai",
+        "core",
+        "authentication",
+        "learning",
+        "telegram_bot",
+        "analytics",
+        "themes",
     ]
 
     print("🔧 Начинаем исправление PEP 8 ошибок...")
@@ -28,15 +29,19 @@ def fix_pep8_issues():
 
             # Запускаем autopep8 для автоматического исправления
             try:
-                result = subprocess.run([
-                    'autopep8',
-                    '--in-place',
-                    '--aggressive',
-                    '--aggressive',
-                    '--max-line-length=88',
-                    '--recursive',
-                    dir_name
-                ], capture_output=True, text=True)
+                result = subprocess.run(
+                    [
+                        "autopep8",
+                        "--in-place",
+                        "--aggressive",
+                        "--aggressive",
+                        "--max-line-length=88",
+                        "--recursive",
+                        dir_name,
+                    ],
+                    capture_output=True,
+                    text=True,
+                )
 
                 if result.returncode == 0:
                     print("✅ {dir_name}/ - исправлено")
@@ -45,10 +50,11 @@ def fix_pep8_issues():
 
             except FileNotFoundError:
                 print("❌ autopep8 не установлен. Устанавливаем...")
-                subprocess.run(['pip', 'install', 'autopep8'])
+                subprocess.run(["pip", "install", "autopep8"])
                 continue
 
     print("🎉 Исправление завершено!")
+
 
 def remove_unused_imports():
     """Удаляет неиспользуемые импорты"""
@@ -57,17 +63,27 @@ def remove_unused_imports():
 
     try:
         # Устанавливаем autoflake если не установлен
-        subprocess.run(['pip', 'install', 'autoflake'], check=True)
+        subprocess.run(["pip", "install", "autoflake"], check=True)
 
         # Удаляем неиспользуемые импорты
-        result = subprocess.run([
-            'autoflake',
-            '--in-place',
-            '--remove-all-unused-imports',
-            '--remove-unused-variables',
-            '--recursive',
-            'ai', 'core', 'authentication', 'learning', 'telegram_bot', 'analytics', 'themes'
-        ], capture_output=True, text=True)
+        result = subprocess.run(
+            [
+                "autoflake",
+                "--in-place",
+                "--remove-all-unused-imports",
+                "--remove-unused-variables",
+                "--recursive",
+                "ai",
+                "core",
+                "authentication",
+                "learning",
+                "telegram_bot",
+                "analytics",
+                "themes",
+            ],
+            capture_output=True,
+            text=True,
+        )
 
         if result.returncode == 0:
             print("✅ Неиспользуемые импорты удалены")
@@ -77,9 +93,10 @@ def remove_unused_imports():
     except Exception:
         print("❌ Ошибка: {e}")
 
+
 if __name__ == "__main__":
     fix_pep8_issues()
     remove_unused_imports()
 
     print("\n📊 Проверяем результат...")
-    subprocess.run(['flake8', '--max-line-length=88', '--statistics', '.'])
+    subprocess.run(["flake8", "--max-line-length=88", "--statistics", "."])
