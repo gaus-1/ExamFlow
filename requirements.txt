@@ -20,7 +20,7 @@ python-dotenv==1.0.0
 requests==2.31.0
 
 # ===== БАЗА ДАННЫХ =====
-dj-database-url==2.1.0
+dj-database-url==3.0.1
 
 # ===== БЕЗОПАСНОСТЬ =====
 cryptography==41.0.7
