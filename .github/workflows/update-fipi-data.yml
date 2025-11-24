@@ -18,7 +18,7 @@ jobs:
     
     steps:
       - name: 📥 Клонирование репозитория
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: 🐍 Настройка Python
         uses: actions/setup-python@v4
