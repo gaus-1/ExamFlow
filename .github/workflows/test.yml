@@ -382,7 +382,7 @@ jobs:
           bandit -r . -f json -o reports/bandit-report.json
       
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: security-reports
           path: reports/
@@ -549,7 +549,7 @@ jobs:
         echo "Load test completed" > reports/load_test_report.html
     
     - name: Upload load test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: load-test-results
         path: reports/load_test_report.html
@@ -579,7 +579,7 @@ jobs:
       run: safety check --json --output reports/safety-report.json
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: security-reports
         path: reports/
