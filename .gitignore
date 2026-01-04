@@ -30,19 +30,13 @@ ENV/
 local_settings.py
 db.sqlite3
 
-# IDE
-.vscode/
-.idea/
-
-# Editor and IDE specific
+# Development tools configs
 .*workspace
 .*rules
 .*/
 *.swp
 *.swo
 *~
-# Hidden directories (editor configs)
-.*/
 
 # OS
 .DS_Store
