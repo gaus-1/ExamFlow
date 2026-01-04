@@ -11,7 +11,7 @@ from django.core.cache import cache
 logger = logging.getLogger(__name__)
 
 
-def is_mobile_device(user_agent: str = None) -> bool:
+def is_mobile_device(user_agent: str | None = None) -> bool:
     """
     Определяет, является ли устройство мобильным
     """
