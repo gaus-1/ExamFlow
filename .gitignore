@@ -35,9 +35,7 @@ db.sqlite3
 .idea/
 
 # Editor and IDE specific
-.cursor/
-.cursorerules
-*.code-workspace
+.*workspace
 *.swp
 *.swo
 *~
