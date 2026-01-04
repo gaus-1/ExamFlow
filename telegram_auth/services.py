@@ -93,8 +93,8 @@ class TelegramAuthService:
     def authenticate_user(
         self,
         auth_data: dict[str, Any],
-        ip_address: str = None,  # type: ignore
-        user_agent: str = None,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
     ) -> tuple[bool, TelegramUser | None, str]:  # type: ignore
         """
         Аутентифицирует пользователя через Telegram данные
@@ -170,8 +170,8 @@ class TelegramAuthService:
     def _create_auth_session(
         self,
         user: TelegramUser,
-        ip_address: str = None,  # type: ignore
-        user_agent: str = None,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
     ) -> TelegramAuthSession:  # type: ignore
         """Создает сессию аутентификации"""
         import secrets
@@ -193,9 +193,9 @@ class TelegramAuthService:
         self,
         telegram_id: int,
         success: bool,
-        ip_address: str = None,
-        user_agent: str = None,  # type: ignore
-        error_message: str = None,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+        error_message: str | None = None,
     ):  # type: ignore
         """Логирует попытку аутентификации"""
         TelegramAuthLog.objects.create(  # type: ignore
