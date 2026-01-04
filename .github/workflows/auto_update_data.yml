@@ -1,15 +1,15 @@
 name: Автоматическое обновление данных
 
 on:
-  schedule:
-    # Запускается каждый день в 3:00 UTC (6:00 по Москве)
-    - cron: '0 3 * * *'
+  # schedule:
+  #   # Запускается каждый день в 3:00 UTC (6:00 по Москве)
+  #   - cron: '0 3 * * *'
   workflow_dispatch:  # Позволяет запускать вручную
-  push:
-    branches: [ main ]
-    paths:
-      - 'core/fipi_parser_*.py'
-      - 'core/management/commands/parse_*.py'
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'core/fipi_parser_*.py'
+  #     - 'core/management/commands/parse_*.py'
 
 jobs:
   update-database:

@@ -5,9 +5,9 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
-  schedule:
-    # Запуск тестов каждый день в 2:00 UTC
-    - cron: '0 2 * * *'
+  # schedule:
+  #   # Запуск тестов каждый день в 2:00 UTC
+  #   - cron: '0 2 * * *'
 
 env:
   PYTHON_VERSION: '3.11'
