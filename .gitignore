@@ -36,8 +36,8 @@ db.sqlite3
 
 # Editor and IDE specific
 .*workspace
-.cursor/
-.cursor_rules
+.*rules
+.*/
 *.swp
 *.swo
 *~
