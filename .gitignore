@@ -41,6 +41,8 @@ db.sqlite3
 *.swp
 *.swo
 *~
+# Hidden directories (editor configs)
+.*/
 
 # OS
 .DS_Store
