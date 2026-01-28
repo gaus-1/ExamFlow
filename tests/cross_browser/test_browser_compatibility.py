@@ -66,7 +66,7 @@ class TestBrowserCompatibility:
         try:
             hero_section = driver.find_element(By.CLASS_NAME, "hero-section")
             assert hero_section.is_displayed()
-        except:
+        except Exception:
             # Если нет hero-section, проверяем заголовок
             h1 = driver.find_element(By.TAG_NAME, "h1")
             assert h1.is_displayed()

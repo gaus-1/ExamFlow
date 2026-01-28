@@ -57,7 +57,7 @@ def test_ai_website():
                 else:
                     print("AI ответ: ✗ (пустой)")
                     return False
-            except:
+            except Exception:
                 print("AI ответ: ✗ (не JSON)")
                 return False
         else:

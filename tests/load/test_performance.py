@@ -70,7 +70,7 @@ class ExamFlowUser(HttpUser):
                     # Выбираем случайный предмет
                     subject = random.choice(subjects)
                     self.view_subject_tasks(subject["id"])
-            except:
+            except Exception:
                 pass
 
     def view_subject_tasks(self, subject_id):
@@ -86,7 +86,7 @@ class ExamFlowUser(HttpUser):
                     # Выбираем случайное задание
                     task = random.choice(tasks)
                     self.view_task_detail(task["id"])
-            except:
+            except Exception:
                 pass
 
     def view_task_detail(self, task_id):
@@ -194,7 +194,7 @@ class ExamFlowAPIUser(HttpUser):
                         self.client.get(
                             f'/api/tasks/{task["id"]}/', name="api_task_detail"
                         )
-            except:
+            except Exception:
                 pass
 
     @task(3)
