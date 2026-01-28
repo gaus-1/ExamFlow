@@ -91,18 +91,15 @@ def run_startup_tasks():
             except Exception:
                 logger.warning("Ошибка генерации голоса: {str(e)}")
 
-            # 6. Запуск keep-alive (поддержание активности и еженедельные напоминания)
-            try:
-                from core.keepalive import (
-                    start_keepalive,  # ленивый импорт, чтобы избежать циклов
-                )
-
-                start_keepalive()
-                logger.info(
-                    "🌐 Keep-alive запущен (пинги каждые 10 минут, напоминания по воскресеньям)"
-                )
-            except Exception:
-                logger.warning("Не удалось запустить keep-alive: {str(e)}")
+            # 6. Keep-alive ОТКЛЮЧЁН (на паузе) — не пингуем сайт/БД/бота
+            # Чтобы включить снова: раскомментировать блок и установить core.keepalive
+            # try:
+            #     from core.keepalive import start_keepalive
+            #     start_keepalive()
+            #     logger.info("🌐 Keep-alive запущен ...")
+            # except Exception:
+            #     logger.warning("Не удалось запустить keep-alive: {str(e)}")
+            logger.info("⏸️ Keep-alive на паузе (не запускается)")
 
             _startup_executed = True
             logger.info("✅ Автозапуск завершен успешно!")

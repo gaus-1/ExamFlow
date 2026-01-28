@@ -1,11 +1,12 @@
 name: 🧪 Тестирование и деплой
 
+# ⏸️ На паузе: запуск только вручную. Push/PR не триггерят.
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
+  # push:
+  #   branches: [ main, master ]
+  # pull_request:
+  #   branches: [ main, master ]
 
 jobs:
   test:

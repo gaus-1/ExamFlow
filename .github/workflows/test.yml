@@ -1,13 +1,12 @@
 name: ExamFlow Tests
 
+# ⏸️ На паузе: запуск только вручную (workflow_dispatch). Push/PR не триггерят.
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-  # schedule:
-  #   # Запуск тестов каждый день в 2:00 UTC
-  #   - cron: '0 2 * * *'
+  workflow_dispatch:
+  # push:
+  #   branches: [ main, develop ]
+  # pull_request:
+  #   branches: [ main, develop ]
 
 env:
   PYTHON_VERSION: '3.11'

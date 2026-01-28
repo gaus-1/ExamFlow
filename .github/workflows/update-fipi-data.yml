@@ -91,26 +91,13 @@ jobs:
               print(f'  Сложность {diff}: {count} заданий')
           "
           
-      - name: 📤 Коммит обновленных данных
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          # Добавляем все изменения
-          git add .
-          
-          # Коммитим с описанием
-          git commit -m "🔄 Автоматическое обновление данных ФИПИ и РешуЕГЭ
-          
-          - Обновлено: $(date)
-          - Предметов: $(python manage.py shell -c 'from learning.models import Subject; print(Subject.objects.count())')
-          - Заданий: $(python manage.py shell -c 'from learning.models import Task; print(Task.objects.count())')
-          - Источник: GitHub Actions
-          "
-          
-      - name: 🚀 Пуш изменений
-        run: |
-          git push origin main
+      # ⏸️ На паузе: коммит и пуш отключены (ничего не отправляется на GitHub)
+      # - name: 📤 Коммит обновленных данных
+      #   run: |
+      #     git config --local user.email "action@github.com"
+      #     ...
+      # - name: 🚀 Пуш изменений
+      #   run: git push origin main
           
       - name: 📧 Уведомление о завершении
         if: always()
